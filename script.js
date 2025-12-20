@@ -1,3 +1,9 @@
+// Auth Check
+const token = localStorage.getItem('synchroEditToken');
+if (!token) {
+    window.location.href = 'login.html';
+}
+
 // Initialize Quill Editor with external toolbar
 const quill = new Quill('#editor', {
     theme: 'snow',
@@ -70,52 +76,41 @@ function getDocumentId() {
     return docId;
 }
 
-// Document Storage Management
-function getAllDocuments() {
-    const docsJson = localStorage.getItem('allDocuments');
-    return docsJson ? JSON.parse(docsJson) : {};
+// Document Storage Management (Backend API)
+async function getAllDocuments() {
+    try {
+        const response = await fetch('/api/documents', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch');
+        return await response.json();
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
 }
 
-function saveDocumentToStorage() {
-    const allDocs = getAllDocuments();
-    allDocs[documentId] = {
-        id: documentId,
-        title: docTitle.value || 'Untitled document',
-        pages: pages,
-        currentPageIndex: currentPageIndex,
-        lastModified: new Date().toISOString(),
-        preview: quill.getText().substring(0, 100)
-    };
-    localStorage.setItem('allDocuments', JSON.stringify(allDocs));
-}
-
-function loadDocumentFromStorage(docId) {
-    const allDocs = getAllDocuments();
-    return allDocs[docId] || null;
-}
-
-function deleteDocumentFromStorage(docId) {
-    const allDocs = getAllDocuments();
-    delete allDocs[docId];
-    localStorage.setItem('allDocuments', JSON.stringify(allDocs));
-}
-
-function createNewDocument() {
-    // Generate new document ID
-    const newDocId = 'doc_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-    
-    // Save current document first
-    saveDocumentToStorage();
-    
-    // Navigate to new document
-    window.location.href = `${window.location.pathname}?doc=${newDocId}`;
+async function createNewDocument() {
+    try {
+        const response = await fetch('/api/documents', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                title: 'Untitled document',
+                pages: [{ content: '' }]
+            })
+        });
+        const doc = await response.json();
+        window.location.href = `${window.location.pathname}?doc=${doc._id}`;
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 function openDocument(docId) {
-    // Save current document first
-    saveDocumentToStorage();
-    
-    // Navigate to selected document
     window.location.href = `${window.location.pathname}?doc=${docId}`;
 }
 
@@ -1320,17 +1315,16 @@ function setupDocumentLibrary() {
 // Logout handler
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to logout? Your work will be saved.')) {
-            saveDocumentToStorage();
-            sessionStorage.removeItem('synchroEditAuth');
-            sessionStorage.removeItem('synchroEditUser');
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('synchroEditToken');
+            localStorage.removeItem('synchroEditUser');
             window.location.href = 'login.html';
         }
     });
 }
 
 // Display logged-in user
-const username = sessionStorage.getItem('synchroEditUser');
+const username = localStorage.getItem('synchroEditUser');
 if (username && logoutBtn) {
     logoutBtn.innerHTML = `<i class="fas fa-user"></i> ${username} <i class="fas fa-sign-out-alt"></i>`;
 }

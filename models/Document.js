@@ -1,0 +1,29 @@
+const mongoose = require('mongoose');
+
+const documentSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        default: 'Untitled document'
+    },
+    pages: [{
+        content: {
+            type: String,
+            default: ''
+        }
+    }],
+    currentPageIndex: {
+        type: Number,
+        default: 0
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    lastModified: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = mongoose.model('Document', documentSchema);

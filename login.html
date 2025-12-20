@@ -463,37 +463,6 @@
     <a href="index.html" class="skip-link">Skip login →</a>
 
     <script>
-        // User Management
-        function getUsers() {
-            const users = localStorage.getItem('synchroEditUsers');
-            return users ? JSON.parse(users) : {};
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem('synchroEditUsers', JSON.stringify(users));
-        }
-
-        function createUser(username, password) {
-            const users = getUsers();
-            if (users[username]) {
-                return { success: false, message: 'Username already exists' };
-            }
-            if (username.length < 3) {
-                return { success: false, message: 'Username must be at least 3 characters' };
-            }
-            if (password.length < 6) {
-                return { success: false, message: 'Password must be at least 6 characters' };
-            }
-            users[username] = { password, createdAt: new Date().toISOString() };
-            saveUsers(users);
-            return { success: true, message: 'Account created successfully!' };
-        }
-
-        function validateUser(username, password) {
-            const users = getUsers();
-            return users[username] && users[username].password === password;
-        }
-
         // Elements - Login
         const loginForm = document.getElementById('loginForm');
         const loginUsernameInput = document.getElementById('loginUsername');
@@ -522,7 +491,6 @@
         let signupPasswordVisible = false;
         let currentEmotion = 'neutral';
         let activeForm = 'login';
-        let activeUsernameInput = loginUsernameInput;
 
         // Set emotion
         function setEmotion(emotion) {
@@ -570,7 +538,6 @@
             loginForm.classList.remove('active');
             signupForm.classList.add('active');
             activeForm = 'signup';
-            activeUsernameInput = signupUsernameInput;
             setEmotion('neutral');
             signupUsernameInput.focus();
         });
@@ -579,157 +546,39 @@
             signupForm.classList.remove('active');
             loginForm.classList.add('active');
             activeForm = 'login';
-            activeUsernameInput = loginUsernameInput;
             setEmotion('neutral');
             loginUsernameInput.focus();
         });
 
-        // Username input handler - LOGIN
-        let loginUsernameTimeout = null;
-        loginUsernameInput.addEventListener('input', () => {
-            const username = loginUsernameInput.value;
-            
-            if (loginUsernameTimeout) {
-                clearTimeout(loginUsernameTimeout);
-            }
-            
-            if (username === '') {
-                setEmotion('neutral');
-            } else {
-                const users = getUsers();
-                if (users[username]) {
-                    setEmotion('happy');
-                } else {
-                    setEmotion('sad');
-                    loginUsernameTimeout = setTimeout(() => {
-                        if (loginUsernameInput.value !== '' && !getUsers()[loginUsernameInput.value]) {
-                            setEmotion('shake-head');
-                            setTimeout(() => setEmotion('sad'), 400);
-                        }
-                    }, 800);
-                }
-            }
-        });
-
-        // Username input handler - SIGNUP
-        let signupUsernameTimeout = null;
-        signupUsernameInput.addEventListener('input', () => {
-            const username = signupUsernameInput.value;
-            
-            if (signupUsernameTimeout) {
-                clearTimeout(signupUsernameTimeout);
-            }
-            
-            if (username === '') {
-                setEmotion('neutral');
-            } else if (username.length < 3) {
-                setEmotion('sad');
-            } else {
-                const users = getUsers();
-                if (users[username]) {
-                    setEmotion('sad');
-                    signupUsernameTimeout = setTimeout(() => {
-                        if (signupUsernameInput.value !== '' && getUsers()[signupUsernameInput.value]) {
-                            setEmotion('shake-head');
-                            setTimeout(() => setEmotion('sad'), 400);
-                        }
-                    }, 800);
-                } else {
-                    setEmotion('happy');
-                }
-            }
-        });
-
-        // Password input handlers - LOGIN
-        loginPasswordInput.addEventListener('input', () => {
-            if (!loginPasswordVisible && loginPasswordInput.value) {
-                setEmotion('looking');
-            }
-        });
-
+        // Password input handlers
         loginPasswordInput.addEventListener('focus', () => {
-            if (!loginPasswordVisible) {
-                setEmotion('looking');
-            } else {
-                setEmotion('shy');
-            }
-        });
-
-        loginPasswordInput.addEventListener('blur', () => {
-            const users = getUsers();
-            if (users[loginUsernameInput.value]) {
-                setEmotion('happy');
-            } else if (loginUsernameInput.value === '') {
-                setEmotion('neutral');
-            } else {
-                setEmotion('sad');
-            }
-        });
-
-        // Password input handlers - SIGNUP
-        signupPasswordInput.addEventListener('input', () => {
-            if (!signupPasswordVisible && signupPasswordInput.value) {
-                setEmotion('looking');
-            }
+            if (!loginPasswordVisible) setEmotion('looking');
+            else setEmotion('shy');
         });
 
         signupPasswordInput.addEventListener('focus', () => {
-            if (!signupPasswordVisible) {
-                setEmotion('looking');
-            } else {
-                setEmotion('shy');
-            }
-        });
-
-        signupPasswordConfirm.addEventListener('focus', () => {
-            setEmotion('looking');
+            if (!signupPasswordVisible) setEmotion('looking');
+            else setEmotion('shy');
         });
 
         // Password toggle - LOGIN
         loginPasswordToggle.addEventListener('click', () => {
             loginPasswordVisible = !loginPasswordVisible;
-            
-            if (loginPasswordVisible) {
-                loginPasswordInput.type = 'text';
-                loginPasswordToggle.textContent = '🙈';
-                setEmotion('shy');
-            } else {
-                loginPasswordInput.type = 'password';
-                loginPasswordToggle.textContent = '👁';
-                if (loginPasswordInput.value) {
-                    setEmotion('looking');
-                } else {
-                    const users = getUsers();
-                    if (users[loginUsernameInput.value]) {
-                        setEmotion('happy');
-                    } else if (loginUsernameInput.value === '') {
-                        setEmotion('neutral');
-                    } else {
-                        setEmotion('sad');
-                    }
-                }
-            }
+            loginPasswordInput.type = loginPasswordVisible ? 'text' : 'password';
+            loginPasswordToggle.textContent = loginPasswordVisible ? '🙈' : '👁';
+            setEmotion(loginPasswordVisible ? 'shy' : 'looking');
         });
 
         // Password toggle - SIGNUP
         signupPasswordToggle.addEventListener('click', () => {
             signupPasswordVisible = !signupPasswordVisible;
-            
-            if (signupPasswordVisible) {
-                signupPasswordInput.type = 'text';
-                signupPasswordToggle.textContent = '🙈';
-                setEmotion('shy');
-            } else {
-                signupPasswordInput.type = 'password';
-                signupPasswordToggle.textContent = '👁';
-                if (signupPasswordInput.value) {
-                    setEmotion('looking');
-                }
-            }
+            signupPasswordInput.type = signupPasswordVisible ? 'text' : 'password';
+            signupPasswordToggle.textContent = signupPasswordVisible ? '🙈' : '👁';
+            setEmotion(signupPasswordVisible ? 'shy' : 'looking');
         });
 
         // Login handler
-        function handleLogin() {
+        async function handleLogin() {
             const username = loginUsernameInput.value.trim();
             const password = loginPasswordInput.value;
 
@@ -740,48 +589,38 @@
                 return;
             }
 
-            if (validateUser(username, password)) {
-                setEmotion('celebrate');
-                createFireworks();
-                loginStatusMessage.textContent = '✓ Login successful!';
-                loginStatusMessage.className = 'status-message success';
-                
-                // Store auth token
-                sessionStorage.setItem('synchroEditAuth', 'true');
-                sessionStorage.setItem('synchroEditUser', username);
-                
-                // Redirect to main app
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else {
-                setEmotion('shake-head');
-                
-                const users = getUsers();
-                if (!users[username]) {
-                    loginStatusMessage.textContent = '✗ Username not found';
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setEmotion('celebrate');
+                    createFireworks();
+                    loginStatusMessage.textContent = '✓ Login successful!';
+                    loginStatusMessage.className = 'status-message success';
+                    
+                    localStorage.setItem('synchroEditToken', data.token);
+                    localStorage.setItem('synchroEditUser', data.username);
+                    
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
                 } else {
-                    loginStatusMessage.textContent = '✗ Incorrect password';
+                    setEmotion('shake-head');
+                    loginStatusMessage.textContent = '✗ ' + (data.message || 'Login failed');
+                    loginStatusMessage.className = 'status-message error';
                 }
-                
+            } catch (err) {
+                loginStatusMessage.textContent = '✗ Server error';
                 loginStatusMessage.className = 'status-message error';
-                
-                setTimeout(() => {
-                    loginStatusMessage.textContent = '';
-                    const users = getUsers();
-                    if (users[loginUsernameInput.value]) {
-                        setEmotion('happy');
-                    } else if (loginUsernameInput.value === '') {
-                        setEmotion('neutral');
-                    } else {
-                        setEmotion('sad');
-                    }
-                }, 3000);
             }
         }
 
         // Signup handler
-        function handleSignup() {
+        async function handleSignup() {
             const username = signupUsernameInput.value.trim();
             const password = signupPasswordInput.value;
             const passwordConfirm = signupPasswordConfirm.value;
@@ -797,101 +636,60 @@
                 signupStatusMessage.textContent = '✗ Passwords do not match';
                 signupStatusMessage.className = 'status-message error';
                 setEmotion('shake-head');
-                setTimeout(() => {
-                    signupStatusMessage.textContent = '';
-                    setEmotion('sad');
-                }, 3000);
                 return;
             }
 
-            const result = createUser(username, password);
-            
-            if (result.success) {
-                setEmotion('celebrate');
-                createFireworks();
-                signupStatusMessage.textContent = '✓ ' + result.message;
-                signupStatusMessage.className = 'status-message success';
-                
-                // Auto-login after successful signup
-                sessionStorage.setItem('synchroEditAuth', 'true');
-                sessionStorage.setItem('synchroEditUser', username);
-                
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else {
-                setEmotion('shake-head');
-                signupStatusMessage.textContent = '✗ ' + result.message;
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setEmotion('celebrate');
+                    createFireworks();
+                    signupStatusMessage.textContent = '✓ Account created!';
+                    signupStatusMessage.className = 'status-message success';
+                    
+                    localStorage.setItem('synchroEditToken', data.token);
+                    localStorage.setItem('synchroEditUser', data.username);
+                    
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                } else {
+                    setEmotion('shake-head');
+                    signupStatusMessage.textContent = '✗ ' + (data.message || 'Signup failed');
+                    signupStatusMessage.className = 'status-message error';
+                }
+            } catch (err) {
+                signupStatusMessage.textContent = '✗ Server error';
                 signupStatusMessage.className = 'status-message error';
-                
-                setTimeout(() => {
-                    signupStatusMessage.textContent = '';
-                    setEmotion('sad');
-                }, 3000);
             }
         }
 
         loginBtn.addEventListener('click', handleLogin);
         signupBtn.addEventListener('click', handleSignup);
 
-        // Enter key handlers - LOGIN
-        loginPasswordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleLogin();
-            }
-        });
-
-        loginUsernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                loginPasswordInput.focus();
-            }
-        });
-
-        // Enter key handlers - SIGNUP
-        signupPasswordConfirm.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSignup();
-            }
-        });
-
-        signupPasswordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                signupPasswordConfirm.focus();
-            }
-        });
-
-        signupUsernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                signupPasswordInput.focus();
-            }
-        });
+        // Enter key handlers
+        loginPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        signupPasswordConfirm.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSignup(); });
 
         // Blinking animation
         function blink() {
             const eyes = document.querySelectorAll('.eye');
-            eyes.forEach(eye => {
-                eye.style.height = '2px';
-            });
-            
+            eyes.forEach(eye => { eye.style.height = '2px'; });
             setTimeout(() => {
-                eyes.forEach(eye => {
-                    eye.style.height = '20px';
-                });
+                eyes.forEach(eye => { eye.style.height = '20px'; });
             }, 150);
         }
 
-        // Random blinking
         function startBlinking() {
-            const randomDelay = 2000 + Math.random() * 3000;
-            setTimeout(() => {
-                blink();
-                startBlinking();
-            }, randomDelay);
+            setTimeout(() => { blink(); startBlinking(); }, 2000 + Math.random() * 3000);
         }
 
         startBlinking();
-
-        // Auto-focus username on page load
         loginUsernameInput.focus();
     </script>
 </body>

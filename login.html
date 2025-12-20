@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynchroEdit - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Force light mode - override system dark mode */
+        html {
+            color-scheme: light only;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            width: 900px;
+            height: 550px;
+            overflow: hidden;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 50px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            font-size: 14px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            outline: none;
+            transition: background 0.3s;
+            color: #333;
+        }
+
+        .input-group input:focus {
+            background: #e8e8e8;
+        }
+
+        .input-group input::placeholder {
+            color: #999;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            user-select: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .login-btn:hover {
+            background: #45a049;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .status-message {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .status-message.success {
+            color: #4CAF50;
+        }
+
+        .status-message.error {
+            color: #f44336;
+        }
+
+        .right-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: relative;
+        }
+
+        .character-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+        }
+
+        .character {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .head {
+            width: 140px;
+            height: 140px;
+            background: white;
+            border-radius: 50%;
+            border: 4px solid #333;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .eyes {
+            position: absolute;
+            top: 45px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+        }
+
+        .eye {
+            width: 18px;
+            height: 22px;
+            background: #333;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pupil {
+            width: 7px;
+            height: 7px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 6px;
+            left: 5px;
+            transition: all 0.2s;
+        }
+
+        .eyebrows {
+            position: absolute;
+            top: 32px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+        }
+
+        .eyebrow {
+            width: 28px;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .mouth {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55px;
+            height: 28px;
+            border: 3px solid #333;
+            border-top: none;
+            border-radius: 0 0 55px 55px;
+            transition: all 0.3s;
+        }
+
+        .blush {
+            position: absolute;
+            width: 16px;
+            height: 11px;
+            background: #FFB6C8;
+            border-radius: 50%;
+            top: 68px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .blush.left {
+            left: 12px;
+        }
+
+        .blush.right {
+            right: 12px;
+        }
+
+        /* Character emotions */
+        .character.happy .mouth {
+            border-radius: 0 0 55px 55px;
+            width: 60px;
+            height: 30px;
+        }
+
+        .character.sad .mouth {
+            border-radius: 55px 55px 0 0;
+            border-top: 3px solid #333;
+            border-bottom: none;
+            bottom: 38px;
+            width: 50px;
+        }
+
+        .character.sad .eyebrow {
+            transform: rotate(-12deg);
+        }
+
+        .character.sad .eyebrow:first-child {
+            transform: rotate(12deg);
+        }
+
+        .character.shy .blush {
+            opacity: 1;
+        }
+
+        .character.shy .pupil {
+            left: 8px;
+        }
+
+        .character.looking .pupil {
+            left: 9px;
+            top: 8px;
+        }
+
+        /* Fireworks */
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: firework-burst 0.6s ease-out forwards;
+        }
+
+        @keyframes firework-burst {
+            to {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50% { transform: translate(-50%, -54%); }
+        }
+
+        .character.celebrate {
+            animation: bounce 0.4s ease-in-out 2;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-54%, -50%); }
+            75% { transform: translate(-46%, -50%); }
+        }
+
+        .character.shake-head {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .skip-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .skip-link:hover {
+            opacity: 1;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-form a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="left-section">
+            <!-- Login Form -->
+            <div class="form-container active" id="loginForm">
+                <div class="title">Welcome Back</div>
+                <div class="subtitle">Please login to continue to SynchroEdit</div>
+
+                <div class="input-group">
+                    <label for="loginUsername">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+                        <span class="password-toggle" id="loginPasswordToggle">👁</span>
+                    </div>
+                </div>
+
+                <button class="login-btn" id="loginBtn">Login</button>
+
+                <div class="status-message" id="loginStatusMessage"></div>
+
+                <div class="toggle-form">
+                    Don't have an account? <a id="showSignup">Create Account</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form-container" id="signupForm">
+                <div class="title">Create Account</div>
+                <div class="subtitle">Join SynchroEdit today</div>
+
+                <div class="input-group">
+                    <label for="signupUsername">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password">
+                        <span class="password-toggle" id="signupPasswordToggle">👁</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="signupPasswordConfirm">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signupPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <button class="login-btn" id="signupBtn">Create Account</button>
+
+                <div class="status-message" id="signupStatusMessage"></div>
+
+                <div class="toggle-form">
+                    Already have an account? <a id="showLogin">Login</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="character-container">
+                <div class="character" id="character">
+                    <div class="head">
+                        <div class="eyebrows">
+                            <div class="eyebrow"></div>
+                            <div class="eyebrow"></div>
+                        </div>
+                        <div class="eyes">
+                            <div class="eye">
+                                <div class="pupil"></div>
+                            </div>
+                            <div class="eye">
+                                <div class="pupil"></div>
+                            </div>
+                        </div>
+                        <div class="mouth"></div>
+                        <div class="blush left"></div>
+                        <div class="blush right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="skip-link">Skip login →</a>
+
+    <script>
+        // User Management
+        function getUsers() {
+            const users = localStorage.getItem('synchroEditUsers');
+            return users ? JSON.parse(users) : {};
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('synchroEditUsers', JSON.stringify(users));
+        }
+
+        function createUser(username, password) {
+            const users = getUsers();
+            if (users[username]) {
+                return { success: false, message: 'Username already exists' };
+            }
+            if (username.length < 3) {
+                return { success: false, message: 'Username must be at least 3 characters' };
+            }
+            if (password.length < 6) {
+                return { success: false, message: 'Password must be at least 6 characters' };
+            }
+            users[username] = { password, createdAt: new Date().toISOString() };
+            saveUsers(users);
+            return { success: true, message: 'Account created successfully!' };
+        }
+
+        function validateUser(username, password) {
+            const users = getUsers();
+            return users[username] && users[username].password === password;
+        }
+
+        // Elements - Login
+        const loginForm = document.getElementById('loginForm');
+        const loginUsernameInput = document.getElementById('loginUsername');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginStatusMessage = document.getElementById('loginStatusMessage');
+
+        // Elements - Signup
+        const signupForm = document.getElementById('signupForm');
+        const signupUsernameInput = document.getElementById('signupUsername');
+        const signupPasswordInput = document.getElementById('signupPassword');
+        const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const signupBtn = document.getElementById('signupBtn');
+        const signupStatusMessage = document.getElementById('signupStatusMessage');
+
+        // Toggle buttons
+        const showSignup = document.getElementById('showSignup');
+        const showLogin = document.getElementById('showLogin');
+
+        // Character
+        const character = document.getElementById('character');
+
+        let loginPasswordVisible = false;
+        let signupPasswordVisible = false;
+        let currentEmotion = 'neutral';
+        let activeForm = 'login';
+        let activeUsernameInput = loginUsernameInput;
+
+        // Set emotion
+        function setEmotion(emotion) {
+            character.className = 'character ' + emotion;
+            currentEmotion = emotion;
+        }
+
+        // Create fireworks
+        function createFireworks() {
+            const container = document.querySelector('.right-section');
+            const colors = ['#FF1744', '#FFD600', '#00E676', '#FF6E40', '#2979FF'];
+            
+            function createBurst() {
+                const x = Math.random() * 100 - 50;
+                const y = -150 + Math.random() * 50;
+                
+                for (let i = 0; i < 12; i++) {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    firework.style.left = '50%';
+                    firework.style.top = '30%';
+                    
+                    const angle = (360 / 12) * i;
+                    const distance = 80;
+                    const fx = Math.cos(angle * Math.PI / 180) * distance;
+                    const fy = Math.sin(angle * Math.PI / 180) * distance;
+                    
+                    firework.style.setProperty('--x', fx + 'px');
+                    firework.style.setProperty('--y', fy + 'px');
+                    
+                    container.appendChild(firework);
+                    
+                    setTimeout(() => firework.remove(), 600);
+                }
+            }
+            
+            createBurst();
+            setTimeout(createBurst, 300);
+            setTimeout(createBurst, 600);
+        }
+
+        // Form toggle
+        showSignup.addEventListener('click', () => {
+            loginForm.classList.remove('active');
+            signupForm.classList.add('active');
+            activeForm = 'signup';
+            activeUsernameInput = signupUsernameInput;
+            setEmotion('neutral');
+            signupUsernameInput.focus();
+        });
+
+        showLogin.addEventListener('click', () => {
+            signupForm.classList.remove('active');
+            loginForm.classList.add('active');
+            activeForm = 'login';
+            activeUsernameInput = loginUsernameInput;
+            setEmotion('neutral');
+            loginUsernameInput.focus();
+        });
+
+        // Username input handler - LOGIN
+        let loginUsernameTimeout = null;
+        loginUsernameInput.addEventListener('input', () => {
+            const username = loginUsernameInput.value;
+            
+            if (loginUsernameTimeout) {
+                clearTimeout(loginUsernameTimeout);
+            }
+            
+            if (username === '') {
+                setEmotion('neutral');
+            } else {
+                const users = getUsers();
+                if (users[username]) {
+                    setEmotion('happy');
+                } else {
+                    setEmotion('sad');
+                    loginUsernameTimeout = setTimeout(() => {
+                        if (loginUsernameInput.value !== '' && !getUsers()[loginUsernameInput.value]) {
+                            setEmotion('shake-head');
+                            setTimeout(() => setEmotion('sad'), 400);
+                        }
+                    }, 800);
+                }
+            }
+        });
+
+        // Username input handler - SIGNUP
+        let signupUsernameTimeout = null;
+        signupUsernameInput.addEventListener('input', () => {
+            const username = signupUsernameInput.value;
+            
+            if (signupUsernameTimeout) {
+                clearTimeout(signupUsernameTimeout);
+            }
+            
+            if (username === '') {
+                setEmotion('neutral');
+            } else if (username.length < 3) {
+                setEmotion('sad');
+            } else {
+                const users = getUsers();
+                if (users[username]) {
+                    setEmotion('sad');
+                    signupUsernameTimeout = setTimeout(() => {
+                        if (signupUsernameInput.value !== '' && getUsers()[signupUsernameInput.value]) {
+                            setEmotion('shake-head');
+                            setTimeout(() => setEmotion('sad'), 400);
+                        }
+                    }, 800);
+                } else {
+                    setEmotion('happy');
+                }
+            }
+        });
+
+        // Password input handlers - LOGIN
+        loginPasswordInput.addEventListener('input', () => {
+            if (!loginPasswordVisible && loginPasswordInput.value) {
+                setEmotion('looking');
+            }
+        });
+
+        loginPasswordInput.addEventListener('focus', () => {
+            if (!loginPasswordVisible) {
+                setEmotion('looking');
+            } else {
+                setEmotion('shy');
+            }
+        });
+
+        loginPasswordInput.addEventListener('blur', () => {
+            const users = getUsers();
+            if (users[loginUsernameInput.value]) {
+                setEmotion('happy');
+            } else if (loginUsernameInput.value === '') {
+                setEmotion('neutral');
+            } else {
+                setEmotion('sad');
+            }
+        });
+
+        // Password input handlers - SIGNUP
+        signupPasswordInput.addEventListener('input', () => {
+            if (!signupPasswordVisible && signupPasswordInput.value) {
+                setEmotion('looking');
+            }
+        });
+
+        signupPasswordInput.addEventListener('focus', () => {
+            if (!signupPasswordVisible) {
+                setEmotion('looking');
+            } else {
+                setEmotion('shy');
+            }
+        });
+
+        signupPasswordConfirm.addEventListener('focus', () => {
+            setEmotion('looking');
+        });
+
+        // Password toggle - LOGIN
+        loginPasswordToggle.addEventListener('click', () => {
+            loginPasswordVisible = !loginPasswordVisible;
+            
+            if (loginPasswordVisible) {
+                loginPasswordInput.type = 'text';
+                loginPasswordToggle.textContent = '🙈';
+                setEmotion('shy');
+            } else {
+                loginPasswordInput.type = 'password';
+                loginPasswordToggle.textContent = '👁';
+                if (loginPasswordInput.value) {
+                    setEmotion('looking');
+                } else {
+                    const users = getUsers();
+                    if (users[loginUsernameInput.value]) {
+                        setEmotion('happy');
+                    } else if (loginUsernameInput.value === '') {
+                        setEmotion('neutral');
+                    } else {
+                        setEmotion('sad');
+                    }
+                }
+            }
+        });
+
+        // Password toggle - SIGNUP
+        signupPasswordToggle.addEventListener('click', () => {
+            signupPasswordVisible = !signupPasswordVisible;
+            
+            if (signupPasswordVisible) {
+                signupPasswordInput.type = 'text';
+                signupPasswordToggle.textContent = '🙈';
+                setEmotion('shy');
+            } else {
+                signupPasswordInput.type = 'password';
+                signupPasswordToggle.textContent = '👁';
+                if (signupPasswordInput.value) {
+                    setEmotion('looking');
+                }
+            }
+        });
+
+        // Login handler
+        function handleLogin() {
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value;
+
+            if (!username || !password) {
+                loginStatusMessage.textContent = '✗ Please fill in all fields';
+                loginStatusMessage.className = 'status-message error';
+                setEmotion('sad');
+                return;
+            }
+
+            if (validateUser(username, password)) {
+                setEmotion('celebrate');
+                createFireworks();
+                loginStatusMessage.textContent = '✓ Login successful!';
+                loginStatusMessage.className = 'status-message success';
+                
+                // Store auth token
+                sessionStorage.setItem('synchroEditAuth', 'true');
+                sessionStorage.setItem('synchroEditUser', username);
+                
+                // Redirect to main app
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                setEmotion('shake-head');
+                
+                const users = getUsers();
+                if (!users[username]) {
+                    loginStatusMessage.textContent = '✗ Username not found';
+                } else {
+                    loginStatusMessage.textContent = '✗ Incorrect password';
+                }
+                
+                loginStatusMessage.className = 'status-message error';
+                
+                setTimeout(() => {
+                    loginStatusMessage.textContent = '';
+                    const users = getUsers();
+                    if (users[loginUsernameInput.value]) {
+                        setEmotion('happy');
+                    } else if (loginUsernameInput.value === '') {
+                        setEmotion('neutral');
+                    } else {
+                        setEmotion('sad');
+                    }
+                }, 3000);
+            }
+        }
+
+        // Signup handler
+        function handleSignup() {
+            const username = signupUsernameInput.value.trim();
+            const password = signupPasswordInput.value;
+            const passwordConfirm = signupPasswordConfirm.value;
+
+            if (!username || !password || !passwordConfirm) {
+                signupStatusMessage.textContent = '✗ Please fill in all fields';
+                signupStatusMessage.className = 'status-message error';
+                setEmotion('sad');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                signupStatusMessage.textContent = '✗ Passwords do not match';
+                signupStatusMessage.className = 'status-message error';
+                setEmotion('shake-head');
+                setTimeout(() => {
+                    signupStatusMessage.textContent = '';
+                    setEmotion('sad');
+                }, 3000);
+                return;
+            }
+
+            const result = createUser(username, password);
+            
+            if (result.success) {
+                setEmotion('celebrate');
+                createFireworks();
+                signupStatusMessage.textContent = '✓ ' + result.message;
+                signupStatusMessage.className = 'status-message success';
+                
+                // Auto-login after successful signup
+                sessionStorage.setItem('synchroEditAuth', 'true');
+                sessionStorage.setItem('synchroEditUser', username);
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                setEmotion('shake-head');
+                signupStatusMessage.textContent = '✗ ' + result.message;
+                signupStatusMessage.className = 'status-message error';
+                
+                setTimeout(() => {
+                    signupStatusMessage.textContent = '';
+                    setEmotion('sad');
+                }, 3000);
+            }
+        }
+
+        loginBtn.addEventListener('click', handleLogin);
+        signupBtn.addEventListener('click', handleSignup);
+
+        // Enter key handlers - LOGIN
+        loginPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+
+        loginUsernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginPasswordInput.focus();
+            }
+        });
+
+        // Enter key handlers - SIGNUP
+        signupPasswordConfirm.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSignup();
+            }
+        });
+
+        signupPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                signupPasswordConfirm.focus();
+            }
+        });
+
+        signupUsernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                signupPasswordInput.focus();
+            }
+        });
+
+        // Blinking animation
+        function blink() {
+            const eyes = document.querySelectorAll('.eye');
+            eyes.forEach(eye => {
+                eye.style.height = '2px';
+            });
+            
+            setTimeout(() => {
+                eyes.forEach(eye => {
+                    eye.style.height = '20px';
+                });
+            }, 150);
+        }
+
+        // Random blinking
+        function startBlinking() {
+            const randomDelay = 2000 + Math.random() * 3000;
+            setTimeout(() => {
+                blink();
+                startBlinking();
+            }, randomDelay);
+        }
+
+        startBlinking();
+
+        // Auto-focus username on page load
+        loginUsernameInput.focus();
+    </script>
+</body>
+</html>

@@ -46,6 +46,7 @@ const copyLinkBtn = document.getElementById('copyLinkBtn');
 const closeShareModal = document.getElementById('closeShareModal');
 const menuBtn = document.getElementById('menuBtn');
 const docLibrary = document.getElementById('docLibrary');
+const libraryOverlay = document.getElementById('libraryOverlay');
 const createNewDoc = document.getElementById('createNewDoc');
 const documentList = document.getElementById('documentList');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -335,8 +336,6 @@ docTitle.addEventListener('input', () => {
         title: docTitle.value
     });
     localStorage.setItem('docTitle', docTitle.value);
-    // Auto-save to localStorage
-    saveDocumentToStorage();
 });
 
 // Quill Content Changes
@@ -352,9 +351,6 @@ quill.on('text-change', () => {
         });
         
         updateCounts();
-        
-        // Auto-save to localStorage
-        saveDocumentToStorage();
     }
 });
 
@@ -533,31 +529,16 @@ if (newPageBtn) {
 }
 
 // Load saved content on page load
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     // Check if we have a document ID in URL
     if (documentId) {
-        // Load the specific document
-        const savedDoc = loadDocumentFromStorage(documentId);
-        if (savedDoc) {
-            docTitle.value = savedDoc.title;
-            pages = savedDoc.pages || [{ content: '' }];
-            currentPageIndex = savedDoc.currentPageIndex || 0;
-            loadPage(currentPageIndex);
-            renderPageTabs();
-        } else {
-            pages = [{ content: '' }];
-            loadPage(currentPageIndex);
-            renderPageTabs();
-        }
-        
         // Initialize WebSocket to sync with server
         initWebSocket();
     } else {
         // No document ID - show document library
-        const allDocs = getAllDocuments();
-        const docCount = Object.keys(allDocs).length;
+        const docArray = await getAllDocuments();
         
-        if (docCount > 0) {
+        if (docArray.length > 0) {
             // Show document library to choose from
             docLibrary.style.display = 'block';
             libraryOverlay.style.display = 'block';
@@ -588,13 +569,6 @@ window.addEventListener('load', () => {
     
     // Setup document library
     setupDocumentLibrary();
-    
-    // Auto-save every 30 seconds (only if we have a document)
-    if (documentId) {
-        autoSaveInterval = setInterval(() => {
-            saveDocumentToStorage();
-        }, 30000);
-    }
 });
 
 // Ribbon Tab Management
@@ -1331,7 +1305,6 @@ if (username && logoutBtn) {
 
 // Save before page unload
 window.addEventListener('beforeunload', () => {
-    saveDocumentToStorage();
     if (autoSaveInterval) {
         clearInterval(autoSaveInterval);
     }

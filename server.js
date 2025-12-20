@@ -57,7 +57,8 @@ app.post('/api/auth/signup', async (req, res) => {
         const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
         res.status(201).json({ token, username: user.username });
     } catch (err) {
-        res.status(500).json({ message: 'Error creating user' });
+        console.error('Signup error:', err);
+        res.status(500).json({ message: err.message || 'Error creating user' });
     }
 });
 
@@ -73,7 +74,8 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, username: user.username });
     } catch (err) {
-        res.status(500).json({ message: 'Login error' });
+        console.error('Login error:', err);
+        res.status(500).json({ message: err.message || 'Login error' });
     }
 });
 

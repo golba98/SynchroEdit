@@ -213,9 +213,9 @@ async function renderDocumentList() {
             const docId = btn.dataset.docId;
             if (confirm(`Are you sure you want to delete this document?`)) {
                 try {
-                    const response = await fetch(\`/api/documents/\${docId}\`, {
+                    const response = await fetch(`/api/documents/${docId}`, {
                         method: 'DELETE',
-                        headers: { 'Authorization': \`Bearer \${token}\` }
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (response.ok) {
                         renderDocumentList();

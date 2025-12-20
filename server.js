@@ -79,6 +79,51 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// --- User Profile Routes ---
+
+app.get('/api/user/profile', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching profile' });
+    }
+});
+
+app.put('/api/user/profile', authenticateToken, async (req, res) => {
+    try {
+        const { profilePicture } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        if (profilePicture !== undefined) user.profilePicture = profilePicture;
+        await user.save();
+
+        res.json({ message: 'Profile updated successfully', profilePicture: user.profilePicture });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating profile' });
+    }
+});
+
+app.put('/api/user/password', authenticateToken, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) return res.status(400).json({ message: 'Current password incorrect' });
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating password' });
+    }
+});
+
 // --- Document Routes ---
 
 app.get('/api/documents', authenticateToken, async (req, res) => {
@@ -101,6 +146,16 @@ app.post('/api/documents', authenticateToken, async (req, res) => {
         res.status(201).json(doc);
     } catch (err) {
         res.status(500).json({ message: 'Error creating document' });
+    }
+});
+
+app.delete('/api/documents/:id', authenticateToken, async (req, res) => {
+    try {
+        const doc = await Document.findOneAndDelete({ _id: req.params.id, owner: req.user.id });
+        if (!doc) return res.status(404).json({ message: 'Document not found' });
+        res.json({ message: 'Document deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting document' });
     }
 });
 

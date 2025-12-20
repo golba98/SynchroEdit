@@ -607,7 +607,11 @@
                     localStorage.setItem('synchroEditToken', data.token);
                     localStorage.setItem('synchroEditUser', data.username);
                     
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                    const params = new URLSearchParams(window.location.search);
+                    const docId = params.get('doc');
+                    const redirectUrl = docId ? `index.html?doc=${docId}` : 'index.html';
+                    
+                    setTimeout(() => { window.location.href = redirectUrl; }, 1500);
                 } else {
                     setEmotion('shake-head');
                     loginStatusMessage.textContent = '✗ ' + (data.message || 'Login failed');
@@ -657,7 +661,11 @@
                     localStorage.setItem('synchroEditToken', data.token);
                     localStorage.setItem('synchroEditUser', data.username);
                     
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                    const params = new URLSearchParams(window.location.search);
+                    const docId = params.get('doc');
+                    const redirectUrl = docId ? `index.html?doc=${docId}` : 'index.html';
+                    
+                    setTimeout(() => { window.location.href = redirectUrl; }, 1500);
                 } else {
                     setEmotion('shake-head');
                     signupStatusMessage.textContent = '✗ ' + (data.message || 'Signup failed');

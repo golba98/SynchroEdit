@@ -1,7 +1,13 @@
 // Auth Check
 const token = localStorage.getItem('synchroEditToken');
 if (!token) {
-    window.location.href = 'login.html';
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get('doc');
+    if (docId) {
+        window.location.href = `login.html?doc=${docId}`;
+    } else {
+        window.location.href = 'login.html';
+    }
 }
 
 // Initialize Quill Editor with external toolbar
@@ -50,6 +56,19 @@ const libraryOverlay = document.getElementById('libraryOverlay');
 const createNewDoc = document.getElementById('createNewDoc');
 const documentList = document.getElementById('documentList');
 const logoutBtn = document.getElementById('logoutBtn');
+
+// Profile Elements
+const userProfileTrigger = document.getElementById('userProfileTrigger');
+const profileModal = document.getElementById('profileModal');
+const closeProfileModal = document.getElementById('closeProfileModal');
+const profilePfp = document.getElementById('profilePfp');
+const headerPfp = document.getElementById('headerPfp');
+const headerUserIcon = document.getElementById('headerUserIcon');
+const pfpUpload = document.getElementById('pfpUpload');
+const profileUsername = document.getElementById('profileUsername');
+const currentPasswordInput = document.getElementById('currentPassword');
+const newPasswordInput = document.getElementById('newPassword');
+const updatePasswordBtn = document.getElementById('updatePasswordBtn');
 
 // State
 let currentZoom = 100;
@@ -115,13 +134,10 @@ function openDocument(docId) {
     window.location.href = `${window.location.pathname}?doc=${docId}`;
 }
 
-function renderDocumentList() {
-    const allDocs = getAllDocuments();
-    const docArray = Object.values(allDocs).sort((a, b) => 
-        new Date(b.lastModified) - new Date(a.lastModified)
-    );
+async function renderDocumentList() {
+    const docArray = await getAllDocuments();
     
-    if (docArray.length === 0) {
+    if (!docArray || docArray.length === 0) {
         documentList.innerHTML = `
             <tr>
                 <td colspan="4" style="text-align: center; padding: 40px; color: #5f6368;">
@@ -133,7 +149,7 @@ function renderDocumentList() {
     }
     
     documentList.innerHTML = docArray.map(doc => {
-        const isActive = doc.id === documentId;
+        const isActive = doc._id === documentId;
         const date = new Date(doc.lastModified);
         const today = new Date();
         const isToday = date.toDateString() === today.toDateString();
@@ -150,44 +166,33 @@ function renderDocumentList() {
                 dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
             }
         }
+
+        // Get a preview from the first page content
+        const previewText = doc.pages && doc.pages[0] && doc.pages[0].content 
+            ? doc.pages[0].content.replace(/<[^>]*>/g, '').substring(0, 100) + '...'
+            : 'Empty document';
         
         return `
-            <tr class="doc-item" data-doc-id="${doc.id}" style="border-bottom: 1px solid #f1f3f4; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: #e8f0fe;' : ''}">
+            <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #f1f3f4; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: #e8f0fe;' : ''}">
                 <td style="padding: 16px 24px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <i class="fas fa-file-alt" style="color: #4a90e2; font-size: 20px;"></i>
                         <div>
                             <div style="color: #202124; font-weight: 500; margin-bottom: 4px;">${doc.title}</div>
-                            <div style="color: #5f6368; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${doc.preview || 'Empty document'}</div>
+                            <div style="color: #5f6368; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
                         </div>
                     </div>
                 </td>
                 <td style="padding: 16px 24px; color: #5f6368; font-size: 14px;">SynchroEdit</td>
                 <td style="padding: 16px 24px; color: #5f6368; font-size: 14px;">${dateStr}</td>
                 <td style="padding: 16px 24px; text-align: center;">
-                    ${!isActive ? `
-                        <button class="delete-doc-btn" data-doc-id="${doc.id}" style="background: none; border: none; color: #5f6368; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    ` : ''}
+                    <button class="delete-doc-btn" data-doc-id="${doc._id}" style="background: none; border: none; color: #5f6368; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             </tr>
         `;
     }).join('');
-    
-    // Add hover effect
-    document.querySelectorAll('.doc-item').forEach(item => {
-        item.addEventListener('mouseenter', (e) => {
-            if (item.dataset.docId !== documentId) {
-                e.currentTarget.style.background = '#f8f9fa';
-            }
-        });
-        item.addEventListener('mouseleave', (e) => {
-            if (item.dataset.docId !== documentId) {
-                e.currentTarget.style.background = 'white';
-            }
-        });
-    });
     
     // Add click handlers
     document.querySelectorAll('.doc-item').forEach(item => {
@@ -203,23 +208,22 @@ function renderDocumentList() {
     
     // Add delete handlers
     document.querySelectorAll('.delete-doc-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             const docId = btn.dataset.docId;
-            const docName = allDocs[docId].title;
-            if (confirm(`Delete "${docName}"?`)) {
-                deleteDocumentFromStorage(docId);
-                renderDocumentList();
+            if (confirm(`Are you sure you want to delete this document?`)) {
+                try {
+                    const response = await fetch(\`/api/documents/\${docId}\`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': \`Bearer \${token}\` }
+                    });
+                    if (response.ok) {
+                        renderDocumentList();
+                    }
+                } catch (err) {
+                    console.error('Error deleting document:', err);
+                }
             }
-        });
-        
-        btn.addEventListener('mouseenter', (e) => {
-            e.currentTarget.style.background = '#fee';
-            e.currentTarget.style.color = '#d93025';
-        });
-        btn.addEventListener('mouseleave', (e) => {
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.color = '#5f6368';
         });
     });
 }
@@ -530,6 +534,9 @@ if (newPageBtn) {
 
 // Load saved content on page load
 window.addEventListener('load', async () => {
+    // Fetch user profile
+    fetchUserProfile();
+
     // Check if we have a document ID in URL
     if (documentId) {
         // Initialize WebSocket to sync with server
@@ -542,7 +549,7 @@ window.addEventListener('load', async () => {
             // Show document library to choose from
             docLibrary.style.display = 'block';
             libraryOverlay.style.display = 'block';
-            renderDocumentList();
+            await renderDocumentList();
         } else {
             // No documents - create first one automatically
             createNewDocument();
@@ -1245,9 +1252,9 @@ if (fileInput) {
 function setupDocumentLibrary() {
     // Menu button to open library
     if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
+        menuBtn.addEventListener('click', async () => {
             docLibrary.style.display = 'block';
-            renderDocumentList();
+            await renderDocumentList();
         });
     }
     
@@ -1284,6 +1291,116 @@ function setupDocumentLibrary() {
             });
         });
     }
+}
+
+// --- Profile Management ---
+
+async function fetchUserProfile() {
+    try {
+        const response = await fetch('/api/user/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const user = await response.json();
+            profileUsername.textContent = user.username;
+            if (user.profilePicture) {
+                profilePfp.src = user.profilePicture;
+                headerPfp.src = user.profilePicture;
+                headerPfp.style.display = 'block';
+                headerUserIcon.style.display = 'none';
+            }
+        }
+    } catch (err) {
+        console.error('Error fetching profile:', err);
+    }
+}
+
+if (pfpUpload) {
+    pfpUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result;
+            try {
+                const response = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ profilePicture: base64String })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    profilePfp.src = data.profilePicture;
+                    headerPfp.src = data.profilePicture;
+                    headerPfp.style.display = 'block';
+                    headerUserIcon.style.display = 'none';
+                    alert('Profile picture updated!');
+                }
+            } catch (err) {
+                console.error('Error updating PFP:', err);
+                alert('Failed to update profile picture');
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+if (updatePasswordBtn) {
+    updatePasswordBtn.addEventListener('click', async () => {
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+
+        if (!currentPassword || !newPassword) {
+            alert('Please fill in both password fields');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/user/password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Password updated successfully!');
+                currentPasswordInput.value = '';
+                newPasswordInput.value = '';
+            } else {
+                alert(data.message || 'Failed to update password');
+            }
+        } catch (err) {
+            console.error('Error updating password:', err);
+            alert('Error updating password');
+        }
+    });
+}
+
+if (userProfileTrigger) {
+    userProfileTrigger.addEventListener('click', () => {
+        profileModal.style.display = 'flex';
+    });
+}
+
+if (closeProfileModal) {
+    closeProfileModal.addEventListener('click', () => {
+        profileModal.style.display = 'none';
+    });
+}
+
+if (profileModal) {
+    profileModal.addEventListener('click', (e) => {
+        if (e.target === profileModal) profileModal.style.display = 'none';
+    });
 }
 
 // Logout handler

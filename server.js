@@ -18,16 +18,24 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret';
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
+const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
 
-// Setup email transporter
+// Setup email transporter (tuned for Render timeouts)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE, // false for 587, true for 465
     auth: {
         user: SMTP_USER,
         pass: SMTP_PASS
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 15000,
     tls: {
-        rejectUnauthorized: false // Helps with some cloud provider SSL issues
+        rejectUnauthorized: false // Helps with some provider SSL quirks
     }
 });
 

@@ -84,7 +84,7 @@ async function sendVerificationEmail(email, code) {
         console.log('Email sent via SMTP');
         return true;
     } catch (err) {
-        console.error('SMTP email sending error:', err);
+        console.error('SMTP email sending error. Please check your SMTP credentials and configuration in the .env file. Full error: ', err);
         return false;
     }
 }

@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '' // Base64 or URL
     },
+    recentDocuments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Document'
+    }],
     createdAt: {
         type: Date,
         default: Date.now

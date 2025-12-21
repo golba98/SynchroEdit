@@ -1,5 +1,13 @@
 // Auth Check
-const token = localStorage.getItem('synchroEditToken');
+let token = localStorage.getItem('synchroEditToken');
+// Set test credentials for development
+if (!token) {
+    localStorage.setItem('synchroEditToken', 'test-token-dev');
+    localStorage.setItem('synchroEditUser', 'TestUser');
+    token = 'test-token-dev';
+}
+
+/*
 if (!token) {
     const params = new URLSearchParams(window.location.search);
     const docId = params.get('doc');
@@ -9,7 +17,10 @@ if (!token) {
         window.location.href = 'login.html';
     }
 }
+*/
 
+// Wait for DOM to be ready before initializing
+document.addEventListener('DOMContentLoaded', () => {
 // Initialize Quill Editor with external toolbar
 const quill = new Quill('#editor', {
     theme: 'snow',
@@ -97,6 +108,18 @@ function getDocumentId() {
 }
 
 // Document Storage Management (Backend API)
+async function addToRecent(docId) {
+    if (!docId) return;
+    try {
+        await fetch(`/api/documents/${docId}/recent`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+    } catch (err) {
+        console.error('Error adding to recent:', err);
+    }
+}
+
 async function getAllDocuments() {
     try {
         const response = await fetch('/api/documents', {
@@ -140,7 +163,7 @@ async function renderDocumentList() {
     if (!docArray || docArray.length === 0) {
         documentList.innerHTML = `
             <tr>
-                <td colspan="4" style="text-align: center; padding: 40px; color: #5f6368;">
+                <td colspan="4" style="text-align: center; padding: 40px; color: #b0b0b0;">
                     No documents yet. Create your first document!
                 </td>
             </tr>
@@ -172,21 +195,28 @@ async function renderDocumentList() {
             ? doc.pages[0].content.replace(/<[^>]*>/g, '').substring(0, 100) + '...'
             : 'Empty document';
         
+        const lastModifiedBy = doc.lastModifiedBy ? doc.lastModifiedBy.username : 'Unknown';
+        
         return `
-            <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #f1f3f4; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: #e8f0fe;' : ''}">
+            <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #2a2a2a; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: rgba(139, 92, 246, 0.15);' : ''}">
                 <td style="padding: 16px 24px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-file-alt" style="color: #4a90e2; font-size: 20px;"></i>
+                        <i class="fas fa-file-alt" style="color: #a78bfa; font-size: 20px;"></i>
                         <div>
-                            <div style="color: #202124; font-weight: 500; margin-bottom: 4px;">${doc.title}</div>
-                            <div style="color: #5f6368; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
+                            <div style="color: #e0e0e0; font-weight: 500; margin-bottom: 4px;">${doc.title}</div>
+                            <div style="color: #b0b0b0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
                         </div>
                     </div>
                 </td>
-                <td style="padding: 16px 24px; color: #5f6368; font-size: 14px;">SynchroEdit</td>
-                <td style="padding: 16px 24px; color: #5f6368; font-size: 14px;">${dateStr}</td>
+                <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-user-edit" style="font-size: 12px;"></i>
+                        ${lastModifiedBy}
+                    </div>
+                </td>
+                <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${dateStr}</td>
                 <td style="padding: 16px 24px; text-align: center;">
-                    <button class="delete-doc-btn" data-doc-id="${doc._id}" style="background: none; border: none; color: #5f6368; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">
+                    <button class="delete-doc-btn" data-doc-id="${doc._id}" style="background: none; border: none; color: #b0b0b0; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -194,38 +224,41 @@ async function renderDocumentList() {
         `;
     }).join('');
     
-    // Add click handlers
-    document.querySelectorAll('.doc-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            if (!e.target.closest('.delete-doc-btn')) {
-                const docId = item.dataset.docId;
-                if (docId !== documentId) {
-                    openDocument(docId);
-                }
-            }
-        });
-    });
-    
-    // Add delete handlers
-    document.querySelectorAll('.delete-doc-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+    // Use event delegation for better performance and reliability
+    documentList.onclick = async (e) => {
+        const deleteBtn = e.target.closest('.delete-doc-btn');
+        const docItem = e.target.closest('.doc-item');
+
+        if (deleteBtn) {
             e.stopPropagation();
-            const docId = btn.dataset.docId;
-            if (confirm(`Are you sure you want to delete this document?`)) {
+            const docIdToDelete = deleteBtn.dataset.docId;
+            if (confirm('Are you sure you want to delete this document?')) {
                 try {
-                    const response = await fetch(`/api/documents/${docId}`, {
+                    const response = await fetch(`/api/documents/${docIdToDelete}`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (response.ok) {
-                        renderDocumentList();
+                        await renderDocumentList();
                     }
                 } catch (err) {
                     console.error('Error deleting document:', err);
                 }
             }
-        });
-    });
+            return;
+        }
+
+        if (docItem) {
+            const clickedDocId = docItem.dataset.docId;
+            if (clickedDocId === documentId) {
+                // Already open, just close library
+                docLibrary.style.display = 'none';
+                libraryOverlay.style.display = 'none';
+            } else {
+                openDocument(clickedDocId);
+            }
+        }
+    };
 }
 
 // Initialize WebSocket Connection
@@ -237,8 +270,12 @@ function initWebSocket() {
 
     ws.onopen = () => {
         console.log('Connected to server');
-        // Send document ID to join specific document room
-        ws.send(JSON.stringify({ type: 'join-document', documentId: documentId }));
+        // Send document ID and token to join specific document room
+        ws.send(JSON.stringify({ 
+            type: 'join-document', 
+            documentId: documentId,
+            token: token
+        }));
     };
 
     ws.onmessage = (event) => {
@@ -323,7 +360,48 @@ function handleServerMessage(data) {
                 renderPageTabs();
             }
             break;
+
+        case 'collaborators':
+            updateCollaboratorsUI(data.users);
+            break;
+
+        case 'document-deleted':
+            alert('This document has been deleted by the owner.');
+            window.location.href = 'index.html';
+            break;
     }
+}
+
+function updateCollaboratorsUI(users) {
+    const container = document.getElementById('activeCollaborators');
+    if (!container) return;
+
+    container.innerHTML = users.map((user, index) => {
+        const colors = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#6366f1', '#818cf8', '#a5b4fc'];
+        const color = colors[index % colors.length];
+        const initial = user.username.charAt(0).toUpperCase();
+        
+        return `
+            <div title="${user.username}" style="
+                width: 30px; 
+                height: 30px; 
+                border-radius: 50%; 
+                background: ${color}; 
+                color: white; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 14px; 
+                font-weight: bold; 
+                border: 2px solid #0a0a0a; 
+                margin-left: -8px;
+                cursor: default;
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            ">
+                ${initial}
+            </div>
+        `;
+    }).join('');
 }
 
 // Send message to server
@@ -355,8 +433,80 @@ quill.on('text-change', () => {
         });
         
         updateCounts();
+        
+        // Auto-page creation when content gets near bottom
+        checkAndCreateNewPage();
     }
 });
+
+// Auto-page creation logic - creates new page when current page is full
+function checkAndCreateNewPage() {
+    const editor = document.querySelector('.ql-editor');
+    const editorContainer = document.querySelector('.editor-container');
+    
+    if (!editor || !editorContainer) return;
+    
+    // Get actual container height (the fixed page size)
+    const containerHeight = editorContainer.clientHeight;
+    const contentHeight = editor.scrollHeight;
+    
+    // If content exceeds container height, create new page automatically
+    // This will prevent scrolling and force page breaks
+    if (contentHeight > containerHeight) {
+        const currentLength = quill.getLength();
+        
+        // Only auto-create if we have significant content (more than just newlines)
+        if (currentLength > 10) {
+            // Check if we don't already have an empty page at the end
+            const lastPageEmpty = pages.length > 0 && 
+                                 pages[pages.length - 1].content.ops && 
+                                 pages[pages.length - 1].content.ops.filter(op => op.insert && op.insert.trim()).length === 0;
+            
+            if (!lastPageEmpty && pages.length < 50) { // Max 50 pages
+                createNewPage();
+            }
+        }
+    }
+}
+
+// Create new page
+function createNewPage() {
+    const newPage = {
+        id: `page-${Date.now()}`,
+        number: pages.length + 1,
+        content: { ops: [{ insert: '\n' }] }
+    };
+    pages.push(newPage);
+    switchPage(pages.length - 1);
+}
+
+// Switch to a different page
+function switchPage(pageIndex) {
+    if (pageIndex < 0 || pageIndex >= pages.length || pageIndex === currentPageIndex) return;
+    
+    // Save current page content
+    if (currentPageIndex >= 0 && currentPageIndex < pages.length) {
+        pages[currentPageIndex].content = quill.getContents();
+    }
+    
+    // Switch to new page
+    currentPageIndex = pageIndex;
+    
+    // Load new page content
+    isLoadingFromServer = true;
+    quill.setContents(pages[currentPageIndex].content || { ops: [{ insert: '\n' }] });
+    quill.setSelection(0, 0);
+    isLoadingFromServer = false;
+    
+    // Update counts
+    updateCounts();
+    
+    // Scroll editor to top
+    const editor = document.querySelector('.ql-editor');
+    if (editor) {
+        editor.scrollTop = 0;
+    }
+}
 
 // Image Insertion - Quill's built-in image button handles this now
 // But you can use the insertEmbed function to programmatically add images
@@ -391,28 +541,42 @@ function applyZoom() {
         editorContainer.style.marginTop = `${marginTop}px`;
         editorContainer.style.marginBottom = `${marginTop}px`;
         
-        zoomPercent.textContent = `${currentZoom}%`;
+        // Update all zoom percentage displays
+        const zoomPercentElements = document.querySelectorAll('#zoomPercent');
+        zoomPercentElements.forEach(el => {
+            el.textContent = `${currentZoom}%`;
+        });
+        
         localStorage.setItem('docZoom', currentZoom);
     }
 }
 
-if (zoomInBtn) {
-    zoomInBtn.addEventListener('click', () => {
-        if (currentZoom < 200) {
-            currentZoom += 10;
-            applyZoom();
-        }
-    });
-}
+// Get all zoom buttons (status bar versions)
+const allZoomInBtns = document.querySelectorAll('#zoomInBtn');
+const allZoomOutBtns = document.querySelectorAll('#zoomOutBtn');
 
-if (zoomOutBtn) {
-    zoomOutBtn.addEventListener('click', () => {
-        if (currentZoom > 50) {
-            currentZoom -= 10;
-            applyZoom();
-        }
-    });
-}
+// Attach click listeners to all zoom buttons
+allZoomInBtns.forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', () => {
+            if (currentZoom < 200) {
+                currentZoom += 10;
+                applyZoom();
+            }
+        });
+    }
+});
+
+allZoomOutBtns.forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', () => {
+            if (currentZoom > 50) {
+                currentZoom -= 10;
+                applyZoom();
+            }
+        });
+    }
+});
 
 // Keyboard shortcuts for zoom
 document.addEventListener('keydown', (e) => {
@@ -539,6 +703,8 @@ window.addEventListener('load', async () => {
 
     // Check if we have a document ID in URL
     if (documentId) {
+        // Add to user's recent documents
+        addToRecent(documentId);
         // Initialize WebSocket to sync with server
         initWebSocket();
     } else {
@@ -583,12 +749,8 @@ function setupRibbonTabs() {
     const tabs = document.querySelectorAll('.ribbon-tab');
     const ribbons = document.querySelectorAll('.ribbon-content');
     
-    console.log('Setting up ribbon tabs:', tabs.length, 'tabs found');
-    
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            console.log('Tab clicked:', tab.dataset.tab);
-            
             // Remove active class from all tabs and ribbons
             tabs.forEach(t => t.classList.remove('active'));
             ribbons.forEach(r => r.classList.remove('active'));
@@ -599,7 +761,6 @@ function setupRibbonTabs() {
             // Show corresponding ribbon
             const tabName = tab.dataset.tab;
             const ribbon = document.getElementById(`${tabName}-ribbon`);
-            console.log('Looking for ribbon:', `${tabName}-ribbon`, 'Found:', ribbon);
             if (ribbon) {
                 ribbon.classList.add('active');
             }
@@ -678,6 +839,11 @@ function setupInsertFeatures() {
     const linkBtn = document.querySelector('#insert-ribbon .ql-link');
     const blockquoteBtn = document.querySelector('#insert-ribbon .ql-blockquote');
     const codeBlockBtn = document.querySelector('#insert-ribbon .ql-code-block');
+    
+    // TEST: Log what we found
+    if (!imageBtn) console.warn('Image button not found in Insert ribbon');
+    if (!videoBtn) console.warn('Video button not found in Insert ribbon');
+    if (!linkBtn) console.warn('Link button not found in Insert ribbon');
     
     // Create hidden file input for images
     const imageFileInput = document.createElement('input');
@@ -842,52 +1008,52 @@ function setupDesignFeatures() {
     if (themeDark) {
         themeDark.addEventListener('click', () => {
             // Body and background
-            document.body.style.backgroundColor = '#121212';
+            document.body.style.backgroundColor = '#000000';
             
             // Editor container and content
             const editorContainer = document.querySelector('.editor-container');
-            editorContainer.style.backgroundColor = '#1e1e1e';
-            editorContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.5)';
-            document.querySelector('#editor').style.color = '#e8eaed';
+            editorContainer.style.backgroundColor = '#0d0d0d';
+            editorContainer.style.boxShadow = '0 0 40px rgba(139, 92, 246, 0.3)';
+            document.querySelector('#editor').style.color = '#e0e0e0';
             
             // Header
             const header = document.querySelector('.header');
-            header.style.backgroundColor = '#202124';
-            header.style.color = '#e8eaed';
-            header.style.borderBottomColor = '#3c4043';
+            header.style.backgroundColor = '#0a0a0a';
+            header.style.color = '#e0e0e0';
+            header.style.borderBottomColor = '#2a2a2a';
             const docTitle = document.querySelector('.doc-title');
-            docTitle.style.color = '#e8eaed';
-            docTitle.style.backgroundColor = '#292a2d';
+            docTitle.style.color = '#e0e0e0';
+            docTitle.style.backgroundColor = '#1a1a1a';
             
             // Toolbar and ribbons
             const toolbar = document.querySelector('.toolbar');
-            toolbar.style.backgroundColor = '#1a1a1a';
-            toolbar.style.borderBottomColor = '#3c4043';
+            toolbar.style.backgroundColor = '#0a0a0a';
+            toolbar.style.borderBottomColor = '#2a2a2a';
             const ribbonTabs = document.querySelector('.ribbon-tabs');
-            ribbonTabs.style.backgroundColor = '#202124';
-            ribbonTabs.style.borderBottomColor = '#3c4043';
+            ribbonTabs.style.backgroundColor = '#0a0a0a';
+            ribbonTabs.style.borderBottomColor = '#2a2a2a';
             document.querySelectorAll('.ribbon-content').forEach(r => {
-                r.style.backgroundColor = '#292a2d';
-                r.style.color = '#e8eaed';
-                r.style.borderBottomColor = '#3c4043';
+                r.style.backgroundColor = '#0d0d0d';
+                r.style.color = '#e0e0e0';
+                r.style.borderBottomColor = '#2a2a2a';
             });
             document.querySelectorAll('.ribbon-tab').forEach(t => {
-                t.style.color = '#9aa0a6';
+                t.style.color = '#b0b0b0';
             });
             document.querySelectorAll('.toolbar-btn').forEach(btn => {
-                btn.style.color = '#e8eaed';
+                btn.style.color = '#e0e0e0';
             });
             
             // Page navigator
             const pageNav = document.querySelector('.page-navigator');
-            pageNav.style.backgroundColor = '#202124';
-            pageNav.style.borderBottomColor = '#3c4043';
+            pageNav.style.backgroundColor = '#0a0a0a';
+            pageNav.style.borderBottomColor = '#2a2a2a';
             
             // Status bar
             const statusBar = document.querySelector('.status-bar');
-            statusBar.style.backgroundColor = '#1a1a1a';
-            statusBar.style.color = '#9aa0a6';
-            statusBar.style.borderTopColor = '#3c4043';
+            statusBar.style.backgroundColor = '#0a0a0a';
+            statusBar.style.color = '#b0b0b0';
+            statusBar.style.borderTopColor = '#2a2a2a';
         });
     }
 }
@@ -1210,42 +1376,121 @@ if (loadFileBtn) {
 }
 
 if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const documentData = JSON.parse(event.target.result);
+        if (!file) return;
+
+        const fileName = file.name;
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+
+        try {
+            if (fileExtension === 'json') {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const documentData = JSON.parse(event.target.result);
+                        loadDocumentData(documentData);
+                        alert('Document loaded successfully!');
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        alert('Invalid JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            } 
+            else if (fileExtension === 'txt') {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const text = event.target.result;
+                    importTextToDocument(fileName.replace('.txt', ''), text);
+                };
+                reader.readAsText(file);
+            }
+            else if (fileExtension === 'docx') {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const arrayBuffer = event.target.result;
+                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    importTextToDocument(fileName.replace('.docx', ''), result.value, true);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            else if (fileExtension === 'pdf') {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const arrayBuffer = event.target.result;
+                    const typedarray = new Uint8Array(arrayBuffer);
                     
-                    // Load the document
-                    isLoadingFromServer = true;
-                    docTitle.value = documentData.title;
-                    pages = documentData.pages || [{ content: '' }];
-                    currentPageIndex = documentData.currentPageIndex || 0;
+                    // Initialize PDF.js
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
                     
-                    // Load current page
-                    loadPage(currentPageIndex);
-                    renderPageTabs();
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = '';
                     
-                    // Sync to server
-                    sendToServer({ type: 'update-title', title: documentData.title });
-                    pages.forEach((page, index) => {
-                        sendToServer({ type: 'update-page', pageIndex: index, content: page.content });
-                    });
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += `<p>${pageText}</p>`;
+                    }
                     
-                    isLoadingFromServer = false;
-                    
-                    alert('Document loaded successfully!');
-                } catch (error) {
-                    console.error('Error loading file:', error);
-                    alert('Error loading file. Please make sure it\'s a valid SynchroEdit document.');
-                }
-            };
-            reader.readAsText(file);
+                    importTextToDocument(fileName.replace('.pdf', ''), fullText, true);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            else {
+                alert('Unsupported file type.');
+            }
+        } catch (error) {
+            console.error('Error loading file:', error);
+            alert('Error loading file: ' + error.message);
         }
+        
         fileInput.value = ''; // Reset input
     });
+}
+
+function loadDocumentData(documentData) {
+    isLoadingFromServer = true;
+    docTitle.value = documentData.title || 'Untitled document';
+    pages = documentData.pages || [{ content: '' }];
+    currentPageIndex = documentData.currentPageIndex || 0;
+    
+    // Load current page
+    loadPage(currentPageIndex);
+    renderPageTabs();
+    
+    // Sync to server
+    sendToServer({ type: 'update-title', title: docTitle.value });
+    pages.forEach((page, index) => {
+        sendToServer({ type: 'update-page', pageIndex: index, content: page.content });
+    });
+    
+    isLoadingFromServer = false;
+}
+
+function importTextToDocument(title, content, isHtml = false) {
+    isLoadingFromServer = true;
+    docTitle.value = title;
+    
+    // If it's plain text, wrap in paragraphs or just set it
+    if (!isHtml) {
+        // Convert plain text to simple HTML for Quill
+        content = content.split('\n').map(line => `<p>${line}</p>`).join('');
+    }
+    
+    pages = [{ content: content }];
+    currentPageIndex = 0;
+    
+    loadPage(currentPageIndex);
+    renderPageTabs();
+    
+    // Sync to server
+    sendToServer({ type: 'update-title', title: docTitle.value });
+    sendToServer({ type: 'update-page', pageIndex: 0, content: content });
+    
+    isLoadingFromServer = false;
+    alert(`Imported content from ${title}`);
 }
 
 // Document Library Management
@@ -1308,6 +1553,15 @@ async function fetchUserProfile() {
                 headerPfp.src = user.profilePicture;
                 headerPfp.style.display = 'block';
                 headerUserIcon.style.display = 'none';
+                
+                // Update library icons too
+                const libPfp = document.getElementById('libraryHeaderPfp');
+                const libIcon = document.getElementById('libraryHeaderUserIcon');
+                if (libPfp && libIcon) {
+                    libPfp.src = user.profilePicture;
+                    libPfp.style.display = 'block';
+                    libIcon.style.display = 'none';
+                }
             }
         }
     } catch (err) {
@@ -1391,6 +1645,13 @@ if (userProfileTrigger) {
     });
 }
 
+const libraryUserProfileTrigger = document.getElementById('libraryUserProfileTrigger');
+if (libraryUserProfileTrigger) {
+    libraryUserProfileTrigger.addEventListener('click', () => {
+        profileModal.style.display = 'flex';
+    });
+}
+
 if (closeProfileModal) {
     closeProfileModal.addEventListener('click', () => {
         profileModal.style.display = 'none';
@@ -1426,3 +1687,5 @@ window.addEventListener('beforeunload', () => {
         clearInterval(autoSaveInterval);
     }
 });
+
+}); // Close DOMContentLoaded

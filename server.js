@@ -128,10 +128,58 @@ app.put('/api/user/password', authenticateToken, async (req, res) => {
 
 app.get('/api/documents', authenticateToken, async (req, res) => {
     try {
-        const docs = await Document.find({ owner: req.user.id }).sort({ lastModified: -1 });
-        res.json(docs);
+        const user = await User.findById(req.user.id);
+        const ownedDocs = await Document.find({ owner: req.user.id }).populate('lastModifiedBy', 'username');
+        const recentDocs = await Document.find({ _id: { $in: user.recentDocuments || [] } }).populate('lastModifiedBy', 'username');
+        
+        // Combine and remove duplicates
+        const allDocs = [...ownedDocs];
+        recentDocs.forEach(rd => {
+            if (!allDocs.some(od => od._id.toString() === rd._id.toString())) {
+                allDocs.push(rd);
+            }
+        });
+
+        // Sort by lastModified
+        allDocs.sort((a, b) => b.lastModified - a.lastModified);
+        
+        res.json(allDocs);
     } catch (err) {
+        console.error('Error fetching documents:', err);
         res.status(500).json({ message: 'Error fetching documents' });
+    }
+});
+
+app.post('/api/documents/:id/recent', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const docId = req.params.id;
+        
+        // Check if document exists
+        const doc = await Document.findById(docId);
+        if (!doc) return res.status(404).json({ message: 'Document not found' });
+
+        // Add to recent if not already there (or move to front)
+        if (!user.recentDocuments) user.recentDocuments = [];
+        
+        const index = user.recentDocuments.findIndex(id => id.toString() === docId);
+        if (index > -1) {
+            user.recentDocuments.splice(index, 1);
+        }
+        user.recentDocuments.unshift(docId);
+        
+        // Limit to 20 recent documents
+        if (user.recentDocuments.length > 20) {
+            user.recentDocuments.pop();
+        }
+
+        await user.save();
+        res.json({ message: 'Added to recent' });
+    } catch (err) {
+        console.error('Error adding to recent:', err);
+        res.status(500).json({ message: 'Error adding to recent' });
     }
 });
 
@@ -151,17 +199,46 @@ app.post('/api/documents', authenticateToken, async (req, res) => {
 
 app.delete('/api/documents/:id', authenticateToken, async (req, res) => {
     try {
-        const doc = await Document.findOneAndDelete({ _id: req.params.id, owner: req.user.id });
-        if (!doc) return res.status(404).json({ message: 'Document not found' });
+        const docId = req.params.id;
+        const doc = await Document.findOneAndDelete({ _id: docId, owner: req.user.id });
+        
+        if (!doc) {
+            // Not the owner or document doesn't exist
+            // Just remove from user's recent list if it's there
+            const user = await User.findById(req.user.id);
+            if (user && user.recentDocuments) {
+                const index = user.recentDocuments.findIndex(id => id.toString() === docId);
+                if (index > -1) {
+                    user.recentDocuments.splice(index, 1);
+                    await user.save();
+                    return res.json({ message: 'Removed from recent' });
+                }
+            }
+            return res.status(404).json({ message: 'Document not found or access denied' });
+        }
+
+        // If deleted by owner, notify all connected clients
+        const docRoom = documents.get(docId);
+        if (docRoom) {
+            const message = JSON.stringify({ type: 'document-deleted' });
+            docRoom.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            });
+            documents.delete(docId);
+        }
+        
         res.json({ message: 'Document deleted' });
     } catch (err) {
+        console.error('Error deleting document:', err);
         res.status(500).json({ message: 'Error deleting document' });
     }
 });
 
 // --- WebSocket Logic ---
 
-let clients = new Map(); // Map of client -> documentId
+let clients = new Map(); // Map of client -> { documentId, userId, username }
 let documents = new Map(); // Map of documentId -> { state, clients: Set }
 
 async function getOrCreateDocument(documentId) {
@@ -196,37 +273,55 @@ wss.on('connection', (ws) => {
             const data = JSON.parse(message);
             
             if (data.type === 'join-document') {
-                const documentId = data.documentId;
+                const { documentId, token } = data;
+                
+                let userId = null;
+                let username = 'Anonymous';
+                
+                if (token) {
+                    try {
+                        const decoded = jwt.verify(token, JWT_SECRET);
+                        userId = decoded.id;
+                        username = decoded.username;
+                    } catch (e) {
+                        console.error('Invalid token in WS join');
+                    }
+                }
+
                 const doc = await getOrCreateDocument(documentId);
-                clients.set(ws, documentId);
+                clients.set(ws, { documentId, userId, username });
                 doc.clients.add(ws);
                 ws.send(JSON.stringify({ type: 'sync', data: doc.state }));
+                
+                // Broadcast updated collaborator list
+                broadcastCollaborators(documentId);
                 return;
             }
             
-            const documentId = clients.get(ws);
-            if (!documentId) return;
+            const clientInfo = clients.get(ws);
+            if (!clientInfo) return;
+            const { documentId, userId, username } = clientInfo;
             const doc = await getOrCreateDocument(documentId);
             
             switch (data.type) {
                 case 'update-title':
                     doc.state.title = data.title;
-                    broadcastToDocument(documentId, ws, { type: 'update-title', title: data.title });
+                    broadcastToDocument(documentId, ws, { type: 'update-title', title: data.title, username });
                     break;
                 case 'update-page':
                     if (doc.state.pages[data.pageIndex]) {
                         doc.state.pages[data.pageIndex].content = data.content;
                     }
-                    broadcastToDocument(documentId, ws, { type: 'update-page', pageIndex: data.pageIndex, content: data.content });
+                    broadcastToDocument(documentId, ws, { type: 'update-page', pageIndex: data.pageIndex, content: data.content, username });
                     break;
                 case 'new-page':
                     doc.state.pages.push({ content: '' });
-                    broadcastToDocument(documentId, ws, { type: 'new-page', totalPages: doc.state.pages.length });
+                    broadcastToDocument(documentId, ws, { type: 'new-page', totalPages: doc.state.pages.length, username });
                     break;
                 case 'delete-page':
                     if (doc.state.pages.length > 1) {
                         doc.state.pages.splice(data.pageIndex, 1);
-                        broadcastToDocument(documentId, ws, { type: 'delete-page', pageIndex: data.pageIndex, totalPages: doc.state.pages.length });
+                        broadcastToDocument(documentId, ws, { type: 'delete-page', pageIndex: data.pageIndex, totalPages: doc.state.pages.length, username });
                     }
                     break;
             }
@@ -236,7 +331,8 @@ wss.on('connection', (ws) => {
                 await Document.findByIdAndUpdate(documentId, {
                     title: doc.state.title,
                     pages: doc.state.pages,
-                    lastModified: new Date()
+                    lastModified: new Date(),
+                    lastModifiedBy: userId
                 });
             }
 
@@ -246,14 +342,41 @@ wss.on('connection', (ws) => {
     });
 
     ws.on('close', () => {
-        const documentId = clients.get(ws);
-        if (documentId) {
+        const clientInfo = clients.get(ws);
+        if (clientInfo) {
+            const { documentId } = clientInfo;
             const doc = documents.get(documentId);
-            if (doc) doc.clients.delete(ws);
+            if (doc) {
+                doc.clients.delete(ws);
+                broadcastCollaborators(documentId);
+            }
             clients.delete(ws);
         }
     });
 });
+
+function broadcastCollaborators(documentId) {
+    const doc = documents.get(documentId);
+    if (!doc) return;
+
+    const activeUsers = [];
+    const seenUsernames = new Set();
+
+    doc.clients.forEach(client => {
+        const info = clients.get(client);
+        if (info && !seenUsernames.has(info.username)) {
+            activeUsers.push({ username: info.username });
+            seenUsernames.add(info.username);
+        }
+    });
+
+    const message = JSON.stringify({ type: 'collaborators', users: activeUsers });
+    doc.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+}
 
 function broadcastToDocument(documentId, sender, message) {
     const doc = documents.get(documentId);

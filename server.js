@@ -93,10 +93,23 @@ const authenticateToken = (req, res, next) => {
 
     if (!token) return res.status(401).json({ message: 'Access denied' });
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, async (err, user) => {
         if (err) return res.status(403).json({ message: 'Invalid token' });
-        req.user = user;
-        next();
+        
+        try {
+            const dbUser = await User.findById(user.id);
+            if (!dbUser) return res.status(403).json({ message: 'User not found' });
+            
+            if (!dbUser.isEmailVerified) {
+                return res.status(403).json({ message: 'Email not verified' });
+            }
+            
+            req.user = user;
+            next();
+        } catch (dbErr) {
+            console.error('Auth middleware error:', dbErr);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
     });
 };
 

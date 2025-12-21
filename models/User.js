@@ -9,6 +9,14 @@ const userSchema = new mongoose.Schema({
         trim: true,
         minlength: 3
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    },
     password: {
         type: String,
         required: true,
@@ -17,6 +25,18 @@ const userSchema = new mongoose.Schema({
     profilePicture: {
         type: String,
         default: '' // Base64 or URL
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationCode: {
+        type: String,
+        default: null
+    },
+    verificationCodeExpires: {
+        type: Date,
+        default: null
     },
     recentDocuments: [{
         type: mongoose.Schema.Types.ObjectId,

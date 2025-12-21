@@ -5,6 +5,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('./models/User');
 const Document = require('./models/Document');
 
@@ -15,6 +16,51 @@ const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret';
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
+
+// Setup email transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+    }
+});
+
+// Function to generate verification code
+function generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Function to send verification email
+async function sendVerificationEmail(email, code) {
+    try {
+        await transporter.sendMail({
+            from: SMTP_USER,
+            to: email,
+            subject: 'SynchroEdit - Email Verification Code',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                    <h2 style="color: #8b5cf6; text-align: center;">SynchroEdit</h2>
+                    <p style="color: #333; font-size: 16px;">Welcome to SynchroEdit!</p>
+                    <p style="color: #666; font-size: 14px;">Your email verification code is:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="font-size: 36px; font-weight: bold; color: #8b5cf6; letter-spacing: 8px; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #8b5cf6;">
+                            ${code}
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+                    <p style="color: #999; font-size: 12px; text-align: center;">If you didn't sign up for SynchroEdit, please ignore this email.</p>
+                </div>
+            `
+        });
+        return true;
+    } catch (err) {
+        console.error('Email sending error:', err);
+        return false;
+    }
+}
 
 // Database Connection
 if (MONGODB_URI) {
@@ -27,7 +73,8 @@ if (MONGODB_URI) {
 
 // Middleware
 app.use(express.static(__dirname));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {
@@ -47,18 +94,105 @@ const authenticateToken = (req, res, next) => {
 
 app.post('/api/auth/signup', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const existingUser = await User.findOne({ username });
-        if (existingUser) return res.status(400).json({ message: 'Username already exists' });
+        const { username, email, password } = req.body;
+        
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'Please provide username, email, and password' });
+        }
 
-        const user = new User({ username, password });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username or email already exists' });
+        }
+
+        const verificationCode = generateVerificationCode();
+        const user = new User({ 
+            username, 
+            email, 
+            password,
+            verificationCode,
+            verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+        });
         await user.save();
 
+        // Send verification email
+        const emailSent = await sendVerificationEmail(email, verificationCode);
+        if (!emailSent) {
+            await User.deleteOne({ _id: user._id });
+            return res.status(500).json({ message: 'Failed to send verification email' });
+        }
+
         const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ token, username: user.username });
+        res.status(201).json({ 
+            token, 
+            username: user.username,
+            email: user.email,
+            message: 'Signup successful! Check your email for verification code.'
+        });
     } catch (err) {
         console.error('Signup error:', err);
         res.status(500).json({ message: err.message || 'Error creating user' });
+    }
+});
+
+// Verify email code
+app.post('/api/auth/verify-email', async (req, res) => {
+    try {
+        const { email, verificationCode } = req.body;
+        
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: 'User not found' });
+
+        if (user.isEmailVerified) {
+            return res.status(400).json({ message: 'Email already verified' });
+        }
+
+        if (!user.verificationCode || user.verificationCode !== verificationCode) {
+            return res.status(400).json({ message: 'Invalid verification code' });
+        }
+
+        if (new Date() > user.verificationCodeExpires) {
+            return res.status(400).json({ message: 'Verification code expired' });
+        }
+
+        user.isEmailVerified = true;
+        user.verificationCode = null;
+        user.verificationCodeExpires = null;
+        await user.save();
+
+        res.json({ message: 'Email verified successfully' });
+    } catch (err) {
+        console.error('Verification error:', err);
+        res.status(500).json({ message: 'Error verifying email' });
+    }
+});
+
+// Resend verification code
+app.post('/api/auth/resend-code', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: 'User not found' });
+
+        if (user.isEmailVerified) {
+            return res.status(400).json({ message: 'Email already verified' });
+        }
+
+        const verificationCode = generateVerificationCode();
+        user.verificationCode = verificationCode;
+        user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+        await user.save();
+
+        const emailSent = await sendVerificationEmail(email, verificationCode);
+        if (!emailSent) {
+            return res.status(500).json({ message: 'Failed to send email' });
+        }
+
+        res.json({ message: 'Verification code resent' });
+    } catch (err) {
+        console.error('Resend error:', err);
+        res.status(500).json({ message: 'Error resending code' });
     }
 });
 

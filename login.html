@@ -460,6 +460,13 @@
                 </div>
 
                 <div class="input-group">
+                    <label for="signupEmail">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="signupEmail" placeholder="Enter your email" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="input-group">
                     <label for="signupPassword">Password</label>
                     <div class="input-wrapper">
                         <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password">
@@ -511,7 +518,42 @@
 
     <a href="index.html" class="skip-link">Skip login →</a>
 
+    <!-- Email Verification Modal -->
+    <div id="emailVerificationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10001; align-items: center; justify-content: center;">
+        <div style="background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0d0d0d 100%); padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.4); border: 1px solid #8b5cf6; text-align: center;">
+            <h2 style="color: #a78bfa; margin-bottom: 16px; font-size: 20px;">Verify Your Email</h2>
+            <p style="color: #b0b0b0; margin-bottom: 24px; font-size: 14px;">We've sent a verification code to your email. Enter it below:</p>
+            
+            <div style="margin-bottom: 24px;">
+                <input type="text" id="verificationCode" placeholder="Enter 6-digit code" style="width: 100%; padding: 12px; border: 1px solid #8b5cf6; border-radius: 6px; background: #1a1a1a; color: #e0e0e0; font-size: 16px; text-align: center; letter-spacing: 4px; outline: none;" maxlength="6">
+            </div>
+            
+            <button id="verifyCodeBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px;">Verify Code</button>
+            <button id="resendCodeBtn" style="width: 100%; padding: 12px; background: transparent; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 6px; cursor: pointer; font-weight: 600;">Resend Code</button>
+            
+            <div id="verificationMessage" style="margin-top: 16px; font-size: 13px;"></div>
+        </div>
+    </div>
+
     <script>
+        // Elements - Signup
+        const signupForm = document.getElementById('signupForm');
+        const signupUsernameInput = document.getElementById('signupUsername');
+        const signupEmailInput = document.getElementById('signupEmail');
+        const signupPasswordInput = document.getElementById('signupPassword');
+        const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const signupBtn = document.getElementById('signupBtn');
+        const signupStatusMessage = document.getElementById('signupStatusMessage');
+
+        // Email Verification
+        const emailVerificationModal = document.getElementById('emailVerificationModal');
+        const verificationCode = document.getElementById('verificationCode');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const resendCodeBtn = document.getElementById('resendCodeBtn');
+        const verificationMessage = document.getElementById('verificationMessage');
+        let pendingSignupData = null;
+
         // Elements - Login
         const loginForm = document.getElementById('loginForm');
         const loginUsernameInput = document.getElementById('loginUsername');
@@ -533,15 +575,6 @@
                 e.preventDefault();
             }, true);
         });
-
-        // Elements - Signup
-        const signupForm = document.getElementById('signupForm');
-        const signupUsernameInput = document.getElementById('signupUsername');
-        const signupPasswordInput = document.getElementById('signupPassword');
-        const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
-        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
-        const signupBtn = document.getElementById('signupBtn');
-        const signupStatusMessage = document.getElementById('signupStatusMessage');
 
         // Suppress Edge autofill popup by handling mousedown/mouseover on password fields
         [signupPasswordInput, signupPasswordConfirm].forEach(field => {
@@ -1009,11 +1042,19 @@
         // Signup handler
         async function handleSignup() {
             const username = signupUsernameInput.value.trim();
+            const email = signupEmailInput.value.trim();
             const password = signupPasswordInput.value;
             const passwordConfirm = signupPasswordConfirm.value;
 
-            if (!username || !password || !passwordConfirm) {
+            if (!username || !email || !password || !passwordConfirm) {
                 signupStatusMessage.textContent = '✗ Please fill in all fields';
+                signupStatusMessage.className = 'status-message error';
+                setEmotion('sad');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                signupStatusMessage.textContent = '✗ Please enter a valid email';
                 signupStatusMessage.className = 'status-message error';
                 setEmotion('sad');
                 return;
@@ -1031,7 +1072,51 @@
                 const response = await fetch('/api/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store signup data temporarily and show verification modal
+                    pendingSignupData = data;
+                    signupStatusMessage.textContent = '✓ Check your email for verification code';
+                    signupStatusMessage.className = 'status-message success';
+                    
+                    // Show verification modal
+                    emailVerificationModal.style.display = 'flex';
+                    verificationCode.focus();
+                } else {
+                    signupStatusMessage.textContent = '✗ ' + (data.message || 'Signup failed');
+                    signupStatusMessage.className = 'status-message error';
+                    setEmotion('sad');
+                }
+            } catch (err) {
+                console.error('Signup error:', err);
+                signupStatusMessage.textContent = '✗ Network error. Please try again.';
+                signupStatusMessage.className = 'status-message error';
+                setEmotion('sad');
+            }
+        }
+
+        // Verify email code
+        verifyCodeBtn.addEventListener('click', async () => {
+            const code = verificationCode.value.trim();
+            
+            if (!code || !pendingSignupData) {
+                verificationMessage.textContent = '✗ Please enter the code';
+                verificationMessage.style.color = '#ef4444';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: pendingSignupData.email,
+                        verificationCode: code 
+                    })
                 });
 
                 const data = await response.json();
@@ -1039,28 +1124,64 @@
                 if (response.ok) {
                     setEmotion('celebrate');
                     createFireworks();
-                    signupStatusMessage.textContent = '✓ Account created!';
-                    signupStatusMessage.className = 'status-message success';
+                    verificationMessage.textContent = '✓ Email verified!';
+                    verificationMessage.style.color = '#10b981';
                     
-                    localStorage.setItem('synchroEditToken', data.token);
-                    localStorage.setItem('synchroEditUser', data.username);
+                    // Save token and redirect
+                    localStorage.setItem('synchroEditToken', pendingSignupData.token);
+                    localStorage.setItem('synchroEditUser', pendingSignupData.username);
                     
-                    const params = new URLSearchParams(window.location.search);
-                    const docId = params.get('doc');
-                    const redirectUrl = docId ? `index.html?doc=${docId}` : 'index.html';
-                    
-                    setTimeout(() => { window.location.href = redirectUrl; }, 1500);
+                    setTimeout(() => {
+                        const params = new URLSearchParams(window.location.search);
+                        const docId = params.get('doc');
+                        if (docId) {
+                            window.location.href = `index.html?doc=${docId}`;
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 1500);
                 } else {
-                    setEmotion('shake-head');
-                    setTimeout(() => setEmotion('sad'), 400);
-                    signupStatusMessage.textContent = '✗ ' + (data.message || 'Signup failed');
-                    signupStatusMessage.className = 'status-message error';
+                    verificationMessage.textContent = '✗ Invalid code. Please try again.';
+                    verificationMessage.style.color = '#ef4444';
+                    setEmotion('sad');
                 }
             } catch (err) {
-                signupStatusMessage.textContent = '✗ Server error';
-                signupStatusMessage.className = 'status-message error';
+                console.error('Verification error:', err);
+                verificationMessage.textContent = '✗ Network error. Please try again.';
+                verificationMessage.style.color = '#ef4444';
             }
-        }
+        });
+
+        // Resend code
+        resendCodeBtn.addEventListener('click', async () => {
+            if (!pendingSignupData) return;
+
+            try {
+                const response = await fetch('/api/auth/resend-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingSignupData.email })
+                });
+
+                if (response.ok) {
+                    verificationMessage.textContent = '✓ Code resent to your email';
+                    verificationMessage.style.color = '#10b981';
+                    verificationCode.value = '';
+                    verificationCode.focus();
+                } else {
+                    verificationMessage.textContent = '✗ Failed to resend code';
+                    verificationMessage.style.color = '#ef4444';
+                }
+            } catch (err) {
+                console.error('Resend error:', err);
+                verificationMessage.textContent = '✗ Network error';
+                verificationMessage.style.color = '#ef4444';
+            }
+        });
+
+        verificationCode.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyCodeBtn.click();
+        });
 
         loginBtn.addEventListener('click', handleLogin);
         signupBtn.addEventListener('click', handleSignup);

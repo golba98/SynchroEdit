@@ -196,7 +196,9 @@ app.post('/api/auth/verify-email', async (req, res) => {
         if (!user) return res.status(400).json({ message: 'User not found' });
 
         if (user.isEmailVerified) {
-            return res.status(400).json({ message: 'Email already verified' });
+            // Provide a fresh token so the user can continue without logging in again
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+            return res.status(200).json({ message: 'Email already verified', token, username: user.username });
         }
 
         if (!user.verificationCode || user.verificationCode !== verificationCode) {
@@ -212,7 +214,8 @@ app.post('/api/auth/verify-email', async (req, res) => {
         user.verificationCodeExpires = null;
         await user.save();
 
-        res.json({ message: 'Email verified successfully' });
+        const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+        res.json({ message: 'Email verified successfully', token, username: user.username });
     } catch (err) {
         console.error('Verification error:', err);
         res.status(500).json({ message: 'Error verifying email' });
@@ -268,12 +271,16 @@ app.post('/api/auth/login', async (req, res) => {
             user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
             await user.save();
 
-            const emailSent = await sendVerificationEmail(user.email, verificationCode);
+            // Fire-and-forget to avoid slowing down the response
+            sendVerificationEmail(user.email, verificationCode).catch(err => {
+                console.error('Deferred verification email failed:', err);
+            });
 
             return res.status(403).json({ 
-                message: emailSent ? 'Email not verified. A new verification code has been sent.' : 'Email not verified. Failed to send email. Check server logs for code.',
+                message: 'Email not verified. We just sent a fresh code.',
                 requiresVerification: true,
-                email: user.email
+                email: user.email,
+                username: user.username
             });
         }
 

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - SynchroEdit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { color-scheme: dark; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(167,139,250,0.12), transparent 25%),
+                        radial-gradient(circle at 80% 0%, rgba(99,102,241,0.12), transparent 18%),
+                        linear-gradient(135deg, #0b021a 0%, #08000f 40%, #05000a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e0e0e0;
+            padding: 16px;
+        }
+        .card {
+            width: 100%;
+            max-width: 480px;
+            background: #0f0f13;
+            border: 1px solid rgba(139, 92, 246, 0.45);
+            border-radius: 16px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(139, 92, 246, 0.25);
+            padding: 32px;
+        }
+        .heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #c4b5fd;
+            margin-bottom: 12px;
+        }
+        .muted { color: #9ca3af; font-size: 14px; line-height: 1.5; margin-bottom: 18px; }
+        .email-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            border-radius: 10px;
+            color: #e5e7eb;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .field-label { font-size: 13px; color: #a1a1aa; margin-bottom: 6px; display: block; }
+        .code-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: #16161d;
+            color: #f5f5f5;
+            letter-spacing: 6px;
+            text-align: center;
+            font-size: 18px;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .code-input:focus { border-color: rgba(139,92,246,0.8); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+        .actions { display: flex; gap: 12px; margin-top: 18px; }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(99,102,241,0.35);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+        .btn:active { transform: translateY(1px); }
+        .status { margin-top: 14px; font-size: 13px; min-height: 18px; }
+        .status.error { color: #f87171; }
+        .status.success { color: #34d399; }
+        .footer { margin-top: 22px; font-size: 13px; color: #9ca3af; display: flex; justify-content: space-between; align-items: center; }
+        .link { color: #c4b5fd; text-decoration: none; font-weight: 600; }
+        .link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="heading"><i class="fas fa-shield-check"></i>Verify your email</div>
+        <p class="muted" id="introText">We sent a 6-digit code to your email. Enter it below to continue.</p>
+        <div class="email-tag" id="emailTag"><i class="fas fa-envelope"></i><span id="emailValue">example@email.com</span></div>
+
+        <label class="field-label" for="codeInput">Verification code</label>
+        <input id="codeInput" class="code-input" type="text" maxlength="6" autocomplete="one-time-code" placeholder="000000" />
+
+        <div class="actions">
+            <button id="verifyBtn" class="btn btn-primary">Confirm</button>
+            <button id="resendBtn" class="btn btn-secondary">Resend code</button>
+        </div>
+
+        <div class="status" id="statusMessage"></div>
+
+        <div class="footer">
+            <span id="lastMessage"></span>
+            <a class="link" href="login.html">Back to login</a>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const storedEmail = sessionStorage.getItem('verificationEmail');
+        const email = storedEmail || params.get('email');
+        const storedUsername = sessionStorage.getItem('verificationUsername');
+        const verificationMessage = sessionStorage.getItem('verificationMessage') || 'Use the code we just sent to continue.';
+        const docId = sessionStorage.getItem('postLoginDocId');
+
+        const emailValueEl = document.getElementById('emailValue');
+        const introTextEl = document.getElementById('introText');
+        const codeInput = document.getElementById('codeInput');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const resendBtn = document.getElementById('resendBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const lastMessage = document.getElementById('lastMessage');
+
+        if (!email) {
+            window.location.href = 'login.html';
+        } else {
+            emailValueEl.textContent = email;
+            introTextEl.textContent = `We sent a 6-digit code to ${email}. Open your inbox and paste it below.`;
+            lastMessage.textContent = verificationMessage;
+            // Send a fresh code on arrival to this page
+            sendCode();
+        }
+
+        function setStatus(text, type = '') {
+            statusMessage.textContent = text;
+            statusMessage.className = 'status ' + type;
+        }
+
+        async function sendCode() {
+            setStatus('Sending code...', '');
+            try {
+                const response = await fetch('/api/auth/resend-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                if (response.ok) {
+                    setStatus('Code sent. Check your email.', 'success');
+                    codeInput.value = '';
+                    codeInput.focus();
+                } else {
+                    const data = await response.json();
+                    setStatus(data.message || 'Unable to send code. Try again.', 'error');
+                }
+            } catch (err) {
+                console.error('Resend error:', err);
+                setStatus('Network error. Try again.', 'error');
+            }
+        }
+
+        async function verifyCode() {
+            const code = codeInput.value.trim();
+            if (!code || code.length < 6) {
+                setStatus('Enter the 6-digit code.', 'error');
+                codeInput.focus();
+                return;
+            }
+
+            setStatus('Verifying...', '');
+            try {
+                const response = await fetch('/api/auth/verify-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, verificationCode: code })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setStatus('Email verified! Redirecting...', 'success');
+                    localStorage.setItem('synchroEditToken', data.token);
+                    localStorage.setItem('synchroEditUser', data.username || storedUsername || '');
+                    sessionStorage.removeItem('verificationEmail');
+                    sessionStorage.removeItem('verificationUsername');
+                    sessionStorage.removeItem('verificationMessage');
+                    const redirectUrl = docId ? `index.html?doc=${docId}` : 'index.html';
+                    sessionStorage.removeItem('postLoginDocId');
+                    setTimeout(() => window.location.href = redirectUrl, 1200);
+                } else {
+                    setStatus(data.message || 'Invalid code. Try again.', 'error');
+                }
+            } catch (err) {
+                console.error('Verification error:', err);
+                setStatus('Network error. Try again.', 'error');
+            }
+        }
+
+        verifyBtn.addEventListener('click', verifyCode);
+        resendBtn.addEventListener('click', sendCode);
+        codeInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyCode(); });
+        codeInput.focus();
+    </script>
+</body>
+</html>

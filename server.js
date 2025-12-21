@@ -116,6 +116,29 @@ app.post('/api/auth/signup', async (req, res) => {
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
+            if (!existingUser.isEmailVerified) {
+                // User exists but is not verified. Treat this as a retry/resend.
+                const verificationCode = generateVerificationCode();
+                existingUser.username = username; // Update username if changed
+                existingUser.password = password; // Update password (will be hashed by pre-save hook)
+                existingUser.verificationCode = verificationCode;
+                existingUser.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+                await existingUser.save();
+
+                const emailSent = await sendVerificationEmail(email, verificationCode);
+                if (!emailSent) {
+                    return res.status(500).json({ message: 'Failed to send verification email' });
+                }
+
+                const token = jwt.sign({ id: existingUser._id, username: existingUser.username }, JWT_SECRET, { expiresIn: '24h' });
+
+                return res.status(200).json({
+                    token,
+                    username: existingUser.username,
+                    email: existingUser.email,
+                    message: 'Verification code resent. Please check your email.'
+                });
+            }
             return res.status(400).json({ message: 'Username or email already exists' });
         }
 

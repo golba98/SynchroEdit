@@ -21,6 +21,9 @@ const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM = process.env.RESEND_FROM || 'no-reply@synchroedit.com';
+const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 
 // Setup email transporter (tuned for Render timeouts)
 const transporter = nodemailer.createTransport({
@@ -46,36 +49,75 @@ function generateVerificationCode() {
 
 // Function to send verification email
 async function sendVerificationEmail(email, code) {
+    if (!EMAIL_VERIFICATION_ENABLED) {
+        console.log('Email verification disabled; skipping send.');
+        return true;
+    }
     console.log(`Attempting to send email to: ${email}`);
-    console.log(`Verification Code: ${code}`); // Log code for debugging/dev purposes
+    console.log(`Verification Code: ${code}`);
+
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+            <h2 style="color: #8b5cf6; text-align: center;">SynchroEdit</h2>
+            <p style="color: #333; font-size: 16px;">Welcome to SynchroEdit!</p>
+            <p style="color: #666; font-size: 14px;">Your email verification code is:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 36px; font-weight: bold; color: #8b5cf6; letter-spacing: 8px; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #8b5cf6;">
+                    ${code}
+                </div>
+            </div>
+            <p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+            <p style="color: #999; font-size: 12px; text-align: center;">If you didn't sign up for SynchroEdit, please ignore this email.</p>
+        </div>
+    `;
+
+    // Prefer Resend (HTTP) to avoid SMTP egress issues
+    if (RESEND_API_KEY) {
+        try {
+            const response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${RESEND_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: RESEND_FROM,
+                    to: email,
+                    subject: 'SynchroEdit - Email Verification Code',
+                    html
+                })
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Resend send failure:', response.status, text);
+                // Fall through to SMTP
+            } else {
+                console.log('Email sent via Resend');
+                return true;
+            }
+        } catch (err) {
+            console.error('Resend error:', err);
+            // Fall through to SMTP
+        }
+    }
+
     if (!SMTP_USER || !SMTP_PASS) {
         console.error('Email configuration missing: SMTP_USER or SMTP_PASS is not defined.');
         return false;
     }
+
     try {
         await transporter.sendMail({
             from: `"SynchroEdit" <${SMTP_USER}>`,
             to: email,
             subject: 'SynchroEdit - Email Verification Code',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
-                    <h2 style="color: #8b5cf6; text-align: center;">SynchroEdit</h2>
-                    <p style="color: #333; font-size: 16px;">Welcome to SynchroEdit!</p>
-                    <p style="color: #666; font-size: 14px;">Your email verification code is:</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <div style="font-size: 36px; font-weight: bold; color: #8b5cf6; letter-spacing: 8px; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #8b5cf6;">
-                            ${code}
-                        </div>
-                    </div>
-                    <p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
-                    <p style="color: #999; font-size: 12px; text-align: center;">If you didn't sign up for SynchroEdit, please ignore this email.</p>
-                </div>
-            `
+            html
         });
-        console.log('Email sent successfully');
+        console.log('Email sent via SMTP');
         return true;
     } catch (err) {
-        console.error('Email sending error details:', err);
+        console.error('SMTP email sending error:', err);
         return false;
     }
 }
@@ -108,7 +150,7 @@ const authenticateToken = (req, res, next) => {
             const dbUser = await User.findById(user.id);
             if (!dbUser) return res.status(403).json({ message: 'User not found' });
             
-            if (!dbUser.isEmailVerified) {
+            if (EMAIL_VERIFICATION_ENABLED && !dbUser.isEmailVerified) {
                 return res.status(403).json({ message: 'Email not verified' });
             }
             
@@ -140,6 +182,17 @@ app.post('/api/auth/signup', async (req, res) => {
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             if (!existingUser.isEmailVerified) {
+                if (!EMAIL_VERIFICATION_ENABLED) {
+                    existingUser.username = username;
+                    existingUser.password = password;
+                    existingUser.isEmailVerified = true;
+                    existingUser.verificationCode = null;
+                    existingUser.verificationCodeExpires = null;
+                    await existingUser.save();
+                    const token = jwt.sign({ id: existingUser._id, username: existingUser.username }, JWT_SECRET, { expiresIn: '24h' });
+                    return res.status(200).json({ token, username: existingUser.username, email: existingUser.email, message: 'Signup successful (verification disabled).' });
+                }
+
                 // User exists but is not verified. Treat this as a retry/resend.
                 const verificationCode = generateVerificationCode();
                 existingUser.username = username; // Update username if changed
@@ -170,25 +223,35 @@ app.post('/api/auth/signup', async (req, res) => {
             username, 
             email, 
             password,
-            verificationCode,
-            verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+            verificationCode: EMAIL_VERIFICATION_ENABLED ? verificationCode : null,
+            verificationCodeExpires: EMAIL_VERIFICATION_ENABLED ? new Date(Date.now() + 10 * 60 * 1000) : null,
+            isEmailVerified: !EMAIL_VERIFICATION_ENABLED
         });
         await user.save();
 
-        // Send verification email
-        const emailSent = await sendVerificationEmail(email, verificationCode);
-        if (!emailSent) {
-            await User.deleteOne({ _id: user._id });
-            return res.status(500).json({ message: 'Failed to send verification email' });
+        let token;
+        if (EMAIL_VERIFICATION_ENABLED) {
+            const emailSent = await sendVerificationEmail(email, verificationCode);
+            if (!emailSent) {
+                await User.deleteOne({ _id: user._id });
+                return res.status(500).json({ message: 'Failed to send verification email' });
+            }
+            token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+            res.status(201).json({ 
+                token, 
+                username: user.username,
+                email: user.email,
+                message: 'Signup successful! Check your email for verification code.'
+            });
+        } else {
+            token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+            res.status(201).json({ 
+                token, 
+                username: user.username,
+                email: user.email,
+                message: 'Signup successful (verification disabled).' 
+            });
         }
-
-        const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ 
-            token, 
-            username: user.username,
-            email: user.email,
-            message: 'Signup successful! Check your email for verification code.'
-        });
     } catch (err) {
         console.error('Signup error:', err);
         res.status(500).json({ message: err.message || 'Error creating user' });
@@ -202,6 +265,15 @@ app.post('/api/auth/verify-email', async (req, res) => {
         
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'User not found' });
+
+        if (!EMAIL_VERIFICATION_ENABLED) {
+            user.isEmailVerified = true;
+            user.verificationCode = null;
+            user.verificationCodeExpires = null;
+            await user.save();
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+            return res.status(200).json({ message: 'Verification disabled; user marked verified.', token, username: user.username });
+        }
 
         if (user.isEmailVerified) {
             // Provide a fresh token so the user can continue without logging in again
@@ -233,6 +305,10 @@ app.post('/api/auth/verify-email', async (req, res) => {
 // Resend verification code
 app.post('/api/auth/resend-code', async (req, res) => {
     try {
+        if (!EMAIL_VERIFICATION_ENABLED) {
+            return res.status(200).json({ message: 'Verification disabled; no code sent.' });
+        }
+
         const { email } = req.body;
         
         const user = await User.findOne({ email });
@@ -274,22 +350,29 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
         if (!user.isEmailVerified) {
-            const verificationCode = generateVerificationCode();
-            user.verificationCode = verificationCode;
-            user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
-            await user.save();
+            if (!EMAIL_VERIFICATION_ENABLED) {
+                user.isEmailVerified = true;
+                user.verificationCode = null;
+                user.verificationCodeExpires = null;
+                await user.save();
+            } else {
+                const verificationCode = generateVerificationCode();
+                user.verificationCode = verificationCode;
+                user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+                await user.save();
 
-            // Fire-and-forget to avoid slowing down the response
-            sendVerificationEmail(user.email, verificationCode).catch(err => {
-                console.error('Deferred verification email failed:', err);
-            });
+                // Fire-and-forget to avoid slowing down the response
+                sendVerificationEmail(user.email, verificationCode).catch(err => {
+                    console.error('Deferred verification email failed:', err);
+                });
 
-            return res.status(403).json({ 
-                message: 'Email not verified. We just sent a fresh code.',
-                requiresVerification: true,
-                email: user.email,
-                username: user.username
-            });
+                return res.status(403).json({ 
+                    message: 'Email not verified. We just sent a fresh code.',
+                    requiresVerification: true,
+                    email: user.email,
+                    username: user.username
+                });
+            }
         }
 
         const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });

@@ -1207,6 +1207,34 @@
         startBlinking();
         enableMouseTracking();
         loginUsernameInput.focus();
+
+        // Check if already logged in
+        const token = localStorage.getItem('synchroEditToken');
+        if (token && token !== 'local-preview-token') {
+            // Verify token with server before redirecting
+            fetch('/api/user/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(response => {
+                if (response.ok) {
+                    const params = new URLSearchParams(window.location.search);
+                    const docId = params.get('doc');
+                    const redirectUrl = docId ? `index.html?doc=${docId}` : 'index.html';
+                    window.location.href = redirectUrl;
+                } else {
+                    // Token invalid or user deleted
+                    console.log('Session invalid, clearing token');
+                    localStorage.removeItem('synchroEditToken');
+                    localStorage.removeItem('synchroEditUser');
+                }
+            }).catch(err => {
+                console.error('Session check failed:', err);
+                // If network error, we might want to keep them on login page
+                // or try to let them in if it's just a temporary glitch.
+                // For security, staying on login is safer.
+            });
+        } else {
+            localStorage.removeItem('synchroEditToken');
+        }
     </script>
 </body>
 </html>

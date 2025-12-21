@@ -13,7 +13,7 @@ if (!token || token === 'local-preview-token') {
 fetch('/api/user/profile', {
     headers: { 'Authorization': `Bearer ${token}` }
 }).then(response => {
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401 || response.status === 403 || response.status === 404) {
         localStorage.removeItem('synchroEditToken');
         window.location.href = 'login.html';
     }

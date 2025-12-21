@@ -1,15 +1,23 @@
 // Auth Check
 let token = localStorage.getItem('synchroEditToken');
 
-if (!token) {
+// Redirect if no token or if it's the old local preview token
+if (!token || token === 'local-preview-token') {
+    localStorage.removeItem('synchroEditToken');
     const params = new URLSearchParams(window.location.search);
     const docId = params.get('doc');
-    if (docId) {
-        window.location.href = `login.html?doc=${docId}`;
-    } else {
+    window.location.href = docId ? `login.html?doc=${docId}` : 'login.html';
+}
+
+// Verify token validity with server
+fetch('/api/user/profile', {
+    headers: { 'Authorization': `Bearer ${token}` }
+}).then(response => {
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('synchroEditToken');
         window.location.href = 'login.html';
     }
-}
+}).catch(console.error);
 
 // Wait for DOM to be ready before initializing
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,13 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
     Quill.register(Font, true);
 
-    // Check for local preview mode
-    if (localStorage.getItem('synchroEditToken') === 'local-preview-token') {
-        const badge = document.getElementById('localModeBadge');
-        if (badge) badge.style.display = 'block';
-    }
-
-// Initialize Quill Editor variables
+    // Initialize Quill Editor variables
 let quill = null;
 let pageQuillInstances = {};
 

@@ -1450,7 +1450,9 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
         // Check authentication before loading app
-        if (!localStorage.getItem('synchroEditToken')) {
+        const token = localStorage.getItem('synchroEditToken');
+        if (!token || token === 'local-preview-token') {
+            localStorage.removeItem('synchroEditToken');
             window.location.href = 'login.html';
         }
     </script>

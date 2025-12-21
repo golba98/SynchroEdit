@@ -39,6 +39,7 @@ function generateVerificationCode() {
 // Function to send verification email
 async function sendVerificationEmail(email, code) {
     console.log(`Attempting to send email to: ${email}`);
+    console.log(`Verification Code: ${code}`); // Log code for debugging/dev purposes
     if (!SMTP_USER || !SMTP_PASS) {
         console.error('Email configuration missing: SMTP_USER or SMTP_PASS is not defined.');
         return false;
@@ -247,6 +248,21 @@ app.post('/api/auth/login', async (req, res) => {
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+        if (!user.isEmailVerified) {
+            const verificationCode = generateVerificationCode();
+            user.verificationCode = verificationCode;
+            user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+            await user.save();
+
+            await sendVerificationEmail(user.email, verificationCode);
+
+            return res.status(403).json({ 
+                message: 'Email not verified. A new verification code has been sent.',
+                requiresVerification: true,
+                email: user.email
+            });
+        }
 
         const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, username: user.username });

@@ -21,8 +21,6 @@ const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM = process.env.RESEND_FROM || 'no-reply@synchroedit.com';
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 
 // Setup email transporter (tuned for Render timeouts)
@@ -70,37 +68,6 @@ async function sendVerificationEmail(email, code) {
             <p style="color: #999; font-size: 12px; text-align: center;">If you didn't sign up for SynchroEdit, please ignore this email.</p>
         </div>
     `;
-
-    // Prefer Resend (HTTP) to avoid SMTP egress issues
-    if (RESEND_API_KEY) {
-        try {
-            const response = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${RESEND_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    from: RESEND_FROM,
-                    to: email,
-                    subject: 'SynchroEdit - Email Verification Code',
-                    html
-                })
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                console.error('Resend send failure:', response.status, text);
-                // Fall through to SMTP
-            } else {
-                console.log('Email sent via Resend');
-                return true;
-            }
-        } catch (err) {
-            console.error('Resend error:', err);
-            // Fall through to SMTP
-        }
-    }
 
     if (!SMTP_USER || !SMTP_PASS) {
         console.error('Email configuration missing: SMTP_USER or SMTP_PASS is not defined.');

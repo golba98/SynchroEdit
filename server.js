@@ -21,12 +21,13 @@ const SMTP_PASS = process.env.SMTP_PASS;
 
 // Setup email transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // use STARTTLS
+    service: 'gmail',
     auth: {
         user: SMTP_USER,
         pass: SMTP_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // Helps with some cloud provider SSL issues
     }
 });
 

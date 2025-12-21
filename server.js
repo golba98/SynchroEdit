@@ -21,7 +21,9 @@ const SMTP_PASS = process.env.SMTP_PASS;
 
 // Setup email transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // use SSL
     auth: {
         user: SMTP_USER,
         pass: SMTP_PASS
@@ -35,9 +37,14 @@ function generateVerificationCode() {
 
 // Function to send verification email
 async function sendVerificationEmail(email, code) {
+    console.log(`Attempting to send email to: ${email}`);
+    if (!SMTP_USER || !SMTP_PASS) {
+        console.error('Email configuration missing: SMTP_USER or SMTP_PASS is not defined.');
+        return false;
+    }
     try {
         await transporter.sendMail({
-            from: SMTP_USER,
+            from: `"SynchroEdit" <${SMTP_USER}>`,
             to: email,
             subject: 'SynchroEdit - Email Verification Code',
             html: `
@@ -55,9 +62,10 @@ async function sendVerificationEmail(email, code) {
                 </div>
             `
         });
+        console.log('Email sent successfully');
         return true;
     } catch (err) {
-        console.error('Email sending error:', err);
+        console.error('Email sending error details:', err);
         return false;
     }
 }
@@ -94,6 +102,12 @@ const authenticateToken = (req, res, next) => {
 
 app.post('/api/auth/signup', async (req, res) => {
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected. Current state:', mongoose.connection.readyState);
+            return res.status(500).json({ message: 'Database connection error. Please check server logs.' });
+        }
+
         const { username, email, password } = req.body;
         
         if (!username || !email || !password) {
@@ -198,6 +212,11 @@ app.post('/api/auth/resend-code', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(500).json({ message: 'Database connection error' });
+        }
+
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user) return res.status(400).json({ message: 'User not found' });

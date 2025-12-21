@@ -1034,7 +1034,8 @@
                     loginStatusMessage.className = 'status-message error';
                 }
             } catch (err) {
-                loginStatusMessage.textContent = '✗ Server error';
+                console.error('Login error:', err);
+                loginStatusMessage.textContent = '✗ ' + (err.message || 'Server error');
                 loginStatusMessage.className = 'status-message error';
             }
         }
@@ -1093,7 +1094,7 @@
                 }
             } catch (err) {
                 console.error('Signup error:', err);
-                signupStatusMessage.textContent = '✗ Network error. Please try again.';
+                signupStatusMessage.textContent = '✗ ' + (err.message || 'Network error. Please try again.');
                 signupStatusMessage.className = 'status-message error';
                 setEmotion('sad');
             }

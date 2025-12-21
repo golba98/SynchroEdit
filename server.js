@@ -268,10 +268,10 @@ app.post('/api/auth/login', async (req, res) => {
             user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
             await user.save();
 
-            await sendVerificationEmail(user.email, verificationCode);
+            const emailSent = await sendVerificationEmail(user.email, verificationCode);
 
             return res.status(403).json({ 
-                message: 'Email not verified. A new verification code has been sent.',
+                message: emailSent ? 'Email not verified. A new verification code has been sent.' : 'Email not verified. Failed to send email. Check server logs for code.',
                 requiresVerification: true,
                 email: user.email
             });

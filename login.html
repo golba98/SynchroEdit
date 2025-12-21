@@ -1028,16 +1028,22 @@
                     
                     setTimeout(() => { window.location.href = redirectUrl; }, 1500);
                 } else if (response.status === 403 && data.requiresVerification) {
+                    console.log('Verification required:', data);
                     pendingSignupData = { email: data.email };
                     loginStatusMessage.textContent = '⚠ ' + data.message;
                     loginStatusMessage.className = 'status-message error';
                     
-                    setTimeout(() => {
+                    // Show modal immediately
+                    if (emailVerificationModal) {
                         emailVerificationModal.style.display = 'flex';
+                        verificationCode.value = '';
                         verificationCode.focus();
                         verificationMessage.textContent = data.message;
                         verificationMessage.style.color = '#e0e0e0';
-                    }, 1000);
+                    } else {
+                        console.error('Email verification modal not found in DOM');
+                        alert('Verification required. Please check your email for the code.');
+                    }
                 } else {
                     setEmotion('shake-head');
                     setTimeout(() => setEmotion('sad'), 400);

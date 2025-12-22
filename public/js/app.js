@@ -18,7 +18,19 @@ class App {
     }
 
     async init() {
-        this.user = await this.profile.loadProfile();
+        // Start loading profile and document/library in parallel
+        const profilePromise = this.profile.loadProfile();
+        
+        let initialTask;
+        if (this.documentId) {
+            initialTask = this.loadDocument();
+        } else {
+            initialTask = this.showLibrary();
+        }
+
+        // Wait for profile first as it's critical for auth
+        this.user = await profilePromise;
+        
         if (!this.user) {
             const params = new URLSearchParams(window.location.search).get('doc');
             window.location.href = params ? `login.html?doc=${params}` : 'login.html';
@@ -26,19 +38,17 @@ class App {
         }
 
         this.setupEventListeners();
-        
-        if (this.documentId) {
-            await this.loadDocument();
-        } else {
-            this.showLibrary();
-        }
-
         this.setupRibbonTabs();
+
+        // Ensure the initial loading task (doc or library) is also finished
+        await initialTask;
     }
 
     async loadDocument() {
         try {
-            await Network.addToRecent(this.documentId);
+            // Fire and forget - don't wait for recent list update to show the editor
+            Network.addToRecent(this.documentId).catch(err => console.warn('Recent list update failed:', err));
+
             this.editor = new Editor('pagesContainer', {
                 onContentChange: (type, data) => this.handleContentChange(type, data),
                 onPageChange: (index) => this.updateStatus(index)

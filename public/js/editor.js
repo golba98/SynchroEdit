@@ -41,13 +41,29 @@ export class Editor {
         this.container.innerHTML = '';
         this.pageQuillInstances = {};
         
-        this.pages.forEach((page, index) => {
-            this.createPageEditor(index);
-        });
+        // Render the current page immediately for perceived speed
+        this.createPageEditor(this.currentPageIndex);
         
-        this.isLoadingFromServer = wasLoading;
+        // Render remaining pages in the background to keep UI responsive
+        const otherIndices = this.pages.map((_, i) => i).filter(i => i !== this.currentPageIndex);
+        
+        const renderRemaining = (indices) => {
+            if (indices.length === 0) {
+                this.isLoadingFromServer = wasLoading;
+                this.applyZoom();
+                return;
+            }
+            
+            // Use requestAnimationFrame or setTimeout to yield to the UI thread
+            requestAnimationFrame(() => {
+                const index = indices.shift();
+                this.createPageEditor(index);
+                renderRemaining(indices);
+            });
+        };
+
+        renderRemaining(otherIndices);
         this.switchToPage(this.currentPageIndex);
-        this.applyZoom();
     }
 
     createPageEditor(pageIndex) {

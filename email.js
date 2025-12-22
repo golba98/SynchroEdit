@@ -6,10 +6,16 @@ const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
-// Default to 465 (SSL) for Gmail if not specified, as it's often more reliable in cloud envs than 587 (STARTTLS)
 const isGmail = SMTP_HOST.includes('gmail');
-const defaultPort = isGmail ? 465 : 587;
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || defaultPort.toString(), 10);
+
+// Force Gmail to use port 465 if it's currently set to 587 (common default that fails on cloud)
+let portFromEnv = parseInt(process.env.SMTP_PORT || (isGmail ? '465' : '587'), 10);
+if (isGmail && portFromEnv === 587) {
+    console.log('Detected Gmail with port 587. Automatically switching to port 465 (SSL) for better reliability on cloud hosting.');
+    portFromEnv = 465;
+}
+
+const SMTP_PORT = portFromEnv;
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 

@@ -1218,7 +1218,7 @@
             <div class="ribbon-section-title">Font</div>
             <div class="ribbon-section-tools" id="editor-toolbar">
                 <select class="ql-font" title="Font Family">
-                    <option selected>Sans Serif</option>
+                    <option value="" selected>Sans Serif</option>
                     <option value="roboto">Roboto</option>
                     <option value="open-sans">Open Sans</option>
                     <option value="lato">Lato</option>
@@ -1253,11 +1253,24 @@
                 <button class="ql-italic toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
                 <button class="ql-underline toolbar-btn" title="Underline"><i class="fas fa-underline"></i></button>
                 <button class="ql-strike toolbar-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
-                <div style="position: relative; display: flex; align-items: center;">
+                <div style="position: relative; display: flex; align-items: center;" class="color-dropdown-container">
                     <button class="ql-color toolbar-btn" id="textColorBtn" title="Text Color">
                         <i class="fas fa-font"></i>
                         <div id="textColorIndicator" style="position: absolute; bottom: 2px; left: 4px; right: 4px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
                     </button>
+                    <div id="textColorMenu" class="color-menu" style="display: none; position: absolute; top: 100%; left: 0; background: #1a1a1a; border: 1px solid var(--accent-color); padding: 8px; border-radius: 4px; z-index: 1000; grid-template-columns: repeat(5, 1fr); gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                        <div class="color-option" data-color="#ffffff" style="width: 20px; height: 20px; background: #ffffff; cursor: pointer; border-radius: 2px; border: 1px solid #333;"></div>
+                        <div class="color-option" data-color="#000000" style="width: 20px; height: 20px; background: #000000; cursor: pointer; border-radius: 2px; border: 1px solid #333;"></div>
+                        <div class="color-option" data-color="#ff0000" style="width: 20px; height: 20px; background: #ff0000; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#00ff00" style="width: 20px; height: 20px; background: #00ff00; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#0000ff" style="width: 20px; height: 20px; background: #0000ff; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#ffff00" style="width: 20px; height: 20px; background: #ffff00; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#00ffff" style="width: 20px; height: 20px; background: #00ffff; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#ff00ff" style="width: 20px; height: 20px; background: #ff00ff; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#ffa500" style="width: 20px; height: 20px; background: #ffa500; cursor: pointer; border-radius: 2px;"></div>
+                        <div class="color-option" data-color="#800080" style="width: 20px; height: 20px; background: #800080; cursor: pointer; border-radius: 2px;"></div>
+                        <div id="customColorBtn" style="grid-column: span 5; font-size: 10px; color: #b0b0b0; text-align: center; margin-top: 4px; cursor: pointer; border-top: 1px solid #333; padding-top: 4px;">More colors...</div>
+                    </div>
                     <input type="color" id="textColorPicker" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
                 </div>
             </div>

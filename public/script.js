@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     Size.whitelist = ['8px', '9px', '10px', '11px', '12px', '14px', '16px', '18px', '20px', '22px', '24px', '26px', '28px', '36px', '48px', '72px'];
     Quill.register(Size, true);
 
-    // Register custom fonts
-    const Font = Quill.import('attributors/style/font');
+    // Register custom fonts using classes (Standard Quill font format)
+    const Font = Quill.import('formats/font');
     Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
     Quill.register(Font, true);
 
@@ -1276,7 +1276,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Home Tab Features
     function setupHomeFeatures() {
-        if (!quill) return;
         // Get all Quill format buttons
         const boldBtn = document.querySelector('.ql-bold');
         const italicBtn = document.querySelector('.ql-italic');
@@ -1294,27 +1293,61 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Wire up the buttons manually
         if (boldBtn) boldBtn.addEventListener('click', () => { 
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('bold', !format.bold);
         });
         
         if (italicBtn) italicBtn.addEventListener('click', () => { 
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('italic', !format.italic);
         });
         
         if (underlineBtn) underlineBtn.addEventListener('click', () => { 
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('underline', !format.underline);
         });
         
         if (strikeBtn) strikeBtn.addEventListener('click', () => { 
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('strike', !format.strike);
         });
 
         if (textColorBtn && textColorPicker) {
-            textColorBtn.addEventListener('click', () => textColorPicker.click());
+            const textColorMenu = document.getElementById('textColorMenu');
+            const customColorBtn = document.getElementById('customColorBtn');
+
+            textColorBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (textColorMenu) {
+                    const isVisible = textColorMenu.style.display === 'grid';
+                    textColorMenu.style.display = isVisible ? 'none' : 'grid';
+                }
+            });
+
+            if (textColorMenu) {
+                textColorMenu.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const color = e.target.dataset.color;
+                        if (quill) {
+                            quill.format('color', color);
+                        }
+                        if (textColorIndicator) textColorIndicator.style.background = color;
+                        textColorMenu.style.display = 'none';
+                    });
+                });
+            }
+
+            if (customColorBtn) {
+                customColorBtn.addEventListener('click', () => {
+                    textColorPicker.click();
+                    if (textColorMenu) textColorMenu.style.display = 'none';
+                });
+            }
+
             textColorPicker.addEventListener('input', (e) => {
                 const color = e.target.value;
                 if (quill) {
@@ -1322,34 +1355,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (textColorIndicator) textColorIndicator.style.background = color;
             });
+
+            // Close menu on outside click
+            document.addEventListener('click', (e) => {
+                if (textColorMenu && !textColorBtn.contains(e.target) && !textColorMenu.contains(e.target)) {
+                    textColorMenu.style.display = 'none';
+                }
+            });
         }
         
         if (alignSelect) alignSelect.addEventListener('change', (e) => {
+            if (!quill) return;
             const value = e.target.value || false;
             quill.format('align', value);
         });
 
         if (sizeSelect) sizeSelect.addEventListener('change', (e) => {
+            if (!quill) return;
             const value = e.target.value;
             quill.format('size', value);
         });
 
         if (fontSelect) fontSelect.addEventListener('change', (e) => {
+            if (!quill) return;
             const value = e.target.value;
             quill.format('font', value);
         });
         
         if (orderedListBtn) orderedListBtn.addEventListener('click', () => {
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('list', format.list === 'ordered' ? false : 'ordered');
         });
         
         if (bulletListBtn) bulletListBtn.addEventListener('click', () => {
+            if (!quill) return;
             const format = quill.getFormat();
             quill.format('list', format.list === 'bullet' ? false : 'bullet');
         });
         
         if (cleanBtn) cleanBtn.addEventListener('click', () => {
+            if (!quill) return;
             const range = quill.getSelection();
             if (range) {
                 quill.removeFormat(range.index, range.length);
@@ -2891,9 +2937,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
-                // For a web app "Save" usually means sync to server (which is automatic)
-                // or export in a default format. Let's make it export as JSON (full backup)
-                saveFileBtn.click();
+                // Since the app auto-saves via WebSockets, we just show a visual confirmation
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+                saveBtn.style.background = '#10b981'; // Green color for success
+                
+                // Trigger an immediate DB update if possible (though auto-save handles it)
+                if (quill && documentId) {
+                    const currentDelta = quill.getContents();
+                    sendToServer({
+                        type: 'update-page',
+                        pageIndex: currentPageIndex,
+                        content: currentDelta
+                    });
+                }
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = ''; // Revert to original CSS
+                }, 2000);
             });
         }
 

@@ -71,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const createNewDoc = document.getElementById('createNewDoc');
     const documentList = document.getElementById('documentList');
     const docSearch = document.getElementById('docSearch');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const logoutBtnLibrary = document.getElementById('logoutBtnLibrary');
     const logoutBtnProfile = document.getElementById('logoutBtnProfile');
 
     // Profile Elements
@@ -2940,14 +2938,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'login.html';
         }
     };
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
-    }
-
-    if (logoutBtnLibrary) {
-        logoutBtnLibrary.addEventListener('click', handleLogout);
-    }
 
     if (logoutBtnProfile) {
         logoutBtnProfile.addEventListener('click', handleLogout);

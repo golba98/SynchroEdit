@@ -416,13 +416,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('activeCollaborators');
         if (!container) return;
 
-        if (users.length > 0) {
+        // Get current username to filter it out
+        const currentUsername = localStorage.getItem('synchroEditUser');
+        
+        // Filter out current user from the list
+        const otherUsers = users.filter(user => user.username !== currentUsername);
+
+        if (otherUsers.length > 0) {
             container.style.display = 'flex';
         } else {
             container.style.display = 'none';
         }
 
-        container.innerHTML = users.map((user, index) => {
+        container.innerHTML = otherUsers.map((user, index) => {
             const colors = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#6366f1', '#818cf8', '#a5b4fc'];
             const color = colors[index % colors.length];
             const initial = user.username.charAt(0).toUpperCase();

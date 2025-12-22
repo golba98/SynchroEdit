@@ -7,10 +7,16 @@ const documentSchema = new mongoose.Schema({
     },
     pages: [{
         content: {
-            type: String,
+            type: mongoose.Schema.Types.Mixed,
             default: ''
         }
     }],
+    borders: {
+        style: { type: String, default: 'solid' },
+        width: { type: String, default: '1pt' },
+        color: { type: String, default: '#333333' },
+        type: { type: String, default: 'box' }
+    },
     currentPageIndex: {
         type: Number,
         default: 0

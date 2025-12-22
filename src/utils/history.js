@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const History = require('../models/History');
 
 async function logHistory(documentId, userId, username, action, details = '') {
@@ -31,8 +32,9 @@ async function logHistory(documentId, userId, username, action, details = '') {
         });
         await history.save();
     } catch (err) {
-        console.error('Error logging history:', err);
+        logger.error('Error logging history:', err);
     }
 }
+
 
 module.exports = { logHistory };

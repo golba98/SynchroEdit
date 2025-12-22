@@ -6,6 +6,10 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+const logger = require('./utils/logger');
+const globalErrorHandler = require('./middleware/errorMiddleware');
+const AppError = require('./utils/AppError');
+
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const documentRoutes = require('./routes/document');
@@ -13,6 +17,12 @@ const documentSocket = require('./sockets/documentSocket');
 
 const app = express();
 const server = http.createServer(app);
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+    logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...', err);
+    process.exit(1);
+});
 
 // Initialize WebSocket
 const wss = documentSocket.init(server);
@@ -58,42 +68,66 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/documents', documentRoutes);
 
+// 404 handler
+app.all('*splat', (req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Global Error Handling Middleware
+app.use(globalErrorHandler);
+
 // Database Connection
 if (MONGODB_URI) {
     mongoose.connect(MONGODB_URI)
-        .then(() => console.log('Connected to MongoDB'))
-        .catch(err => console.error('MongoDB connection error:', err));
+        .then(() => logger.info('Connected to MongoDB'))
+        .catch(err => logger.error('MongoDB connection error:', err));
 } else {
-    console.warn('MONGODB_URI not found in .env. Database features will not work.');
+    logger.warn('MONGODB_URI not found in .env. Database features will not work.');
 }
 
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!', error: process.env.NODE_ENV === 'development' ? err.message : undefined });
-});
-
 // Graceful Shutdown
-const gracefulShutdown = (signal) => {
-    console.log(`${signal} received. Broadcasting maintenance mode...`);
+const gracefulShutdown = async (signal) => {
+    logger.info(`${signal} received. Starting graceful shutdown...`);
     
     documentSocket.broadcastMaintenance(wss);
 
-    setTimeout(() => {
-        console.log('Closing server...');
-        server.close(() => {
-            console.log('Server closed.');
+    // Give some time for maintenance broadcast to reach clients
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    server.close(async () => {
+        logger.info('HTTP server closed.');
+        
+        try {
+            await mongoose.connection.close();
+            logger.info('MongoDB connection closed.');
             process.exit(0);
-        });
-    }, 1000);
+        } catch (err) {
+            logger.error('Error during MongoDB closure:', err);
+            process.exit(1);
+        }
+    });
+
+    // If graceful shutdown takes too long, force exit
+    setTimeout(() => {
+        logger.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1);
+    }, 10000);
 };
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
+// Handle unhandled rejections
+process.on('unhandledRejection', (err) => {
+    logger.error('UNHANDLED REJECTION! 💥 Shutting down...', err);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
 if (require.main === module) {
     server.listen(PORT, () => {
-        console.log(`Secure Server running on http://localhost:${PORT}`);
+        logger.info(`Secure Server running on http://localhost:${PORT}`);
     });
 }
 

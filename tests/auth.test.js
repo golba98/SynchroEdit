@@ -40,10 +40,14 @@ describe('Auth API Tests', () => {
     });
 
     it('should return 400 if user already exists', async () => {
-        User.findOne.mockResolvedValue({ 
+        const mockUser = { 
             username: 'testuser', 
             email: 'test@example.com',
             isEmailVerified: true 
+        };
+        
+        User.findOne.mockReturnValue({
+            lean: jest.fn().mockResolvedValue(mockUser)
         });
 
         const res = await request(app)

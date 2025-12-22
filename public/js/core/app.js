@@ -18,7 +18,6 @@ class App {
     }
 
     async init() {
-        // Start loading profile and document/library in parallel
         const profilePromise = this.profile.loadProfile();
         
         let initialTask;
@@ -28,7 +27,6 @@ class App {
             initialTask = this.showLibrary();
         }
 
-        // Wait for profile first as it's critical for auth
         this.user = await profilePromise;
         
         if (!this.user) {
@@ -40,24 +38,23 @@ class App {
         this.setupEventListeners();
         this.setupRibbonTabs();
 
-        // Ensure the initial loading task (doc or library) is also finished
         await initialTask;
     }
 
     async loadDocument() {
         try {
-            // Fire and forget - don't wait for recent list update to show the editor
             Network.addToRecent(this.documentId).catch(err => console.warn('Recent list update failed:', err));
 
             this.editor = new Editor('pagesContainer', {
                 onContentChange: (type, data) => this.handleContentChange(type, data),
-                onPageChange: (index) => this.updateStatus(index)
+                onPageChange: (index) => this.updateStatus(index),
+                onTitleChange: (title) => this.handleTitleChange(title)
             });
 
             this.ws = Network.initWebSocket(
                 this.documentId,
                 (data) => this.handleWSMessage(data),
-                () => this.handleWSClose()
+                (status) => this.handleWSStatusChange(status)
             );
 
             document.getElementById('docLibrary').style.display = 'none';
@@ -66,6 +63,10 @@ class App {
             console.error('Failed to load document:', err);
             this.showLibrary();
         }
+    }
+
+    handleTitleChange(title) {
+        Network.sendWS(this.ws, { type: 'update-title', title });
     }
 
     handleContentChange(type, data) {
@@ -79,6 +80,8 @@ class App {
             Network.sendWS(this.ws, { type: 'new-page' });
         } else if (type === 'delete-page') {
             Network.sendWS(this.ws, { type: 'delete-page', pageIndex: data.pageIndex });
+        } else if (type === 'update-borders') {
+            Network.sendWS(this.ws, { type: 'update-borders', ...data });
         }
     }
 
@@ -87,12 +90,24 @@ class App {
             case 'sync':
                 document.getElementById('docTitle').value = data.data.title;
                 this.editor.updateFromSync(data.data);
+                if (data.data.borders) {
+                    this.editor.borderManager.updateBorders(
+                        data.data.borders.style,
+                        data.data.borders.width,
+                        data.data.borders.color,
+                        data.data.borders.type,
+                        true
+                    );
+                }
                 break;
             case 'update-title':
                 document.getElementById('docTitle').value = data.title;
                 break;
             case 'update-page':
                 this.editor.updatePageContent(data.pageIndex, data.content);
+                break;
+            case 'update-borders':
+                this.editor.borderManager.updateBorders(data.style, data.width, data.color, data.type, true);
                 break;
             case 'collaborators':
                 UI.updateCollaboratorsUI(
@@ -108,10 +123,14 @@ class App {
         }
     }
 
-    handleWSClose() {
-        const offlineOverlay = document.getElementById('serverOfflineOverlay');
-        if (offlineOverlay) offlineOverlay.style.display = 'flex';
-        setTimeout(() => window.location.reload(), 3000);
+    handleWSStatusChange(status) {
+        UI.updateConnectionStatus(document.getElementById('serverOfflineOverlay'), status);
+        const overlay = document.getElementById('serverOfflineOverlay');
+        if (status === 'connected') {
+            if (overlay) overlay.style.display = 'none';
+        } else {
+            if (overlay) overlay.style.display = 'flex';
+        }
     }
 
     setupEventListeners() {
@@ -119,11 +138,6 @@ class App {
             const el = document.getElementById(id);
             if (el) el.addEventListener(event, handler);
         };
-
-        // Document Title
-        addEvent('docTitle', 'input', (e) => {
-            Network.sendWS(this.ws, { type: 'update-title', title: e.target.value });
-        });
 
         // Navigation/Library
         addEvent('menuBtn', 'click', () => this.showLibrary());
@@ -158,16 +172,9 @@ class App {
         profileTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const targetTab = tab.dataset.tab;
-                profileTabs.forEach(t => {
-                    t.classList.remove('active');
-                    t.style.opacity = '0.7';
-                    t.style.background = 'linear-gradient(135deg, var(--accent-color), var(--accent-color-light))';
-                });
+                profileTabs.forEach(t => t.classList.remove('active'));
                 profileTabContents.forEach(c => c.style.display = 'none');
-                
                 tab.classList.add('active');
-                tab.style.opacity = '1';
-                
                 const targetContent = document.getElementById(`${targetTab}-content`);
                 if (targetContent) targetContent.style.display = 'block';
             });
@@ -189,10 +196,8 @@ class App {
             if (current && next) {
                 this.profile.updatePassword(current, next).then(success => {
                     if (success) {
-                        const curEl = document.getElementById('currentPassword');
-                        const nxtEl = document.getElementById('newPassword');
-                        if (curEl) curEl.value = '';
-                        if (nxtEl) nxtEl.value = '';
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
                     }
                 });
             }
@@ -231,90 +236,71 @@ class App {
         });
 
         // Save and Save As
-        const saveBtn = document.getElementById('saveBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                const originalText = saveBtn.innerHTML;
-                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
-                saveBtn.style.background = '#10b981';
-                
-                if (this.editor && this.documentId) {
-                    this.handleContentChange('update-page', {
-                        pageIndex: this.editor.currentPageIndex,
-                        content: this.editor.quill.getContents()
-                    });
-                }
-
-                setTimeout(() => {
-                    saveBtn.innerHTML = originalText;
-                    saveBtn.style.background = '';
-                }, 2000);
-            });
-        }
-
-        const saveAsBtn = document.getElementById('saveAsBtn');
-        if (saveAsBtn) {
-            saveAsBtn.addEventListener('click', async () => {
-                if (!this.editor) return;
-                
-                const titleEl = document.getElementById('docTitle');
-                const currentTitle = titleEl ? titleEl.value : 'Untitled';
-                const newTitle = prompt('Enter a name for the copy:', `Copy of ${currentTitle}`);
-                
-                if (newTitle === null) return; // Cancelled
-                
-                try {
-                    // Get all pages content
-                    const pagesCopy = this.editor.pages.map((page, index) => {
-                        // If it's the current page, get from Quill
-                        if (index === this.editor.currentPageIndex) {
-                            return { content: this.editor.quill.getContents() };
-                        }
-                        return { content: page.content };
-                    });
-
-                    const newDoc = await Network.createDocument(newTitle || 'Untitled Copy', pagesCopy);
-                    alert('Document copied successfully! Redirecting...');
-                    window.location.href = `?doc=${newDoc._id}`;
-                } catch (err) {
-                    console.error('Save As failed:', err);
-                    alert('Failed to save a copy of the document.');
-                }
-            });
-        }
-
-        // Toolbar formatting (Delegation could be better, but for now)
-        this.setupToolbar();
-    }
-
-    setupToolbar() {
-        const buttons = {
-            'ql-bold': 'bold',
-            'ql-italic': 'italic',
-            'ql-underline': 'underline',
-            'ql-strike': 'strike'
-        };
-
-        Object.entries(buttons).forEach(([cls, fmt]) => {
-            document.querySelectorAll(`.${cls}`).forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (!this.editor.quill) return;
-                    const format = this.editor.quill.getFormat();
-                    this.editor.quill.format(fmt, !format[fmt]);
+        addEvent('saveBtn', 'click', () => {
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            saveBtn.style.background = '#10b981';
+            
+            if (this.editor && this.documentId) {
+                this.handleContentChange('update-page', {
+                    pageIndex: this.editor.currentPageIndex,
+                    content: this.editor.quill.getContents()
                 });
-            });
+            }
+
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.style.background = '';
+            }, 2000);
         });
 
-        // Font and Size
-        document.querySelectorAll('.ql-font').forEach(sel => {
-            sel.addEventListener('change', (e) => {
-                if (this.editor.quill) this.editor.quill.format('font', e.target.value);
-            });
+        addEvent('saveAsBtn', 'click', async () => {
+            if (!this.editor) return;
+            const currentTitle = document.getElementById('docTitle').value || 'Untitled';
+            const newTitle = prompt('Enter a name for the copy:', `Copy of ${currentTitle}`);
+            if (newTitle === null) return;
+            
+            try {
+                const pagesCopy = this.editor.pages.map((page, index) => {
+                    if (index === this.editor.currentPageIndex) {
+                        return { content: this.editor.quill.getContents() };
+                    }
+                    return { content: page.content };
+                });
+
+                const newDoc = await Network.createDocument(newTitle || 'Untitled Copy', pagesCopy);
+                alert('Document copied successfully! Redirecting...');
+                window.location.href = `?doc=${newDoc._id}`;
+            } catch (err) {
+                console.error('Save As failed:', err);
+                alert('Failed to save a copy of the document.');
+            }
         });
-        document.querySelectorAll('.ql-size').forEach(sel => {
-            sel.addEventListener('change', (e) => {
-                if (this.editor.quill) this.editor.quill.format('size', e.target.value);
-            });
+        
+        // Share
+        addEvent('shareBtn', 'click', () => {
+            const modal = document.getElementById('shareModal');
+            const input = document.getElementById('shareLink');
+            if (modal && input) {
+                input.value = window.location.href;
+                modal.style.display = 'flex';
+            }
+        });
+        
+        addEvent('closeShareModal', 'click', () => {
+            const modal = document.getElementById('shareModal');
+            if (modal) modal.style.display = 'none';
+        });
+        
+        addEvent('copyLinkBtn', 'click', () => {
+            const input = document.getElementById('shareLink');
+            input.select();
+            document.execCommand('copy');
+            const btn = document.getElementById('copyLinkBtn');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => btn.innerHTML = original, 2000);
         });
     }
 
@@ -326,7 +312,9 @@ class App {
         document.getElementById('closeLibrary').style.display = this.documentId ? 'block' : 'none';
 
         try {
-            const docs = await Network.getDocuments();
+            const data = await Network.getDocuments();
+            const docs = data.documents || [];
+            
             UI.renderDocumentList(
                 document.getElementById('documentList'),
                 docs,
@@ -379,13 +367,12 @@ class App {
 
     updateStatus(pageIndex) {
         document.getElementById('pageIndicator').textContent = `Page ${pageIndex + 1}`;
-        const totalPages = this.editor.pages.length;
+        const totalPages = this.editor ? this.editor.pages.length : 1;
         document.getElementById('pageIndicator').textContent += ` of ${totalPages}`;
         
-        // Debounce word/char count updates
         if (this.statusTimeout) clearTimeout(this.statusTimeout);
         this.statusTimeout = setTimeout(() => {
-            if (this.editor.quill) {
+            if (this.editor && this.editor.quill) {
                 const text = this.editor.quill.getText();
                 const chars = text.replace(/\s/g, '').length;
                 const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;

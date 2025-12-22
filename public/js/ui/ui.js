@@ -102,5 +102,24 @@ export const UI = {
                     ${initial}
                 </div>`;
         }).join('');
+    },
+
+    updateConnectionStatus(container, status) {
+        if (!container) return;
+        
+        const titleEl = container.querySelector('#overlayTitle');
+        const descEl = container.querySelector('#overlayDesc');
+        
+        if (status === 'connected') {
+            container.style.display = 'none';
+        } else if (status === 'reconnecting') {
+            container.style.display = 'flex';
+            if (titleEl) titleEl.textContent = 'Connection Lost';
+            if (descEl) descEl.textContent = 'We are attempting to reconnect you to the document. Please wait...';
+        } else if (status === 'offline') {
+            container.style.display = 'flex';
+            if (titleEl) titleEl.textContent = 'Server Offline';
+            if (descEl) descEl.textContent = 'The server is currently unavailable. We will keep trying to connect.';
+        }
     }
 };

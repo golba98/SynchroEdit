@@ -10,23 +10,30 @@ const JWT_SECRET = process.env.JWT_SECRET;
 let clients = new Map(); // Map of client -> { documentId, userId, username }
 let documents = new Map(); // Map of documentId -> { state, clients: Set }
 
+const logger = require('../utils/logger');
+
 async function getOrCreateDocument(documentId) {
     if (!documents.has(documentId)) {
         let docData;
         if (mongoose.connection.readyState === 1) {
             try {
                 docData = await Document.findById(documentId);
-            } catch (e) {}
+            } catch (e) {
+                logger.error('Error fetching document for socket cache:', e);
+            }
         }
+// ... (omitting some lines for context match if needed, but I'll use enough context)
 
         documents.set(documentId, {
             state: docData ? {
                 title: docData.title,
                 pages: docData.pages,
+                borders: docData.borders,
                 currentPageIndex: docData.currentPageIndex
             } : {
                 title: 'Untitled document',
                 pages: [{ content: '' }],
+                borders: { style: 'solid', width: '1pt', color: '#333333', type: 'box' },
                 currentPageIndex: 0
             },
             clients: new Set()
@@ -120,7 +127,7 @@ function init(server) {
                         
                         broadcastCollaborators(documentId);
                     } catch (e) {
-                        console.error('Join error:', e);
+                        logger.error('Join error:', e);
                         ws.send(JSON.stringify({ type: 'error', message: 'Authentication or access error' }));
                     }
                     return;
@@ -157,6 +164,16 @@ function init(server) {
                             logHistory(documentId, userId, username, `Deleted Page ${data.pageIndex + 1}`);
                         }
                         break;
+                    case 'update-borders':
+                        doc.state.borders = {
+                            style: data.style,
+                            width: data.width,
+                            color: data.color,
+                            type: data.type
+                        };
+                        broadcastToDocument(documentId, ws, { type: 'update-borders', ...data, username });
+                        logHistory(documentId, userId, username, 'Updated Page Borders');
+                        break;
                 }
 
                 // Background database update - don't await to keep socket responsive
@@ -164,13 +181,14 @@ function init(server) {
                     Document.findByIdAndUpdate(documentId, {
                         title: doc.state.title,
                         pages: doc.state.pages,
+                        borders: doc.state.borders,
                         lastModified: new Date(),
                         lastModifiedBy: userId
-                    }).catch(err => console.error('Auto-save error:', err));
+                    }).catch(err => logger.error('Auto-save error:', err));
                 }
 
             } catch (error) {
-                console.error('WebSocket error:', error);
+                logger.error('WebSocket message parsing error:', error);
             }
         });
 

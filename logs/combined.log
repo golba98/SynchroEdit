@@ -1,0 +1,19 @@
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:09:12"}
+{"level":"error","message":"WebSocket message parsing error: Cannot read properties of undefined (reading 'catch')","service":"synchroedit","stack":"TypeError: Cannot read properties of undefined (reading 'catch')\n    at WebSocket.<anonymous> (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\src\\sockets\\documentSocket.js:187:23)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-23 00:09:16"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:14:54"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:20:23"}
+{"level":"error","message":"Error logging history: Operation `histories.findOne()` buffering timed out after 10000ms","service":"synchroedit","timestamp":"2025-12-23 00:20:33"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:20:59"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:26:40"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:27:15"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:27:36"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:05"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:19"}
+{"level":"error","message":"ERROR 💥 User.findOne(...).lean is not a function","service":"synchroedit","stack":"TypeError: User.findOne(...).lean is not a function\n    at lean (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\src\\controllers\\authController.js:25:81)\n    at Layer.handleRequest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\node_modules\\express-rate-limit\\dist\\index.cjs:942:7\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SynchroEdit\\node_modules\\express-rate-limit\\dist\\index.cjs:825:5","status":"error","statusCode":500,"timestamp":"2025-12-23 00:28:19"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:19"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:19"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:20"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:47"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:47"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:47"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-23 00:28:48"}

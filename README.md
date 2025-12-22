@@ -7,11 +7,13 @@ A real-time collaborative document editor built with Node.js and Quill Rich Text
 ### Features Implemented
 
 **Rich Text Editor Foundation:**
+
 - ✅ Quill Rich Text Editor (replaces basic contentEditable)
 - ✅ Quill Delta format for document representation (enables future real-time sync)
 - ✅ Professional formatting toolbar with bold, italic, underline, alignment, lists
 
 **Core Features:**
+
 - ✅ Multiple pages support
 - ✅ Zoom in/out functionality
 - ✅ Image insertion
@@ -19,6 +21,7 @@ A real-time collaborative document editor built with Node.js and Quill Rich Text
 - ✅ Auto-save to localStorage
 
 **Server Infrastructure:**
+
 - ✅ Express.js server for serving the application
 - ✅ WebSocket support for real-time communication (ready for Phase 2)
 - ✅ Document state management on server
@@ -27,6 +30,7 @@ A real-time collaborative document editor built with Node.js and Quill Rich Text
 ## Installation & Setup
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - npm
 
@@ -48,19 +52,18 @@ The server will start at `http://localhost:3000`
 ## How It Works
 
 ### Quill Delta Format
+
 Quill uses a "Delta" format to represent document changes:
+
 ```javascript
 // Example Delta
 {
-  ops: [
-    { insert: "Hello " },
-    { insert: "World", attributes: { bold: true } },
-    { insert: "\n" }
-  ]
+  ops: [{ insert: 'Hello ' }, { insert: 'World', attributes: { bold: true } }, { insert: '\n' }];
 }
 ```
 
 This format is:
+
 - **Lightweight**: Easy to transmit over network
 - **Operational**: Describes changes, not just content
 - **Composable**: Perfect for merging multiple edits (needed for real-time collaboration)
@@ -86,6 +89,7 @@ This format is:
 ## Next Steps: Phase 2
 
 To enable real-time collaboration, we'll implement:
+
 - Operational Transformation (OT) for conflict resolution
 - Real-time delta sync between clients
 - Cursor position tracking

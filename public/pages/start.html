@@ -1,93 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Starting SynchroEdit...</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #000000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: white;
-        }
+      body {
+        font-family: 'Arial', sans-serif;
+        background: #000000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        color: white;
+      }
 
-        .container {
-            text-align: center;
-            max-width: 600px;
-            padding: 40px;
-        }
+      .container {
+        text-align: center;
+        max-width: 600px;
+        padding: 40px;
+      }
 
-        h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            animation: fadeIn 1s ease-in;
-            color: #a78bfa;
-            text-shadow: 0 0 30px rgba(167, 139, 250, 0.8);
-        }
+      h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        animation: fadeIn 1s ease-in;
+        color: #a78bfa;
+        text-shadow: 0 0 30px rgba(167, 139, 250, 0.8);
+      }
 
-        .logo {
-            font-size: 72px;
-            margin-bottom: 30px;
-            animation: bounce 2s infinite;
-            filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.6));
-        }
+      .logo {
+        font-size: 72px;
+        margin-bottom: 30px;
+        animation: bounce 2s infinite;
+        filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.6));
+      }
 
-        p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            color: #e0e0e0;
-        }
+      p {
+        font-size: 18px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        color: #e0e0e0;
+      }
 
-        .loading {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(139, 92, 246, 0.3);
-            border-top-color: #8b5cf6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-        }
+      .loading {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(139, 92, 246, 0.3);
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+      }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
         }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="logo">📄</div>
-        <h1>SynchroEdit</h1>
-        <p>Starting your collaborative document editor...</p>
-        <div class="loading"></div>
+      <div class="logo">📄</div>
+      <h1>SynchroEdit</h1>
+      <p>Starting your collaborative document editor...</p>
+      <div class="loading"></div>
     </div>
 
     <script>
-        // Redirect to login page after brief delay
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 2000);
+      // Redirect to login page after brief delay
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
     </script>
-</body>
+  </body>
 </html>

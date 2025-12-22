@@ -16,77 +16,77 @@ const logger = require('./logger');
 // Setup SMTP Transporter (Fallback)
 let transporter = null;
 if (!RESEND_API_KEY) {
-    const isGmail = SMTP_HOST.includes('gmail');
-    const port = isGmail ? 465 : SMTP_PORT; // Prefer 465 for Gmail
-    
-    transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465, 
-        auth: {
-            user: SMTP_USER,
-            pass: SMTP_PASS
-        },
-        connectionTimeout: 10000, // Fail faster (10s)
-        greetingTimeout: 10000,
-        socketTimeout: 10000
-    });
+  const isGmail = SMTP_HOST.includes('gmail');
+  const port = isGmail ? 465 : SMTP_PORT; // Prefer 465 for Gmail
+
+  transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: port,
+    secure: port === 465,
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS,
+    },
+    connectionTimeout: 10000, // Fail faster (10s)
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
 }
 
 async function sendViaResend(email, html, subject) {
-    return new Promise((resolve, reject) => {
-        logger.debug(`Resend Request Details - From: ${SMTP_FROM}, To: ${email}, Subject: ${subject}`);
-        const data = JSON.stringify({
-            from: SMTP_FROM,
-            to: [email],
-            subject: subject,
-            html: html
-        });
-
-        const options = {
-            hostname: 'api.resend.com',
-            path: '/emails',
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-                'Content-Type': 'application/json',
-                'Content-Length': data.length
-            }
-        };
-
-        const req = https.request(options, (res) => {
-            let responseBody = '';
-            res.on('data', (chunk) => responseBody += chunk);
-            res.on('end', () => {
-                if (res.statusCode >= 200 && res.statusCode < 300) {
-                    logger.info('Email sent successfully via Resend API');
-                    resolve(true);
-                } else {
-                    logger.error(`Resend API Error (${res.statusCode}):`, { responseBody });
-                    resolve(false);
-                }
-            });
-        });
-
-        req.on('error', (error) => {
-            logger.error('Resend Request Error:', error);
-            resolve(false);
-        });
-
-        req.write(data);
-        req.end();
+  return new Promise((resolve, reject) => {
+    logger.debug(`Resend Request Details - From: ${SMTP_FROM}, To: ${email}, Subject: ${subject}`);
+    const data = JSON.stringify({
+      from: SMTP_FROM,
+      to: [email],
+      subject: subject,
+      html: html,
     });
+
+    const options = {
+      hostname: 'api.resend.com',
+      path: '/emails',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let responseBody = '';
+      res.on('data', (chunk) => (responseBody += chunk));
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          logger.info('Email sent successfully via Resend API');
+          resolve(true);
+        } else {
+          logger.error(`Resend API Error (${res.statusCode}):`, { responseBody });
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      logger.error('Resend Request Error:', error);
+      resolve(false);
+    });
+
+    req.write(data);
+    req.end();
+  });
 }
 
 async function sendVerificationEmail(email, code) {
-    if (!EMAIL_VERIFICATION_ENABLED) {
-        logger.info('Email verification disabled; skipping send.');
-        return true;
-    }
-    
-    logger.info(`Attempting to send verification email to ${email}`);
+  if (!EMAIL_VERIFICATION_ENABLED) {
+    logger.info('Email verification disabled; skipping send.');
+    return true;
+  }
 
-    const html = `
+  logger.info(`Attempting to send verification email to ${email}`);
+
+  const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
             <h2 style="color: #8b5cf6; text-align: center;">SynchroEdit</h2>
             <p style="color: #333; font-size: 16px;">Welcome to SynchroEdit!</p>
@@ -101,40 +101,43 @@ async function sendVerificationEmail(email, code) {
         </div>
     `;
 
-    // 1. Try Resend if configured (Recommended for Cloud)
-    if (RESEND_API_KEY) {
-        logger.info('Using Resend API for delivery...');
-        return await sendViaResend(email, html, 'SynchroEdit - Verification Code');
-    }
+  // 1. Try Resend if configured (Recommended for Cloud)
+  if (RESEND_API_KEY) {
+    logger.info('Using Resend API for delivery...');
+    return await sendViaResend(email, html, 'SynchroEdit - Verification Code');
+  }
 
-    // 2. Fallback to SMTP
-    if (!SMTP_USER || !SMTP_PASS) {
-        logger.error('Email configuration missing: SMTP_USER/PASS not set and RESEND_API_KEY not found.');
-        return false;
-    }
+  // 2. Fallback to SMTP
+  if (!SMTP_USER || !SMTP_PASS) {
+    logger.error(
+      'Email configuration missing: SMTP_USER/PASS not set and RESEND_API_KEY not found.'
+    );
+    return false;
+  }
 
-    logger.info(`Using SMTP (Host: ${SMTP_HOST})`);
-    try {
-        await transporter.sendMail({
-            from: `"SynchroEdit" <${SMTP_FROM}>`,
-            to: email,
-            subject: 'SynchroEdit - Email Verification Code',
-            html
-        });
-        logger.info('Email sent via SMTP');
-        return true;
-    } catch (err) {
-        logger.error(`SMTP sending failed. If you are on a cloud provider (like Render), SMTP ports may be blocked. Consider using RESEND_API_KEY. Error: ${err.message}`);
-        return false;
-    }
+  logger.info(`Using SMTP (Host: ${SMTP_HOST})`);
+  try {
+    await transporter.sendMail({
+      from: `"SynchroEdit" <${SMTP_FROM}>`,
+      to: email,
+      subject: 'SynchroEdit - Email Verification Code',
+      html,
+    });
+    logger.info('Email sent via SMTP');
+    return true;
+  } catch (err) {
+    logger.error(
+      `SMTP sending failed. If you are on a cloud provider (like Render), SMTP ports may be blocked. Consider using RESEND_API_KEY. Error: ${err.message}`
+    );
+    return false;
+  }
 }
 
-
 function generateVerificationCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 module.exports = {
-    sendVerificationEmail,
-    generateVerificationCode
+  sendVerificationEmail,
+  generateVerificationCode,
 };

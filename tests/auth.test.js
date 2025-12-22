@@ -8,53 +8,51 @@ jest.mock('../src/models/User');
 
 // Mock mongoose connection
 jest.mock('mongoose', () => {
-    const actualMongoose = jest.requireActual('mongoose');
-    return {
-        ...actualMongoose,
-        connect: jest.fn().mockResolvedValue(actualMongoose),
-        connection: {
-            ...actualMongoose.connection,
-            readyState: 1,
-            close: jest.fn().mockResolvedValue(true)
-        }
-    };
+  const actualMongoose = jest.requireActual('mongoose');
+  return {
+    ...actualMongoose,
+    connect: jest.fn().mockResolvedValue(actualMongoose),
+    connection: {
+      ...actualMongoose.connection,
+      readyState: 1,
+      close: jest.fn().mockResolvedValue(true),
+    },
+  };
 });
 
 describe('Auth API Tests', () => {
-    afterAll(async () => {
-        await server.close();
-        await mongoose.connection.close();
+  afterAll(async () => {
+    await server.close();
+    await mongoose.connection.close();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return 400 if missing fields in signup', async () => {
+    const res = await request(app).post('/api/auth/signup').send({ username: 'testuser' });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.message).toContain('Please provide username, email, and password');
+  });
+
+  it('should return 400 if user already exists', async () => {
+    const mockUser = {
+      username: 'testuser',
+      email: 'test@example.com',
+      isEmailVerified: true,
+    };
+
+    User.findOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockUser),
     });
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+    const res = await request(app)
+      .post('/api/auth/signup')
+      .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
 
-    it('should return 400 if missing fields in signup', async () => {
-        const res = await request(app)
-            .post('/api/auth/signup')
-            .send({ username: 'testuser' });
-        
-        expect(res.statusCode).toEqual(400);
-        expect(res.body.message).toContain('Please provide username, email, and password');
-    });
-
-    it('should return 400 if user already exists', async () => {
-        const mockUser = { 
-            username: 'testuser', 
-            email: 'test@example.com',
-            isEmailVerified: true 
-        };
-        
-        User.findOne.mockReturnValue({
-            lean: jest.fn().mockResolvedValue(mockUser)
-        });
-
-        const res = await request(app)
-            .post('/api/auth/signup')
-            .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
-        
-        expect(res.statusCode).toEqual(400);
-        expect(res.body.message).toEqual('Username or email already exists');
-    });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.message).toEqual('Username or email already exists');
+  });
 });

@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "jest",
-    "lint": "eslint .",
-    "format": "prettier --write ."
+    "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . -c config/.eslintrc.json --ignore-path config/.eslintignore",
+    "format": "prettier --write . --config config/.prettierrc --ignore-path config/.prettierignore"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

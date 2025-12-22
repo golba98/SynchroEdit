@@ -13,7 +13,18 @@ const Document = require('./models/Document');
 const History = require('./models/History');
 
 const app = express();
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "fonts.googleapis.com"],
+            fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "blob:"],
+            connectSrc: ["'self'", "ws:", "wss:"], // Allow WebSocket connections
+        },
+    },
+}));
 app.set('trust proxy', 1); // Trust the first proxy (Render)
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });

@@ -1405,7 +1405,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Design Features
     function setupDesignFeatures() {
-        const colorBtn = document.querySelector('#design-ribbon .ql-color');
+        const colorBtn = document.querySelector('.ql-color'); // Now in Home tab
         const backgroundBtn = document.querySelector('#design-ribbon .ql-background');
         
         // Color buttons

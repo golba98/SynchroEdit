@@ -31,7 +31,15 @@ const documentSchema = new mongoose.Schema({
     lastModifiedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    comments: [{
+        id: String,
+        content: String,
+        author: String, // Username
+        timestamp: { type: Date, default: Date.now },
+        pageIndex: Number, // To help jump to it
+        quote: String // The text that was highlighted
+    }]
 });
 
 module.exports = mongoose.model('Document', documentSchema);

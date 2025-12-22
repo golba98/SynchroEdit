@@ -382,13 +382,19 @@ class App {
         const totalPages = this.editor.pages.length;
         document.getElementById('pageIndicator').textContent += ` of ${totalPages}`;
         
-        if (this.editor.quill) {
-            const text = this.editor.quill.getText();
-            const chars = text.replace(/\s/g, '').length;
-            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
-            document.getElementById('charCount').textContent = `Characters: ${Math.max(0, chars)}`;
-            document.getElementById('wordCount').textContent = `Words: ${words}`;
-        }
+        // Debounce word/char count updates
+        if (this.statusTimeout) clearTimeout(this.statusTimeout);
+        this.statusTimeout = setTimeout(() => {
+            if (this.editor.quill) {
+                const text = this.editor.quill.getText();
+                const chars = text.replace(/\s/g, '').length;
+                const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+                const charEl = document.getElementById('charCount');
+                const wordEl = document.getElementById('wordCount');
+                if (charEl) charEl.textContent = `Characters: ${Math.max(0, chars)}`;
+                if (wordEl) wordEl.textContent = `Words: ${words}`;
+            }
+        }, 500);
     }
 
     updateZoomDisplay() {

@@ -83,10 +83,6 @@ function init(server) {
                 if (data.type === 'join-document') {
                     const { documentId, token } = data;
                     
-                    let userId = null;
-                    let username = null;
-                    let profilePicture = null;
-                    
                     if (!token) {
                         ws.send(JSON.stringify({ type: 'error', message: 'Authentication required' }));
                         return;
@@ -94,46 +90,39 @@ function init(server) {
 
                     try {
                         const decoded = jwt.verify(token, JWT_SECRET);
-                        userId = decoded.id;
-                        username = decoded.username;
+                        const userId = decoded.id;
+                        const username = decoded.username;
                         
-                        if (mongoose.connection.readyState === 1) {
-                            const dbUser = await User.findById(userId);
-                            if (dbUser) {
-                                profilePicture = dbUser.profilePicture;
-                            }
-                        }
-                    } catch (e) {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Invalid token' }));
-                        return;
-                    }
+                        // Execute user, doc existence, and cache retrieval in parallel
+                        const [dbUser, dbDoc, doc] = await Promise.all([
+                            User.findById(userId).select('profilePicture').lean(),
+                            Document.findById(documentId).select('owner sharedWith').lean(),
+                            getOrCreateDocument(documentId)
+                        ]);
 
-                    if (mongoose.connection.readyState === 1) {
-                        const dbDoc = await Document.findById(documentId);
                         if (!dbDoc) {
                             ws.send(JSON.stringify({ type: 'error', message: 'Document not found' }));
                             return;
                         }
-                        
+
+                        // Check permissions and add to sharedWith if needed
                         const isOwner = dbDoc.owner.toString() === userId;
                         const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some(id => id.toString() === userId);
 
                         if (!isOwner && !isShared) {
-                            dbDoc.sharedWith.push(userId);
-                            await dbDoc.save();
+                            await Document.findByIdAndUpdate(documentId, { $addToSet: { sharedWith: userId } });
                             logHistory(documentId, userId, username, 'Joined Document via link');
                         }
-                    } else {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Database unavailable' }));
-                        return;
-                    }
 
-                    const doc = await getOrCreateDocument(documentId);
-                    clients.set(ws, { documentId, userId, username, profilePicture });
-                    doc.clients.add(ws);
-                    ws.send(JSON.stringify({ type: 'sync', data: doc.state }));
-                    
-                    broadcastCollaborators(documentId);
+                        clients.set(ws, { documentId, userId, username, profilePicture: dbUser?.profilePicture });
+                        doc.clients.add(ws);
+                        ws.send(JSON.stringify({ type: 'sync', data: doc.state }));
+                        
+                        broadcastCollaborators(documentId);
+                    } catch (e) {
+                        console.error('Join error:', e);
+                        ws.send(JSON.stringify({ type: 'error', message: 'Authentication or access error' }));
+                    }
                     return;
                 }
                 
@@ -153,6 +142,7 @@ function init(server) {
                             doc.state.pages[data.pageIndex].content = data.content;
                         }
                         broadcastToDocument(documentId, ws, { type: 'update-page', pageIndex: data.pageIndex, content: data.content, username });
+                        // Log history in background (no await)
                         logHistory(documentId, userId, username, `Edited Page ${data.pageIndex + 1}`);
                         break;
                     case 'new-page':
@@ -169,13 +159,14 @@ function init(server) {
                         break;
                 }
 
+                // Background database update - don't await to keep socket responsive
                 if (mongoose.connection.readyState === 1) {
-                    await Document.findByIdAndUpdate(documentId, {
+                    Document.findByIdAndUpdate(documentId, {
                         title: doc.state.title,
                         pages: doc.state.pages,
                         lastModified: new Date(),
                         lastModifiedBy: userId
-                    });
+                    }).catch(err => console.error('Auto-save error:', err));
                 }
 
             } catch (error) {

@@ -1,6 +1,14 @@
 // Auth Check
 let token = localStorage.getItem('synchroEditToken');
 
+// Utility: Escape HTML
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 // Redirect if no token or if it's the old local preview token
 if (!token || token === 'local-preview-token') {
     localStorage.removeItem('synchroEditToken');
@@ -198,10 +206,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Get a preview from the first page content
             const previewText = doc.pages && doc.pages[0] && doc.pages[0].content 
-                ? doc.pages[0].content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' 
+                ? escapeHTML(doc.pages[0].content.replace(/<[^>]*>/g, '').substring(0, 100)) + '...' 
                 : 'Empty document';
             
-            const lastModifiedBy = doc.lastModifiedBy ? doc.lastModifiedBy.username : 'Unknown';
+            const lastModifiedBy = escapeHTML(doc.lastModifiedBy ? doc.lastModifiedBy.username : 'Unknown');
+            const safeTitle = escapeHTML(doc.title);
             
             return `
                 <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #2a2a2a; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: rgba(var(--accent-color-rgb), 0.15);' : ''}">
@@ -209,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <i class="fas fa-file-alt" style="color: var(--accent-color-light); font-size: 20px;"></i>
                             <div>
-                                <div style="color: #e0e0e0; font-weight: 500; margin-bottom: 4px;">${doc.title}</div>
+                                <div style="color: #e0e0e0; font-weight: 500; margin-bottom: 4px;">${safeTitle}</div>
                                 <div style="color: #b0b0b0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
                             </div>
                         </div>
@@ -431,11 +440,12 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = otherUsers.map((user, index) => {
             const colors = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#6366f1', '#818cf8', '#a5b4fc'];
             const color = colors[index % colors.length];
-            const initial = user.username.charAt(0).toUpperCase();
+            const initial = escapeHTML(user.username.charAt(0).toUpperCase());
+            const safeUsername = escapeHTML(user.username);
             
             if (user.profilePicture) {
                 return `
-                <div title="${user.username}" style="
+                <div title="${safeUsername}" style="
                     width: 30px; 
                     height: 30px; 
                     border-radius: 50%; 
@@ -453,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             return `
-                <div title="${user.username}" style="
+                <div title="${safeUsername}" style="
                     width: 30px; 
                     height: 30px; 
                     border-radius: 50%; 
@@ -1121,6 +1131,9 @@ document.addEventListener('DOMContentLoaded', () => {
             historyList.innerHTML = items.map(item => {
                 const date = new Date(item.timestamp);
                 const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const safeUsername = escapeHTML(item.username);
+                const safeAction = escapeHTML(item.action);
+                const safeDetails = escapeHTML(item.details);
                 
                 // Icon based on action
                 let icon = 'fa-pen';
@@ -1136,11 +1149,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div style="flex: 1;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span style="color: #e0e0e0; font-weight: 500;">${item.username}</span>
+                                <span style="color: #e0e0e0; font-weight: 500;">${safeUsername}</span>
                                 <span style="color: #666; font-size: 12px;">${dateStr}</span>
                             </div>
-                            <div style="color: #b0b0b0; font-size: 14px;">${item.action}</div>
-                            ${item.details ? `<div style="color: #666; font-size: 12px; margin-top: 2px;">${item.details}</div>` : ''}
+                            <div style="color: #b0b0b0; font-size: 14px;">${safeAction}</div>
+                            ${item.details ? `<div style="color: #666; font-size: 12px; margin-top: 2px;">${safeDetails}</div>` : ''}
                         </div>
                     </div>
                 `;

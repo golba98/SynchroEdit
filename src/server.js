@@ -6,12 +6,14 @@ const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const { sendVerificationEmail, generateVerificationCode } = require('./utils/email');
 const User = require('./models/User');
 const Document = require('./models/Document');
 const History = require('./models/History');
 
 const app = express();
+app.use(helmet());
 app.set('trust proxy', 1); // Trust the first proxy (Render)
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -148,10 +150,8 @@ app.post('/api/auth/signup', async (req, res) => {
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
-            if (!existingUser.isEmailVerified) {
+            if (!existingUser.isEmailVerified && existingUser.email === email) {
                 if (!EMAIL_VERIFICATION_ENABLED) {
-                    existingUser.username = username;
-                    existingUser.password = password;
                     existingUser.isEmailVerified = true;
                     existingUser.verificationCode = null;
                     existingUser.verificationCodeExpires = null;
@@ -160,10 +160,8 @@ app.post('/api/auth/signup', async (req, res) => {
                     return res.status(200).json({ token, username: existingUser.username, email: existingUser.email, message: 'Signup successful (verification disabled).' });
                 }
 
-                // User exists but is not verified. Treat this as a retry/resend.
+                // User exists but is not verified. Resend code WITHOUT updating username/password to prevent hijacking.
                 const verificationCode = generateVerificationCode();
-                existingUser.username = username; // Update username if changed
-                existingUser.password = password; // Update password (will be hashed by pre-save hook)
                 existingUser.verificationCode = verificationCode;
                 existingUser.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
                 await existingUser.save();
@@ -314,10 +312,10 @@ app.post('/api/auth/login', async (req, res) => {
 
         const { username, password } = req.body;
         const user = await User.findOne({ username });
-        if (!user) return res.status(400).json({ message: 'User not found' });
+        if (!user) return res.status(401).json({ message: 'Invalid username or password' });
 
         const isMatch = await user.comparePassword(password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!isMatch) return res.status(401).json({ message: 'Invalid username or password' });
 
         if (!user.isEmailVerified) {
             if (!EMAIL_VERIFICATION_ENABLED) {
@@ -443,9 +441,16 @@ app.post('/api/documents/:id/recent', authenticateToken, async (req, res) => {
 
         const docId = req.params.id;
         
-        // Check if document exists
+        // Check if document exists and user has access
         const doc = await Document.findById(docId);
         if (!doc) return res.status(404).json({ message: 'Document not found' });
+
+        const isOwner = doc.owner.toString() === req.user.id;
+        const isShared = doc.sharedWith && doc.sharedWith.some(id => id.toString() === req.user.id);
+
+        if (!isOwner && !isShared) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
 
         // Add to recent if not already there (or move to front)
         if (!user.recentDocuments) user.recentDocuments = [];
@@ -533,9 +538,17 @@ app.delete('/api/documents/:id', authenticateToken, async (req, res) => {
 app.get('/api/documents/:id/history', authenticateToken, async (req, res) => {
     try {
         const docId = req.params.id;
-        // Verify access (basic check if doc exists and user has access)
-        // For simplicity allowing any authenticated user to see history of any doc they can open
-        // In a real app, you'd check ownership or shared permissions specifically
+        
+        // Verify access
+        const doc = await Document.findById(docId);
+        if (!doc) return res.status(404).json({ message: 'Document not found' });
+
+        const isOwner = doc.owner.toString() === req.user.id;
+        const isShared = doc.sharedWith && doc.sharedWith.some(id => id.toString() === req.user.id);
+
+        if (!isOwner && !isShared) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
         
         const history = await History.find({ documentId: docId })
             .sort({ timestamp: -1 })
@@ -616,15 +629,22 @@ wss.on('connection', (ws) => {
                 // 2. Authorization Check (Owner or Shared User)
                 if (mongoose.connection.readyState === 1) {
                     const dbDoc = await Document.findById(documentId);
-                    if (dbDoc) {
-                        const isOwner = dbDoc.owner.toString() === userId;
-                        const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some(id => id.toString() === userId);
-
-                        if (!isOwner && !isShared) {
-                            ws.send(JSON.stringify({ type: 'error', message: 'Access denied: You do not have permission to view or edit this document.' }));
-                            return;
-                        }
+                    if (!dbDoc) {
+                        ws.send(JSON.stringify({ type: 'error', message: 'Document not found' }));
+                        return;
                     }
+                    
+                    const isOwner = dbDoc.owner.toString() === userId;
+                    const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some(id => id.toString() === userId);
+
+                    if (!isOwner && !isShared) {
+                        ws.send(JSON.stringify({ type: 'error', message: 'Access denied: You do not have permission to view or edit this document.' }));
+                        return;
+                    }
+                } else {
+                    // If DB is down, we can't verify permission. For security, deny.
+                    ws.send(JSON.stringify({ type: 'error', message: 'Database unavailable, cannot verify permissions.' }));
+                    return;
                 }
 
                 const doc = await getOrCreateDocument(documentId);

@@ -82,7 +82,7 @@ async function sendVerificationEmail(email, code) {
         return true;
     }
     
-    console.log(`Attempting to send verification code: ${code} to ${email}`);
+    console.log(`Attempting to send verification email to ${email}`);
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">

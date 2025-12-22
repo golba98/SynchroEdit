@@ -42,4 +42,9 @@ const documentSchema = new mongoose.Schema({
     }]
 });
 
+// Indexes for faster document retrieval
+documentSchema.index({ owner: 1 });
+documentSchema.index({ sharedWith: 1 });
+documentSchema.index({ lastModified: -1 });
+
 module.exports = mongoose.model('Document', documentSchema);

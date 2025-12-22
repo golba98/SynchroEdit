@@ -6,31 +6,24 @@ const { notifyDocumentDeleted } = require('../sockets/documentSocket');
 
 exports.getDocuments = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        const accessibleDocs = await Document.find({ 
+        const userId = req.user.id;
+        
+        // Use a single query for all accessible documents, including those in recentDocuments
+        const user = await User.findById(userId).select('recentDocuments');
+        
+        const documents = await Document.find({ 
             $or: [
-                { owner: req.user.id },
-                { sharedWith: req.user.id }
+                { owner: userId },
+                { sharedWith: userId },
+                { _id: { $in: user ? user.recentDocuments : [] } }
             ]
-        }).populate('lastModifiedBy', 'username');
-        
-        const recentDocs = await Document.find({ _id: { $in: user.recentDocuments || [] } }).populate('lastModifiedBy', 'username');
-        
-        const allDocs = [...accessibleDocs];
-        recentDocs.forEach(rd => {
-            if (!allDocs.some(od => od._id.toString() === rd._id.toString())) {
-                allDocs.push(rd);
-            }
-        });
+        })
+        .select('title lastModified lastModifiedBy pages')
+        .populate('lastModifiedBy', 'username')
+        .sort({ lastModified: -1 })
+        .lean(); // Use lean() for faster read-only queries
 
-        const filteredDocs = allDocs.filter(doc => 
-            doc.owner.toString() === req.user.id || 
-            (doc.sharedWith && doc.sharedWith.some(id => id.toString() === req.user.id))
-        );
-
-        filteredDocs.sort((a, b) => b.lastModified - a.lastModified);
-        
-        res.json(filteredDocs);
+        res.json(documents);
     } catch (err) {
         console.error('Error fetching documents:', err);
         res.status(500).json({ message: 'Error fetching documents' });

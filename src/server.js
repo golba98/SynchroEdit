@@ -19,9 +19,9 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "fonts.googleapis.com"],
-            fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com"],
+            fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com", "data:"],
             imgSrc: ["'self'", "data:", "blob:"],
-            connectSrc: ["'self'", "ws:", "wss:"], // Allow WebSocket connections
+            connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"], // Allow broader connections for debugging
         },
     },
 }));

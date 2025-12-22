@@ -1,5 +1,6 @@
 // Auth Check
 let token = localStorage.getItem('synchroEditToken');
+console.log('Script loaded. Token present:', !!token);
 
 // Utility: Escape HTML
 function escapeHTML(str) {
@@ -291,6 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ws.onopen = () => {
             console.log('Connected to server');
+            // Hide offline overlay if it was shown
+            const offlineOverlay = document.getElementById('serverOfflineOverlay');
+            if (offlineOverlay) offlineOverlay.style.display = 'none';
+
             // Send document ID and token to join specific document room
             ws.send(JSON.stringify({
                 type: 'join-document',
@@ -310,11 +315,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ws.onclose = () => {
             console.log('Disconnected from server, attempting reconnect in 3s...');
+            // Show offline overlay
+            const offlineOverlay = document.getElementById('serverOfflineOverlay');
+            if (offlineOverlay) offlineOverlay.style.display = 'flex';
+
             setTimeout(initWebSocket, 3000);
         };
 
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
+            // Show offline overlay immediately on error
+            const offlineOverlay = document.getElementById('serverOfflineOverlay');
+            if (offlineOverlay) offlineOverlay.style.display = 'flex';
         };
     }
 
@@ -346,6 +358,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle incoming server messages
     function handleServerMessage(data) {
         switch (data.type) {
+            case 'error':
+                console.error('Server Error:', data.message);
+                alert('Server Error: ' + data.message);
+                break;
+
             case 'sync':
                 // Initial sync from server
                 isLoadingFromServer = true;
@@ -1907,12 +1924,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Profile Management ---
 
     async function fetchUserProfile() {
+        console.log('Fetching user profile...');
         try {
             const response = await fetch('/api/user/profile', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            console.log('Profile response status:', response.status);
+            
             if (response.ok) {
                 const user = await response.json();
+                console.log('User profile loaded for:', user.username);
+                
                 if (profileUsername) profileUsername.textContent = user.username;
                 if (user.profilePicture) {
                     if (profilePfp) {
@@ -1943,6 +1965,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (headerPfp) headerPfp.style.display = 'none';
                     if (headerUserIcon) headerUserIcon.style.display = 'block';
                 }
+            } else {
+                console.warn('Failed to load profile. Status:', response.status);
             }
         } catch (err) {
             console.error('Error fetching profile:', err);

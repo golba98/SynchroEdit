@@ -17,10 +17,12 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "unpkg.com"],
+            scriptSrcAttr: ["'unsafe-inline'"],
             styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "fonts.googleapis.com"],
             fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com", "data:"],
             imgSrc: ["'self'", "data:", "blob:"],
+            mediaSrc: ["'self'", "data:", "blob:"],
             connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"], // Allow broader connections for debugging
         },
     },

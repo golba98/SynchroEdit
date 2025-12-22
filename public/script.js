@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const docSearch = document.getElementById('docSearch');
     const logoutBtn = document.getElementById('logoutBtn');
     const logoutBtnLibrary = document.getElementById('logoutBtnLibrary');
+    const logoutBtnProfile = document.getElementById('logoutBtnProfile');
 
     // Profile Elements
     const userProfileTrigger = document.getElementById('userProfileTrigger');
@@ -705,6 +706,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store reference to this page's quill instance
         pageQuillInstances[pageIndex] = pageQuill;
         
+        // Add selection-change listener to update toolbar
+        pageQuill.on('selection-change', (range) => {
+            if (range) {
+                // When selection changes on any page, make sure it becomes the active one
+                if (pageIndex !== currentPageIndex) {
+                    quill = pageQuill;
+                    currentPageIndex = pageIndex;
+                    renderPageTabs();
+                }
+                updateToolbarUI();
+            }
+        });
+        
         // Load the page content
         if (pages[pageIndex] && pages[pageIndex].content) {
             pageQuill.setContents(pages[pageIndex].content);
@@ -815,6 +829,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchToPage(pageIndex) {
         if (pageIndex < 0 || pageIndex >= pages.length) return;
         
+        // Capture active formats from current quill before switching
+        let activeFormats = {};
+        if (quill) {
+            activeFormats = quill.getFormat();
+        }
+
         currentPageIndex = pageIndex;
         
         // Update quill reference to the current page's editor
@@ -826,11 +846,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (quill) {
                     quill.focus();
                     
+                    // Carry over formatting to the new active quill instance
+                    if (Object.keys(activeFormats).length > 0) {
+                        const range = quill.getSelection();
+                        // Only apply if we have a cursor (not a selection)
+                        if (range && range.length === 0) {
+                            for (const [name, value] of Object.entries(activeFormats)) {
+                                quill.format(name, value, 'user');
+                            }
+                        }
+                    }
+
                     // Scroll to the page
                     const container = document.getElementById(`page-container-${pageIndex}`);
                     if (container) {
                         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
+
+                    updateToolbarUI();
                 }
             }, 10);
         }
@@ -838,6 +871,57 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCounts();
         renderPageTabs();
         localStorage.setItem('currentPageIndex', currentPageIndex);
+    }
+
+    function updateToolbarUI() {
+        if (!quill) return;
+        const formats = quill.getFormat();
+        
+        // Update Bold, Italic, Underline, Strike buttons
+        const formatButtons = {
+            'bold': '.ql-bold',
+            'italic': '.ql-italic',
+            'underline': '.ql-underline',
+            'strike': '.ql-strike'
+        };
+
+        for (const [format, selector] of Object.entries(formatButtons)) {
+            const btn = document.querySelector(selector);
+            if (btn) {
+                if (formats[format]) btn.classList.add('active');
+                else btn.classList.remove('active');
+            }
+        }
+
+        // Update Font dropdown
+        const fontSelect = document.querySelector('.ql-font');
+        if (fontSelect) {
+            fontSelect.value = formats.font || '';
+        }
+
+        // Update Size dropdown
+        const sizeSelect = document.querySelector('.ql-size');
+        if (sizeSelect) {
+            sizeSelect.value = formats.size || '16px';
+        }
+
+        // Update Alignment
+        const alignSelect = document.querySelector('.ql-align');
+        if (alignSelect) {
+            alignSelect.value = formats.align || '';
+        }
+
+        // Update Text Color Indicator
+        const textColorIndicator = document.getElementById('textColorIndicator');
+        if (textColorIndicator) {
+            textColorIndicator.style.background = formats.color || '#ffffff';
+        }
+
+        // Update Highlight Color Indicator
+        const highlightColorIndicator = document.getElementById('highlightColorIndicator');
+        if (highlightColorIndicator) {
+            highlightColorIndicator.style.background = formats.background || 'transparent';
+        }
     }
 
     let isSplitting = false;
@@ -1303,24 +1387,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('bold', !format.bold);
+            updateToolbarUI();
         });
         
         if (italicBtn) italicBtn.addEventListener('click', () => { 
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('italic', !format.italic);
+            updateToolbarUI();
         });
         
         if (underlineBtn) underlineBtn.addEventListener('click', () => { 
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('underline', !format.underline);
+            updateToolbarUI();
         });
         
         if (strikeBtn) strikeBtn.addEventListener('click', () => { 
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('strike', !format.strike);
+            updateToolbarUI();
         });
 
         if (textColorBtn && textColorPicker) {
@@ -1344,6 +1432,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         if (textColorIndicator) textColorIndicator.style.background = color;
                         textColorMenu.style.display = 'none';
+                        updateToolbarUI();
                     });
                 });
             }
@@ -1361,6 +1450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     quill.format('color', color);
                 }
                 if (textColorIndicator) textColorIndicator.style.background = color;
+                updateToolbarUI();
             });
 
             // Close menu on outside click
@@ -1375,30 +1465,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!quill) return;
             const value = e.target.value || false;
             quill.format('align', value);
+            updateToolbarUI();
         });
 
         if (sizeSelect) sizeSelect.addEventListener('change', (e) => {
             if (!quill) return;
             const value = e.target.value;
             quill.format('size', value);
+            updateToolbarUI();
         });
 
         if (fontSelect) fontSelect.addEventListener('change', (e) => {
             if (!quill) return;
             const value = e.target.value;
             quill.format('font', value);
+            updateToolbarUI();
         });
         
         if (orderedListBtn) orderedListBtn.addEventListener('click', () => {
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('list', format.list === 'ordered' ? false : 'ordered');
+            updateToolbarUI();
         });
         
         if (bulletListBtn) bulletListBtn.addEventListener('click', () => {
             if (!quill) return;
             const format = quill.getFormat();
             quill.format('list', format.list === 'bullet' ? false : 'bullet');
+            updateToolbarUI();
         });
         
         if (cleanBtn) cleanBtn.addEventListener('click', () => {
@@ -1407,6 +1502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (range) {
                 quill.removeFormat(range.index, range.length);
             }
+            updateToolbarUI();
         });
     }
 
@@ -1525,6 +1621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     quill.format('background', color);
                 }
                 if (highlightColorIndicator) highlightColorIndicator.style.background = color;
+                updateToolbarUI();
             });
         }
     }
@@ -2850,6 +2947,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (logoutBtnLibrary) {
         logoutBtnLibrary.addEventListener('click', handleLogout);
+    }
+
+    if (logoutBtnProfile) {
+        logoutBtnProfile.addEventListener('click', handleLogout);
     }
 
     // Export Functionality

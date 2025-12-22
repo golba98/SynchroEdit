@@ -1176,9 +1176,12 @@
                 </div>
             </div>
 
-            <!-- Footer with Close Button -->
-            <div style="padding: 16px 24px; border-top: 1px solid rgba(var(--accent-color-rgb), 0.2); background: rgba(var(--accent-color-rgb), 0.05);">
-                <button id="closeProfileModal" class="toolbar-btn" style="width: 100%; padding: 10px 12px; background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 6px; cursor: pointer; color: #e0e0e0; transition: all 0.3s ease; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.boxShadow='0 0 15px rgba(var(--accent-color-rgb), 0.25)'; this.style.background='rgba(var(--accent-color-rgb), 0.1)';" onmouseout="this.style.borderColor='#2a2a2a'; this.style.boxShadow='none'; this.style.background='#1a1a1a';">
+            <!-- Footer with Buttons -->
+            <div style="padding: 16px 24px; border-top: 1px solid rgba(var(--accent-color-rgb), 0.2); background: rgba(var(--accent-color-rgb), 0.05); display: flex; gap: 12px;">
+                <button id="logoutBtnProfile" class="toolbar-btn" style="flex: 1; padding: 10px 12px; background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; cursor: pointer; color: #ef4444; transition: all 0.3s ease; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.boxShadow='0 0 15px rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.boxShadow='none';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                <button id="closeProfileModal" class="toolbar-btn" style="flex: 1; padding: 10px 12px; background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 6px; cursor: pointer; color: #e0e0e0; transition: all 0.3s ease; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.boxShadow='0 0 15px rgba(var(--accent-color-rgb), 0.25)'; this.style.background='rgba(var(--accent-color-rgb), 0.1)';" onmouseout="this.style.borderColor='#2a2a2a'; this.style.boxShadow='none'; this.style.background='#1a1a1a';">
                     ✕ Close
                 </button>
             </div>

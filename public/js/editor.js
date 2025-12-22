@@ -54,10 +54,10 @@ export class Editor {
         const newPageContainer = document.createElement('div');
         newPageContainer.className = 'editor-container';
         newPageContainer.id = `page-container-${pageIndex}`;
-        newPageContainer.innerHTML = "`
+        newPageContainer.innerHTML = `
             <div class="page-border-inner" style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; pointer-events: none; border: 1px solid transparent; z-index: 5;"></div>
-            <div id=\"editor-${pageIndex}\" class="page-editor" data-page-index="${pageIndex}" style="position: relative; z-index: 1;"></div>
-        `";
+            <div id="editor-${pageIndex}" class="page-editor" data-page-index="${pageIndex}" style="position: relative; z-index: 1;"></div>
+        `;
         
         this.container.appendChild(newPageContainer);
 

@@ -36,6 +36,7 @@ if (!RESEND_API_KEY) {
 
 async function sendViaResend(email, html, subject) {
     return new Promise((resolve, reject) => {
+        console.log(`Resend Request Details - From: ${SMTP_FROM}, To: ${email}, Subject: ${subject}`);
         const data = JSON.stringify({
             from: SMTP_FROM,
             to: [email],

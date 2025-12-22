@@ -1735,12 +1735,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Border color picker
         if (borderColorBtn && borderColorPicker) {
             borderColorBtn.addEventListener('click', () => borderColorPicker.click());
+            borderColorPicker.addEventListener('change', (e) => {
+                currentBorderColor = e.target.value;
+                if (borderColorIndicator) borderColorIndicator.style.background = currentBorderColor;
+                applyBorder();
+            });
+            // Also handle input for real-time preview
             borderColorPicker.addEventListener('input', (e) => {
                 currentBorderColor = e.target.value;
                 if (borderColorIndicator) borderColorIndicator.style.background = currentBorderColor;
-                if (currentBorderType !== 'none') {
-                    applyBorder();
-                }
+                applyBorder();
             });
         }
         

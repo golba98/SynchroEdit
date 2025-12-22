@@ -92,6 +92,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // State
     let currentZoom = 100;
+    
+    // Border State (Global)
+    let currentBorderStyle = 'solid';
+    let currentBorderWidth = '1pt';
+    let currentBorderColor = '#333333';
+    let currentBorderType = 'box'; // none, box, shadow, 3d
+
+    // Helper function to convert pt to px (1pt = 1.333px)
+    function ptToPx(pt) {
+        return parseFloat(pt) * 1.333;
+    }
+
+    // Helper function to apply border to a single element
+    function applyBorderToElement(element) {
+        const widthPx = `${ptToPx(currentBorderWidth)}px`;
+        const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
+
+        // Reset all sides first
+        element.style.border = 'none';
+        element.style.boxShadow = 'none';
+
+        if (currentBorderType === 'none') {
+            // Already reset
+        } else if (currentBorderType === 'box') {
+            element.style.border = borderValue;
+        } else if (currentBorderType === 'shadow') {
+            element.style.border = borderValue;
+            element.style.boxShadow = `5px 5px 10px rgba(0, 0, 0, 0.5)`;
+        } else if (currentBorderType === '3d') {
+            element.style.border = borderValue;
+            // For 3D we simulate with multiple shadows
+            element.style.boxShadow = `inset -2px -2px 5px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.1)`;
+        }
+    }
+
     let pages = [
         {
             id: 'page-1',
@@ -644,6 +679,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         
         pagesContainer.appendChild(newPageContainer);
+
+        // Apply current border style to the new page
+        const borderElement = newPageContainer.querySelector('.page-border-inner');
+        if (borderElement) {
+            applyBorderToElement(borderElement);
+        }
         
         // Initialize Quill for this page
         const pageQuill = new Quill(`#editor-${pageIndex}`, {
@@ -1453,12 +1494,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const borderLeft = document.getElementById('borderLeft');
         const borderRight = document.getElementById('borderRight');
         
-        // Border state tracking
-        let currentBorderStyle = 'solid';
-        let currentBorderWidth = '1pt';
-        let currentBorderColor = '#333333';
-        let currentBorderType = 'box'; // none, box, shadow, 3d
-        
         // Indent functionality
         if (indentDecreaseBtn) indentDecreaseBtn.addEventListener('click', () => {
             if (quill) quill.format('indent', '-1');
@@ -1468,34 +1503,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (quill) quill.format('indent', '+1');
         });
         
-        // Helper function to convert pt to px (1pt = 1.333px)
-        function ptToPx(pt) {
-            return parseFloat(pt) * 1.333;
-        }
-        
         // Helper function to apply border
         function applyBorder() {
             const borders = document.querySelectorAll('.page-border-inner');
-            const widthPx = `${ptToPx(currentBorderWidth)}px`;
-            const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
-            
             borders.forEach(border => {
-                // Reset all sides first
-                border.style.border = 'none';
-                border.style.boxShadow = 'none';
-                
-                if (currentBorderType === 'none') {
-                    // Already reset
-                } else if (currentBorderType === 'box') {
-                    border.style.border = borderValue;
-                } else if (currentBorderType === 'shadow') {
-                    border.style.border = borderValue;
-                    border.style.boxShadow = `5px 5px 10px rgba(0, 0, 0, 0.5)`;
-                } else if (currentBorderType === '3d') {
-                    border.style.border = borderValue;
-                    // For 3D we simulate with multiple shadows
-                    border.style.boxShadow = `inset -2px -2px 5px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.1)`;
-                }
+                applyBorderToElement(border);
             });
         }
         

@@ -34,6 +34,7 @@ async function sendVerificationEmail(email, code) {
     }
     console.log(`Attempting to send email to: ${email}`);
     console.log(`Verification Code: ${code}`);
+    console.log(`SMTP Config: Host=${SMTP_HOST}, Port=${SMTP_PORT}, Secure=${SMTP_SECURE}, User=${SMTP_USER ? SMTP_USER.replace(/(.{2})(.*)(@.*)/, '$1***$3') : 'Not Set'}`);
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">

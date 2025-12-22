@@ -105,35 +105,45 @@ class App {
     }
 
     setupEventListeners() {
+        const addEvent = (id, event, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(event, handler);
+        };
+
         // Document Title
-        document.getElementById('docTitle').addEventListener('input', (e) => {
+        addEvent('docTitle', 'input', (e) => {
             Network.sendWS(this.ws, { type: 'update-title', title: e.target.value });
         });
 
         // Navigation/Library
-        document.getElementById('menuBtn').addEventListener('click', () => this.showLibrary());
-        document.getElementById('createNewDoc').addEventListener('click', () => this.createNewDocument());
-        document.getElementById('closeLibrary').addEventListener('click', () => {
+        addEvent('menuBtn', 'click', () => this.showLibrary());
+        addEvent('createNewDoc', 'click', () => this.createNewDocument());
+        addEvent('closeLibrary', 'click', () => {
             if (this.documentId) {
-                document.getElementById('docLibrary').style.display = 'none';
-                document.getElementById('libraryOverlay').style.display = 'none';
+                const docLibrary = document.getElementById('docLibrary');
+                const libraryOverlay = document.getElementById('libraryOverlay');
+                if (docLibrary) docLibrary.style.display = 'none';
+                if (libraryOverlay) libraryOverlay.style.display = 'none';
             }
         });
 
         // Profile
-        document.getElementById('userProfileTrigger').addEventListener('click', () => {
-            document.getElementById('profileModal').style.display = 'flex';
+        addEvent('userProfileTrigger', 'click', () => {
+            const modal = document.getElementById('profileModal');
+            if (modal) modal.style.display = 'flex';
         });
-        document.getElementById('libraryUserProfileTrigger').addEventListener('click', () => {
-            document.getElementById('profileModal').style.display = 'flex';
+        addEvent('libraryUserProfileTrigger', 'click', () => {
+            const modal = document.getElementById('profileModal');
+            if (modal) modal.style.display = 'flex';
         });
-        document.getElementById('closeProfileModal').addEventListener('click', () => {
-            document.getElementById('profileModal').style.display = 'none';
+        addEvent('closeProfileModal', 'click', () => {
+            const modal = document.getElementById('profileModal');
+            if (modal) modal.style.display = 'none';
         });
-        document.getElementById('logoutBtnProfile').addEventListener('click', () => Auth.logout());
+        addEvent('logoutBtnProfile', 'click', () => Auth.logout());
 
         // PFP Upload
-        document.getElementById('pfpUpload').addEventListener('change', (e) => {
+        addEvent('pfpUpload', 'change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -142,22 +152,24 @@ class App {
         });
 
         // Password Update
-        document.getElementById('updatePasswordBtn').addEventListener('click', () => {
-            const current = document.getElementById('currentPassword').value;
-            const next = document.getElementById('newPassword').value;
+        addEvent('updatePasswordBtn', 'click', () => {
+            const current = document.getElementById('currentPassword')?.value;
+            const next = document.getElementById('newPassword')?.value;
             if (current && next) {
                 this.profile.updatePassword(current, next).then(success => {
                     if (success) {
-                        document.getElementById('currentPassword').value = '';
-                        document.getElementById('newPassword').value = '';
+                        const curEl = document.getElementById('currentPassword');
+                        const nxtEl = document.getElementById('newPassword');
+                        if (curEl) curEl.value = '';
+                        if (nxtEl) nxtEl.value = '';
                     }
                 });
             }
         });
 
         // Theme
-        document.getElementById('darkThemeBtn').addEventListener('click', () => this.theme.applyTheme('dark'));
-        document.getElementById('lightThemeBtn').addEventListener('click', () => this.theme.applyTheme('light'));
+        addEvent('darkThemeBtn', 'click', () => this.theme.applyTheme('dark'));
+        addEvent('lightThemeBtn', 'click', () => this.theme.applyTheme('light'));
 
         // Accent Colors
         document.querySelectorAll('.accent-color-btn').forEach(btn => {
@@ -165,15 +177,15 @@ class App {
         });
 
         // Zoom
-        document.getElementById('zoomInBtn').addEventListener('click', () => {
-            if (this.editor.currentZoom < 200) {
+        addEvent('zoomInBtn', 'click', () => {
+            if (this.editor && this.editor.currentZoom < 200) {
                 this.editor.currentZoom += 10;
                 this.editor.applyZoom();
                 this.updateZoomDisplay();
             }
         });
-        document.getElementById('zoomOutBtn').addEventListener('click', () => {
-            if (this.editor.currentZoom > 50) {
+        addEvent('zoomOutBtn', 'click', () => {
+            if (this.editor && this.editor.currentZoom > 50) {
                 this.editor.currentZoom -= 10;
                 this.editor.applyZoom();
                 this.updateZoomDisplay();
@@ -181,9 +193,10 @@ class App {
         });
 
         // History
-        document.getElementById('showHistoryBtn').addEventListener('click', () => this.showHistory());
-        document.getElementById('closeHistoryModal').addEventListener('click', () => {
-            document.getElementById('historyModal').style.display = 'none';
+        addEvent('showHistoryBtn', 'click', () => this.showHistory());
+        addEvent('closeHistoryModal', 'click', () => {
+            const modal = document.getElementById('historyModal');
+            if (modal) modal.style.display = 'none';
         });
 
         // Save and Save As
@@ -213,7 +226,8 @@ class App {
             saveAsBtn.addEventListener('click', async () => {
                 if (!this.editor) return;
                 
-                const currentTitle = document.getElementById('docTitle').value;
+                const titleEl = document.getElementById('docTitle');
+                const currentTitle = titleEl ? titleEl.value : 'Untitled';
                 const newTitle = prompt('Enter a name for the copy:', `Copy of ${currentTitle}`);
                 
                 if (newTitle === null) return; // Cancelled

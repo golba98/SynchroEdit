@@ -70,11 +70,15 @@ app.post('/api/auth/signup', async (req, res) => {
             return res.status(500).json({ message: 'Database connection error. Please check server logs.' });
         }
 
-        const { username, email, password } = req.body;
+        let { username, email, password } = req.body;
         
         if (!username || !email || !password) {
             return res.status(400).json({ message: 'Please provide username, email, and password' });
         }
+
+        // Sanitize input
+        username = username.trim();
+        email = email.trim().toLowerCase();
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
@@ -151,6 +155,9 @@ app.post('/api/auth/signup', async (req, res) => {
         }
     } catch (err) {
         console.error('Signup error:', err);
+        if (err.code === 11000) {
+            return res.status(400).json({ message: 'Username or email already exists' });
+        }
         res.status(500).json({ message: err.message || 'Error creating user' });
     }
 });

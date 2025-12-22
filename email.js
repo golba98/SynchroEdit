@@ -1,39 +1,26 @@
-
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const https = require('https');
 
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
-const isGmail = SMTP_HOST.includes('gmail');
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465', 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-// Configure transporter
-let transportConfig;
-
-if (isGmail) {
-    console.log('Using Gmail Service configuration with Connection Pooling');
-    transportConfig = {
-        service: 'gmail',
-        auth: {
-            user: SMTP_USER,
-            pass: SMTP_PASS
-        },
-        // Pooling can help with connection stability
-        pool: true,
-        maxConnections: 1,
-        // Debug options
-        logger: true,
-        debug: true
-    };
-} else {
-    transportConfig = {
+// Setup SMTP Transporter (Fallback)
+let transporter = null;
+if (!RESEND_API_KEY) {
+    const isGmail = SMTP_HOST.includes('gmail');
+    const port = isGmail ? 465 : SMTP_PORT; // Prefer 465 for Gmail
+    
+    transporter = nodemailer.createTransport({
         host: SMTP_HOST,
-        port: SMTP_PORT,
-        secure: SMTP_SECURE,
+        port: port,
+        secure: port === 465, 
         auth: {
             user: SMTP_USER,
             pass: SMTP_PASS
@@ -41,22 +28,63 @@ if (isGmail) {
         tls: {
             rejectUnauthorized: false
         },
-        connectionTimeout: 30000, 
-        greetingTimeout: 30000,
-        socketTimeout: 30000
-    };
+        connectionTimeout: 10000, // Fail faster (10s)
+        greetingTimeout: 10000,
+        socketTimeout: 10000
+    });
 }
 
-const transporter = nodemailer.createTransport(transportConfig);
+async function sendViaResend(email, html, subject) {
+    return new Promise((resolve, reject) => {
+        const data = JSON.stringify({
+            from: 'SynchroEdit <onboarding@resend.dev>', // Default testing sender for Resend
+            to: [email],
+            subject: subject,
+            html: html
+        });
+
+        const options = {
+            hostname: 'api.resend.com',
+            path: '/emails',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Content-Length': data.length
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let responseBody = '';
+            res.on('data', (chunk) => responseBody += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log('Email sent successfully via Resend API');
+                    resolve(true);
+                } else {
+                    console.error(`Resend API Error (${res.statusCode}):`, responseBody);
+                    resolve(false);
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            console.error('Resend Request Error:', error);
+            resolve(false);
+        });
+
+        req.write(data);
+        req.end();
+    });
+}
 
 async function sendVerificationEmail(email, code) {
     if (!EMAIL_VERIFICATION_ENABLED) {
         console.log('Email verification disabled; skipping send.');
         return true;
     }
-    console.log(`Attempting to send email to: ${email}`);
-    console.log(`Verification Code: ${code}`);
-    console.log(`SMTP Config: Host=${SMTP_HOST}, Port=${SMTP_PORT}, Secure=${SMTP_SECURE}, User=${SMTP_USER ? SMTP_USER.replace(/(.{2})(.*)(@.*)/, '$1***$3') : 'Not Set'}`);
+    
+    console.log(`Attempting to send verification code: ${code} to ${email}`);
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
@@ -73,11 +101,19 @@ async function sendVerificationEmail(email, code) {
         </div>
     `;
 
+    // 1. Try Resend if configured (Recommended for Cloud)
+    if (RESEND_API_KEY) {
+        console.log('Using Resend API for delivery...');
+        return await sendViaResend(email, html, 'SynchroEdit - Verification Code');
+    }
+
+    // 2. Fallback to SMTP
     if (!SMTP_USER || !SMTP_PASS) {
-        console.error('Email configuration missing: SMTP_USER or SMTP_PASS is not defined.');
+        console.error('Email configuration missing: SMTP_USER/PASS not set and RESEND_API_KEY not found.');
         return false;
     }
 
+    console.log(`Using SMTP (Host: ${SMTP_HOST})`);
     try {
         await transporter.sendMail({
             from: `"SynchroEdit" <${SMTP_FROM}>`,
@@ -88,7 +124,7 @@ async function sendVerificationEmail(email, code) {
         console.log('Email sent via SMTP');
         return true;
     } catch (err) {
-        console.error(`SMTP email sending error to ${email} with code ${code}. Please check your SMTP credentials and configuration in the .env file. Full error: `, err);
+        console.error(`SMTP sending failed. If you are on a cloud provider (like Render), SMTP ports may be blocked. Consider using RESEND_API_KEY. Error:`, err.message);
         return false;
     }
 }

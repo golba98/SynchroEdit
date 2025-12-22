@@ -25,9 +25,6 @@ if (!RESEND_API_KEY) {
             user: SMTP_USER,
             pass: SMTP_PASS
         },
-        tls: {
-            rejectUnauthorized: false
-        },
         connectionTimeout: 10000, // Fail faster (10s)
         greetingTimeout: 10000,
         socketTimeout: 10000

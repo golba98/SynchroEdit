@@ -20,6 +20,10 @@ const documentSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    sharedWith: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     lastModified: {
         type: Date,
         default: Date.now

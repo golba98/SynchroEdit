@@ -5,7 +5,8 @@ const http = require('http');
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { sendVerificationEmail, generateVerificationCode } = require('./email');
+const rateLimit = require('express-rate-limit');
+const { sendVerificationEmail, generateVerificationCode } = require('./utils/email');
 const User = require('./models/User');
 const Document = require('./models/Document');
 const History = require('./models/History');
@@ -16,8 +17,31 @@ const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
-const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+    console.error('FATAL ERROR: JWT_SECRET is not defined in environment variables.');
+    process.exit(1);
+}
+
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
+
+// Rate Limiting
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window`
+    message: { message: 'Too many requests from this IP, please try again after 15 minutes' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 requests per `window` for auth routes
+    message: { message: 'Too many login/signup attempts, please try again after 15 minutes' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 // Helper: Log History
 async function logHistory(documentId, userId, username, action, details = '') {
@@ -66,9 +90,13 @@ if (MONGODB_URI) {
 }
 
 // Middleware
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Apply rate limiters
+app.use('/api/', apiLimiter);
+app.use('/api/auth/', authLimiter);
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {
@@ -374,21 +402,33 @@ app.put('/api/user/password', authenticateToken, async (req, res) => {
 app.get('/api/documents', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        const ownedDocs = await Document.find({ owner: req.user.id }).populate('lastModifiedBy', 'username');
+        const accessibleDocs = await Document.find({ 
+            $or: [
+                { owner: req.user.id },
+                { sharedWith: req.user.id }
+            ]
+        }).populate('lastModifiedBy', 'username');
+        
         const recentDocs = await Document.find({ _id: { $in: user.recentDocuments || [] } }).populate('lastModifiedBy', 'username');
         
         // Combine and remove duplicates
-        const allDocs = [...ownedDocs];
+        const allDocs = [...accessibleDocs];
         recentDocs.forEach(rd => {
             if (!allDocs.some(od => od._id.toString() === rd._id.toString())) {
                 allDocs.push(rd);
             }
         });
 
+        // Filter out docs user doesn't have access to anymore (just in case)
+        const filteredDocs = allDocs.filter(doc => 
+            doc.owner.toString() === req.user.id || 
+            (doc.sharedWith && doc.sharedWith.some(id => id.toString() === req.user.id))
+        );
+
         // Sort by lastModified
-        allDocs.sort((a, b) => b.lastModified - a.lastModified);
+        filteredDocs.sort((a, b) => b.lastModified - a.lastModified);
         
-        res.json(allDocs);
+        res.json(filteredDocs);
     } catch (err) {
         console.error('Error fetching documents:', err);
         res.status(500).json({ message: 'Error fetching documents' });
@@ -547,24 +587,42 @@ wss.on('connection', (ws) => {
                 const { documentId, token } = data;
                 
                 let userId = null;
-                let username = 'Anonymous';
+                let username = null;
                 let profilePicture = null;
                 
-                if (token) {
-                    try {
-                        const decoded = jwt.verify(token, JWT_SECRET);
-                        userId = decoded.id;
-                        username = decoded.username;
-                        
-                        // Fetch fresh profile picture
-                        if (mongoose.connection.readyState === 1) {
-                            const dbUser = await User.findById(userId);
-                            if (dbUser) {
-                                profilePicture = dbUser.profilePicture;
-                            }
+                // 1. Authenticate User
+                if (!token) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Authentication required' }));
+                    return;
+                }
+
+                try {
+                    const decoded = jwt.verify(token, JWT_SECRET);
+                    userId = decoded.id;
+                    username = decoded.username;
+                    
+                    if (mongoose.connection.readyState === 1) {
+                        const dbUser = await User.findById(userId);
+                        if (dbUser) {
+                            profilePicture = dbUser.profilePicture;
                         }
-                    } catch (e) {
-                        console.error('Invalid token or DB error in WS join:', e);
+                    }
+                } catch (e) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Invalid token' }));
+                    return;
+                }
+
+                // 2. Authorization Check (Owner or Shared User)
+                if (mongoose.connection.readyState === 1) {
+                    const dbDoc = await Document.findById(documentId);
+                    if (dbDoc) {
+                        const isOwner = dbDoc.owner.toString() === userId;
+                        const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some(id => id.toString() === userId);
+
+                        if (!isOwner && !isShared) {
+                            ws.send(JSON.stringify({ type: 'error', message: 'Access denied: You do not have permission to view or edit this document.' }));
+                            return;
+                        }
                     }
                 }
 

@@ -7,36 +7,47 @@ const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const isGmail = SMTP_HOST.includes('gmail');
-
-// Force Gmail to use port 465 if it's currently set to 587 (common default that fails on cloud)
-let portFromEnv = parseInt(process.env.SMTP_PORT || (isGmail ? '465' : '587'), 10);
-if (isGmail && portFromEnv === 587) {
-    console.log('Detected Gmail with port 587. Automatically switching to port 465 (SSL) for better reliability on cloud hosting.');
-    portFromEnv = 465;
-}
-
-const SMTP_PORT = portFromEnv;
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 
+// Configure transporter
+let transportConfig;
 
-// Setup email transporter
-const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE, // true for 465, false for other ports
-    auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    // Increase timeouts for cloud environments
-    connectionTimeout: 20000, 
-    greetingTimeout: 20000,
-    socketTimeout: 20000
-});
+if (isGmail) {
+    console.log('Using Gmail Service configuration with Connection Pooling');
+    transportConfig = {
+        service: 'gmail',
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASS
+        },
+        // Pooling can help with connection stability
+        pool: true,
+        maxConnections: 1,
+        // Debug options
+        logger: true,
+        debug: true
+    };
+} else {
+    transportConfig = {
+        host: SMTP_HOST,
+        port: SMTP_PORT,
+        secure: SMTP_SECURE,
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASS
+        },
+        tls: {
+            rejectUnauthorized: false
+        },
+        connectionTimeout: 30000, 
+        greetingTimeout: 30000,
+        socketTimeout: 30000
+    };
+}
+
+const transporter = nodemailer.createTransport(transportConfig);
 
 async function sendVerificationEmail(email, code) {
     if (!EMAIL_VERIFICATION_ENABLED) {

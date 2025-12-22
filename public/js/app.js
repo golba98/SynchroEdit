@@ -186,6 +186,58 @@ class App {
             document.getElementById('historyModal').style.display = 'none';
         });
 
+        // Save and Save As
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+                saveBtn.style.background = '#10b981';
+                
+                if (this.editor && this.documentId) {
+                    this.handleContentChange('update-page', {
+                        pageIndex: this.editor.currentPageIndex,
+                        content: this.editor.quill.getContents()
+                    });
+                }
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        const saveAsBtn = document.getElementById('saveAsBtn');
+        if (saveAsBtn) {
+            saveAsBtn.addEventListener('click', async () => {
+                if (!this.editor) return;
+                
+                const currentTitle = document.getElementById('docTitle').value;
+                const newTitle = prompt('Enter a name for the copy:', `Copy of ${currentTitle}`);
+                
+                if (newTitle === null) return; // Cancelled
+                
+                try {
+                    // Get all pages content
+                    const pagesCopy = this.editor.pages.map((page, index) => {
+                        // If it's the current page, get from Quill
+                        if (index === this.editor.currentPageIndex) {
+                            return { content: this.editor.quill.getContents() };
+                        }
+                        return { content: page.content };
+                    });
+
+                    const newDoc = await Network.createDocument(newTitle || 'Untitled Copy', pagesCopy);
+                    alert('Document copied successfully! Redirecting...');
+                    window.location.href = `?doc=${newDoc._id}`;
+                } catch (err) {
+                    console.error('Save As failed:', err);
+                    alert('Failed to save a copy of the document.');
+                }
+            });
+        }
+
         // Toolbar formatting (Delegation could be better, but for now)
         this.setupToolbar();
     }

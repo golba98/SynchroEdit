@@ -37,7 +37,7 @@ if (!RESEND_API_KEY) {
 async function sendViaResend(email, html, subject) {
     return new Promise((resolve, reject) => {
         const data = JSON.stringify({
-            from: 'SynchroEdit <onboarding@resend.dev>', // Default testing sender for Resend
+            from: SMTP_FROM,
             to: [email],
             subject: subject,
             html: html

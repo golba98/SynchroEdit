@@ -142,6 +142,27 @@ class App {
         });
         addEvent('logoutBtnProfile', 'click', () => Auth.logout());
 
+        // Profile Tabs
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const profileTabContents = document.querySelectorAll('.profile-tab-content');
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                profileTabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.style.opacity = '0.7';
+                    t.style.background = 'linear-gradient(135deg, var(--accent-color), var(--accent-color-light))';
+                });
+                profileTabContents.forEach(c => c.style.display = 'none');
+                
+                tab.classList.add('active');
+                tab.style.opacity = '1';
+                
+                const targetContent = document.getElementById(`${targetTab}-content`);
+                if (targetContent) targetContent.style.display = 'block';
+            });
+        });
+
         // PFP Upload
         addEvent('pfpUpload', 'change', (e) => {
             const file = e.target.files[0];

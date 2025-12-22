@@ -849,7 +849,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const range = quill.getSelection();
                         // Only apply if we have a cursor (not a selection)
                         if (range && range.length === 0) {
-                            for (const [name, value] of Object.entries(activeFormats)) {
+                            for (let [name, value] of Object.entries(activeFormats)) {
+                                // If value is an array (multiple formats at once), take the first one
+                                if (Array.isArray(value)) value = value[0];
                                 quill.format(name, value, 'user');
                             }
                         }
@@ -906,7 +908,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update Alignment
         const alignSelect = document.querySelector('.ql-align');
         if (alignSelect) {
-            alignSelect.value = formats.align || '';
+            let alignValue = formats.align || '';
+            if (Array.isArray(alignValue)) alignValue = alignValue[0];
+            alignSelect.value = alignValue;
         }
 
         // Update Text Color Indicator
@@ -1462,22 +1466,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (alignSelect) alignSelect.addEventListener('change', (e) => {
             if (!quill) return;
             const value = e.target.value || false;
-            quill.format('align', value);
-            updateToolbarUI();
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.format('align', value, 'user');
+                updateToolbarUI();
+            }
         });
 
         if (sizeSelect) sizeSelect.addEventListener('change', (e) => {
             if (!quill) return;
             const value = e.target.value;
-            quill.format('size', value);
-            updateToolbarUI();
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.format('size', value, 'user');
+                updateToolbarUI();
+            }
         });
 
         if (fontSelect) fontSelect.addEventListener('change', (e) => {
             if (!quill) return;
             const value = e.target.value;
-            quill.format('font', value);
-            updateToolbarUI();
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.format('font', value, 'user');
+                updateToolbarUI();
+            }
         });
         
         if (orderedListBtn) orderedListBtn.addEventListener('click', () => {

@@ -315,18 +315,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ws.onclose = () => {
             console.log('Disconnected from server, attempting reconnect in 3s...');
-            // Show offline overlay
+            
+            // Show overlay with "Waiting..." message first
             const offlineOverlay = document.getElementById('serverOfflineOverlay');
-            if (offlineOverlay) offlineOverlay.style.display = 'flex';
+            const title = document.getElementById('overlayTitle');
+            const desc = document.getElementById('overlayDesc');
+            
+            if (offlineOverlay && title && desc) {
+                title.textContent = 'Reconnecting...';
+                desc.textContent = 'Waiting for response from server...';
+                offlineOverlay.style.display = 'flex';
+            }
 
             setTimeout(initWebSocket, 3000);
         };
 
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
-            // Show offline overlay immediately on error
-            const offlineOverlay = document.getElementById('serverOfflineOverlay');
-            if (offlineOverlay) offlineOverlay.style.display = 'flex';
+            // Optional: Don't show immediately on error, wait for close
         };
     }
 
@@ -618,7 +624,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPageContainer = document.createElement('div');
         newPageContainer.className = 'editor-container';
         newPageContainer.id = `page-container-${pageIndex}`;
-        newPageContainer.innerHTML = `<div id="editor-${pageIndex}" class="page-editor" data-page-index="${pageIndex}"></div>`;
+        newPageContainer.innerHTML = `
+            <div class="page-border-inner" style="position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; pointer-events: none; border: 1px solid transparent; z-index: 5;"></div>
+            <div id="editor-${pageIndex}" class="page-editor" data-page-index="${pageIndex}" style="position: relative; z-index: 1;"></div>
+        `;
         
         pagesContainer.appendChild(newPageContainer);
         
@@ -1452,29 +1461,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Helper function to apply border
         function applyBorder() {
-            const container = document.querySelector('.editor-container');
-            if (!container) return;
+            const borders = document.querySelectorAll('.page-border-inner');
             const widthPx = `${ptToPx(currentBorderWidth)}px`;
             const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
             
-            // Reset all special effects first
-            container.style.boxShadow = 'none';
-            
-            if (currentBorderType === 'none') {
-                container.style.border = 'none';
-                container.style.borderTop = 'none';
-                container.style.borderBottom = 'none';
-                container.style.borderLeft = 'none';
-                container.style.borderRight = 'none';
-            } else if (currentBorderType === 'box') {
-                container.style.border = borderValue;
-            } else if (currentBorderType === 'shadow') {
-                container.style.border = borderValue;
-                container.style.boxShadow = `5px 5px 10px rgba(0, 0, 0, 0.3)`;
-            } else if (currentBorderType === '3d') {
-                container.style.border = borderValue;
-                container.style.boxShadow = `inset -2px -2px 5px rgba(0, 0, 0, 0.2), inset 2px 2px 5px rgba(255, 255, 255, 0.5)`;
-            }
+            borders.forEach(border => {
+                // Reset all sides first
+                border.style.border = 'none';
+                border.style.boxShadow = 'none';
+                
+                if (currentBorderType === 'none') {
+                    // Already reset
+                } else if (currentBorderType === 'box') {
+                    border.style.border = borderValue;
+                } else if (currentBorderType === 'shadow') {
+                    border.style.border = borderValue;
+                    border.style.boxShadow = `5px 5px 10px rgba(0, 0, 0, 0.5)`;
+                } else if (currentBorderType === '3d') {
+                    border.style.border = borderValue;
+                    // For 3D we simulate with multiple shadows
+                    border.style.boxShadow = `inset -2px -2px 5px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.1)`;
+                }
+            });
         }
         
         // Border setting controls
@@ -1567,74 +1575,60 @@ document.addEventListener('DOMContentLoaded', () => {
         // Border position controls
         if (borderAll) {
             borderAll.addEventListener('click', () => {
-                if (currentBorderType === 'none') {
-                    currentBorderType = 'box';
-                }
+                currentBorderType = 'box';
                 applyBorder();
             });
         }
         
         if (borderTop) {
             borderTop.addEventListener('click', () => {
-                const container = document.querySelector('.editor-container');
-                if (!container) return;
+                const borders = document.querySelectorAll('.page-border-inner');
                 const widthPx = `${ptToPx(currentBorderWidth)}px`;
                 const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
                 
-                container.style.border = 'none';
-                container.style.boxShadow = 'none';
-                container.style.borderTop = borderValue;
-                container.style.borderBottom = 'none';
-                container.style.borderLeft = 'none';
-                container.style.borderRight = 'none';
+                borders.forEach(border => {
+                    border.style.border = 'none';
+                    border.style.borderTop = borderValue;
+                });
             });
         }
         
         if (borderBottom) {
             borderBottom.addEventListener('click', () => {
-                const container = document.querySelector('.editor-container');
-                if (!container) return;
+                const borders = document.querySelectorAll('.page-border-inner');
                 const widthPx = `${ptToPx(currentBorderWidth)}px`;
                 const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
                 
-                container.style.border = 'none';
-                container.style.boxShadow = 'none';
-                container.style.borderTop = 'none';
-                container.style.borderBottom = borderValue;
-                container.style.borderLeft = 'none';
-                container.style.borderRight = 'none';
+                borders.forEach(border => {
+                    border.style.border = 'none';
+                    border.style.borderBottom = borderValue;
+                });
             });
         }
         
         if (borderLeft) {
             borderLeft.addEventListener('click', () => {
-                const container = document.querySelector('.editor-container');
-                if (!container) return;
+                const borders = document.querySelectorAll('.page-border-inner');
                 const widthPx = `${ptToPx(currentBorderWidth)}px`;
                 const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
                 
-                container.style.border = 'none';
-                container.style.boxShadow = 'none';
-                container.style.borderTop = 'none';
-                container.style.borderBottom = 'none';
-                container.style.borderLeft = borderValue;
-                container.style.borderRight = 'none';
+                borders.forEach(border => {
+                    border.style.border = 'none';
+                    border.style.borderLeft = borderValue;
+                });
             });
         }
         
         if (borderRight) {
             borderRight.addEventListener('click', () => {
-                const container = document.querySelector('.editor-container');
-                if (!container) return;
+                const borders = document.querySelectorAll('.page-border-inner');
                 const widthPx = `${ptToPx(currentBorderWidth)}px`;
                 const borderValue = `${widthPx} ${currentBorderStyle} ${currentBorderColor}`;
                 
-                container.style.border = 'none';
-                container.style.boxShadow = 'none';
-                container.style.borderTop = 'none';
-                container.style.borderBottom = 'none';
-                container.style.borderLeft = 'none';
-                container.style.borderRight = borderValue;
+                borders.forEach(border => {
+                    border.style.border = 'none';
+                    border.style.borderRight = borderValue;
+                });
             });
         }
     }

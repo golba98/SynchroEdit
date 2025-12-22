@@ -488,10 +488,10 @@
             background: linear-gradient(135deg, #000000 0%, #0d0520 100%);
             padding: 30px 50px;
             box-shadow: 
-                0 0 40px rgba(var(--accent-color-rgb), 0.3), 
-                0 0 80px rgba(var(--accent-color-rgb), 0.1);
-            border: 2px solid var(--accent-color);
-            border-radius: 12px;
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(var(--accent-color-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 2px;
             transform-origin: top center;
             transition: box-shadow 0.3s ease, transform 0.3s ease;
             max-width: 750px;
@@ -1486,13 +1486,13 @@
         <div style="font-size: 64px; color: var(--accent-color-light); margin-bottom: 24px; animation: float 3s ease-in-out infinite; text-shadow: 0 0 30px rgba(var(--accent-color-rgb), 0.6);">
             <i class="fas fa-server"></i>
         </div>
-        <h1 style="font-size: 32px; color: var(--accent-color); margin-bottom: 16px; font-weight: 700; letter-spacing: 1px;">Server Offline</h1>
-        <p style="font-size: 18px; color: #b0b0b0; max-width: 500px; line-height: 1.6; margin-bottom: 32px;">
-            We are currently maintaining the server. <br>Please come back in a few minutes.
+        <h1 id="overlayTitle" style="font-size: 32px; color: var(--accent-color); margin-bottom: 16px; font-weight: 700; letter-spacing: 1px;">Connecting...</h1>
+        <p id="overlayDesc" style="font-size: 18px; color: #b0b0b0; max-width: 500px; line-height: 1.6; margin-bottom: 32px;">
+            Waiting for response from server...
         </p>
         <div style="display: flex; gap: 8px; align-items: center; background: rgba(var(--accent-color-rgb), 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--accent-color);">
             <div style="width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; animation: pulse 2s infinite;"></div>
-            <span style="font-size: 14px; color: var(--accent-color-light);">Attempting to reconnect...</span>
+            <span style="font-size: 14px; color: var(--accent-color-light);">Status check...</span>
         </div>
 
         <style>

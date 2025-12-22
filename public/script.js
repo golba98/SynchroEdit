@@ -2023,9 +2023,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('User profile loaded for:', user.username);
                 
                 if (profileUsername) profileUsername.textContent = user.username;
-                // ... rest of code
-                return user;
-            }
                 if (user.profilePicture) {
                     if (profilePfp) {
                         profilePfp.src = user.profilePicture;

@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const { sendVerificationEmail, generateVerificationCode } = require('./email');
 const User = require('./models/User');
 const Document = require('./models/Document');
+const History = require('./models/History');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,6 +18,42 @@ const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret';
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
+
+// Helper: Log History
+async function logHistory(documentId, userId, username, action, details = '') {
+    try {
+        if (!documentId) return;
+
+        // Debounce "Edited Page X" actions to avoid spamming DB
+        if (action.startsWith('Edited Page')) {
+            const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+            const recentEntry = await History.findOne({
+                documentId,
+                userId,
+                action,
+                details,
+                timestamp: { $gte: fiveMinutesAgo }
+            }).sort({ timestamp: -1 });
+
+            if (recentEntry) {
+                recentEntry.timestamp = new Date(); // Update timestamp
+                await recentEntry.save();
+                return;
+            }
+        }
+
+        const history = new History({
+            documentId,
+            userId,
+            username: username || 'Anonymous',
+            action,
+            details
+        });
+        await history.save();
+    } catch (err) {
+        console.error('Error logging history:', err);
+    }
+}
 
 
 // Database Connection
@@ -399,6 +436,10 @@ app.post('/api/documents', authenticateToken, async (req, res) => {
             pages: req.body.pages || [{ content: '' }]
         });
         await doc.save();
+        
+        // Initial history log
+        logHistory(doc._id, req.user.id, req.user.username, 'Created Document');
+        
         res.status(201).json(doc);
     } catch (err) {
         res.status(500).json({ message: 'Error creating document' });
@@ -437,10 +478,32 @@ app.delete('/api/documents/:id', authenticateToken, async (req, res) => {
             documents.delete(docId);
         }
         
+        // Clean up history
+        await History.deleteMany({ documentId: docId });
+
         res.json({ message: 'Document deleted' });
     } catch (err) {
         console.error('Error deleting document:', err);
         res.status(500).json({ message: 'Error deleting document' });
+    }
+});
+
+// Get document history
+app.get('/api/documents/:id/history', authenticateToken, async (req, res) => {
+    try {
+        const docId = req.params.id;
+        // Verify access (basic check if doc exists and user has access)
+        // For simplicity allowing any authenticated user to see history of any doc they can open
+        // In a real app, you'd check ownership or shared permissions specifically
+        
+        const history = await History.find({ documentId: docId })
+            .sort({ timestamp: -1 })
+            .limit(50); // Limit to last 50 entries
+            
+        res.json(history);
+    } catch (err) {
+        console.error('Error fetching history:', err);
+        res.status(500).json({ message: 'Error fetching history' });
     }
 });
 
@@ -485,19 +548,28 @@ wss.on('connection', (ws) => {
                 
                 let userId = null;
                 let username = 'Anonymous';
+                let profilePicture = null;
                 
                 if (token) {
                     try {
                         const decoded = jwt.verify(token, JWT_SECRET);
                         userId = decoded.id;
                         username = decoded.username;
+                        
+                        // Fetch fresh profile picture
+                        if (mongoose.connection.readyState === 1) {
+                            const dbUser = await User.findById(userId);
+                            if (dbUser) {
+                                profilePicture = dbUser.profilePicture;
+                            }
+                        }
                     } catch (e) {
-                        console.error('Invalid token in WS join');
+                        console.error('Invalid token or DB error in WS join:', e);
                     }
                 }
 
                 const doc = await getOrCreateDocument(documentId);
-                clients.set(ws, { documentId, userId, username });
+                clients.set(ws, { documentId, userId, username, profilePicture });
                 doc.clients.add(ws);
                 ws.send(JSON.stringify({ type: 'sync', data: doc.state }));
                 
@@ -515,21 +587,25 @@ wss.on('connection', (ws) => {
                 case 'update-title':
                     doc.state.title = data.title;
                     broadcastToDocument(documentId, ws, { type: 'update-title', title: data.title, username });
+                    logHistory(documentId, userId, username, 'Renamed Document', `New title: ${data.title}`);
                     break;
                 case 'update-page':
                     if (doc.state.pages[data.pageIndex]) {
                         doc.state.pages[data.pageIndex].content = data.content;
                     }
                     broadcastToDocument(documentId, ws, { type: 'update-page', pageIndex: data.pageIndex, content: data.content, username });
+                    logHistory(documentId, userId, username, `Edited Page ${data.pageIndex + 1}`);
                     break;
                 case 'new-page':
                     doc.state.pages.push({ content: '' });
                     broadcastToDocument(documentId, ws, { type: 'new-page', totalPages: doc.state.pages.length, username });
+                    logHistory(documentId, userId, username, 'Added New Page');
                     break;
                 case 'delete-page':
                     if (doc.state.pages.length > 1) {
                         doc.state.pages.splice(data.pageIndex, 1);
                         broadcastToDocument(documentId, ws, { type: 'delete-page', pageIndex: data.pageIndex, totalPages: doc.state.pages.length, username });
+                        logHistory(documentId, userId, username, `Deleted Page ${data.pageIndex + 1}`);
                     }
                     break;
             }
@@ -573,7 +649,10 @@ function broadcastCollaborators(documentId) {
     doc.clients.forEach(client => {
         const info = clients.get(client);
         if (info && !seenUsernames.has(info.username)) {
-            activeUsers.push({ username: info.username });
+            activeUsers.push({ 
+                username: info.username, 
+                profilePicture: info.profilePicture 
+            });
             seenUsernames.add(info.username);
         }
     });

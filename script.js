@@ -416,11 +416,36 @@ function updateCollaboratorsUI(users) {
     const container = document.getElementById('activeCollaborators');
     if (!container) return;
 
+    if (users.length > 0) {
+        container.style.display = 'flex';
+    } else {
+        container.style.display = 'none';
+    }
+
     container.innerHTML = users.map((user, index) => {
         const colors = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#6366f1', '#818cf8', '#a5b4fc'];
         const color = colors[index % colors.length];
         const initial = user.username.charAt(0).toUpperCase();
         
+        if (user.profilePicture) {
+            return `
+            <div title="${user.username}" style="
+                width: 30px; 
+                height: 30px; 
+                border-radius: 50%; 
+                background: #ffffff; 
+                border: 2px solid var(--accent-color); 
+                margin-left: -8px;
+                cursor: default;
+                box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.4);
+                overflow: hidden;
+                position: relative;
+            ">
+                <img src="${user.profilePicture}" style="width: 100%; height: 100%; object-fit: cover;" alt="${initial}">
+            </div>
+            `;
+        }
+
         return `
             <div title="${user.username}" style="
                 width: 30px; 
@@ -1022,10 +1047,96 @@ window.addEventListener('load', async () => {
     setupDesignFeatures();
     setupLayoutFeatures();
     setupViewFeatures();
+    setupHistoryFeatures(); // New
     
     // Setup document library
     setupDocumentLibrary();
 });
+
+// History Features
+function setupHistoryFeatures() {
+    const showHistoryBtn = document.getElementById('showHistoryBtn');
+    const historyModal = document.getElementById('historyModal');
+    const closeHistoryModal = document.getElementById('closeHistoryModal');
+    const historyList = document.getElementById('historyList');
+
+    if (showHistoryBtn) {
+        showHistoryBtn.addEventListener('click', () => {
+            historyModal.style.display = 'flex';
+            fetchHistory();
+        });
+    }
+
+    if (closeHistoryModal) {
+        closeHistoryModal.addEventListener('click', () => {
+            historyModal.style.display = 'none';
+        });
+    }
+    
+    // Close on outside click
+    if (historyModal) {
+        historyModal.addEventListener('click', (e) => {
+            if (e.target === historyModal) {
+                historyModal.style.display = 'none';
+            }
+        });
+    }
+
+    async function fetchHistory() {
+        if (!documentId) return;
+        
+        historyList.innerHTML = '<div style="text-align: center; color: #b0b0b0; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        
+        try {
+            const response = await fetch(`/api/documents/${documentId}/history`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch history');
+            
+            const history = await response.json();
+            renderHistory(history);
+        } catch (err) {
+            console.error('Error fetching history:', err);
+            historyList.innerHTML = '<div style="text-align: center; color: #ff6b6b; padding: 20px;">Failed to load history</div>';
+        }
+    }
+    
+    function renderHistory(items) {
+        if (!items || items.length === 0) {
+            historyList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No history available yet.</div>';
+            return;
+        }
+        
+        historyList.innerHTML = items.map(item => {
+            const date = new Date(item.timestamp);
+            const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Icon based on action
+            let icon = 'fa-pen';
+            if (item.action.includes('Created')) icon = 'fa-plus-circle';
+            else if (item.action.includes('Renamed')) icon = 'fa-i-cursor';
+            else if (item.action.includes('Deleted')) icon = 'fa-trash';
+            else if (item.action.includes('Added')) icon = 'fa-file-medical';
+            
+            return `
+                <div style="display: flex; gap: 16px; padding: 12px; border-bottom: 1px solid #2a2a2a; align-items: flex-start;">
+                    <div style="background: rgba(var(--accent-color-rgb), 0.1); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent-color-light);">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="color: #e0e0e0; font-weight: 500;">${item.username}</span>
+                            <span style="color: #666; font-size: 12px;">${dateStr}</span>
+                        </div>
+                        <div style="color: #b0b0b0; font-size: 14px;">${item.action}</div>
+                        ${item.details ? `<div style="color: #666; font-size: 12px; margin-top: 2px;">${item.details}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
 
 // Ribbon Tab Management
 function setupRibbonTabs() {

@@ -12,6 +12,8 @@
     <!-- File Extraction Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
     <style>
         :root {
             --accent-color: #8b5cf6;
@@ -1251,7 +1253,13 @@
                 <button class="ql-italic toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
                 <button class="ql-underline toolbar-btn" title="Underline"><i class="fas fa-underline"></i></button>
                 <button class="ql-strike toolbar-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
-                <button class="ql-color toolbar-btn" title="Text Color"><i class="fas fa-palette"></i></button>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <button class="ql-color toolbar-btn" id="textColorBtn" title="Text Color">
+                        <i class="fas fa-font"></i>
+                        <div id="textColorIndicator" style="position: absolute; bottom: 2px; left: 4px; right: 4px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                    </button>
+                    <input type="color" id="textColorPicker" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+                </div>
             </div>
         </div>
         <div class="ribbon-section">
@@ -1310,7 +1318,13 @@
         <div class="ribbon-section">
             <div class="ribbon-section-title">Highlights</div>
             <div class="ribbon-section-tools">
-                <button class="ql-background toolbar-btn" title="Highlight"><i class="fas fa-highlighter"></i></button>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <button class="ql-background toolbar-btn" id="highlightColorBtn" title="Highlight">
+                        <i class="fas fa-highlighter"></i>
+                        <div id="highlightColorIndicator" style="position: absolute; bottom: 2px; left: 4px; right: 4px; height: 3px; background: #ffff00; border-radius: 1px;"></div>
+                    </button>
+                    <input type="color" id="highlightColorPicker" value="#ffff00" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+                </div>
             </div>
         </div>
     </div>
@@ -1387,7 +1401,13 @@
         <div class="ribbon-section">
             <div class="ribbon-section-title">Color</div>
             <div class="ribbon-section-tools">
-                <input type="color" id="borderColorPicker" value="#333333" title="Border Color">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <button class="toolbar-btn" id="borderColorBtn" title="Border Color">
+                        <i class="fas fa-border-style"></i>
+                        <div id="borderColorIndicator" style="position: absolute; bottom: 2px; left: 4px; right: 4px; height: 3px; background: #333333; border-radius: 1px;"></div>
+                    </button>
+                    <input type="color" id="borderColorPicker" value="#333333" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+                </div>
             </div>
         </div>
         <div class="ribbon-section">

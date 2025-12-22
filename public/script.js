@@ -1282,6 +1282,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const italicBtn = document.querySelector('.ql-italic');
         const underlineBtn = document.querySelector('.ql-underline');
         const strikeBtn = document.querySelector('.ql-strike');
+        const textColorBtn = document.getElementById('textColorBtn');
+        const textColorPicker = document.getElementById('textColorPicker');
+        const textColorIndicator = document.getElementById('textColorIndicator');
         const alignSelect = document.querySelector('.ql-align');
         const sizeSelect = document.querySelector('.ql-size');
         const fontSelect = document.querySelector('.ql-font');
@@ -1309,6 +1312,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const format = quill.getFormat();
             quill.format('strike', !format.strike);
         });
+
+        if (textColorBtn && textColorPicker) {
+            textColorBtn.addEventListener('click', () => textColorPicker.click());
+            textColorPicker.addEventListener('input', (e) => {
+                const color = e.target.value;
+                if (quill) {
+                    quill.format('color', color);
+                }
+                if (textColorIndicator) textColorIndicator.style.background = color;
+            });
+        }
         
         if (alignSelect) alignSelect.addEventListener('change', (e) => {
             const value = e.target.value || false;
@@ -1446,25 +1460,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Design Features
     function setupDesignFeatures() {
-        const colorBtn = document.querySelector('.ql-color'); // Now in Home tab
-        const backgroundBtn = document.querySelector('#design-ribbon .ql-background');
+        const highlightColorBtn = document.getElementById('highlightColorBtn');
+        const highlightColorPicker = document.getElementById('highlightColorPicker');
+        const highlightColorIndicator = document.getElementById('highlightColorIndicator');
         
-        // Color buttons
-        if (colorBtn) colorBtn.addEventListener('click', () => {
-            if (!quill) return;
-            const color = prompt('Enter text color (e.g., #ff0000, red, rgb(255,0,0)):');
-            if (color) {
-                quill.format('color', color);
-            }
-        });
-        
-        if (backgroundBtn) backgroundBtn.addEventListener('click', () => {
-            if (!quill) return;
-            const color = prompt('Enter highlight color (e.g., #ffff00, yellow):');
-            if (color) {
-                quill.format('background', color);
-            }
-        });
+        if (highlightColorBtn && highlightColorPicker) {
+            highlightColorBtn.addEventListener('click', () => highlightColorPicker.click());
+            highlightColorPicker.addEventListener('input', (e) => {
+                const color = e.target.value;
+                if (quill) {
+                    quill.format('background', color);
+                }
+                if (highlightColorIndicator) highlightColorIndicator.style.background = color;
+            });
+        }
     }
 
     // Layout Features
@@ -1485,7 +1494,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Border customization
         const borderStyleSelect = document.getElementById('borderStyleSelect');
         const borderWidthSelect = document.getElementById('borderWidthSelect');
+        const borderColorBtn = document.getElementById('borderColorBtn');
         const borderColorPicker = document.getElementById('borderColorPicker');
+        const borderColorIndicator = document.getElementById('borderColorIndicator');
         
         // Border position buttons
         const borderAll = document.getElementById('borderAll');
@@ -1561,9 +1572,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Border color picker
-        if (borderColorPicker) {
+        if (borderColorBtn && borderColorPicker) {
+            borderColorBtn.addEventListener('click', () => borderColorPicker.click());
             borderColorPicker.addEventListener('input', (e) => {
                 currentBorderColor = e.target.value;
+                if (borderColorIndicator) borderColorIndicator.style.background = currentBorderColor;
                 if (currentBorderType !== 'none') {
                     applyBorder();
                 }
@@ -2784,6 +2797,124 @@ document.addEventListener('DOMContentLoaded', () => {
     if (username && logoutBtn) {
         logoutBtn.innerHTML = `<i class="fas fa-user"></i> ${username} <i class="fas fa-sign-out-alt"></i>`;
     }
+
+    // Export Functionality
+    async function exportDocument(format) {
+        const title = docTitle.value || 'Untitled document';
+        
+        if (format === 'txt') {
+            // Combine all pages text
+            let fullText = '';
+            pages.forEach((page, index) => {
+                const tempQuill = pageQuillInstances[index];
+                if (tempQuill) {
+                    fullText += `Page ${index + 1}\n${tempQuill.getText()}\n\n`;
+                }
+            });
+            
+            const blob = new Blob([fullText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } 
+        else if (format === 'pdf') {
+            const element = document.getElementById('pagesContainer');
+            const opt = {
+                margin: 10,
+                filename: `${title}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Show loading message or indicator
+            const originalTitle = document.title;
+            document.title = 'Generating PDF...';
+            
+            html2pdf().from(element).set(opt).save().then(() => {
+                document.title = originalTitle;
+            });
+        }
+        else if (format === 'docx') {
+            if (!window.docx) {
+                alert('Docx library not loaded');
+                return;
+            }
+
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+            
+            const docSections = [];
+            pages.forEach((page, index) => {
+                const tempQuill = pageQuillInstances[index];
+                if (tempQuill) {
+                    const text = tempQuill.getText();
+                    const paragraphs = text.split('\n').map(line => {
+                        return new Paragraph({
+                            children: [new TextRun(line)],
+                        });
+                    });
+                    
+                    docSections.push({
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                text: `Page ${index + 1}`,
+                                heading: HeadingLevel.HEADING_1,
+                            }),
+                            ...paragraphs
+                        ],
+                    });
+                }
+            });
+
+            const doc = new Document({
+                sections: docSections
+            });
+
+            Packer.toBlob(doc).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title}.docx`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+    }
+
+    function setupExportHandlers() {
+        const saveBtn = document.getElementById('saveBtn');
+        const saveAsBtn = document.getElementById('saveAsBtn');
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                // For a web app "Save" usually means sync to server (which is automatic)
+                // or export in a default format. Let's make it export as JSON (full backup)
+                saveFileBtn.click();
+            });
+        }
+
+        if (saveAsBtn) {
+            saveAsBtn.addEventListener('click', () => {
+                const format = prompt('Export as: (pdf, docx, txt, json)', 'pdf');
+                if (format) {
+                    const lowerFormat = format.toLowerCase().trim();
+                    if (lowerFormat === 'json') {
+                        saveFileBtn.click();
+                    } else if (['pdf', 'docx', 'txt'].includes(lowerFormat)) {
+                        exportDocument(lowerFormat);
+                    } else {
+                        alert('Unsupported format: ' + format);
+                    }
+                }
+            });
+        }
+    }
+
+    setupExportHandlers();
 
     // Load saved theme preference
     loadTheme();

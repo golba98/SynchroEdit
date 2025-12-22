@@ -1504,7 +1504,7 @@ function setupViewFeatures() {
 // File Management Functions
 if (shareBtn) {
     shareBtn.addEventListener('click', () => {
-        const shareUrl = `${window.location.origin}${window.location.pathname}?doc=${documentId}`;
+        const shareUrl = `${window.location.origin}?doc=${documentId}`;
         shareLink.value = shareUrl;
         shareModal.style.display = 'flex';
     });

@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const documentList = document.getElementById('documentList');
     const docSearch = document.getElementById('docSearch');
     const logoutBtn = document.getElementById('logoutBtn');
+    const logoutBtnLibrary = document.getElementById('logoutBtnLibrary');
 
     // Profile Elements
     const userProfileTrigger = document.getElementById('userProfileTrigger');
@@ -98,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBorderWidth = '1pt';
     let currentBorderColor = '#333333';
     let currentBorderType = 'box'; // none, box, shadow, 3d
+
+    let currentUserProfile = null;
 
     // Helper function to convert pt to px (1pt = 1.333px)
     function ptToPx(pt) {
@@ -247,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const lastModifiedBy = escapeHTML(doc.lastModifiedBy ? doc.lastModifiedBy.username : 'Unknown');
             const safeTitle = escapeHTML(doc.title);
+            const isSharedDoc = currentUserProfile && doc.owner !== currentUserProfile._id;
             
             return `
                 <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #2a2a2a; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: rgba(var(--accent-color-rgb), 0.15);' : ''}">
@@ -254,7 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <i class="fas fa-file-alt" style="color: var(--accent-color-light); font-size: 20px;"></i>
                             <div>
-                                <div style="color: #e0e0e0; font-weight: 500; margin-bottom: 4px;">${safeTitle}</div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <div style="color: #e0e0e0; font-weight: 500;">${safeTitle}</div>
+                                    ${isSharedDoc ? '<span style="background: rgba(var(--accent-color-rgb), 0.2); color: var(--accent-color-light); font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-color); font-weight: bold; text-transform: uppercase;">Shared</span>' : ''}
+                                </div>
                                 <div style="color: #b0b0b0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
                             </div>
                         </div>
@@ -1114,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved content on page load
     async function init() {
         // Fetch user profile
-        fetchUserProfile();
+        await fetchUserProfile();
 
         // Check if we have a document ID in URL
         if (documentId) {
@@ -2012,9 +2019,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (response.ok) {
                 const user = await response.json();
+                currentUserProfile = user;
                 console.log('User profile loaded for:', user.username);
                 
                 if (profileUsername) profileUsername.textContent = user.username;
+                // ... rest of code
+                return user;
+            }
                 if (user.profilePicture) {
                     if (profilePfp) {
                         profilePfp.src = user.profilePicture;
@@ -2828,20 +2839,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Logout handler
+    const handleLogout = () => {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('synchroEditToken');
+            localStorage.removeItem('synchroEditUser');
+            window.location.href = 'login.html';
+        }
+    };
+
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('synchroEditToken');
-                localStorage.removeItem('synchroEditUser');
-                window.location.href = 'login.html';
-            }
-        });
+        logoutBtn.addEventListener('click', handleLogout);
     }
 
-    // Display logged-in user
-    const username = localStorage.getItem('synchroEditUser');
-    if (username && logoutBtn) {
-        logoutBtn.innerHTML = `<i class="fas fa-user"></i> ${username} <i class="fas fa-sign-out-alt"></i>`;
+    if (logoutBtnLibrary) {
+        logoutBtnLibrary.addEventListener('click', handleLogout);
     }
 
     // Export Functionality

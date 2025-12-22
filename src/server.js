@@ -649,8 +649,11 @@ wss.on('connection', (ws) => {
                     const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some(id => id.toString() === userId);
 
                     if (!isOwner && !isShared) {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Access denied: You do not have permission to view or edit this document.' }));
-                        return;
+                        // If user has the link, they are automatically added to sharedWith
+                        dbDoc.sharedWith.push(userId);
+                        await dbDoc.save();
+                        console.log(`User ${username} added to sharedWith for document ${documentId}`);
+                        logHistory(documentId, userId, username, 'Joined Document via link');
                     }
                 } else {
                     // If DB is down, we can't verify permission. For security, deny.

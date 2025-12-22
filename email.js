@@ -6,16 +6,19 @@ const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+// Default to 465 (SSL) for Gmail if not specified, as it's often more reliable in cloud envs than 587 (STARTTLS)
+const isGmail = SMTP_HOST.includes('gmail');
+const defaultPort = isGmail ? 465 : 587;
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || defaultPort.toString(), 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 
 
 // Setup email transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE, // true for 465, false for other ports
     auth: {
         user: SMTP_USER,
         pass: SMTP_PASS

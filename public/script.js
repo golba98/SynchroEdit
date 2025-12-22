@@ -321,9 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = document.getElementById('overlayTitle');
             const desc = document.getElementById('overlayDesc');
             
-            if (offlineOverlay && title && desc) {
-                title.textContent = 'Reconnecting...';
-                desc.textContent = 'Waiting for response from server...';
+            // Only update text if it's not already showing the specific maintenance message
+            if (offlineOverlay && title && desc && title.textContent !== 'System Update') {
+                title.textContent = 'Connection Lost';
+                desc.textContent = 'Reconnecting... The server may be restarting for updates.';
                 offlineOverlay.style.display = 'flex';
             }
 
@@ -440,6 +441,19 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'document-deleted':
                 alert('This document has been deleted by the owner.');
                 window.location.href = 'index.html';
+                break;
+
+            case 'server-maintenance':
+                console.log('Server is entering maintenance mode');
+                const offlineOverlay = document.getElementById('serverOfflineOverlay');
+                const title = document.getElementById('overlayTitle');
+                const desc = document.getElementById('overlayDesc');
+                
+                if (offlineOverlay && title && desc) {
+                    title.textContent = 'System Update';
+                    desc.textContent = data.message || 'Deploying new features. The system will restart momentarily.';
+                    offlineOverlay.style.display = 'flex';
+                }
                 break;
         }
     }

@@ -769,3 +769,31 @@ function broadcastToDocument(documentId, sender, message) {
 server.listen(PORT, () => {
     console.log(`Secure Server running on http://localhost:${PORT}`);
 });
+
+// Graceful Shutdown for Deployments
+const gracefulShutdown = (signal) => {
+    console.log(`${signal} received. Broadcasting maintenance mode...`);
+    
+    const message = JSON.stringify({ 
+        type: 'server-maintenance', 
+        message: 'Server is deploying new features. We will be back shortly!' 
+    });
+
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+
+    // Allow time for messages to send
+    setTimeout(() => {
+        console.log('Closing server...');
+        server.close(() => {
+            console.log('Server closed.');
+            process.exit(0);
+        });
+    }, 1000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

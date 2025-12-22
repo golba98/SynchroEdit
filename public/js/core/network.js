@@ -1,4 +1,4 @@
-import { Auth } from '../ui/auth.js';
+import { Auth } from '/js/ui/auth.js';
 
 export const Network = {
   async fetchAPI(url, options = {}) {

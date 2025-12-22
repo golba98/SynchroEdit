@@ -1,8 +1,8 @@
-import { PageManager } from '../managers/PageManager.js';
-import { BorderManager } from '../managers/BorderManager.js';
-import { CursorManager } from '../managers/CursorManager.js';
-import { ToolbarController } from '../ui/ToolbarController.js';
-import { ptToPx, debounce } from '../core/utils.js';
+import { PageManager } from '/js/managers/PageManager.js';
+import { BorderManager } from '/js/managers/BorderManager.js';
+import { CursorManager } from '/js/managers/CursorManager.js';
+import { ToolbarController } from '/js/ui/ToolbarController.js';
+import { ptToPx, debounce } from '/js/core/utils.js';
 
 export class Editor {
   constructor(containerId, options = {}) {

@@ -1,4 +1,4 @@
-import { ptToPx } from '../core/utils.js';
+import { ptToPx } from '/js/core/utils.js';
 
 export class BorderManager {
   constructor(editor) {

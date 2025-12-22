@@ -1,4 +1,4 @@
-import { escapeHTML } from '../core/utils.js';
+import { escapeHTML } from '/js/core/utils.js';
 
 export const UI = {
   renderDocumentList(container, documents, currentDocId, onOpen, onDelete) {

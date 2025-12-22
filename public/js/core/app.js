@@ -1,9 +1,9 @@
-import { Auth } from '../ui/auth.js';
-import { Network } from './network.js';
-import { UI } from '../ui/ui.js';
-import { Editor } from '../editor/editor.js';
-import { Theme } from '../ui/theme.js';
-import { Profile } from '../ui/profile.js';
+import { Auth } from '/js/ui/auth.js';
+import { Network } from '/js/core/network.js';
+import { UI } from '/js/ui/ui.js';
+import { Editor } from '/js/editor/editor.js';
+import { Theme } from '/js/ui/theme.js';
+import { Profile } from '/js/ui/profile.js';
 
 class App {
   constructor() {

@@ -1,5 +1,5 @@
-import { Auth } from './auth.js';
-import { Network } from '../core/network.js';
+import { Auth } from '/js/ui/auth.js';
+import { Network } from '/js/core/network.js';
 
 export class Profile {
   constructor() {

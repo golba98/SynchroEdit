@@ -12,21 +12,33 @@ const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'fa
 
 
 // Setup email transporter
-const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE,
-    auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 8000,
-    socketTimeout: 15000,
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+let transporterConfig;
+
+if (SMTP_HOST.includes('gmail')) {
+    transporterConfig = {
+        service: 'gmail',
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASS
+        }
+    };
+} else {
+    transporterConfig = {
+        host: SMTP_HOST,
+        port: SMTP_PORT,
+        secure: SMTP_SECURE,
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASS
+        },
+        connectionTimeout: 10000,
+        tls: {
+            rejectUnauthorized: false
+        }
+    };
+}
+
+const transporter = nodemailer.createTransport(transporterConfig);
 
 async function sendVerificationEmail(email, code) {
     if (!EMAIL_VERIFICATION_ENABLED) {

@@ -139,8 +139,16 @@
             emailValueEl.textContent = email;
             introTextEl.textContent = `We sent a 6-digit code to ${email}. Open your inbox and paste it below.`;
             lastMessage.textContent = verificationMessage;
-            // Send a fresh code on arrival to this page
-            sendCode();
+            
+            // Check if we just sent a code from the login page
+            const codeJustSent = sessionStorage.getItem('codeJustSent');
+            if (codeJustSent === 'true') {
+                sessionStorage.removeItem('codeJustSent');
+                setStatus('Code sent. Check your email.', 'success');
+            } else {
+                // Send a fresh code on arrival to this page
+                sendCode();
+            }
         }
 
         function setStatus(text, type = '') {

@@ -1038,6 +1038,7 @@
                     
                     setTimeout(() => { window.location.href = redirectUrl; }, 1500);
                 } else if (response.status === 403 && data.requiresVerification) {
+                    sessionStorage.setItem('codeJustSent', 'true');
                     redirectToVerification(data.email, data.username, data.message);
                 } else {
                     setEmotion('shake-head');

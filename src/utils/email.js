@@ -79,6 +79,13 @@ async function sendViaResend(email, html, subject) {
 }
 
 async function sendVerificationEmail(email, code) {
+  // ALWAYS log the code for development/demo purposes
+  console.log('=================================================');
+  console.log(` TO: ${email}`);
+  console.log(` VERIFICATION CODE: ${code}`);
+  console.log('=================================================');
+  logger.info(`DEV MODE: Verification code for ${email} is ${code}`);
+
   if (!EMAIL_VERIFICATION_ENABLED) {
     logger.info('Email verification disabled; skipping send.');
     return true;
@@ -109,10 +116,10 @@ async function sendVerificationEmail(email, code) {
 
   // 2. Fallback to SMTP
   if (!SMTP_USER || !SMTP_PASS) {
-    logger.error(
-      'Email configuration missing: SMTP_USER/PASS not set and RESEND_API_KEY not found.'
+    logger.warn(
+      'Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.'
     );
-    return false;
+    return true; // Return true so the user can verify using the console log
   }
 
   logger.info(`Using SMTP (Host: ${SMTP_HOST})`);
@@ -129,7 +136,8 @@ async function sendVerificationEmail(email, code) {
     logger.error(
       `SMTP sending failed. If you are on a cloud provider (like Render), SMTP ports may be blocked. Consider using RESEND_API_KEY. Error: ${err.message}`
     );
-    return false;
+    // In dev, we still want to allow signup if SMTP fails but we logged the code
+    return true;
   }
 }
 

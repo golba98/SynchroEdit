@@ -50,7 +50,10 @@ export class DynamicBackground {
     this.createParticles();
     this.animate();
     
-    // Theme listener (optional integration)
+    // Theme listener
+    window.addEventListener('theme-update', () => this.updateThemeColors());
+    
+    // Also observe class attribute for light/dark toggle if not covered by event
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {

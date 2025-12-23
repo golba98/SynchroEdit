@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '', // Base64 or URL
   },
+  accentColor: {
+    type: String,
+    default: '#8b5cf6',
+  },
   isEmailVerified: {
     type: Boolean,
     default: false,

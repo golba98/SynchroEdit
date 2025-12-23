@@ -9,15 +9,21 @@ exports.getProfile = async (req, res, next) => {
 };
 
 exports.updateProfile = async (req, res, next) => {
-  const { profilePicture } = req.body;
+  const { profilePicture, accentColor } = req.body;
   const user = await User.findById(req.user.id);
   if (!user) return next(new AppError('User not found', 404));
 
   if (profilePicture !== undefined) user.profilePicture = profilePicture;
+  if (accentColor !== undefined) user.accentColor = accentColor;
+  
   await user.save();
 
   logger.info(`Profile updated for user: ${req.user.id}`);
-  res.json({ message: 'Profile updated successfully', profilePicture: user.profilePicture });
+  res.json({ 
+      message: 'Profile updated successfully', 
+      profilePicture: user.profilePicture,
+      accentColor: user.accentColor 
+  });
 };
 
 exports.updatePassword = async (req, res, next) => {

@@ -36,6 +36,20 @@ class App {
       return;
     }
 
+    // Sync Theme from Profile
+    if (this.user.accentColor) {
+        this.theme.applyAccentColor(this.user.accentColor);
+    }
+    
+    // Listen for Theme Changes to Sync Back
+    window.addEventListener('theme-update', () => {
+        if (this.user && this.theme.currentAccentColor) {
+             if (this.user.accentColor !== this.theme.currentAccentColor) {
+                 this.profile.updateAccentColor(this.theme.currentAccentColor);
+             }
+        }
+    });
+
     this.setupEventListeners();
     this.setupRibbonTabs();
 

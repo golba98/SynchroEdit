@@ -78,4 +78,17 @@ export class Profile {
       return false;
     }
   }
+
+  async updateAccentColor(color) {
+    if (!this.user) return;
+    try {
+      await Network.fetchAPI('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ accentColor: color }),
+      });
+      this.user.accentColor = color;
+    } catch (err) {
+      console.error('Error syncing accent color:', err);
+    }
+  }
 }

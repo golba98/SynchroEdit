@@ -36,7 +36,7 @@ export class Editor {
     this.doc = new Y.Doc();
     const docId = new URLSearchParams(window.location.search).get('doc');
     const token = Auth.getToken();
-    const user = options.user || { username: 'Anonymous', color: '#ff0000' };
+    const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
     
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     this.provider = new WebsocketProvider(
@@ -48,7 +48,7 @@ export class Editor {
     
     this.provider.awareness.setLocalStateField('user', {
         name: user.username,
-        color: user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
+        color: user.accentColor || user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
     });
     
     this.provider.awareness.on('change', () => {

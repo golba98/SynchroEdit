@@ -11,6 +11,7 @@ import { debounce } from '/js/core/utils.js';
 export class Editor {
   constructor(containerId, options = {}) {
     this.container = document.getElementById(containerId);
+    if (this.container) this.container.innerHTML = ''; // Clear static content
     this.quill = null; // Current active quill
     this.pageQuillInstances = {}; // index -> Quill
     this.pageBindings = {}; // index -> QuillBinding
@@ -126,39 +127,27 @@ export class Editor {
   renderAllPages() {
     if (!this.container) return;
 
-    // We do a full re-render for simplicity on array changes for now.
-    // Optimization: Diff the pages and only update changed/added ones.
-    
     const pages = this.yPages.toArray();
     
-    // If we have fewer containers than pages, create new ones
-    // If we have more, remove them
-    // This is a naive implementation, but robust
-    
-    // Clear removed pages
-    Object.keys(this.pageQuillInstances).forEach(index => {
-        if (index >= pages.length) {
-            const container = document.getElementById(`page-container-${index}`);
+    // 1. Remove pages that no longer exist
+    Object.keys(this.pageQuillInstances).forEach(idxStr => {
+        const idx = parseInt(idxStr);
+        if (idx >= pages.length) {
+            const container = document.getElementById(`page-container-${idx}`);
             if (container) container.remove();
             
-            // Destroy binding
-            if (this.pageBindings[index]) {
-                this.pageBindings[index].destroy();
-                delete this.pageBindings[index];
+            if (this.pageBindings[idx]) {
+                this.pageBindings[idx].destroy();
+                delete this.pageBindings[idx];
             }
-            delete this.pageQuillInstances[index];
+            delete this.pageQuillInstances[idx];
         }
     });
 
-    // Create/Update pages
+    // 2. Add or update pages
     pages.forEach((pageMap, index) => {
-        let container = document.getElementById(`page-container-${index}`);
-        if (!container) {
+        if (!this.pageQuillInstances[index]) {
             this.createPageEditor(index, pageMap);
-        } else {
-             // Ensure binding is correct (it should be if index matches)
-             // If we swapped pages, we might need to re-bind.
-             // For now assuming append-only or simple removal from end
         }
     });
     

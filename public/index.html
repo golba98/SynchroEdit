@@ -27,13 +27,13 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
       defer
     ></script>
-    <script src="https://unpkg.com/docx@8.2.2/build/index.js" defer></script>
+    <!-- <script src="https://unpkg.com/docx@8.2.2/build/index.js" defer></script> -->
     <script type="importmap">
       {
         "imports": {
           "yjs": "https://esm.sh/yjs@13.6.8",
-          "y-websocket": "https://esm.sh/y-websocket@1.5.0",
-          "y-quill": "https://esm.sh/y-quill@1.0.0"
+          "y-websocket": "https://esm.sh/y-websocket@1.5.0?deps=yjs@13.6.8",
+          "y-quill": "https://esm.sh/y-quill@1.0.0?deps=yjs@13.6.8"
         }
       }
     </script>

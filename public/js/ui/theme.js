@@ -92,6 +92,9 @@ export class Theme {
             .toolbar-btn.active { background: linear-gradient(135deg, ${hexColor} 0%, ${lightColor} 100%) !important; color: white !important; box-shadow: 0 0 15px rgba(${rgbString}, 0.4) !important; }
             
             /* Editor Container & Background */
+            .pages-container { background: linear-gradient(135deg, #0a0a0a 0%, ${hexColor}15 50%, #0a0a0a 100%) !important; }
+            body.light-theme .pages-container { background: linear-gradient(135deg, #f5f5f5 0%, ${hexColor}08 50%, #f5f5f5 100%) !important; }
+
             .editor-container { border-color: ${hexColor} !important; box-shadow: 0 0 40px rgba(${rgbString}, 0.15) !important; }
             .editor-container::after { background: radial-gradient(ellipse at center, rgba(${rgbString}, 0.3) 0%, rgba(${rgbString}, 0.1) 40%, transparent 70%) !important; opacity: 0.6; }
             .editor-container:hover { border-color: ${lightColor} !important; box-shadow: 0 0 60px rgba(${rgbString}, 0.3) !important; }
@@ -128,8 +131,8 @@ export class Theme {
             #createNewDoc:hover { box-shadow: 0 0 50px rgba(${rgbString}, 0.4) !important; background: rgba(${rgbString}, 0.05) !important; }
             #createNewDoc > div { border-color: ${hexColor} !important; color: ${lightColor} !important; }
             
-            #docSearch { border-color: ${hexColor}60 !important; }
-            #docSearch:focus { border-color: ${hexColor} !important; box-shadow: 0 0 20px rgba(${rgbString}, 0.4) !important; }
+            #docSearch { border-color: ${hexColor} !important; }
+            #docSearch:focus { border-color: ${lightColor} !important; box-shadow: 0 0 20px rgba(${rgbString}, 0.4) !important; }
             
             #docLibrary div[style*="border: 1px solid #1a1a1a"] { border-color: ${hexColor}40 !important; box-shadow: 0 0 30px rgba(${rgbString}, 0.1) !important; }
             
@@ -142,7 +145,11 @@ export class Theme {
             .delete-doc-btn:hover { background: rgba(${rgbString}, 0.2) !important; color: ${lightColor} !important; }
 
             /* Modals */
-            #profileModal > div, #historyModal > div, #shareModal > div { border-color: ${hexColor} !important; box-shadow: 0 0 50px rgba(${rgbString}, 0.4) !important; }
+            #profileModal > div, #historyModal > div, #shareModal > div { 
+                background: linear-gradient(135deg, #0a0a0a 0%, ${hexColor}15 50%, #0d0d0d 100%) !important;
+                border-color: ${hexColor} !important; 
+                box-shadow: 0 0 50px rgba(${rgbString}, 0.4) !important; 
+            }
             .profile-tab.active { background: linear-gradient(135deg, ${hexColor}, ${lightColor}) !important; box-shadow: 0 4px 15px rgba(${rgbString}, 0.4) !important; }
             
             /* Scrollbars */

@@ -24,7 +24,7 @@ exports.getDocuments = async (req, res, next) => {
 
   const totalDocuments = await Document.countDocuments(query);
   const documents = await Document.find(query)
-    .select('title lastModified lastModifiedBy pages')
+    .select('title lastModified lastModifiedBy pages owner')
     .populate('lastModifiedBy', 'username')
     .sort({ lastModified: -1 })
     .skip(skip)

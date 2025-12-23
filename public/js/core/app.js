@@ -271,7 +271,8 @@ class App {
             await Network.deleteDocument(id);
             this.showLibrary();
           }
-        }
+        },
+        this.user._id
       );
     } catch (err) {
       console.error('Error showing library:', err);

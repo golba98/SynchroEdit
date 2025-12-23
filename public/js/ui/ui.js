@@ -1,7 +1,7 @@
 import { escapeHTML } from '/js/core/utils.js';
 
 export const UI = {
-  renderDocumentList(container, documents, currentDocId, onOpen, onDelete) {
+  renderDocumentList(container, documents, currentDocId, onOpen, onDelete, currentUserId) {
     if (!documents || documents.length === 0) {
       container.innerHTML = `
                 <tr>
@@ -42,9 +42,7 @@ export const UI = {
               )
             : 'Empty document';
 
-        const lastModifiedBy = escapeHTML(
-          doc.lastModifiedBy ? doc.lastModifiedBy.username : 'Unknown'
-        );
+        const location = doc.owner === currentUserId ? 'My Drive' : 'Shared with me';
         const safeTitle = escapeHTML(doc.title);
 
         return `
@@ -60,7 +58,7 @@ export const UI = {
                             </div>
                         </div>
                     </td>
-                    <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${lastModifiedBy}</td>
+                    <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${location}</td>
                     <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${dateStr}</td>
                     <td style="padding: 16px 24px; text-align: center;">
                         <button class="delete-doc-btn" data-doc-id="${doc._id}" style="background: none; border: none; color: #b0b0b0; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">

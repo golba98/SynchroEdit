@@ -4,6 +4,7 @@ import { UI } from '/js/ui/ui.js';
 import { Editor } from '/js/editor/editor.js';
 import { Theme } from '/js/ui/theme.js';
 import { Profile } from '/js/ui/profile.js';
+import { DynamicBackground } from '/js/ui/background.js';
 
 class App {
   constructor() {
@@ -12,6 +13,7 @@ class App {
     this.editor = null;
     this.theme = new Theme();
     this.profile = new Profile();
+    this.background = new DynamicBackground();
 
     this.init();
   }

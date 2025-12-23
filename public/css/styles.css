@@ -214,6 +214,10 @@ body.light-theme .status-bar {
   color: #1a1a1a;
 }
 
+#dynamic-background {
+  transition: opacity 0.5s ease;
+}
+
 .header {
   background: linear-gradient(
     90deg,

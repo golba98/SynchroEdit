@@ -42,6 +42,7 @@ app.use(
           'cdnjs.cloudflare.com',
           'cdn.quilljs.com',
           'unpkg.com',
+          'https://esm.sh',
         ],
         scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: [

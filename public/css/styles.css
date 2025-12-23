@@ -583,22 +583,6 @@ body.light-theme .ql-picker-item:hover {
   will-change: transform;
 }
 
-.editor-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(var(--accent-color-rgb), 0.6) 50%,
-    transparent 100%
-  );
-  z-index: 1;
-}
-
 .editor-container:hover {
   box-shadow:
     0 0 60px rgba(var(--accent-color-rgb), 0.6),

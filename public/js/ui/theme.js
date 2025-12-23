@@ -93,7 +93,6 @@ export class Theme {
             
             /* Editor Container & Background */
             .editor-container { border-color: ${hexColor} !important; box-shadow: 0 0 40px rgba(${rgbString}, 0.15) !important; }
-            .editor-container::before { background: linear-gradient(90deg, transparent 0%, rgba(${rgbString}, 0.6) 50%, transparent 100%) !important; }
             .editor-container::after { background: radial-gradient(ellipse at center, rgba(${rgbString}, 0.3) 0%, rgba(${rgbString}, 0.1) 40%, transparent 70%) !important; opacity: 0.6; }
             .editor-container:hover { border-color: ${lightColor} !important; box-shadow: 0 0 60px rgba(${rgbString}, 0.3) !important; }
             body.light-theme .editor-container::after { background: linear-gradient(90deg, transparent 0%, ${hexColor} 20%, ${hexColor} 80%, transparent 100%) !important; }

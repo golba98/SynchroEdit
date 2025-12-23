@@ -91,6 +91,17 @@ const messageAwareness = 1;
 function init(server) {
   const wss = new WebSocket.Server({ noServer: true });
 
+  // Heartbeat to keep connections alive (especially on cloud providers like Render)
+  const interval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (ws.isAlive === false) return ws.terminate();
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
+
+  wss.on('close', () => clearInterval(interval));
+
   server.on('upgrade', (request, socket, head) => {
     // Parse URL for documentId and token
     // Expected format: /ws?docId=...&token=...
@@ -132,6 +143,8 @@ function init(server) {
         }
 
         wss.handleUpgrade(request, socket, head, (ws) => {
+          ws.isAlive = true;
+          ws.on('pong', () => (ws.isAlive = true));
           wss.emit('connection', ws, request, { documentId, user: decoded });
         });
       } catch (e) {

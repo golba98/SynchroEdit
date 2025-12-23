@@ -33,7 +33,7 @@ SynchroEdit is a modern, real-time collaborative document editor designed with a
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/golba98-dev/SynchroEdit.git
+    git clone https://github.com/golba98/SynchroEdit.git
     cd SynchroEdit
     ```
 

@@ -68,6 +68,17 @@ async function getOrCreateDoc(documentId, gc = true) {
   doc.on('update', (update, origin) => {
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(saveToDB, 2000); // Save every 2 seconds of inactivity
+
+    const encoder = encoding.createEncoder();
+    encoding.writeVarUint(encoder, messageSync);
+    syncProtocol.writeUpdate(encoder, update);
+    const message = encoding.toUint8Array(encoder);
+
+    doc.conns.forEach((_, c) => {
+      if (origin !== c && c.readyState === WebSocket.OPEN) {
+        c.send(message);
+      }
+    });
   });
 
   docs.set(documentId, doc);
@@ -157,7 +168,7 @@ function init(server) {
         switch (messageType) {
           case messageSync:
             encoding.writeVarUint(encoder, messageSync);
-            syncProtocol.readSyncMessage(decoder, encoder, doc, null);
+            syncProtocol.readSyncMessage(decoder, encoder, doc, conn);
             if (encoding.length(encoder) > 1) {
               conn.send(encoding.toUint8Array(encoder));
             }
@@ -186,32 +197,8 @@ function init(server) {
       doc.conns.set(conn, new Set());
     }
     
-    // Setup update listener to broadcast changes
-    const onUpdate = (update, origin) => {
-      if (origin !== conn) { // Don't echo back to sender if they sent it
-         // However, standard Yjs server broadcasts to ALL including sender usually? 
-         // No, sender applies their own update locally. 
-         // origin is set by us when we applyUpdate? 
-         // Yjs `applyUpdate` origin argument is what we need to use.
-      }
-      
-      const encoder = encoding.createEncoder();
-      encoding.writeVarUint(encoder, messageSync);
-      syncProtocol.writeUpdate(encoder, update);
-      const message = encoding.toUint8Array(encoder);
-      
-      doc.conns.forEach((_, c) => {
-          if (c !== conn && c.readyState === WebSocket.OPEN) { // Broadcast to others
-              c.send(message);
-          }
-      });
-    };
-    
-    doc.on('update', onUpdate);
-
     conn.on('close', () => {
       doc.conns.delete(conn);
-      doc.off('update', onUpdate);
       if (doc.conns.size === 0) {
         // persistence is handled by debounce, but we could force save here
         // or unload doc from memory after a delay

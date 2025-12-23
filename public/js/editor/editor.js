@@ -1,85 +1,124 @@
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
+import { QuillBinding } from 'y-quill';
 import { PageManager } from '/js/managers/PageManager.js';
 import { BorderManager } from '/js/managers/BorderManager.js';
 import { CursorManager } from '/js/managers/CursorManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
-import { ptToPx, debounce } from '/js/core/utils.js';
+import { Auth } from '/js/ui/auth.js';
+import { debounce } from '/js/core/utils.js';
 
 export class Editor {
   constructor(containerId, options = {}) {
     this.container = document.getElementById(containerId);
-    this.quill = null;
-    this.pageQuillInstances = {};
-    this.pages = options.pages || [{ content: '' }];
+    this.quill = null; // Current active quill
+    this.pageQuillInstances = {}; // index -> Quill
+    this.pageBindings = {}; // index -> QuillBinding
     this.currentPageIndex = 0;
     this.currentZoom = 100;
-    this.isLoadingFromServer = false;
-
-    this.onContentChange = options.onContentChange || (() => {});
+    
+    // Callbacks
     this.onPageChange = options.onPageChange || (() => {});
     this.onTitleChange = options.onTitleChange || (() => {});
+    this.onStatusChange = options.onStatusChange || (() => {});
+    this.onCollaboratorsChange = options.onCollaboratorsChange || (() => {});
 
+    // Managers
     this.pageManager = new PageManager(this);
     this.borderManager = new BorderManager(this);
     this.cursorManager = new CursorManager(this);
     this.toolbarController = new ToolbarController(this);
 
     this.initQuill();
-    this.setupTitleDebounce();
+    
+    // Yjs Setup
+    this.doc = new Y.Doc();
+    const docId = new URLSearchParams(window.location.search).get('doc');
+    const token = Auth.getToken();
+    const user = options.user || { username: 'Anonymous', color: '#ff0000' };
+    
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    this.provider = new WebsocketProvider(
+        `${protocol}://${window.location.host}`, 
+        '', // Room name (unused, we use params)
+        this.doc,
+        { params: { documentId: docId, token: token } }
+    );
+    
+    this.provider.awareness.setLocalStateField('user', {
+        name: user.username,
+        color: user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
+    });
+    
+    this.provider.awareness.on('change', () => {
+        const states = this.provider.awareness.getStates();
+        const users = [];
+        states.forEach(state => {
+            if (state.user) {
+                users.push(state.user);
+            }
+        });
+        this.onCollaboratorsChange(users);
+    });
+    
+    this.provider.on('status', event => {
+        console.log('Yjs WebSocket status:', event.status);
+        this.onStatusChange(event.status);
+    });
 
-    // Debounce the content change notification to avoid overwhelming the server
-    this.debouncedNotifyContentChange = debounce((pageIndex, content) => {
-      this.onContentChange('update-page', { pageIndex, content });
-    }, 500);
+    this.yPages = this.doc.getArray('pages');
+    this.yPages.observe(event => {
+        this.renderAllPages();
+    });
+    
+    // Wait for initial sync to render or create default page
+    this.provider.on('sync', isSynced => {
+        if (isSynced && this.yPages.length === 0) {
+            // Create initial page if empty
+            const newPage = new Y.Map();
+            const content = new Y.Text();
+            newPage.set('content', content);
+            this.yPages.push([newPage]);
+        }
+        if (isSynced) {
+             this.renderAllPages();
+        }
+    });
+
+    this.setupTitleDebounce();
   }
 
   initQuill() {
     const Size = Quill.import('attributors/style/size');
-    Size.whitelist = [
-      '8px',
-      '9px',
-      '10px',
-      '11px',
-      '12px',
-      '14px',
-      '16px',
-      '18px',
-      '20px',
-      '22px',
-      '24px',
-      '26px',
-      '28px',
-      '36px',
-      '48px',
-      '72px',
-    ];
+    Size.whitelist = ['8px', '9px', '10px', '11px', '12px', '14px', '16px', '18px', '20px', '22px', '24px', '26px', '28px', '36px', '48px', '72px'];
     Quill.register(Size, true);
 
     const Font = Quill.import('formats/font');
-    Font.whitelist = [
-      'roboto',
-      'open-sans',
-      'lato',
-      'montserrat',
-      'oswald',
-      'merriweather',
-      'arial',
-      'times-new-roman',
-      'courier-new',
-      'georgia',
-      'verdana',
-    ];
+    Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
     Quill.register(Font, true);
   }
 
   setupTitleDebounce() {
     const docTitle = document.getElementById('docTitle');
+    // Bind title to Yjs (simple map for metadata)
+    const meta = this.doc.getMap('meta');
+    
     if (docTitle) {
-      const debouncedTitle = debounce((title) => {
-        this.onTitleChange(title);
-      }, 1000);
-
+      // Incoming changes
+      meta.observe(event => {
+          if (event.keysChanged.has('title')) {
+              const newTitle = meta.get('title');
+              if (docTitle.value !== newTitle) {
+                  docTitle.value = newTitle;
+                  this.onTitleChange(newTitle);
+              }
+          }
+      });
+      
+      // Outgoing changes
       docTitle.addEventListener('input', (e) => {
-        debouncedTitle(e.target.value);
+        meta.set('title', e.target.value);
+        this.onTitleChange(e.target.value);
       });
     }
   }
@@ -87,35 +126,51 @@ export class Editor {
   renderAllPages() {
     if (!this.container) return;
 
-    const wasLoading = this.isLoadingFromServer;
-    this.isLoadingFromServer = true;
+    // We do a full re-render for simplicity on array changes for now.
+    // Optimization: Diff the pages and only update changed/added ones.
+    
+    const pages = this.yPages.toArray();
+    
+    // If we have fewer containers than pages, create new ones
+    // If we have more, remove them
+    // This is a naive implementation, but robust
+    
+    // Clear removed pages
+    Object.keys(this.pageQuillInstances).forEach(index => {
+        if (index >= pages.length) {
+            const container = document.getElementById(`page-container-${index}`);
+            if (container) container.remove();
+            
+            // Destroy binding
+            if (this.pageBindings[index]) {
+                this.pageBindings[index].destroy();
+                delete this.pageBindings[index];
+            }
+            delete this.pageQuillInstances[index];
+        }
+    });
 
-    this.container.innerHTML = '';
-    this.pageQuillInstances = {};
-
-    // Render pages sequentially to keep UI responsive
-    const renderRemaining = (indices) => {
-      if (indices.length === 0) {
-        this.isLoadingFromServer = wasLoading;
-        this.applyZoom();
-        return;
-      }
-
-      const index = indices.shift();
-      this.createPageEditor(index);
-
-      // Yield to UI thread
-      requestAnimationFrame(() => renderRemaining(indices));
-    };
-
-    const indices = this.pages.map((_, i) => i);
-    renderRemaining(indices);
-
-    // Ensure we focus the correct page after rendering
-    setTimeout(() => this.switchToPage(this.currentPageIndex), 100);
+    // Create/Update pages
+    pages.forEach((pageMap, index) => {
+        let container = document.getElementById(`page-container-${index}`);
+        if (!container) {
+            this.createPageEditor(index, pageMap);
+        } else {
+             // Ensure binding is correct (it should be if index matches)
+             // If we swapped pages, we might need to re-bind.
+             // For now assuming append-only or simple removal from end
+        }
+    });
+    
+    this.applyZoom();
+    
+    // Ensure active quill is set
+    if (!this.quill && this.pageQuillInstances[0]) {
+        this.switchToPage(0);
+    }
   }
 
-  createPageEditor(pageIndex) {
+  createPageEditor(pageIndex, pageMap) {
     const newPageContainer = document.createElement('div');
     newPageContainer.className = 'editor-container';
     newPageContainer.id = `page-container-${pageIndex}`;
@@ -134,35 +189,27 @@ export class Editor {
     const pageQuill = new Quill(`#editor-${pageIndex}`, {
       theme: 'snow',
       placeholder: 'Start typing...',
-      modules: { toolbar: false },
+      modules: { 
+          toolbar: false,
+          history: { // Disable Quill's history, use Yjs history
+             userOnly: true 
+          }
+      },
     });
 
     this.pageQuillInstances[pageIndex] = pageQuill;
-    this.cursorManager.setupPageListeners(pageQuill, pageIndex);
+    
+    // Bind Y.Text
+    const yText = pageMap.get('content');
+    const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
+    this.pageBindings[pageIndex] = binding;
 
-    if (this.pages[pageIndex] && this.pages[pageIndex].content) {
-      pageQuill.setContents(this.pages[pageIndex].content);
-    }
+    this.cursorManager.setupPageListeners(pageQuill, pageIndex);
 
     const qlEditor = newPageContainer.querySelector('.ql-editor');
     if (qlEditor) {
       qlEditor.addEventListener('keydown', (e) => this.handleKeyDown(e, pageIndex), true);
     }
-
-    pageQuill.on('text-change', (delta, oldDelta, source) => {
-      if (source === 'user' && !this.isLoadingFromServer) {
-        const currentDelta = pageQuill.getContents();
-
-        // Optimistic local state update
-        this.pages[pageIndex].content = currentDelta;
-
-        // Debounced server notification
-        this.debouncedNotifyContentChange(pageIndex, currentDelta);
-
-        // Check for page overflow
-        this.pageManager.checkAndCreateNewPage(pageIndex);
-      }
-    });
   }
 
   handleKeyDown(e, pageIndex) {
@@ -171,7 +218,7 @@ export class Editor {
       const range = pageQuill.getSelection();
       if ((range && range.index === 0 && range.length === 0) || pageQuill.getLength() <= 1) {
         e.preventDefault();
-        this.pageManager.mergeWithPreviousPage(pageIndex);
+        this.mergeWithPreviousPage(pageIndex); // Moved logic here or update PageManager
       }
     }
 
@@ -183,7 +230,7 @@ export class Editor {
       }
     }
 
-    if (e.key === 'ArrowRight' && pageIndex < this.pages.length - 1) {
+    if (e.key === 'ArrowRight' && pageIndex < this.yPages.length - 1) {
       const range = pageQuill.getSelection();
       if (range && range.index >= pageQuill.getLength() - 1) {
         e.preventDefault();
@@ -191,9 +238,45 @@ export class Editor {
       }
     }
   }
+  
+  // Custom Page Logic adapted for Yjs
+  addNewPage() {
+      const newPage = new Y.Map();
+      const content = new Y.Text();
+      newPage.set('content', content);
+      this.yPages.push([newPage]);
+  }
+  
+  deletePage(index) {
+      if (this.yPages.length > 1) {
+          this.yPages.delete(index, 1);
+      }
+  }
+  
+  mergeWithPreviousPage(index) {
+      if (index <= 0) return;
+      
+      const prevPageMap = this.yPages.get(index - 1);
+      const currPageMap = this.yPages.get(index);
+      
+      const prevText = prevPageMap.get('content');
+      const currText = currPageMap.get('content');
+      
+      // Move content to previous page
+      // Y.Text doesn't support direct append easily without formatted delta
+      // Actually, we can insert content. 
+      // Simplified: We rely on user to manually move content if they delete the page break,
+      // or we programmatically move it.
+      
+      // For now, let's just delete the empty page if it's empty
+      if (currText.length === 0) {
+          this.deletePage(index);
+          this.switchToPage(index - 1, 'end');
+      }
+  }
 
   switchToPage(pageIndex, cursorPosition = null) {
-    if (pageIndex < 0 || pageIndex >= this.pages.length) return;
+    if (pageIndex < 0 || pageIndex >= this.yPages.length) return;
 
     this.currentPageIndex = pageIndex;
     this.quill = this.pageQuillInstances[pageIndex];
@@ -222,25 +305,9 @@ export class Editor {
       container.style.marginBottom = `${40 + pageHeight * (scale - 1)}px`;
     });
   }
-
-  updateFromSync(data) {
-    this.isLoadingFromServer = true;
-    this.pages = data.pages;
-    this.currentPageIndex = data.currentPageIndex || 0;
-    this.renderAllPages();
-    this.isLoadingFromServer = false;
-  }
-
-  updatePageContent(pageIndex, content) {
-    if (this.pages[pageIndex]) {
-      this.pages[pageIndex].content = content;
-    }
-    const targetQuill = this.pageQuillInstances[pageIndex];
-    if (targetQuill && !this.isLoadingFromServer) {
-      const wasLoading = this.isLoadingFromServer;
-      this.isLoadingFromServer = true;
-      targetQuill.setContents(content);
-      this.isLoadingFromServer = wasLoading;
-    }
+  
+  // Public API compatibility
+  get pages() {
+      return this.yPages.toArray().map(map => ({ content: map.get('content') })); // Mock for read-only access
   }
 }

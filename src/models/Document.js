@@ -52,6 +52,10 @@ const documentSchema = new mongoose.Schema({
       quote: String, // The text that was highlighted
     },
   ],
+  yjsState: {
+    type: String, // Base64 encoded Buffer
+    select: false, // Don't return by default in queries
+  },
 });
 
 // Indexes for faster document retrieval

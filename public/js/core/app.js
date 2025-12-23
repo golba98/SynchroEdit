@@ -9,7 +9,6 @@ class App {
   constructor() {
     this.documentId = new URLSearchParams(window.location.search).get('doc');
     this.user = null;
-    this.ws = null;
     this.editor = null;
     this.theme = new Theme();
     this.profile = new Profile();
@@ -22,7 +21,7 @@ class App {
 
     let initialTask;
     if (this.documentId) {
-      initialTask = this.loadDocument();
+      initialTask = Promise.resolve(); // Editor loads itself
     } else {
       initialTask = this.showLibrary();
     }
@@ -38,7 +37,11 @@ class App {
     this.setupEventListeners();
     this.setupRibbonTabs();
 
-    await initialTask;
+    if (this.documentId) {
+        await this.loadDocument();
+    } else {
+        await initialTask;
+    }
   }
 
   async loadDocument() {
@@ -48,86 +51,27 @@ class App {
       );
 
       this.editor = new Editor('pagesContainer', {
-        onContentChange: (type, data) => this.handleContentChange(type, data),
+        user: this.user,
         onPageChange: (index) => this.updateStatus(index),
-        onTitleChange: (title) => this.handleTitleChange(title),
+        onTitleChange: (title) => {
+            // Title synced via Yjs, just update UI if needed
+            // Editor updates the input value automatically
+        },
+        onStatusChange: (status) => this.handleWSStatusChange(status),
+        onCollaboratorsChange: (users) => {
+             UI.updateCollaboratorsUI(
+              document.getElementById('activeCollaborators'),
+              users,
+              this.user.username
+            );
+        }
       });
-
-      this.ws = Network.initWebSocket(
-        this.documentId,
-        (data) => this.handleWSMessage(data),
-        (status) => this.handleWSStatusChange(status)
-      );
 
       document.getElementById('docLibrary').style.display = 'none';
       document.getElementById('libraryOverlay').style.display = 'none';
     } catch (err) {
       console.error('Failed to load document:', err);
       this.showLibrary();
-    }
-  }
-
-  handleTitleChange(title) {
-    Network.sendWS(this.ws, { type: 'update-title', title });
-  }
-
-  handleContentChange(type, data) {
-    if (type === 'update-page') {
-      Network.sendWS(this.ws, {
-        type: 'update-page',
-        pageIndex: data.pageIndex,
-        content: data.content,
-      });
-    } else if (type === 'new-page') {
-      Network.sendWS(this.ws, { type: 'new-page' });
-    } else if (type === 'delete-page') {
-      Network.sendWS(this.ws, { type: 'delete-page', pageIndex: data.pageIndex });
-    } else if (type === 'update-borders') {
-      Network.sendWS(this.ws, { type: 'update-borders', ...data });
-    }
-  }
-
-  handleWSMessage(data) {
-    switch (data.type) {
-      case 'sync':
-        document.getElementById('docTitle').value = data.data.title;
-        this.editor.updateFromSync(data.data);
-        if (data.data.borders) {
-          this.editor.borderManager.updateBorders(
-            data.data.borders.style,
-            data.data.borders.width,
-            data.data.borders.color,
-            data.data.borders.type,
-            true
-          );
-        }
-        break;
-      case 'update-title':
-        document.getElementById('docTitle').value = data.title;
-        break;
-      case 'update-page':
-        this.editor.updatePageContent(data.pageIndex, data.content);
-        break;
-      case 'update-borders':
-        this.editor.borderManager.updateBorders(
-          data.style,
-          data.width,
-          data.color,
-          data.type,
-          true
-        );
-        break;
-      case 'collaborators':
-        UI.updateCollaboratorsUI(
-          document.getElementById('activeCollaborators'),
-          data.users,
-          this.user.username
-        );
-        break;
-      case 'document-deleted':
-        alert('This document has been deleted by the owner.');
-        window.location.href = 'index.html';
-        break;
     }
   }
 
@@ -250,13 +194,9 @@ class App {
       saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
       saveBtn.style.background = '#10b981';
 
-      if (this.editor && this.documentId) {
-        this.handleContentChange('update-page', {
-          pageIndex: this.editor.currentPageIndex,
-          content: this.editor.quill.getContents(),
-        });
-      }
-
+      // Yjs autosaves, so this is just visual feedback
+      // We could force a save via API if we wanted to be sure
+      
       setTimeout(() => {
         saveBtn.innerHTML = originalText;
         saveBtn.style.background = '';
@@ -264,26 +204,8 @@ class App {
     });
 
     addEvent('saveAsBtn', 'click', async () => {
-      if (!this.editor) return;
-      const currentTitle = document.getElementById('docTitle').value || 'Untitled';
-      const newTitle = prompt('Enter a name for the copy:', `Copy of ${currentTitle}`);
-      if (newTitle === null) return;
-
-      try {
-        const pagesCopy = this.editor.pages.map((page, index) => {
-          if (index === this.editor.currentPageIndex) {
-            return { content: this.editor.quill.getContents() };
-          }
-          return { content: page.content };
-        });
-
-        const newDoc = await Network.createDocument(newTitle || 'Untitled Copy', pagesCopy);
-        alert('Document copied successfully! Redirecting...');
-        window.location.href = `?doc=${newDoc._id}`;
-      } catch (err) {
-        console.error('Save As failed:', err);
-        alert('Failed to save a copy of the document.');
-      }
+        alert('Save As is currently disabled during migration to Real-time engine.');
+        // Needs to be re-implemented to copy Yjs state
     });
 
     // Share

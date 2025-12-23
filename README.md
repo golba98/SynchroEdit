@@ -1,113 +1,41 @@
-# SynchroEdit - Collaborative Document Editor
+===========================================================
+SYNCHROEDIT: PROJECT OVERVIEW
+===========================================================
 
-A real-time collaborative document editor built with Node.js and Quill Rich Text Editor.
+DESCRIPTION:
+A real-time collaborative document editor focusing on speed, 
+security, and a custom math formatting engine.
 
-## Phase 1: The Foundation (Local Setup) ✅
+CORE FEATURES:
+- Real-time Sync: CRDT-based collaboration (Yjs).
+- Math Editor: Converts shorthand (sqrt, ^2) to formatted symbols.
+- Rich Text: Full styling, image support, and multi-page layout.
+- Security: JWT auth, bcrypt hashing, and rate limiting.
+- Management: Version history, cursor tracking, and auto-save.
 
-### Features Implemented
+TECH STACK:
+- Frontend: Vanilla JS (logic), Tailwind CSS (OLED UI), Quill.
+- Backend: Node.js, Express.js.
+- Real-time: WebSockets (ws).
+- Database: MongoDB.
+- Hosting: Render.
 
-**Rich Text Editor Foundation:**
+QUICK START:
+1. npm install
+2. Configure .env (PORT, MONGODB_URI, JWT_SECRET)
+3. npm start
 
-- ✅ Quill Rich Text Editor (replaces basic contentEditable)
-- ✅ Quill Delta format for document representation (enables future real-time sync)
-- ✅ Professional formatting toolbar with bold, italic, underline, alignment, lists
+PROJECT STRUCTURE:
+/public       - Client editor modules and styles
+/src/sockets  - Real-time relay logic
+/src/models   - MongoDB schemas (Docs/Users)
+/src/routes   - API endpoints
+/tests        - Jest/Supertest suite
 
-**Core Features:**
+DEVELOPMENT:
+- Test: npm test
+- Lint: npm run lint
+- Format: npm run format
 
-- ✅ Multiple pages support
-- ✅ Zoom in/out functionality
-- ✅ Image insertion
-- ✅ Character & word count
-- ✅ Auto-save to localStorage
-
-**Server Infrastructure:**
-
-- ✅ Express.js server for serving the application
-- ✅ WebSocket support for real-time communication (ready for Phase 2)
-- ✅ Document state management on server
-- ✅ Message routing between clients
-
-## Installation & Setup
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm
-
-### Installation
-
-```bash
-# Navigate to project directory
-cd your-synchroedit-folder
-
-# Install dependencies (already done)
-npm install
-
-# Start the server
-npm start
-```
-
-The server will start at `http://localhost:3000`
-
-## How It Works
-
-### Quill Delta Format
-
-Quill uses a "Delta" format to represent document changes:
-
-```javascript
-// Example Delta
-{
-  ops: [{ insert: 'Hello ' }, { insert: 'World', attributes: { bold: true } }, { insert: '\n' }];
-}
-```
-
-This format is:
-
-- **Lightweight**: Easy to transmit over network
-- **Operational**: Describes changes, not just content
-- **Composable**: Perfect for merging multiple edits (needed for real-time collaboration)
-
-### Architecture
-
-```
-┌─────────────┐                    ┌──────────────┐
-│  Browser 1  │                    │  Browser 2   │
-│  (Quill)    │                    │  (Quill)     │
-└──────┬──────┘                    └──────┬───────┘
-       │ WebSocket                        │
-       │ Message: {type, data}            │
-       └────────────┬──────────────────────┘
-                    │
-            ┌───────▼────────┐
-            │  Node.js Server │
-            │  (Express.js)   │
-            │  + WebSocket    │
-            └─────────────────┘
-```
-
-## Next Steps: Phase 2
-
-To enable real-time collaboration, we'll implement:
-
-- Operational Transformation (OT) for conflict resolution
-- Real-time delta sync between clients
-- Cursor position tracking
-- User presence indicators
-
-## File Structure
-
-```
-.
-├── server.js          # Express.js + WebSocket server
-├── index.html         # HTML with Quill editor
-├── script.js          # Client-side logic
-├── package.json       # Node.js dependencies
-└── README.md          # This file
-```
-
-## Technologies Used
-
-- **Backend**: Node.js, Express.js, WebSocket (ws)
-- **Frontend**: Quill Rich Text Editor
-- **Storage**: localStorage (Phase 1) → Database (Phase 2)
+LICENSE: ISC
+===========================================================

@@ -105,6 +105,36 @@ export class Editor {
     });
 
     this.setupTitleDebounce();
+    
+    // Render placeholder immediately for perceived performance
+    this.createPlaceholderPage();
+  }
+
+  createPlaceholderPage() {
+      // Create a visual placeholder that looks exactly like a page
+      const placeholderId = 'page-placeholder';
+      if (document.getElementById(placeholderId)) return;
+      
+      const newPageContainer = document.createElement('div');
+      newPageContainer.className = 'editor-container';
+      newPageContainer.id = placeholderId;
+      newPageContainer.style.opacity = '0.7'; // Slight transparency to indicate loading
+      newPageContainer.innerHTML = `
+              <div class="page-border-inner" style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; pointer-events: none; border: 1px solid transparent; z-index: 5;"></div>
+              <div class="page-editor ql-container ql-snow" style="position: relative; z-index: 1;">
+                  <div class="ql-editor" data-placeholder="Loading document..." contenteditable="false"></div>
+              </div>
+          `;
+  
+      this.container.appendChild(newPageContainer);
+      
+      // Apply current border settings if possible
+      const borderElement = newPageContainer.querySelector('.page-border-inner');
+      if (borderElement) {
+        this.borderManager.applyBorderToElement(borderElement);
+      }
+      
+      this.applyZoom();
   }
 
   initQuill() {
@@ -160,6 +190,12 @@ export class Editor {
 
   renderAllPages() {
     if (!this.container) return;
+
+    // Remove placeholder if exists
+    const placeholder = document.getElementById('page-placeholder');
+    if (placeholder) {
+        placeholder.remove();
+    }
 
     const pages = this.yPages.toArray();
     

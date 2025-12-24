@@ -45,10 +45,7 @@ export class Editor {
         `${protocol}://${window.location.host}`, 
         '', // Room name (unused, we use params)
         this.doc,
-        { 
-            params: { documentId: docId }, 
-            protocols: [token] 
-        }
+        { params: { documentId: docId, token: token } }
     );
     
     this.provider.awareness.setLocalStateField('user', {

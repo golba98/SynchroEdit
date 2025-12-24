@@ -127,11 +127,9 @@ export class Theme {
             
             /* Library / File Management Overrides */
             #docLibrary h1 { color: ${lightColor} !important; text-shadow: 0 0 20px rgba(${rgbString}, 0.5) !important; }
-            #createNewDoc { border-color: ${hexColor} !important; }
             #createNewDoc:hover { box-shadow: 0 0 50px rgba(${rgbString}, 0.4) !important; background: rgba(${rgbString}, 0.05) !important; }
-            #createNewDoc > div { border-color: ${hexColor} !important; color: ${lightColor} !important; }
+            #createNewDoc > div { color: ${lightColor} !important; }
             
-            #docSearch { border-color: ${hexColor} !important; }
             #docSearch:focus { border-color: ${lightColor} !important; box-shadow: 0 0 20px rgba(${rgbString}, 0.4) !important; }
             
             #docLibrary div[style*="border: 1px solid #1a1a1a"] { border-color: ${hexColor}40 !important; box-shadow: 0 0 30px rgba(${rgbString}, 0.1) !important; }

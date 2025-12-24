@@ -117,11 +117,14 @@ export class Editor {
     Quill.register(Font, true);
 
     // Image Styles
-    const Width = Quill.import('attributors/style/width');
-    const Height = Quill.import('attributors/style/height');
-    const Float = new (Quill.import('attributors/style/direction'))('float', 'float', { whitelist: ['left', 'right', 'none'] });
-    const Display = new (Quill.import('attributors/style/direction'))('display', 'display', { whitelist: ['inline', 'block', 'inline-block'] });
-    const Margin = new (Quill.import('attributors/style/direction'))('margin', 'margin', { whitelist: ['auto', '0 auto', '10px'] });
+    const Parchment = Quill.import('parchment');
+    const Style = Parchment.Attributor.Style;
+    
+    const Width = new Style('width', 'width', { scope: Parchment.Scope.INLINE });
+    const Height = new Style('height', 'height', { scope: Parchment.Scope.INLINE });
+    const Float = new Style('float', 'float', { whitelist: ['left', 'right', 'none'], scope: Parchment.Scope.INLINE });
+    const Display = new Style('display', 'display', { whitelist: ['inline', 'block', 'inline-block'], scope: Parchment.Scope.INLINE });
+    const Margin = new Style('margin', 'margin', { scope: Parchment.Scope.INLINE });
 
     Quill.register(Width, true);
     Quill.register(Height, true);

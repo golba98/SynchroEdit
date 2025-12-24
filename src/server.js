@@ -35,13 +35,29 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "unpkg.com", "esm.sh"],
+            scriptSrc: [
+                "'self'",
+                "cdnjs.cloudflare.com",
+                "cdn.quilljs.com",
+                "unpkg.com",
+                "esm.sh",
+                "'sha256-F1kqS54C7q7qqV+qtxPg1CHQiKhkGBHv+NblWRzLIFw='"
+            ],
             scriptSrcAttr: ["'unsafe-inline'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "fonts.googleapis.com"],
+            styleSrc: [
+                "'self'",
+                "cdnjs.cloudflare.com",
+                "cdn.quilljs.com",
+                "fonts.googleapis.com",
+                "'sha256-TtFvTEBANgIezLalHw0WqBARCYrYOLxrQe5D/nzeBSU='",
+                "'sha256-weGEUFMREfPgSMDMt/CIYKjV9/RfUf956V9UFvMgVH0='",
+                "'sha256-1IDlht6Ofyuz6g6PgQFOT1t5q3Arm5StQrbGRdoFoVA='",
+                "'sha256-qSbbIyJ2Lqo8VR8Qk77tNYU69LPoz6M6C0W+LiTDo0w='"
+            ],
             fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com", "data:"],
             imgSrc: ["'self'", "data:", "blob:"],
             mediaSrc: ["'self'", "data:", "blob:"],
-            connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"],
+            connectSrc: ["'self'", "ws:", "wss:", "http:", "https:", "syncroedit.online", "*.syncroedit.online", "wss://syncroedit.online"],
         },
     },
 }));

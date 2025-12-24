@@ -138,8 +138,9 @@ function init(server) {
           dbDoc.sharedWith && dbDoc.sharedWith.some((id) => id.toString() === userId);
 
         if (!isOwner && !isShared) {
-          // Auto-join via link if open (optional, matching previous logic)
-           await Document.findByIdAndUpdate(documentId, { $addToSet: { sharedWith: userId } });
+          socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+          socket.destroy();
+          return;
         }
 
         wss.handleUpgrade(request, socket, head, (ws) => {

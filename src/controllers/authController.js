@@ -113,7 +113,8 @@ exports.verifyEmail = async (req, res, next) => {
   const { email, verificationCode } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return next(new AppError('User not found', 400));
+  // Prevent user enumeration by returning generic error
+  if (!user) return next(new AppError('Invalid verification code', 400));
 
   if (!EMAIL_VERIFICATION_ENABLED) {
     user.isEmailVerified = true;
@@ -167,7 +168,10 @@ exports.resendCode = async (req, res, next) => {
   const { email } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return next(new AppError('User not found', 400));
+  if (!user) {
+    // Prevent user enumeration: return success even if user not found
+    return res.status(200).json({ message: 'If your email is registered, a code has been sent.' });
+  }
 
   if (user.isEmailVerified) {
     return next(new AppError('Email already verified', 400));
@@ -184,7 +188,7 @@ exports.resendCode = async (req, res, next) => {
   }
 
   logger.info(`Verification code resent to: ${email}`);
-  res.json({ message: 'Verification code resent' });
+  res.json({ message: 'If your email is registered, a code has been sent.' });
 };
 
 exports.login = async (req, res, next) => {

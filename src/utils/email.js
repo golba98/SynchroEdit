@@ -80,12 +80,14 @@ async function sendViaResend(email, html, subject) {
 }
 
 async function sendVerificationEmail(email, code) {
-  // ALWAYS log the code for development/demo purposes
-  console.log('=================================================');
-  console.log(` TO: ${email}`);
-  console.log(` VERIFICATION CODE: ${code}`);
-  console.log('=================================================');
-  logger.info(`DEV MODE: Verification code for ${email} is ${code}`);
+  // Only log the code in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('=================================================');
+    console.log(` TO: ${email}`);
+    console.log(` VERIFICATION CODE: ${code}`);
+    console.log('=================================================');
+    logger.info(`DEV MODE: Verification code for ${email} is ${code}`);
+  }
 
   if (!EMAIL_VERIFICATION_ENABLED) {
     logger.info('Email verification disabled; skipping send.');

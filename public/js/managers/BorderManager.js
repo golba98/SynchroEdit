@@ -6,7 +6,7 @@ export class BorderManager {
     this.currentBorderStyle = 'solid';
     this.currentBorderWidth = '1pt';
     this.currentBorderColor = '#333333';
-    this.currentBorderType = 'box';
+    this.currentBorderType = 'none';
 
     this.setupEventListeners();
   }

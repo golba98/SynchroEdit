@@ -4,6 +4,7 @@ import { QuillBinding } from 'y-quill';
 import { PageManager } from '/js/managers/PageManager.js';
 import { BorderManager } from '/js/managers/BorderManager.js';
 import { CursorManager } from '/js/managers/CursorManager.js';
+import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { Auth } from '/js/ui/auth.js';
 import { debounce } from '/js/core/utils.js';
@@ -28,6 +29,7 @@ export class Editor {
     this.pageManager = new PageManager(this);
     this.borderManager = new BorderManager(this);
     this.cursorManager = new CursorManager(this);
+    this.imageManager = new ImageManager(this);
     this.toolbarController = new ToolbarController(this);
 
     this.initQuill();
@@ -113,6 +115,19 @@ export class Editor {
     const Font = Quill.import('formats/font');
     Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
     Quill.register(Font, true);
+
+    // Image Styles
+    const Width = Quill.import('attributors/style/width');
+    const Height = Quill.import('attributors/style/height');
+    const Float = new (Quill.import('attributors/style/direction'))('float', 'float', { whitelist: ['left', 'right', 'none'] });
+    const Display = new (Quill.import('attributors/style/direction'))('display', 'display', { whitelist: ['inline', 'block', 'inline-block'] });
+    const Margin = new (Quill.import('attributors/style/direction'))('margin', 'margin', { whitelist: ['auto', '0 auto', '10px'] });
+
+    Quill.register(Width, true);
+    Quill.register(Height, true);
+    Quill.register(Float, true);
+    Quill.register(Display, true);
+    Quill.register(Margin, true);
   }
 
   setupTitleDebounce() {

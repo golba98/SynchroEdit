@@ -62,9 +62,25 @@ export class Editor {
         this.onCollaboratorsChange(users);
     });
     
+    this.statusTimeout = null;
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
-        this.onStatusChange(event.status);
+        
+        if (event.status === 'connected') {
+            if (this.statusTimeout) {
+                clearTimeout(this.statusTimeout);
+                this.statusTimeout = null;
+            }
+            this.onStatusChange(event.status);
+        } else {
+            // Delay reporting disconnected/connecting status to avoid flicker
+            if (!this.statusTimeout) {
+                this.statusTimeout = setTimeout(() => {
+                    this.onStatusChange(event.status);
+                    this.statusTimeout = null;
+                }, 2000);
+            }
+        }
     });
 
     this.yPages = this.doc.getArray('pages');

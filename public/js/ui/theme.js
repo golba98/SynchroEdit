@@ -84,8 +84,8 @@ export class Theme {
             .ribbon-tab.active { color: ${hexColor} !important; border-bottom: 2px solid ${hexColor} !important; background: linear-gradient(180deg, rgba(${rgbString}, 0.1) 0%, transparent 100%) !important; }
             .ribbon-tab:hover { color: ${lightColor} !important; background: rgba(${rgbString}, 0.05) !important; }
             .ribbon-content { border-bottom: 1px solid ${hexColor}20 !important; box-shadow: 0 4px 12px rgba(${rgbString}, 0.1) !important; }
-            .ribbon-section { border-right-color: ${hexColor}40 !important; }
-            .ribbon-section-title { color: ${lightColor} !important; border-bottom-color: ${hexColor}40 !important; }
+            .ribbon-section { border-right-color: ${hexColor} !important; }
+            .ribbon-section-title { color: ${lightColor} !important; border-bottom-color: ${hexColor} !important; }
             
             /* Toolbar Buttons */
             .toolbar-btn:hover { color: ${hexColor} !important; background: rgba(${rgbString}, 0.15) !important; box-shadow: 0 0 10px rgba(${rgbString}, 0.2) !important; }

@@ -14,8 +14,8 @@ export class DynamicBackground {
         mouseDistance: 180, // Interaction radius
         baseSpeed: 0.3,
         sizeRange: [1, 2.5],
-        color: 'rgba(139, 92, 246, 0.4)', // Default accent color (purple)
-        lineColor: 'rgba(139, 92, 246, 0.15)'
+        color: 'rgba(var(--accent-color-rgb), 0.4)', // Default accent color
+        lineColor: 'rgba(var(--accent-color-rgb), 0.15)'
     };
 
     this.init();
@@ -67,14 +67,11 @@ export class DynamicBackground {
 
   updateThemeColors() {
       const isLight = document.body.classList.contains('light-theme');
-      // We can grab CSS variables if we want to be precise
-      const styles = getComputedStyle(document.body);
-      const accent = styles.getPropertyValue('--accent-color').trim() || '#8b5cf6';
+      const styles = getComputedStyle(document.documentElement);
+      const accentRgb = styles.getPropertyValue('--accent-color-rgb').trim() || '139, 92, 246';
       
-      // Parse hex to rgb for opacity handling if needed, or just use css var
-      // Canvas needs explicit colors usually for performance in loop
-      this.config.color = isLight ? 'rgba(139, 92, 246, 0.6)' : 'rgba(139, 92, 246, 0.4)';
-      this.config.lineColor = isLight ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.15)';
+      this.config.color = isLight ? `rgba(${accentRgb}, 0.6)` : `rgba(${accentRgb}, 0.4)`;
+      this.config.lineColor = isLight ? `rgba(${accentRgb}, 0.2)` : `rgba(${accentRgb}, 0.15)`;
   }
 
   handleResize() {

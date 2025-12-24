@@ -54,12 +54,42 @@ async function getOrCreateDoc(documentId, gc = true) {
     if (mongoose.connection.readyState !== 1) return;
     const state = Y.encodeStateAsUpdate(doc);
     const stateBase64 = Buffer.from(state).toString('base64');
-    try {
-      await Document.findByIdAndUpdate(documentId, {
+
+    // Extract Metadata
+    const meta = doc.getMap('meta');
+    const title = meta.get('title');
+
+    // Extract Content for Preview
+    const pages = doc.getArray('pages');
+    let previewContent = '';
+    // Iterate to get text from all pages or just first?
+    // For preview/search, getting at least the first page is good.
+    if (pages.length > 0) {
+      const firstPage = pages.get(0);
+      // Ensure it's a Y.Map and has 'content' (Y.Text)
+      if (firstPage && firstPage.get) {
+         const content = firstPage.get('content');
+         if (content && typeof content.toString === 'function') {
+             previewContent = content.toString();
+         }
+      }
+    }
+
+    const updateData = {
         yjsState: stateBase64,
         lastModified: new Date(),
-      });
-      // We could also extract text here for search indexing if needed
+    };
+
+    if (title) updateData.title = title;
+    
+    // Save preview content to pages[0]
+    // This allows the file list to show a snippet or at least search to work
+    if (previewContent || previewContent === '') {
+         updateData.pages = [{ content: previewContent.substring(0, 500) }]; // Limit preview size
+    }
+
+    try {
+      await Document.findByIdAndUpdate(documentId, updateData);
     } catch (e) {
       logger.error('Error saving document state:', e);
     }

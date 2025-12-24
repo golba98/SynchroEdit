@@ -119,7 +119,13 @@ const messageSync = 0;
 const messageAwareness = 1;
 
 function init(server) {
-  const wss = new WebSocket.Server({ noServer: true });
+  const wss = new WebSocket.Server({ 
+    noServer: true,
+    handleProtocols: (protocols) => {
+      // The token is passed as a sub-protocol
+      return protocols.values().next().value;
+    }
+  });
 
   // Heartbeat to keep connections alive (especially on cloud providers like Render)
   const interval = setInterval(() => {
@@ -137,7 +143,7 @@ function init(server) {
     // Expected format: /ws?docId=...&token=...
     const url = new URL(request.url, 'http://localhost');
     const documentId = url.searchParams.get('documentId');
-    const token = url.searchParams.get('token');
+    const token = request.headers['sec-websocket-protocol'];
 
     if (!documentId || !token) {
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');

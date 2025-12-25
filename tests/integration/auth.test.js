@@ -1,6 +1,6 @@
 const request = require('supertest');
-const { app } = require('../src/server');
-const User = require('../src/models/User');
+const { app } = require('../../src/server');
+const User = require('../../src/models/User');
 
 describe('Auth Integration Tests', () => {
   const testUser = {

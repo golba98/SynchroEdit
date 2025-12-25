@@ -15,7 +15,7 @@ exports.createTicket = (userId) => {
   
   // Cleanup
   setTimeout(() => tickets.delete(ticket), 30000);
-  
+  console.log(`[DEBUG] Created ticket: ${ticket} for ${userId}`);
   return ticket;
 };
 
@@ -26,6 +26,7 @@ exports.createTicket = (userId) => {
  */
 exports.verifyTicket = (ticket) => {
   const data = tickets.get(ticket);
+  console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: ${!!data}`);
   if (!data) return null;
   
   tickets.delete(ticket); // One-time use

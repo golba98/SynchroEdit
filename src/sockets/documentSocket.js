@@ -10,6 +10,7 @@ const User = require('../models/User');
 const Document = require('../models/Document');
 const { logHistory } = require('../utils/history');
 const logger = require('../utils/logger');
+const { verifyTicket } = require('../utils/ticketStore');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -24,6 +25,7 @@ async function getOrCreateDoc(documentId, gc = true) {
 
   const doc = new Y.Doc({ gc });
   doc.conns = new Map(); // Map<WebSocket, Set<number>> - track imported scripts per client if needed
+  docs.set(documentId, doc);
 
   // Load from MongoDB
   if (mongoose.connection.readyState === 1) {
@@ -111,7 +113,6 @@ async function getOrCreateDoc(documentId, gc = true) {
     });
   });
 
-  docs.set(documentId, doc);
   return doc;
 }
 
@@ -132,61 +133,83 @@ function init(server) {
 
   wss.on('close', () => clearInterval(interval));
 
-  server.on('upgrade', (request, socket, head) => {
-    // Parse URL for documentId and token
-    // Expected format: /ws?docId=...&token=...
+  server.on('upgrade', async (request, socket, head) => {
+    // Parse URL for documentId and token/ticket
+    // Expected format: /ws?docId=...&token=... OR &ticket=...
     const url = new URL(request.url, 'http://localhost');
     const documentId = url.searchParams.get('documentId');
     const token = url.searchParams.get('token');
+    const ticket = url.searchParams.get('ticket');
 
-    if (!documentId || !token) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+    if (!documentId) {
+      socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
       socket.destroy();
       return;
     }
 
-    // Verify Token
-    jwt.verify(token, JWT_SECRET, async (err, decoded) => {
-      if (err) {
+    let userId = null;
+
+    // Authentication Strategy: Ticket (Preferred) > Token
+    if (ticket) {
+        userId = verifyTicket(ticket);
+        if (!userId) {
+            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+            socket.destroy();
+            return;
+        }
+    } else if (token) {
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            userId = decoded.id;
+        } catch (err) {
+            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+            socket.destroy();
+            return;
+        }
+    } else {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+    }
+
+    // Check Document Access
+    try {
+      const dbDoc = await Document.findById(documentId);
+      if (!dbDoc) {
+        socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
         socket.destroy();
         return;
       }
 
-      // Check Document Access
-      try {
-        const dbDoc = await Document.findById(documentId);
-        if (!dbDoc) {
-          socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
-          socket.destroy();
-          return;
-        }
+      const isOwner = dbDoc.owner.toString() === userId;
+      const isShared =
+        dbDoc.sharedWith && dbDoc.sharedWith.some((id) => id.toString() === userId);
+      const isViewer = 
+        dbDoc.viewers && dbDoc.viewers.some((id) => id.toString() === userId);
 
-        const userId = decoded.id;
-        const isOwner = dbDoc.owner.toString() === userId;
-        const isShared =
-          dbDoc.sharedWith && dbDoc.sharedWith.some((id) => id.toString() === userId);
-
-        if (!isOwner && !isShared) {
-          socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
-          socket.destroy();
-          return;
-        }
-
-        wss.handleUpgrade(request, socket, head, (ws) => {
-          ws.isAlive = true;
-          ws.on('pong', () => (ws.isAlive = true));
-          wss.emit('connection', ws, request, { documentId, user: decoded });
-        });
-      } catch (e) {
-        logger.error('Auth error during upgrade:', e);
-        socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+      if (!isOwner && !isShared && !isViewer) {
+        socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
         socket.destroy();
+        return;
       }
-    });
+
+      const readOnly = isViewer && !isOwner && !isShared;
+
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        ws.isAlive = true;
+        ws.readOnly = readOnly; // Attach flag
+        ws.on('pong', () => (ws.isAlive = true));
+        wss.emit('connection', ws, request, { documentId, userId }); // Pass userId
+      });
+    } catch (e) {
+      logger.error('Auth error during upgrade:', e);
+      socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+      socket.destroy();
+    }
   });
 
-  wss.on('connection', async (conn, req, { documentId, user }) => {
+  wss.on('connection', async (conn, req, { documentId, userId }) => {
+    console.log(`Client connected to doc: ${documentId} (User: ${userId})`);
     const doc = await getOrCreateDoc(documentId);
     
     // Setup Awareness (Cursors)
@@ -208,10 +231,22 @@ function init(server) {
         const encoder = encoding.createEncoder();
         const decoder = decoding.createDecoder(new Uint8Array(message));
         const messageType = decoding.readVarUint(decoder);
+        // console.log(`Received message type: ${messageType} from doc: ${documentId}`);
 
         switch (messageType) {
           case messageSync:
             encoding.writeVarUint(encoder, messageSync);
+            
+            // Peek at sync message type to enforce Read-Only
+            // y-protocols: 0=Step1, 1=Step2, 2=Update
+            if (conn.readOnly) {
+                const syncMessageType = decoding.peekVarUint(decoder); 
+                if (syncMessageType === 2) { // Update
+                    // Ignore updates from viewers
+                    return;
+                }
+            }
+            
             syncProtocol.readSyncMessage(decoder, encoder, doc, conn);
             if (encoding.length(encoder) > 1) {
               conn.send(encoding.toUint8Array(encoder));

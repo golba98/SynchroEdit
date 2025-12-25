@@ -5,8 +5,9 @@ import { Editor } from '/js/editor/editor.js';
 import { Theme } from '/js/ui/theme.js';
 import { Profile } from '/js/ui/profile.js';
 import { DynamicBackground } from '/js/ui/background.js';
+import { navigateTo } from '/js/core/utils.js';
 
-class App {
+export class App {
   constructor() {
     this.documentId = new URLSearchParams(window.location.search).get('doc');
     this.user = null;
@@ -32,7 +33,7 @@ class App {
 
     if (!this.user) {
       const params = new URLSearchParams(window.location.search).get('doc');
-      window.location.href = params ? `pages/login.html?doc=${params}` : 'pages/login.html';
+      navigateTo(params ? `pages/login.html?doc=${params}` : 'pages/login.html');
       return;
     }
 
@@ -358,4 +359,6 @@ class App {
   }
 }
 
-new App();
+if (typeof window !== 'undefined' && !window.testEnv) {
+    new App();
+}

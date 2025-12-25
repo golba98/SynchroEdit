@@ -1,7 +1,7 @@
 const request = require('supertest');
-const { app } = require('../src/server');
-const User = require('../src/models/User');
-const Document = require('../src/models/Document');
+const { app } = require('../../src/server');
+const User = require('../../src/models/User');
+const Document = require('../../src/models/Document');
 const mongoose = require('mongoose');
 
 describe('Document Integration Tests', () => {

@@ -1232,6 +1232,27 @@
           const data = await response.json();
 
           if (response.ok) {
+            if (data.token) {
+              setEmotion('celebrate');
+              createFireworks();
+              signupStatusMessage.textContent = '✓ Signup successful!';
+              signupStatusMessage.className = 'status-message success';
+
+              localStorage.setItem('synchroEditToken', data.token);
+              localStorage.setItem('synchroEditUser', data.username);
+
+              setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const docId = params.get('doc');
+                if (docId) {
+                  window.location.href = `../index.html?doc=${docId}`;
+                } else {
+                  window.location.href = '../index.html';
+                }
+              }, 1500);
+              return;
+            }
+
             // Store signup data temporarily and show verification modal
             pendingSignupData = data;
             signupStatusMessage.textContent = '✓ Check your email for verification code';

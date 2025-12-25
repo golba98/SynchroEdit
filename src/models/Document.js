@@ -34,6 +34,12 @@ const documentSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  viewers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
   lastModified: {
     type: Date,
     default: Date.now,

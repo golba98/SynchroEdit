@@ -4,10 +4,21 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
     "test": "jest",
+    "test:integration": "jest",
+    "test:ui": "playwright test",
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . -c config/.eslintrc.json --ignore-path config/.eslintignore",
     "format": "prettier --write . --config config/.prettierrc --ignore-path config/.prettierignore"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ],
+    "setupFiles": [
+      "./tests/env.js"
+    ],
+    "testEnvironment": "node",
+    "maxWorkers": 1
   },
   "repository": {
     "type": "git",
@@ -40,6 +51,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
+    "mongodb-memory-server": "^11.0.1",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4"
   }

@@ -4,9 +4,17 @@ const User = require('../models/User');
 const { sendVerificationEmail, generateVerificationCode } = require('../utils/email');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
+const { createTicket } = require('../utils/ticketStore');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
+
+exports.getWsTicket = (req, res, next) => {
+    // req.user is set by authenticateToken middleware
+    const userId = req.user.id;
+    const ticket = createTicket(userId);
+    res.json({ ticket });
+};
 
 exports.signup = async (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
@@ -24,49 +32,13 @@ exports.signup = async (req, res, next) => {
 
   const existingUser = await User.findOne({ $or: [{ username }, { email }] }).lean();
   if (existingUser) {
-    if (!existingUser.isEmailVerified && existingUser.email === email) {
-      if (!EMAIL_VERIFICATION_ENABLED) {
-        existingUser.isEmailVerified = true;
-        existingUser.verificationCode = null;
-        existingUser.verificationCodeExpires = null;
-        await existingUser.save();
-        const token = jwt.sign(
-          { id: existingUser._id, username: existingUser.username },
-          JWT_SECRET,
-          { expiresIn: '24h' }
-        );
-        return res.status(200).json({
-          token,
-          username: existingUser.username,
-          email: existingUser.email,
-          message: 'Signup successful (verification disabled).',
-        });
-      }
+    // Prevent enumeration: If user exists, we pretend success or return a generic message.
+    // Simulate delay to prevent timing attacks
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
 
-      const verificationCode = generateVerificationCode();
-      existingUser.verificationCode = verificationCode;
-      existingUser.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
-      await existingUser.save();
-
-      const emailSent = await sendVerificationEmail(email, verificationCode);
-      if (!emailSent) {
-        return next(new AppError('Failed to send verification email', 500));
-      }
-
-      const token = jwt.sign(
-        { id: existingUser._id, username: existingUser.username },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      return res.status(200).json({
-        token,
-        username: existingUser.username,
-        email: existingUser.email,
-        message: 'Verification code resent. Please check your email.',
-      });
-    }
-    return next(new AppError('Username or email already exists', 400));
+    return res.status(200).json({
+       message: 'If your email is not registered, you will receive a verification code.',
+    });
   }
 
   const verificationCode = generateVerificationCode();
@@ -82,23 +54,18 @@ exports.signup = async (req, res, next) => {
   });
   await user.save();
 
-  let token;
   if (EMAIL_VERIFICATION_ENABLED) {
     const emailSent = await sendVerificationEmail(email, verificationCode);
     if (!emailSent) {
       await User.deleteOne({ _id: user._id });
       return next(new AppError('Failed to send verification email', 500));
     }
-    token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
     logger.info(`New user signed up (pending verification): ${user.username}`);
-    res.status(201).json({
-      token,
-      username: user.username,
-      email: user.email,
-      message: 'Signup successful! Check your email for verification code.',
+    res.status(200).json({
+      message: 'If your email is not registered, you will receive a verification code.',
     });
   } else {
-    token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
     logger.info(`New user signed up: ${user.username}`);
     res.status(201).json({
       token,

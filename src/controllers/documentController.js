@@ -90,9 +90,10 @@ exports.createDocument = async (req, res, next) => {
 
 exports.deleteDocument = async (req, res, next) => {
   const docId = req.params.id;
-  const doc = await Document.findOneAndDelete({ _id: docId, owner: req.user.id });
+  const doc = await Document.findById(docId);
 
   if (!doc) {
+    // Check if it's in recent docs to remove it (cleanup)
     const user = await User.findById(req.user.id);
     if (user && user.recentDocuments) {
       const index = user.recentDocuments.findIndex((id) => id.toString() === docId);
@@ -102,8 +103,14 @@ exports.deleteDocument = async (req, res, next) => {
         return res.json({ message: 'Removed from recent' });
       }
     }
-    return next(new AppError('Document not found or access denied', 404));
+    return next(new AppError('Document not found', 404));
   }
+
+  if (doc.owner.toString() !== req.user.id) {
+      return next(new AppError('Access denied', 403));
+  }
+
+  await doc.deleteOne();
 
   notifyDocumentDeleted(docId);
 

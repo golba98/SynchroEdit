@@ -1,58 +1,122 @@
 const request = require('supertest');
-const { app, server } = require('../src/server');
-const mongoose = require('mongoose');
+const { app } = require('../src/server');
 const User = require('../src/models/User');
 
-// Mock User model
-jest.mock('../src/models/User');
-
-// Mock mongoose connection
-jest.mock('mongoose', () => {
-  const actualMongoose = jest.requireActual('mongoose');
-  return {
-    ...actualMongoose,
-    connect: jest.fn().mockResolvedValue(actualMongoose),
-    connection: {
-      ...actualMongoose.connection,
-      readyState: 1,
-      close: jest.fn().mockResolvedValue(true),
-    },
+describe('Auth Integration Tests', () => {
+  const testUser = {
+    username: 'testuser',
+    email: 'test@example.com',
+    password: 'password123',
   };
-});
 
-describe('Auth API Tests', () => {
-  afterAll(async () => {
-    await server.close();
-    await mongoose.connection.close();
-  });
+  describe('POST /api/auth/signup', () => {
+    it('should register a new user successfully (pending verification)', async () => {
+      const res = await request(app)
+        .post('/api/auth/signup')
+        .send(testUser);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+      expect(res.status).toBe(200);
+      expect(res.body.message).toMatch(/receive a verification code/i);
 
-  it('should return 400 if missing fields in signup', async () => {
-    const res = await request(app).post('/api/auth/signup').send({ username: 'testuser' });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body.message).toContain('Please provide username, email, and password');
-  });
-
-  it('should return 400 if user already exists', async () => {
-    const mockUser = {
-      username: 'testuser',
-      email: 'test@example.com',
-      isEmailVerified: true,
-    };
-
-    User.findOne.mockReturnValue({
-      lean: jest.fn().mockResolvedValue(mockUser),
+      const user = await User.findOne({ email: testUser.email });
+      expect(user).toBeTruthy();
+      expect(user.isEmailVerified).toBe(false);
+      expect(user.verificationCode).toBeTruthy();
     });
 
-    const res = await request(app)
-      .post('/api/auth/signup')
-      .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
+    it('should return 200 and generic message even if email already exists', async () => {
+        await User.create(testUser);
+  
+        const res = await request(app)
+          .post('/api/auth/signup')
+          .send(testUser);
+  
+        expect(res.status).toBe(200);
+        expect(res.body.message).toMatch(/receive a verification code/i);
+      });
+  });
 
-    expect(res.statusCode).toEqual(400);
-    expect(res.body.message).toEqual('Username or email already exists');
+  describe('POST /api/auth/verify-email', () => {
+    it('should verify email with correct code', async () => {
+      await request(app).post('/api/auth/signup').send(testUser);
+      const user = await User.findOne({ email: testUser.email });
+      
+      const res = await request(app)
+        .post('/api/auth/verify-email')
+        .send({
+          email: testUser.email,
+          verificationCode: user.verificationCode,
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toMatch(/verified successfully/i);
+      expect(res.body.token).toBeTruthy();
+
+      const updatedUser = await User.findOne({ email: testUser.email });
+      expect(updatedUser.isEmailVerified).toBe(true);
+    });
+  });
+
+  describe('POST /api/auth/login', () => {
+    it('should login successfully if verified', async () => {
+      await request(app).post('/api/auth/signup').send(testUser);
+      const user = await User.findOne({ email: testUser.email });
+      await request(app).post('/api/auth/verify-email').send({
+          email: testUser.email,
+          verificationCode: user.verificationCode
+      });
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          username: testUser.username,
+          password: testUser.password,
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.token).toBeTruthy();
+    });
+
+    it('should return 403 if email not verified', async () => {
+        await request(app).post('/api/auth/signup').send(testUser);
+  
+        const res = await request(app)
+          .post('/api/auth/login')
+          .send({
+            username: testUser.username,
+            password: testUser.password,
+          });
+  
+        expect(res.status).toBe(403);
+        expect(res.body.requiresVerification).toBe(true);
+      });
+
+    it('should return 401 if password is incorrect', async () => {
+        await request(app).post('/api/auth/signup').send(testUser);
+        const user = await User.findOne({ email: testUser.email });
+        // Verify manually to bypass check
+        user.isEmailVerified = true;
+        await user.save();
+
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({
+                username: testUser.username,
+                password: 'wrongpassword'
+            });
+        
+        expect(res.status).toBe(401);
+    });
+
+    it('should return 401 if user does not exist', async () => {
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({
+                username: 'nonexistent',
+                password: 'password'
+            });
+        
+        expect(res.status).toBe(401);
+    });
   });
 });

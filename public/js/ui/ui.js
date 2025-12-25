@@ -121,7 +121,11 @@ export const UI = {
 
     if (status === 'connected') {
       container.style.display = 'none';
-    } else if (status === 'reconnecting') {
+    } else if (status === 'connecting') {
+      container.style.display = 'flex';
+      if (titleEl) titleEl.textContent = 'Connecting...';
+      if (descEl) descEl.textContent = 'Establishing connection to the real-time server...';
+    } else if (status === 'reconnecting' || status === 'disconnected') {
       container.style.display = 'flex';
       if (titleEl) titleEl.textContent = 'Connection Lost';
       if (descEl)

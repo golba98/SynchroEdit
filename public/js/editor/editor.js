@@ -76,11 +76,12 @@ export class Editor {
             this.onStatusChange(event.status);
         } else {
             // Delay reporting disconnected/connecting status to avoid flicker
+            // Increased to 5s to better handle background tab throttling
             if (!this.statusTimeout) {
                 this.statusTimeout = setTimeout(() => {
                     this.onStatusChange(event.status);
                     this.statusTimeout = null;
-                }, 2000);
+                }, 5000);
             }
         }
     });

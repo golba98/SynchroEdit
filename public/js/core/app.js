@@ -53,12 +53,29 @@ export class App {
 
     this.setupEventListeners();
     this.setupRibbonTabs();
+    this.setupVisibilityListener();
 
     if (this.documentId) {
         await this.loadDocument();
     } else {
         await initialTask;
     }
+  }
+
+  setupVisibilityListener() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        // When coming back, check if we need to refresh status
+        if (this.editor && this.editor.provider) {
+          const status = this.editor.provider.wsconnected ? 'connected' : 'connecting';
+          this.handleWSStatusChange(status);
+        }
+      } else {
+          // When moving out, we can hide the overlay if it was showing due to throttling
+          const overlay = document.getElementById('serverOfflineOverlay');
+          if (overlay) overlay.style.display = 'none';
+      }
+    });
   }
 
   async loadDocument() {
@@ -93,12 +110,21 @@ export class App {
   }
 
   handleWSStatusChange(status) {
-    UI.updateConnectionStatus(document.getElementById('serverOfflineOverlay'), status);
     const overlay = document.getElementById('serverOfflineOverlay');
+    if (!overlay) return;
+
+    UI.updateConnectionStatus(overlay, status);
+    
     if (status === 'connected') {
-      if (overlay) overlay.style.display = 'none';
+      overlay.style.display = 'none';
     } else {
-      if (overlay) overlay.style.display = 'flex';
+      // Only show overlay if the page is actually visible to the user
+      // and not in a background tab that might be throttled
+      if (document.visibilityState === 'visible') {
+        overlay.style.display = 'flex';
+      } else {
+        overlay.style.display = 'none';
+      }
     }
   }
 

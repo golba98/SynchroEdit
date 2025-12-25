@@ -90,4 +90,33 @@ describe('App Core Initialization', () => {
 
     expect(Utils.navigateTo).toHaveBeenCalledWith('pages/login.html');
   });
+
+  it('should not show connection overlay if page is hidden', async () => {
+    global.URLSearchParams = jest.fn(() => ({
+      get: jest.fn().mockReturnValue('123')
+    }));
+
+    // Mock hidden state
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'hidden',
+      configurable: true
+    });
+
+    const app = new App();
+    await new Promise(process.nextTick);
+
+    const overlay = document.getElementById('serverOfflineOverlay');
+    app.handleWSStatusChange('connecting');
+    
+    expect(overlay.style.display).toBe('none');
+
+    // Change to visible
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true
+    });
+
+    app.handleWSStatusChange('connecting');
+    expect(overlay.style.display).toBe('flex');
+  });
 });

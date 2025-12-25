@@ -4,9 +4,10 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "test": "jest",
-    "test:integration": "jest",
-    "test:ui": "playwright test",
+    "start": "node src/server.js",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "cross-env SKIP_DB_SETUP=true jest tests/unit",
+    "test:integration": "jest tests/integration",
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . -c config/.eslintrc.json --ignore-path config/.eslintignore",
     "format": "prettier --write . --config config/.prettierrc --ignore-path config/.prettierignore"
   },

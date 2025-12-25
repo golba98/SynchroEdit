@@ -135,11 +135,19 @@ function init(server) {
 
   server.on('upgrade', async (request, socket, head) => {
     // Parse URL for documentId and token/ticket
-    // Expected format: /ws?docId=...&token=... OR &ticket=...
+    // Expected format: /ws/:docId?token=... OR /?documentId=...
     const url = new URL(request.url, 'http://localhost');
-    const documentId = url.searchParams.get('documentId');
+    let documentId = url.searchParams.get('documentId');
     const token = url.searchParams.get('token');
     const ticket = url.searchParams.get('ticket');
+
+    // Support dedicated path /ws/:docId
+    if (!documentId && url.pathname.startsWith('/ws/')) {
+        const parts = url.pathname.split('/');
+        if (parts.length >= 3) {
+            documentId = parts[2];
+        }
+    }
 
     if (!documentId) {
       socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');

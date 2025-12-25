@@ -42,10 +42,10 @@ export class Editor {
     
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     this.provider = new WebsocketProvider(
-        `${protocol}://${window.location.host}`, 
-        '', // Room name (unused, we use params)
+        `${protocol}://${window.location.host}/ws`, 
+        docId, // Room name becomes part of the path: /ws/docId
         this.doc,
-        { params: { documentId: docId, token: token } }
+        { params: { token: token } } // documentId is now in path, removed from params
     );
     
     this.provider.awareness.setLocalStateField('user', {
@@ -68,6 +68,11 @@ export class Editor {
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
         
+        // Visibility Check: Don't bother user if tab is hidden
+        if (document.hidden && event.status !== 'connected') {
+            return;
+        }
+
         if (event.status === 'connected') {
             if (this.statusTimeout) {
                 clearTimeout(this.statusTimeout);
@@ -79,10 +84,23 @@ export class Editor {
             // Increased to 5s to better handle background tab throttling
             if (!this.statusTimeout) {
                 this.statusTimeout = setTimeout(() => {
-                    this.onStatusChange(event.status);
+                    // Check visibility again before showing error
+                    if (!document.hidden) {
+                        this.onStatusChange(event.status);
+                    }
                     this.statusTimeout = null;
                 }, 5000);
             }
+        }
+    });
+
+    // Resume status updates when tab becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && this.provider.wsconnected === false) {
+             // If we were disconnected while hidden, show it now (or wait for reconnect)
+             // The provider will likely try to reconnect immediately upon visibility
+             // so we might not need to do anything, or we can force a status update.
+             // For now, let's just let the loop handle it, but clear any pending timeout.
         }
     });
 

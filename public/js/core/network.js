@@ -76,50 +76,65 @@ export const Network = {
     const maxReconnectDelay = 30000;
     let isIntentionallyClosed = false;
 
-    const connect = () => {
-      ws = new WebSocket(wsUrl);
+    const connect = async () => {
+      if (isIntentionallyClosed) return;
 
-      ws.onopen = () => {
-        console.log('Connected to server');
-        reconnectAttempts = 0;
-        if (onStatusChange) onStatusChange('connected');
-        ws.send(
-          JSON.stringify({
-            type: 'join-document',
-            documentId,
-            token: Auth.getToken(),
-          })
-        );
-      };
+      try {
+          // 1. Get a fresh ticket before every connection attempt
+          // This also verifies the session is still active
+          const { ticket } = await this.fetchAPI('/api/auth/ws-ticket');
+          
+          ws = new WebSocket(wsUrl);
 
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          onMessage(data);
-        } catch (error) {
-          console.error('WebSocket message error:', error);
-        }
-      };
+          ws.onopen = () => {
+            console.log('Connected to server');
+            reconnectAttempts = 0;
+            if (onStatusChange) onStatusChange('connected');
+            ws.send(
+              JSON.stringify({
+                type: 'join-document',
+                documentId,
+                ticket, // Use the fresh ticket
+              })
+            );
+          };
 
-      ws.onclose = () => {
-        if (isIntentionallyClosed) return;
+          ws.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              onMessage(data);
+            } catch (error) {
+              console.error('WebSocket message error:', error);
+            }
+          };
 
-        console.log('Disconnected from server');
-        if (onStatusChange) onStatusChange('reconnecting');
+          ws.onclose = () => {
+            if (isIntentionallyClosed) return;
 
-        const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
-        reconnectAttempts++;
+            console.log('Disconnected from server');
+            if (onStatusChange) onStatusChange('reconnecting');
 
-        setTimeout(connect, delay);
-      };
+            const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
+            reconnectAttempts++;
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        if (onStatusChange) onStatusChange('offline');
-        ws.close();
-      };
+            setTimeout(connect, delay);
+          };
 
-      return ws;
+          ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            // Don't call onStatusChange('offline') yet, let onclose handle reconnection
+            ws.close();
+          };
+      } catch (err) {
+          console.error('Failed to acquire WS ticket or connect:', err);
+          if (onStatusChange) onStatusChange('reconnecting');
+          
+          // If the ticket fetch failed (e.g. 401), fetchAPI already tried to refresh the token.
+          // If it still fails, the user is likely logged out.
+          const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
+          reconnectAttempts++;
+          setTimeout(connect, delay);
+      }
     };
 
     const socketProxy = {

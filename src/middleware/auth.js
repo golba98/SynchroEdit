@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
         return next(new AppError('Email not verified', 403));
       }
 
-      req.user = user;
+      req.user = user; // Now contains id, username, and sessionId
       next();
     } catch (dbErr) {
       logger.error('Auth middleware database error:', dbErr);

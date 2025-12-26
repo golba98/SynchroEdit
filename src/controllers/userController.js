@@ -42,3 +42,19 @@ exports.updatePassword = async (req, res, next) => {
   logger.info(`Password updated for user: ${req.user.id}`);
   res.json({ message: 'Password updated successfully' });
 };
+
+exports.getSessions = async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('sessions');
+    if (!user) return next(new AppError('User not found', 404));
+
+    // Return sessions but exclude the refresh token hash for security
+    const sessions = user.sessions.map(s => ({
+        sessionId: s.sessionId,
+        userAgent: s.userAgent,
+        ipAddress: s.ipAddress,
+        lastActive: s.lastActive,
+        isCurrent: s.sessionId === req.user.sessionId
+    }));
+
+    res.json(sessions);
+};

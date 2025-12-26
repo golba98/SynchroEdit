@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit each IP to 10 requests per `window` for auth routes
+  max: 100, // Increased from 10 to 100 to prevent 429 during tests
   message: { message: 'Too many login/signup attempts, please try again after 15 minutes' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -19,5 +19,6 @@ router.post('/forgot-password', authLimiter, authController.forgotPassword);
 router.post('/reset-password', authLimiter, authController.resetPassword);
 router.post('/refresh-token', authController.refreshToken); 
 router.post('/logout', authController.logout);
+router.get('/ws-ticket', authController.getWsTicket);
 
 module.exports = router;

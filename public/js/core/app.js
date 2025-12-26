@@ -75,19 +75,28 @@ export class App {
   }
 
   setupVisibilityListener() {
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', async () => {
       if (document.visibilityState === 'visible') {
-        // When coming back, check if we need to refresh status
+        console.log('Tab visible, checking session and connection...');
+        
+        // 1. Re-validate session (triggers refresh if needed)
+        const user = await this.profile.loadProfile();
+        if (!user) {
+            Auth.logout();
+            return;
+        }
+
+        // 2. Check connection
         if (this.editor && this.editor.provider) {
-          if (this.editor.provider.wsconnected) {
-             this.handleWSStatusChange('connected');
-          } else {
-             // Immediate feedback if we come back to a dead connection
-             // Force the overlay to show immediately without the 5s patience timer
-             const overlay = document.getElementById('serverOfflineOverlay');
-             if (overlay) {
-                 UI.updateConnectionStatus(overlay, 'disconnected');
-                 overlay.style.display = 'flex';
+          if (!this.editor.provider.wsconnected) {
+             console.log('WS disconnected on wake, forcing reconnection...');
+             // Most providers have a connect() or disconnect/connect cycle
+             // For y-websocket, we can just let its internal reconnect logic work,
+             // but our Network.initWebSocket wrapper now fetches fresh tickets.
+             
+             // If we are using our custom network.js WebSocket:
+             if (this.editor.socket && this.editor.socket.reconnect) {
+                 this.editor.socket.reconnect();
              }
           }
         }
@@ -200,6 +209,11 @@ export class App {
         tab.classList.add('active');
         const targetContent = document.getElementById(`${targetTab}-content`);
         if (targetContent) targetContent.style.display = 'block';
+        
+        // Load sessions if security tab opened
+        if (targetTab === 'security') {
+            this.profile.loadSessions();
+        }
       });
     });
 

@@ -126,13 +126,40 @@ exports.verifyEmail = async (req, res, next) => {
   user.isEmailVerified = true;
   user.verificationCode = null;
   user.verificationCodeExpires = null;
+  
+  // Create Session
+  const sessionId = crypto.randomBytes(16).toString('hex');
+  const refreshToken = jwt.sign({ id: user._id, sessionId }, JWT_SECRET, {
+    expiresIn: '7d',
+  });
+
+  user.sessions.push({
+      sessionId,
+      refreshToken: crypto.createHash('sha256').update(refreshToken).digest('hex'),
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+      lastActive: new Date()
+  });
+
+  if (user.sessions.length > 5) user.sessions.shift();
   await user.save();
 
   logger.info(`User email verified: ${user.username}`);
-  const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-    expiresIn: '24h',
+
+  // Dual-Token System
+  const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId }, JWT_SECRET, {
+    expiresIn: '15m',
   });
-  res.json({ message: 'Email verified successfully', token, username: user.username });
+
+  // Send Refresh Token as HTTP-Only Cookie
+  res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  res.json({ message: 'Email verified successfully', token: accessToken, username: user.username });
 };
 
 exports.resendCode = async (req, res, next) => {
@@ -231,13 +258,29 @@ exports.login = async (req, res, next) => {
 
   logger.info(`User logged in: ${user.username}`);
   
-  // Dual-Token System
-  const accessToken = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-    expiresIn: '15m', // Short-lived
+  // Create Session
+  const sessionId = crypto.randomBytes(16).toString('hex');
+  const refreshToken = jwt.sign({ id: user._id, sessionId }, JWT_SECRET, {
+    expiresIn: '7d', // Long-lived
   });
 
-  const refreshToken = jwt.sign({ id: user._id }, JWT_SECRET, {
-    expiresIn: '7d', // Long-lived
+  user.sessions.push({
+      sessionId,
+      refreshToken: crypto.createHash('sha256').update(refreshToken).digest('hex'),
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+      lastActive: new Date()
+  });
+
+  // Keep only last 5 sessions
+  if (user.sessions.length > 5) {
+      user.sessions.shift();
+  }
+  await user.save();
+
+  // Dual-Token System
+  const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId }, JWT_SECRET, {
+    expiresIn: '15m', // Short-lived
   });
 
   // Send Refresh Token as HTTP-Only Cookie
@@ -251,6 +294,47 @@ exports.login = async (req, res, next) => {
   res.json({ token: accessToken, username: user.username });
 };
 
+exports.logout = async (req, res, next) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (refreshToken) {
+        try {
+            const decoded = jwt.verify(refreshToken, JWT_SECRET);
+            const user = await User.findById(decoded.id);
+            if (user) {
+                user.sessions = user.sessions.filter(s => s.sessionId !== decoded.sessionId);
+                await user.save();
+            }
+        } catch (err) {
+            // Token might be invalid or expired, just proceed to clear cookie
+        }
+    }
+
+    res.clearCookie('refreshToken');
+    res.status(200).json({ message: 'Logged out successfully' });
+};
+
+exports.revokeSession = async (req, res, next) => {
+    const { sessionId } = req.params;
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new AppError('User not found', 404));
+
+    user.sessions = user.sessions.filter(s => s.sessionId !== sessionId);
+    await user.save();
+
+    res.status(200).json({ message: 'Session revoked' });
+};
+
+exports.revokeAllOtherSessions = async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new AppError('User not found', 404));
+
+    // req.user.sessionId is set by the authenticateToken middleware (we'll update that next)
+    user.sessions = user.sessions.filter(s => s.sessionId === req.user.sessionId);
+    await user.save();
+
+    res.status(200).json({ message: 'All other sessions revoked' });
+};
+
 exports.refreshToken = async (req, res, next) => {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
@@ -260,14 +344,21 @@ exports.refreshToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(refreshToken, JWT_SECRET);
         
-        // Check if user still exists (security best practice)
         const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(401).json({ message: 'User no longer exists.' });
         }
 
+        // Validate session
+        const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+        const session = user.sessions.find(s => s.sessionId === decoded.sessionId && s.refreshToken === hashedToken);
+        
+        if (!session) {
+            return res.status(403).json({ message: 'Session expired or revoked.' });
+        }
+
         // Issue new Access Token
-        const accessToken = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
+        const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId: decoded.sessionId }, JWT_SECRET, {
             expiresIn: '15m',
         });
 

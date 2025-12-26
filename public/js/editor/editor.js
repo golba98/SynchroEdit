@@ -44,7 +44,7 @@ export class Editor {
     // 1. Instant Load from IndexedDB
     this.loadFromCache(docId).then(() => {
         // Only connect after cache check (or concurrently, but we apply cache first)
-        this.connectWebSocket(docId, token, user);
+        this.connectWebSocket(docId, user);
     });
 
     this.yPages = this.doc.getArray('pages');
@@ -72,13 +72,42 @@ export class Editor {
       }
   }
 
-  connectWebSocket(docId, token, user) {
+  async connectWebSocket(docId, user) {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    
+    // Fetch a fresh ticket
+    let ticket;
+    try {
+        const response = await fetch('/api/auth/ws-ticket', {
+            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+        });
+        
+        if (response.status === 401) {
+            // Attempt refresh
+            const refreshed = await Auth.tryRefresh();
+            if (refreshed) {
+                return this.connectWebSocket(docId, user);
+            }
+        }
+        
+        const data = await response.json();
+        ticket = data.ticket;
+    } catch (err) {
+        console.error('Failed to get WS ticket:', err);
+        // Retry later
+        setTimeout(() => this.connectWebSocket(docId, user), 5000);
+        return;
+    }
+
+    if (this.provider) {
+        this.provider.destroy();
+    }
+
     this.provider = new WebsocketProvider(
         `${protocol}://${window.location.host}`, 
-        '', // Empty room name to force query-param only URL (e.g. /?documentId=...)
+        '', 
         this.doc,
-        { params: { documentId: docId, token: token } }
+        { params: { documentId: docId, ticket: ticket } }
     );
     
     this.provider.awareness.setLocalStateField('user', {
@@ -106,16 +135,9 @@ export class Editor {
     this.doc.on('update', (update) => {
         this.saveToCache(docId);
     });
-    
-    // Optimization: y-websocket provider automatically implements the efficiency protocol.
-    // When connected, it exchanges State Vectors (SyncStep1) first, then only sends missing blocks (SyncStep2).
-    // Because we pre-loaded from IndexedDB, our local State Vector is populated.
-    // The server will see this and ONLY send the tiny difference (Delta), not the full 2MB doc.
-    
-    // Wait for initial sync to render or create default page
+
     this.provider.on('sync', isSynced => {
         if (isSynced && this.yPages.length === 0) {
-            // Create initial page if empty
             const newPage = new Y.Map();
             const content = new Y.Text();
             newPage.set('content', content);
@@ -123,9 +145,16 @@ export class Editor {
         }
         if (isSynced) {
              this.renderAllPages();
-             this.saveToCache(docId); // Force save on full sync
+             this.saveToCache(docId);
         }
     });
+  }
+
+  async reconnect() {
+      console.log('Forcing editor reconnection...');
+      const docId = new URLSearchParams(window.location.search).get('doc');
+      const user = { username: Auth.getToken() ? 'User' : 'Anonymous' }; // Simplified for reconnect
+      await this.connectWebSocket(docId, user);
   }
 
   async saveToCache(docId) {

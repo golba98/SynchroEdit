@@ -113,12 +113,15 @@ describe('Auth Controller Unit Tests', () => {
   describe('login', () => {
       it('should return token if login successful', async () => {
           req.body = { username: 'user', password: 'password' };
+          req.headers = { 'user-agent': 'test-agent' };
+          req.ip = '127.0.0.1';
           
           const mockUser = {
               _id: 'user123',
               username: 'user',
               comparePassword: jest.fn().mockResolvedValue(true),
               isEmailVerified: true,
+              sessions: [],
               save: jest.fn()
           };
           

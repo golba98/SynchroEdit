@@ -4,6 +4,37 @@ import { Network } from '/js/core/network.js';
 export class Profile {
   constructor() {
     this.user = null;
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    // Password strength listener
+    const newPasswordInput = document.getElementById('newPassword');
+    if (newPasswordInput) {
+      newPasswordInput.addEventListener('input', () => this.updatePasswordStrength(newPasswordInput.value));
+    }
+
+    // Tab switching listener (to load sessions when security tab is opened)
+    const profileTabs = document.querySelectorAll('.profile-tab');
+    profileTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (tab.getAttribute('data-tab') === 'security') {
+                this.loadSessions();
+            }
+        });
+    });
+
+    // Resend verification listener
+    const resendBtn = document.getElementById('resendVerificationBtn');
+    if (resendBtn) {
+        resendBtn.addEventListener('click', () => this.resendVerification());
+    }
+
+    // Revoke all others listener
+    const revokeOthersBtn = document.getElementById('revokeAllOthersBtn');
+    if (revokeOthersBtn) {
+        revokeOthersBtn.addEventListener('click', () => this.revokeAllOtherSessions());
+    }
   }
 
   async loadProfile() {
@@ -15,11 +46,16 @@ export class Profile {
   }
 
   updateUI() {
+    const profileEmailInput = document.getElementById('profileEmailInput');
+    if (profileEmailInput) profileEmailInput.value = this.user.email;
+
     const profileUsernameInput = document.getElementById('profileUsernameInput');
     if (profileUsernameInput) profileUsernameInput.value = this.user.username;
 
     const profileBioInput = document.getElementById('profileBioInput');
     if (profileBioInput) profileBioInput.value = this.user.bio || '';
+
+    this.updateVerificationBadge();
 
     const pfpElements = [
       document.getElementById('profilePfp'),
@@ -50,6 +86,183 @@ export class Profile {
         if (el) el.style.display = 'flex';
       });
     }
+  }
+
+  updateVerificationBadge() {
+      const badge = document.getElementById('emailVerificationBadge');
+      const resendContainer = document.getElementById('resendVerificationContainer');
+      if (!badge) return;
+
+      if (this.user.isEmailVerified) {
+          badge.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> <span style="color: #10b981;">Verified</span>';
+          if (resendContainer) resendContainer.style.display = 'none';
+      } else {
+          badge.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #f59e0b;"></i> <span style="color: #f59e0b;">Unverified</span>';
+          if (resendContainer) resendContainer.style.display = 'block';
+      }
+  }
+
+  async resendVerification() {
+      const resendBtn = document.getElementById('resendVerificationBtn');
+      const timerSpan = document.getElementById('resendTimer');
+      
+      try {
+          resendBtn.disabled = true;
+          await Network.fetchAPI('/api/auth/resend-code', {
+              method: 'POST',
+              body: JSON.stringify({ email: this.user.email })
+          });
+          
+          alert('Verification code sent to your email!');
+          
+          // Rate limit UI
+          let timeLeft = 60;
+          timerSpan.style.display = 'inline';
+          resendBtn.style.opacity = '0.5';
+          resendBtn.style.cursor = 'not-allowed';
+          
+          const interval = setInterval(() => {
+              timeLeft--;
+              timerSpan.textContent = `Retry in ${timeLeft}s`;
+              if (timeLeft <= 0) {
+                  clearInterval(interval);
+                  resendBtn.disabled = false;
+                  resendBtn.style.opacity = '1';
+                  resendBtn.style.cursor = 'pointer';
+                  timerSpan.style.display = 'none';
+              }
+          }, 1000);
+
+      } catch (err) {
+          console.error('Resend error:', err);
+          alert('Failed to resend code. Please try again later.');
+          resendBtn.disabled = false;
+      }
+  }
+
+  updatePasswordStrength(password) {
+    const bar = document.getElementById('passwordStrengthBar');
+    const reqs = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        number: /[0-9]/.test(password),
+        symbol: /[!@#$%^&*]/.test(password)
+    };
+
+    let score = 0;
+    Object.keys(reqs).forEach(key => {
+        const el = document.querySelector(`li[data-req="${key}"]`);
+        if (reqs[key]) {
+            score++;
+            el.style.color = '#10b981';
+            el.querySelector('i').className = 'fas fa-check-circle';
+        } else {
+            el.style.color = '#666';
+            el.querySelector('i').className = 'fas fa-circle';
+        }
+    });
+
+    const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
+    const widths = ['25%', '50%', '75%', '100%'];
+    
+    if (password.length === 0) {
+        bar.style.width = '0%';
+    } else {
+        const index = Math.min(score, colors.length) - 1;
+        bar.style.width = widths[index] || '0%';
+        bar.style.background = colors[index] || '#ef4444';
+    }
+  }
+
+  async loadSessions() {
+      const container = document.getElementById('sessionListContainer');
+      if (!container) return;
+      
+      try {
+          container.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; padding: 10px;">Loading sessions...</div>';
+          const sessions = await Network.fetchAPI('/api/user/sessions');
+          
+          container.innerHTML = '';
+          sessions.sort((a, b) => (a.isCurrent ? -1 : 1)).forEach(session => {
+              const sessionEl = document.createElement('div');
+              sessionEl.style.cssText = 'background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between;';
+              
+              const info = this.parseUserAgent(session.userAgent);
+              const lastActive = this.formatLastActive(session.lastActive);
+
+              sessionEl.innerHTML = `
+                  <div style="flex: 1;">
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                          <span style="font-size: 11px; color: #e0e0e0; font-weight: 600;">${info.os} • ${info.browser}</span>
+                          ${session.isCurrent ? '<span style="font-size: 8px; background: var(--accent-color); color: white; padding: 1px 4px; border-radius: 4px; text-transform: uppercase;">Current</span>' : ''}
+                      </div>
+                      <div style="font-size: 10px; color: #666; margin-top: 2px;">${session.ipAddress} • ${lastActive}</div>
+                  </div>
+                  ${!session.isCurrent ? `<button class="revoke-session-btn" data-id="${session.sessionId}" style="background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer; padding: 4px;"><i class="fas fa-times-circle"></i></button>` : ''}
+              `;
+              container.appendChild(sessionEl);
+          });
+
+          // Add revocation listeners
+          container.querySelectorAll('.revoke-session-btn').forEach(btn => {
+              btn.addEventListener('click', () => this.revokeSession(btn.getAttribute('data-id')));
+          });
+
+      } catch (err) {
+          console.error('Error loading sessions:', err);
+          container.innerHTML = '<div style="font-size: 11px; color: #ef4444; text-align: center; padding: 10px;">Failed to load sessions</div>';
+      }
+  }
+
+  async revokeSession(sessionId) {
+      if (!confirm('Are you sure you want to revoke this session? The device will be signed out.')) return;
+      try {
+          await Network.fetchAPI(`/api/user/sessions/${sessionId}`, { method: 'DELETE' });
+          this.loadSessions();
+      } catch (err) {
+          alert('Failed to revoke session');
+      }
+  }
+
+  async revokeAllOtherSessions() {
+      if (!confirm('Sign out of all other devices?')) return;
+      try {
+          await Network.fetchAPI('/api/user/sessions', { method: 'DELETE' });
+          this.loadSessions();
+      } catch (err) {
+          alert('Failed to revoke sessions');
+      }
+  }
+
+  parseUserAgent(ua) {
+      let os = 'Unknown OS';
+      let browser = 'Unknown Browser';
+
+      if (ua.includes('Win')) os = 'Windows';
+      else if (ua.includes('Mac')) os = 'macOS';
+      else if (ua.includes('Linux')) os = 'Linux';
+      else if (ua.includes('Android')) os = 'Android';
+      else if (ua.includes('like Mac')) os = 'iOS';
+
+      if (ua.includes('Firefox')) browser = 'Firefox';
+      else if (ua.includes('Chrome')) browser = 'Chrome';
+      else if (ua.includes('Safari')) browser = 'Safari';
+      else if (ua.includes('Edge')) browser = 'Edge';
+
+      return { os, browser };
+  }
+
+  formatLastActive(date) {
+      const now = new Date();
+      const last = new Date(date);
+      const diffMs = now - last;
+      const diffMins = Math.floor(diffMs / 60000);
+
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return last.toLocaleDateString();
   }
 
   async updateProfilePicture(base64String) {

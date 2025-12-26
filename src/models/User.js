@@ -68,7 +68,17 @@ const userSchema = new mongoose.Schema({
   },
   lockUntil: {
     type: Date
-  }
+  },
+  sessions: [{
+    sessionId: String,
+    refreshToken: String,
+    userAgent: String,
+    ipAddress: String,
+    lastActive: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 });
 
 // Hash password before saving

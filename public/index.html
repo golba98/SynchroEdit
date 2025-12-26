@@ -1831,6 +1831,20 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
+                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Email Address</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="text" id="profileEmailInput" readonly style="flex: 1; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #888; font-size: 11px;" />
+                  <div id="emailVerificationBadge" style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <!-- Will be populated by JS -->
+                  </div>
+                </div>
+                <div id="resendVerificationContainer" style="display: none; margin-top: 8px;">
+                   <button id="resendVerificationBtn" style="background: none; border: none; color: var(--accent-color-light); font-size: 10px; cursor: pointer; text-decoration: underline; padding: 0;">Resend verification code</button>
+                   <span id="resendTimer" style="font-size: 10px; color: #666; margin-left: 8px; display: none;"></span>
+                </div>
+              </div>
+
+              <div>
                 <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
                 <input type="text" id="profileUsernameInput" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #888; font-size: 11px;" />
               </div>
@@ -2022,6 +2036,18 @@
                     transition: all 0.3s ease;
                   "
                 />
+                <!-- Password Strength Meter -->
+                <div style="margin-top: 8px;">
+                  <div style="height: 4px; width: 100%; background: #1a1a1a; border-radius: 2px; overflow: hidden; margin-bottom: 8px;">
+                    <div id="passwordStrengthBar" style="height: 100%; width: 0%; transition: all 0.3s ease; background: #ef4444;"></div>
+                  </div>
+                  <ul id="passwordRequirements" style="list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                    <li data-req="length" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> 8+ Characters</li>
+                    <li data-req="upper" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Uppercase</li>
+                    <li data-req="number" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Number</li>
+                    <li data-req="symbol" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Symbol</li>
+                  </ul>
+                </div>
               </div>
               <button
                 id="updatePasswordBtn"
@@ -2050,10 +2076,12 @@
             </div>
             
             <div style="margin-top: 24px;">
-               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
-               <div style="background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
-                   <div style="font-size: 12px; color: #e0e0e0; font-weight: bold;">Current Session</div>
-                   <div style="font-size: 11px; color: #888;">Windows • Chrome • Just now</div>
+               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                 <h3 style="margin: 0; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
+                 <button id="revokeAllOthersBtn" style="background: none; border: none; color: #ef4444; font-size: 9px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; font-weight: 600;">Revoke Others</button>
+               </div>
+               <div id="sessionListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                   <!-- Dynamically populated -->
                </div>
             </div>
 

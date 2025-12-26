@@ -51,6 +51,19 @@ describe('User Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.accentColor).toBe(updatedData.accentColor);
     });
+
+    it('should persist showOnlineStatus toggle', async () => {
+      const res = await request(app)
+        .put('/api/user/profile')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ showOnlineStatus: false });
+
+      expect(res.status).toBe(200);
+      expect(res.body.showOnlineStatus).toBe(false);
+
+      const user = await User.findOne({ email: testUser.email });
+      expect(user.showOnlineStatus).toBe(false);
+    });
   });
 
   describe('PUT /api/user/password', () => {

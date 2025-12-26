@@ -83,12 +83,15 @@ export class Editor {
             headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
         
-        if (response.status === 401) {
-            // Attempt refresh
-            const refreshed = await Auth.tryRefresh();
-            if (refreshed) {
-                return this.connectWebSocket(docId, user);
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Attempt refresh
+                const refreshed = await Auth.tryRefresh();
+                if (refreshed) {
+                    return this.connectWebSocket(docId, user);
+                }
             }
+            throw new Error(`Failed to fetch ticket: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
@@ -111,7 +114,7 @@ export class Editor {
         { params: { documentId: docId, ticket: ticket } }
     );
     
-    if (user.showOnlineStatus !== false) {
+    if (this.provider && this.provider.awareness && user.showOnlineStatus !== false) {
         this.provider.awareness.setLocalStateField('user', {
             username: user.username,
             profilePicture: user.profilePicture,
@@ -119,16 +122,18 @@ export class Editor {
         });
     }
     
-    this.provider.awareness.on('change', () => {
-        const states = this.provider.awareness.getStates();
-        const users = [];
-        states.forEach(state => {
-            if (state.user) {
-                users.push(state.user);
-            }
+    if (this.provider && this.provider.awareness) {
+        this.provider.awareness.on('change', () => {
+            const states = this.provider.awareness.getStates();
+            const users = [];
+            states.forEach(state => {
+                if (state.user) {
+                    users.push(state.user);
+                }
+            });
+            this.onCollaboratorsChange(users);
         });
-        this.onCollaboratorsChange(users);
-    });
+    }
     
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
@@ -148,6 +153,20 @@ export class Editor {
             this.yPages.push([newPage]);
         }
         if (isSynced) {
+             // After sync, ensure all existing pages are bound to awareness
+             Object.keys(this.pageQuillInstances).forEach(index => {
+                 if (!this.pageBindings[index]) {
+                     const pageQuill = this.pageQuillInstances[index];
+                     const pageMap = this.yPages.get(parseInt(index));
+                     if (pageMap) {
+                         const yText = pageMap.get('content');
+                         if (this.provider && this.provider.awareness) {
+                             const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
+                             this.pageBindings[index] = binding;
+                         }
+                     }
+                 }
+             });
              this.renderAllPages();
              this.saveToCache(docId);
         }
@@ -334,10 +353,12 @@ export class Editor {
 
     this.pageQuillInstances[pageIndex] = pageQuill;
     
-    // Bind Y.Text
+    // Bind Y.Text (if provider/awareness is ready)
     const yText = pageMap.get('content');
-    const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
-    this.pageBindings[pageIndex] = binding;
+    if (this.provider && this.provider.awareness) {
+        const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
+        this.pageBindings[pageIndex] = binding;
+    }
 
     this.cursorManager.setupPageListeners(pageQuill, pageIndex);
 

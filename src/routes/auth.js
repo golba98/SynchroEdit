@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/auth');
 const rateLimit = require('express-rate-limit');
 
 const authLimiter = rateLimit({
@@ -19,6 +20,6 @@ router.post('/forgot-password', authLimiter, authController.forgotPassword);
 router.post('/reset-password', authLimiter, authController.resetPassword);
 router.post('/refresh-token', authController.refreshToken); 
 router.post('/logout', authController.logout);
-router.get('/ws-ticket', authController.getWsTicket);
+router.get('/ws-ticket', authenticateToken, authController.getWsTicket);
 
 module.exports = router;

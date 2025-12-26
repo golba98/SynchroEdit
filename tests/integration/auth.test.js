@@ -185,4 +185,33 @@ describe('Auth Integration Tests', () => {
         expect(res.status).toBe(401);
     });
   });
+
+  describe('GET /api/auth/ws-ticket', () => {
+    it('should return a ticket when authenticated', async () => {
+        await User.create({ ...testUser, isEmailVerified: true });
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({ username: testUser.username, password: testUser.password });
+        const token = loginRes.body.token;
+
+        const res = await request(app)
+            .get('/api/auth/ws-ticket')
+            .set('Authorization', `Bearer ${token}`);
+        
+        expect(res.status).toBe(200);
+        expect(res.body.ticket).toBeTruthy();
+    });
+
+    it('should return 401 if token is missing', async () => {
+        const res = await request(app).get('/api/auth/ws-ticket');
+        expect(res.status).toBe(401);
+    });
+
+    it('should return 401 if token is invalid', async () => {
+        const res = await request(app)
+            .get('/api/auth/ws-ticket')
+            .set('Authorization', 'Bearer invalid-token');
+        expect(res.status).toBe(403); // Middleware returns 403 for invalid
+    });
+  });
 });

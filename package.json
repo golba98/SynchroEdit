@@ -24,7 +24,8 @@
     "moduleNameMapper": {
       "^/js/(.*)$": "<rootDir>/public/js/$1",
       "^y-websocket$": "<rootDir>/tests/mocks/emptyModule.js",
-      "^y-quill$": "<rootDir>/tests/mocks/emptyModule.js"
+      "^y-quill$": "<rootDir>/tests/mocks/emptyModule.js",
+      "^https://unpkg.com/idb-keyval@(.*)$": "idb-keyval"
     }
   },
   "repository": {

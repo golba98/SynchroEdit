@@ -59,10 +59,21 @@ const sendTokens = async (user, statusCode, req, res, message = undefined) => {
 };
 
 exports.getWsTicket = (req, res, next) => {
-    // req.user is set by authenticateToken middleware
-    const userId = req.user.id;
-    const ticket = createTicket(userId);
-    res.json({ ticket });
+    try {
+        if (!req.user || !req.user.id) {
+            logger.warn('getWsTicket called without valid user session');
+            return next(new AppError('Authentication required', 401));
+        }
+        
+        const userId = req.user.id;
+        const ticket = createTicket(userId);
+        
+        logger.debug(`Generated WS ticket for user ${userId}`);
+        res.json({ ticket });
+    } catch (err) {
+        logger.error('Error generating WS ticket:', err);
+        next(err);
+    }
 };
 
 exports.signup = async (req, res, next) => {

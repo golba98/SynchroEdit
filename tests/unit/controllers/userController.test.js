@@ -50,6 +50,23 @@ describe('userController', () => {
       }));
     });
 
+    it('should update profile picture string', async () => {
+        const mockUser = {
+          _id: 'user123',
+          save: jest.fn().mockResolvedValue(true)
+        };
+        User.findById.mockResolvedValue(mockUser);
+  
+        req.body = {
+          profilePicture: 'data:image/png;base64,mockdata'
+        };
+  
+        await userController.updateProfile(req, res, next);
+  
+        expect(mockUser.profilePicture).toBe('data:image/png;base64,mockdata');
+        expect(mockUser.save).toHaveBeenCalled();
+      });
+
     it('should return 404 if user not found', async () => {
       User.findById.mockResolvedValue(null);
 

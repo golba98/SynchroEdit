@@ -364,6 +364,13 @@ export class App {
       }
     } catch (err) {
       console.error('Error fetching documents from network:', err);
+      
+      // Handle Auth Error (Token expired/invalid)
+      if (err.message && err.message.includes('401')) {
+          window.location.href = '/pages/login.html';
+          return;
+      }
+
       // If network fails and we didn't render cache, show error
       if (!hasRenderedCache) {
           document.getElementById('documentList').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Failed to load documents (Offline).</td></tr>';

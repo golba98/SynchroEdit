@@ -19,18 +19,25 @@ export class PageManager {
     // Use requestAnimationFrame to ensure we have latest layout
     requestAnimationFrame(() => {
       const pageHeight = 950; // Fixed page height in CSS
-      const availableHeight = pageHeight - 100; // Leaving margin for padding
+      const availableHeight = pageHeight - 60; // 30px padding top/bottom
       const contentHeight = qlEditor.scrollHeight;
 
       if (contentHeight > availableHeight) {
         this.isSplitting = true;
         const currentQuill = this.editor.pageQuillInstances[pageIndex];
 
+        // Find exactly where the text overflows
         let splitIndex = currentQuill.getLength() - 1;
         while (splitIndex > 0) {
           const bounds = currentQuill.getBounds(splitIndex);
           if (bounds && bounds.bottom <= availableHeight) break;
           splitIndex--;
+        }
+
+        // Only split if we actually found an overflow point
+        if (splitIndex >= currentQuill.getLength() - 1) {
+            this.isSplitting = false;
+            return;
         }
 
         const overflowDelta = currentQuill.getContents(splitIndex);

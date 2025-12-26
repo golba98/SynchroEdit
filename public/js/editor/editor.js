@@ -359,7 +359,7 @@ export class Editor {
       const range = pageQuill.getSelection();
       if ((range && range.index === 0 && range.length === 0) || pageQuill.getLength() <= 1) {
         e.preventDefault();
-        this.mergeWithPreviousPage(pageIndex); // Moved logic here or update PageManager
+        this.pageManager.mergeWithPreviousPage(pageIndex);
       }
     }
 

@@ -49,8 +49,7 @@
         border: 1px solid #2a2a2a;
         display: flex;
         width: 900px;
-        height: 550px;
-        overflow: hidden;
+        min-height: 550px;
         position: relative;
         z-index: 10;
         transition: box-shadow 0.5s;
@@ -58,7 +57,7 @@
 
       .left-section {
         flex: 1;
-        padding: 60px 50px;
+        padding: 40px 50px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -81,7 +80,7 @@
       }
 
       .input-group {
-        margin-bottom: 25px;
+        margin-bottom: 15px;
         position: relative;
       }
 
@@ -528,7 +527,7 @@
         <!-- Signup Form -->
         <div class="form-container" id="signupForm">
           <div style="margin-bottom: 20px;">
-              <button id="signupBackBtn" style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--accent-color); padding: 10px 20px; border-radius: 8px; color: var(--accent-color); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: all 0.3s; font-weight: 600;">
+              <button id="signupBackBtn" style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--accent-color); padding: 10px 20px; border-radius: 8px; color: var(--accent-color); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: all 0.3s; font-weight: 600; position: relative; z-index: 100;">
                   <i class="fas fa-arrow-left"></i> Back to Login
               </button>
           </div>

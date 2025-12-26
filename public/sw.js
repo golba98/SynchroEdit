@@ -53,8 +53,12 @@ self.addEventListener('activate', (event) => {
 
 // Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
-  // Ignore API requests and WebSocket upgrades
-  if (event.request.url.includes('/api/') || event.request.url.includes('/ws/')) {
+  // Ignore API requests, WebSocket upgrades, and non-http/https schemes (like chrome-extension)
+  if (
+      event.request.url.includes('/api/') || 
+      event.request.url.includes('/ws/') ||
+      !event.request.url.startsWith('http')
+  ) {
     return;
   }
   

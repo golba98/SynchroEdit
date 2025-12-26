@@ -6,7 +6,7 @@ describe('Auth Integration Tests', () => {
   const testUser = {
     username: 'testuser',
     email: 'test@example.com',
-    password: 'password123',
+    password: 'TestPassword123!',
   };
 
   describe('POST /api/auth/signup', () => {

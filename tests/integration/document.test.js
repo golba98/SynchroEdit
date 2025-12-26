@@ -10,7 +10,7 @@ describe('Document Integration Tests', () => {
   const testUser = {
     username: 'testuser_doc',
     email: 'test_doc@example.com',
-    password: 'password123',
+    password: 'TestPassword123!',
   };
 
   beforeEach(async () => {

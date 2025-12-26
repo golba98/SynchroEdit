@@ -15,13 +15,17 @@ let mongoServer;
 if (isNodeEnv) {
   mongoose = require('mongoose');
   MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
-  // We mock server require to avoid starting it immediately if possible, 
-  // but here we just require it.
-  const serverModule = require('../src/server');
-  server = serverModule.server;
-  User = require('../src/models/User');
-  Document = require('../src/models/Document');
-  History = require('../src/models/History');
+  
+  // Only load server and models if we are NOT skipping DB setup (Integration Tests)
+  // For Unit Tests (SKIP_DB_SETUP=true), we want to avoid loading these to prevent 
+  // module caching that interferes with mocking.
+  if (!process.env.SKIP_DB_SETUP) {
+    const serverModule = require('../src/server');
+    server = serverModule.server;
+    User = require('../src/models/User');
+    Document = require('../src/models/Document');
+    History = require('../src/models/History');
+  }
 } else {
     // Frontend Test Environment Setup
     window.testEnv = true;

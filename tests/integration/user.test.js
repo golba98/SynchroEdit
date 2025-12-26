@@ -7,7 +7,7 @@ describe('User Integration Tests', () => {
   const testUser = {
     username: 'testuser_user',
     email: 'test_user@example.com',
-    password: 'password123',
+    password: 'TestPassword123!',
   };
 
   beforeEach(async () => {
@@ -57,7 +57,7 @@ describe('User Integration Tests', () => {
     it('should update password successfully', async () => {
       const passwordData = {
         currentPassword: testUser.password,
-        newPassword: 'newpassword123'
+        newPassword: 'NewTestPassword123!'
       };
 
       const res = await request(app)
@@ -71,7 +71,7 @@ describe('User Integration Tests', () => {
         .post('/api/auth/login')
         .send({
           username: testUser.username,
-          password: 'newpassword123',
+          password: 'NewTestPassword123!',
         });
       expect(loginRes.status).toBe(200);
     });

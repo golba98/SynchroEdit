@@ -5,11 +5,37 @@ const { createTicket } = require('../../../src/utils/ticketStore');
 const jwt = require('jsonwebtoken');
 
 // Mock Dependencies
-jest.mock('../../../src/models/User');
 jest.mock('../../../src/utils/email');
 jest.mock('../../../src/utils/ticketStore');
 jest.mock('jsonwebtoken');
 jest.mock('../../../src/utils/logger'); // Silence logs
+jest.mock('mongoose', () => {
+  class MockSchema {
+    constructor() {
+      this.methods = {};
+    }
+    pre() {}
+  }
+  MockSchema.Types = { ObjectId: 'ObjectId' };
+
+  const MockModel = jest.fn().mockImplementation((doc) => ({
+    ...doc,
+    save: jest.fn().mockResolvedValue(doc),
+  }));
+  
+  MockModel.findOne = jest.fn();
+  MockModel.findById = jest.fn();
+  MockModel.deleteOne = jest.fn();
+  MockModel.deleteMany = jest.fn();
+  
+  return {
+    connection: {
+      readyState: 1
+    },
+    Schema: MockSchema,
+    model: jest.fn(() => MockModel),
+  };
+});
 
 describe('Auth Controller Unit Tests', () => {
   let req, res, next;
@@ -19,13 +45,10 @@ describe('Auth Controller Unit Tests', () => {
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
+      cookie: jest.fn(),
     };
     next = jest.fn();
     jest.clearAllMocks();
-    
-    // Default mongoose state
-    const mongoose = require('mongoose');
-    mongoose.connection = { readyState: 1 };
   });
 
   describe('getWsTicket', () => {
@@ -42,7 +65,7 @@ describe('Auth Controller Unit Tests', () => {
 
   describe('signup', () => {
     it('should return generic message if user exists (enumeration prevention)', async () => {
-      req.body = { username: 'existing', email: 'test@test.com', password: 'password123' };
+      req.body = { username: 'existing', email: 'test@test.com', password: 'TestPassword123!' };
       
       User.findOne.mockReturnValue({
         lean: jest.fn().mockResolvedValue({ _id: '123' }),
@@ -63,7 +86,7 @@ describe('Auth Controller Unit Tests', () => {
         // Since we can't easily change process.env inside a running module without reloading,
         // we test the path assuming defaults (which seems to be ENABLED based on code read).
         
-        req.body = { username: 'new', email: 'new@test.com', password: 'password123' };
+        req.body = { username: 'new', email: 'new@test.com', password: 'TestPassword123!' };
         
         User.findOne.mockReturnValue({
             lean: jest.fn().mockResolvedValue(null),

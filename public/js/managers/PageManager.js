@@ -27,20 +27,30 @@ export class PageManager {
         const currentQuill = this.editor.pageQuillInstances[pageIndex];
 
         // Find exactly where the text overflows
+        // We start from the end and work backwards until we find a line that fits
         let splitIndex = currentQuill.getLength() - 1;
-        while (splitIndex > 0) {
+        
+        // Safety: Limit the backward search to avoid freezing on massive pages
+        // though pages should be reasonable size.
+        let safeGuard = 0;
+        
+        while (splitIndex > 0 && safeGuard < 5000) {
           const bounds = currentQuill.getBounds(splitIndex);
           if (bounds && bounds.bottom <= availableHeight) break;
           splitIndex--;
+          safeGuard++;
         }
 
-        // Only split if we actually found an overflow point
+        // Only split if we actually found an overflow point that isn't the very end
         if (splitIndex >= currentQuill.getLength() - 1) {
             this.isSplitting = false;
             return;
         }
 
         const overflowDelta = currentQuill.getContents(splitIndex);
+        const selection = currentQuill.getSelection();
+        const shouldMoveCursor = selection && selection.index >= splitIndex;
+        const relativeCursorIndex = shouldMoveCursor ? selection.index - splitIndex : 0;
         
         // Use Yjs transaction for atomic page split
         this.editor.doc.transact(() => {
@@ -51,14 +61,14 @@ export class PageManager {
             
             if (nextPageExists) {
                  // Prepend to next page
-                 nextPageExists.updateContents(overflowDelta, 'user');
+                 // We use the quill instance directly which syncs to Yjs
+                 nextPageExists.updateContents([{ insert: '' }, ...overflowDelta.ops], 'user');
             } else {
                 // Create new page
                 const newPageMap = new Y.Map();
                 const yText = new Y.Text();
                 
                 // Apply the overflow content directly to the new Y.Text
-                // This ensures it's there before the editor even renders
                 yText.applyDelta(overflowDelta.ops);
                 
                 newPageMap.set('content', yText);
@@ -66,12 +76,22 @@ export class PageManager {
             }
         });
 
-        // If we pushed content to the next page, we must check IT for overflow too (Ripple Effect)
-        // We use setTimeout to allow the DOM to update/render the changes (especially if new page created)
+        // Handle Cursor and Ripple Effect
         setTimeout(() => {
-            if (this.editor.pageQuillInstances[pageIndex + 1]) {
+            const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
+            
+            if (shouldMoveCursor && nextQuill) {
+                this.editor.switchToPage(pageIndex + 1);
+                // Ensure index is within bounds of the new page
+                const safeIndex = Math.min(relativeCursorIndex, nextQuill.getLength() - 1);
+                nextQuill.setSelection(Math.max(0, safeIndex), 0);
+            }
+
+            // Ripple: Check if the next page now overflows
+            if (nextQuill) {
                 this.checkAndCreateNewPage(pageIndex + 1);
             }
+            
             this.isSplitting = false;
         }, 50);
       }

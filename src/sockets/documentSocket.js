@@ -142,10 +142,11 @@ function init(server) {
     const ticket = url.searchParams.get('ticket');
 
     // Support dedicated path /ws/:docId
-    if (!documentId && url.pathname.startsWith('/ws/')) {
-        const parts = url.pathname.split('/');
-        if (parts.length >= 3) {
-            documentId = parts[2];
+    // Robust extraction: Handle /ws/docId (direct) or /docId (proxy stripped)
+    if (!documentId) {
+        const parts = url.pathname.split('/').filter(p => p.trim().length > 0);
+        if (parts.length > 0) {
+             documentId = parts[parts.length - 1];
         }
     }
 

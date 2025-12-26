@@ -18,7 +18,7 @@ export class PageManager {
 
     // Use requestAnimationFrame to ensure we have latest layout
     requestAnimationFrame(() => {
-      const pageHeight = 950; // Fixed page height in CSS
+      const pageHeight = 1056; // Fixed page height in CSS (US Letter)
       const availableHeight = pageHeight - 60; // 30px padding top/bottom
       const contentHeight = qlEditor.scrollHeight;
 
@@ -47,27 +47,33 @@ export class PageManager {
             // Delete overflow from current page
             currentQuill.deleteText(splitIndex, currentQuill.getLength() - splitIndex, 'user');
 
-            // Create new page map
-            const newPageMap = new Y.Map();
-            const yText = new Y.Text();
-            newPageMap.set('content', yText);
+            const nextPageExists = this.editor.pageQuillInstances[pageIndex + 1];
             
-            // Insert after current page
-            this.editor.yPages.insert(pageIndex + 1, [newPageMap]);
-            
-            // Note: renderAllPages will be triggered by observer
-            // We need to wait for it to create the next quill instance
+            if (nextPageExists) {
+                 // Prepend to next page
+                 nextPageExists.updateContents(overflowDelta, 'user');
+            } else {
+                // Create new page
+                const newPageMap = new Y.Map();
+                const yText = new Y.Text();
+                
+                // Apply the overflow content directly to the new Y.Text
+                // This ensures it's there before the editor even renders
+                yText.applyDelta(overflowDelta.ops);
+                
+                newPageMap.set('content', yText);
+                this.editor.yPages.insert(pageIndex + 1, [newPageMap]);
+            }
         });
 
+        // If we pushed content to the next page, we must check IT for overflow too (Ripple Effect)
+        // We use setTimeout to allow the DOM to update/render the changes (especially if new page created)
         setTimeout(() => {
-            const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
-            if (nextQuill) {
-                nextQuill.setContents(overflowDelta, 'user');
-                this.editor.switchToPage(pageIndex + 1);
-                nextQuill.setSelection(0, 0);
+            if (this.editor.pageQuillInstances[pageIndex + 1]) {
+                this.checkAndCreateNewPage(pageIndex + 1);
             }
             this.isSplitting = false;
-        }, 100);
+        }, 50);
       }
     });
   }

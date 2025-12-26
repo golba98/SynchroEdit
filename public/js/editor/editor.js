@@ -416,7 +416,7 @@ export class Editor {
   applyZoom() {
     const containers = document.querySelectorAll('.editor-container');
     const scale = this.currentZoom / 100;
-    const pageHeight = 950;
+    const pageHeight = 1056;
 
     containers.forEach((container) => {
       container.style.transform = `scale(${scale})`;

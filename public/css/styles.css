@@ -701,9 +701,9 @@ body.light-theme .outline-item:hover {
   transition:
     box-shadow 0.3s ease,
     transform 0.3s ease;
-  max-width: 750px;
-  width: 750px;
-  height: 950px;
+  max-width: 816px;
+  width: 816px;
+  height: 1056px;
   flex-shrink: 0;
   position: relative;
   display: flex;

@@ -527,7 +527,10 @@
 
         <!-- Signup Form -->
         <div class="form-container" id="signupForm">
-          <div class="title">Create Account</div>
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <i class="fas fa-arrow-left" id="signupBackBtn" style="color: #b0b0b0; cursor: pointer; font-size: 24px; transition: color 0.2s;"></i>
+              <div class="title" style="margin-bottom: 0;">Create Account</div>
+          </div>
           <div class="subtitle">Join SynchroEdit today</div>
 
           <div class="input-group">
@@ -771,6 +774,18 @@
         signupForm.classList.remove('active');
         loginForm.classList.add('active');
         botRig.className = 'bot-rig';
+      });
+      
+      // Back Button Handler
+      document.getElementById('signupBackBtn').addEventListener('click', () => {
+          showLogin.click();
+      });
+      
+      document.getElementById('signupBackBtn').addEventListener('mouseenter', function() {
+          this.style.color = 'var(--accent-color)';
+      });
+      document.getElementById('signupBackBtn').addEventListener('mouseleave', function() {
+          this.style.color = '#b0b0b0';
       });
 
       // Password Toggles Logic

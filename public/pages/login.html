@@ -698,9 +698,21 @@
       ];
       
       pInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+           // If showing password, track the eyes!
+           if (input.type === 'text') {
+               updatePupils(e.target.value.length);
+           }
+        });
+
         input.addEventListener('focus', () => {
           botRig.classList.add('secure');
           botRig.classList.remove('peeking');
+          
+          // If we focus and it's ALREADY visible (edge case), set peeking
+          if (input.type === 'text') {
+              botRig.classList.add('peeking');
+          }
         });
         input.addEventListener('blur', () => {
           // Only remove if we aren't clicking the toggle

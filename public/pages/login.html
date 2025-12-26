@@ -390,18 +390,19 @@
 
       /* 2. Secure Mode (Password Focus) */
       .bot-rig.secure .hand {
-        bottom: 85px; /* Cover Eyes */
+        bottom: 80px; /* Adjusted to sit directly on eyes */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.8); /* Stronger shadow to show depth over face */
       }
       .bot-rig.secure .hand.left {
-        left: 40px; /* Move inward */
-        transform: rotate(-15deg); /* Slight tilt */
+        left: 58px; /* Tighter to center (Overlap) */
+        transform: rotate(-25deg); /* More rotation */
       }
       .bot-rig.secure .hand.right {
-        right: 40px; /* Move inward */
-        transform: rotate(15deg);
+        right: 58px; /* Tighter to center */
+        transform: rotate(25deg);
       }
-      .bot-rig.secure .eyelid.top { height: 40%; } /* Squint */
-      .bot-rig.secure .eyelid.bottom { height: 40%; }
+      .bot-rig.secure .eyelid.top { height: 50%; } /* Close eyes more */
+      .bot-rig.secure .eyelid.bottom { height: 50%; }
 
       /* 3. Peek Mode (Show Password) */
       .bot-rig.peeking .hand {

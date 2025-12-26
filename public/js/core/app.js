@@ -15,6 +15,7 @@ export class App {
     this.theme = new Theme();
     this.profile = new Profile();
     this.background = new DynamicBackground();
+    this.connectionTimer = null;
 
     this.init();
   }
@@ -67,13 +68,18 @@ export class App {
       if (document.visibilityState === 'visible') {
         // When coming back, check if we need to refresh status
         if (this.editor && this.editor.provider) {
-          const status = this.editor.provider.wsconnected ? 'connected' : 'connecting';
-          this.handleWSStatusChange(status);
+          if (this.editor.provider.wsconnected) {
+             this.handleWSStatusChange('connected');
+          } else {
+             // Immediate feedback if we come back to a dead connection
+             // Force the overlay to show immediately without the 5s patience timer
+             const overlay = document.getElementById('serverOfflineOverlay');
+             if (overlay) {
+                 UI.updateConnectionStatus(overlay, 'disconnected');
+                 overlay.style.display = 'flex';
+             }
+          }
         }
-      } else {
-          // When moving out, we can hide the overlay if it was showing due to throttling
-          const overlay = document.getElementById('serverOfflineOverlay');
-          if (overlay) overlay.style.display = 'none';
       }
     });
   }
@@ -113,17 +119,28 @@ export class App {
     const overlay = document.getElementById('serverOfflineOverlay');
     if (!overlay) return;
 
-    UI.updateConnectionStatus(overlay, status);
-    
     if (status === 'connected') {
+      // 1. Immediate Flush
+      if (this.connectionTimer) {
+          clearTimeout(this.connectionTimer);
+          this.connectionTimer = null;
+      }
       overlay.style.display = 'none';
     } else {
-      // Only show overlay if the page is actually visible to the user
-      // and not in a background tab that might be throttled
+      // 2. State Machine for Disconnect
       if (document.visibilityState === 'visible') {
-        overlay.style.display = 'flex';
+          // If we are already waiting, don't restart the timer
+          if (!this.connectionTimer) {
+              this.connectionTimer = setTimeout(() => {
+                  if (document.visibilityState === 'visible') {
+                      UI.updateConnectionStatus(overlay, status);
+                      overlay.style.display = 'flex';
+                  }
+                  this.connectionTimer = null;
+              }, 5000); // 5-second patience
+          }
       } else {
-        overlay.style.display = 'none';
+          // If hidden, do nothing. We will check status immediately upon visibility change.
       }
     }
   }

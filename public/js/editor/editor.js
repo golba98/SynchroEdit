@@ -64,44 +64,9 @@ export class Editor {
         this.onCollaboratorsChange(users);
     });
     
-    this.statusTimeout = null;
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
-        
-        // Visibility Check: Don't bother user if tab is hidden
-        if (document.hidden && event.status !== 'connected') {
-            return;
-        }
-
-        if (event.status === 'connected') {
-            if (this.statusTimeout) {
-                clearTimeout(this.statusTimeout);
-                this.statusTimeout = null;
-            }
-            this.onStatusChange(event.status);
-        } else {
-            // Delay reporting disconnected/connecting status to avoid flicker
-            // Increased to 5s to better handle background tab throttling
-            if (!this.statusTimeout) {
-                this.statusTimeout = setTimeout(() => {
-                    // Check visibility again before showing error
-                    if (!document.hidden) {
-                        this.onStatusChange(event.status);
-                    }
-                    this.statusTimeout = null;
-                }, 5000);
-            }
-        }
-    });
-
-    // Resume status updates when tab becomes visible
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && this.provider.wsconnected === false) {
-             // If we were disconnected while hidden, show it now (or wait for reconnect)
-             // The provider will likely try to reconnect immediately upon visibility
-             // so we might not need to do anything, or we can force a status update.
-             // For now, let's just let the loop handle it, but clear any pending timeout.
-        }
+        this.onStatusChange(event.status);
     });
 
     this.yPages = this.doc.getArray('pages');

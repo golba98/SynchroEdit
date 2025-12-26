@@ -150,7 +150,8 @@
       .password-toggle {
         position: absolute;
         right: 15px;
-        top: 38px;
+        top: 50%;
+        transform: translateY(-50%);
         cursor: pointer;
         font-size: 16px;
         color: #b0b0b0;
@@ -837,6 +838,32 @@
           const type = input.type === 'password' ? 'text' : 'password';
           input.type = type;
           toggle.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+          
+          // Update bot state: if showing password (type is text) and field is empty, show confused state
+          const isPasswordVisible = type === 'text';
+          const isEmpty = input.value === '';
+          
+          if (isPasswordVisible && isEmpty) {
+            botRig.className = 'bot-rig confused peeking';
+          } else if (isPasswordVisible) {
+            botRig.className = 'bot-rig peeking';
+          } else {
+            botRig.className = 'bot-rig secure';
+          }
+        });
+        
+        // Also update state when typing in password field
+        const input = toggle.previousElementSibling.querySelector('input');
+        input.addEventListener('input', () => {
+          if (input.type === 'text') { // password is visible
+            if (input.value === '') {
+              botRig.className = 'bot-rig confused peeking';
+            } else {
+              botRig.className = 'bot-rig peeking';
+            }
+          } else {
+            botRig.className = 'bot-rig secure';
+          }
         });
       });
 

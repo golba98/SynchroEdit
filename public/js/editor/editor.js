@@ -28,15 +28,6 @@ export class Editor {
     this.onStatusChange = options.onStatusChange || (() => {});
     this.onCollaboratorsChange = options.onCollaboratorsChange || (() => {});
 
-    // Managers
-    this.pageManager = new PageManager(this);
-    this.borderManager = new BorderManager(this);
-    this.cursorManager = new CursorManager(this);
-    this.imageManager = new ImageManager(this);
-    this.toolbarController = new ToolbarController(this);
-    this.readabilityManager = new ReadabilityManager(this);
-    this.navigationManager = new NavigationManager(this);
-
     this.initQuill();
     
     // Yjs Setup
@@ -45,6 +36,16 @@ export class Editor {
     const token = Auth.getToken();
     const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
     this.user = user;
+    this.yPages = this.doc.getArray('pages');
+
+    // Managers
+    this.pageManager = new PageManager(this);
+    this.borderManager = new BorderManager(this);
+    this.cursorManager = new CursorManager(this);
+    this.imageManager = new ImageManager(this);
+    this.toolbarController = new ToolbarController(this);
+    this.readabilityManager = new ReadabilityManager(this);
+    this.navigationManager = new NavigationManager(this);
     
     // 1. Instant Load from IndexedDB
     this.loadFromCache(docId).then(() => {
@@ -52,7 +53,6 @@ export class Editor {
         this.connectWebSocket(docId, user);
     });
 
-    this.yPages = this.doc.getArray('pages');
     this.yPages.observe(event => {
         this.renderAllPages();
     });

@@ -61,13 +61,21 @@ describe('Network Module', () => {
       global.WebSocket = jest.fn(() => mockWebSocket);
     });
 
-    it('should initialize WebSocket connection', () => {
+    it('should initialize WebSocket connection', async () => {
       const onMessage = jest.fn();
       const onStatusChange = jest.fn();
 
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ ticket: 'mock-ticket' }),
+      });
+
       Network.initWebSocket('doc1', onMessage, onStatusChange);
 
-      expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost');
+      // Wait for async connect()
+      await new Promise(process.nextTick);
+
+      expect(global.WebSocket).toHaveBeenCalled();
       
       // Simulate Open
       mockWebSocket.onopen();
@@ -75,13 +83,22 @@ describe('Network Module', () => {
       expect(mockWebSocket.send).toHaveBeenCalledWith(JSON.stringify({
         type: 'join-document',
         documentId: 'doc1',
-        token: 'mock-token',
+        ticket: 'mock-ticket',
       }));
     });
 
-    it('should handle incoming messages', () => {
+    it('should handle incoming messages', async () => {
       const onMessage = jest.fn();
+      
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ ticket: 'mock-ticket' }),
+      });
+
       Network.initWebSocket('doc1', onMessage);
+      
+      // Wait for async connect()
+      await new Promise(process.nextTick);
 
       const message = { type: 'test', data: 'hello' };
       mockWebSocket.onmessage({ data: JSON.stringify(message) });

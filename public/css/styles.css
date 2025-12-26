@@ -1034,6 +1034,90 @@ body.light-theme #docSearch::placeholder {
   }
 }
 
+/* Skeleton Loading */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.skeleton {
+  background: #1a1a1a !important;
+  background-image: linear-gradient(
+    to right,
+    #1a1a1a 0%,
+    #2a2a2a 20%,
+    #1a1a1a 40%,
+    #1a1a1a 100%
+  ) !important;
+  background-repeat: no-repeat !important;
+  background-size: 800px 104px !important;
+  display: inline-block;
+  position: relative;
+  animation: shimmer 1.5s infinite linear forwards !important;
+  color: transparent !important;
+  border-color: #2a2a2a !important;
+}
+
+.profile-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  background: #0d0520;
+  color: #e0e0e0;
+  font-size: 11px;
+  transition: all 0.3s ease;
+}
+
+.profile-input[readonly] {
+  color: #888;
+  cursor: default;
+}
+
+body.light-theme .profile-input {
+  background: #faf8ff;
+  border-color: var(--accent-color-lighter);
+  color: #1a1a1a;
+}
+
+body.light-theme .skeleton {
+  background: #f0f0f0;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  height: 12px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Avatar Initials */
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  text-transform: uppercase;
+  user-select: none;
+  background-color: var(--accent-color);
+}
+
 /* Yjs / Quill Collaboration Cursors */
 .yRemoteSelection {
     background-color: rgba(250, 250, 250, 0.5); /* Fallback */

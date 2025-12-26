@@ -33,11 +33,31 @@ describe('App Core Initialization', () => {
       <div id="documentList"></div>
       <div id="activeCollaborators"></div>
       <div id="serverOfflineOverlay"></div>
+      
+      <div id="userProfileTrigger">
+        <img id="headerPfp" />
+        <div id="headerInitials"></div>
+        <i id="headerUserIcon"></i>
+      </div>
+      
+      <div id="profileModal">
+        <img id="profilePfp" />
+        <div id="profileInitials"></div>
+        <div id="profilePfpPlaceholder"></div>
+        <input id="profileEmailInput" />
+        <input id="profileUsernameInput" />
+        <textarea id="profileBioInput"></textarea>
+        <button id="saveGeneralBtn"></button>
+      </div>
     `;
     
     // Default Profile load success
     Profile.prototype.loadProfile = jest.fn().mockResolvedValue({ _id: 'user1', username: 'TestUser' });
     
+    // Default Network mocks
+    Network.getDocuments.mockResolvedValue({ documents: [] });
+    Network.addToRecent.mockResolvedValue({});
+
     // Mock URLSearchParams globally
     global.URLSearchParams = jest.fn(() => ({
         get: jest.fn().mockReturnValue(null) // Default no doc param
@@ -68,9 +88,6 @@ describe('App Core Initialization', () => {
         get: jest.fn().mockReturnValue('123')
     }));
 
-    Network.getDocuments.mockResolvedValue({ documents: [] });
-    Network.addToRecent.mockResolvedValue({});
-
     const app = new App();
     
     // Wait for async init
@@ -92,6 +109,7 @@ describe('App Core Initialization', () => {
   });
 
   it('should not show connection overlay if page is hidden', async () => {
+    jest.useFakeTimers();
     global.URLSearchParams = jest.fn(() => ({
       get: jest.fn().mockReturnValue('123')
     }));
@@ -103,9 +121,11 @@ describe('App Core Initialization', () => {
     });
 
     const app = new App();
-    await new Promise(process.nextTick);
+    // Use runAllTicks instead of nextTick promise for fake timers
+    jest.runAllTicks();
 
     const overlay = document.getElementById('serverOfflineOverlay');
+    overlay.style.display = 'none';
     app.handleWSStatusChange('connecting');
     
     expect(overlay.style.display).toBe('none');
@@ -117,6 +137,11 @@ describe('App Core Initialization', () => {
     });
 
     app.handleWSStatusChange('connecting');
+    
+    // Fast-forward 5 seconds
+    jest.advanceTimersByTime(5000);
+    
     expect(overlay.style.display).toBe('flex');
+    jest.useRealTimers();
   });
 });

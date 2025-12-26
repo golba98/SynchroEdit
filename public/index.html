@@ -1096,6 +1096,11 @@
               object-fit: cover;
             "
           />
+          <div
+            id="headerInitials"
+            class="avatar-initials"
+            style="width: 32px; height: 32px; font-size: 14px; display: none;"
+          ></div>
           <i
             id="headerUserIcon"
             class="fas fa-user-circle"
@@ -1202,6 +1207,11 @@
                   object-fit: cover;
                 "
               />
+              <div
+                id="libraryHeaderInitials"
+                class="avatar-initials"
+                style="width: 32px; height: 32px; font-size: 14px; display: none;"
+              ></div>
               <i
                 id="libraryHeaderUserIcon"
                 class="fas fa-user-circle"
@@ -1778,6 +1788,18 @@
                   "
                 />
                 <div
+                  id="profileInitials"
+                  class="avatar-initials"
+                  style="
+                    width: 80px;
+                    height: 80px;
+                    font-size: 32px;
+                    border: 3px solid var(--accent-color);
+                    box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.5);
+                    display: none;
+                  "
+                ></div>
+                <div
                   id="profilePfpPlaceholder"
                   style="
                     width: 80px;
@@ -1835,7 +1857,7 @@
               <div>
                 <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Email Address</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <input type="text" id="profileEmailInput" readonly style="flex: 1; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #888; font-size: 11px;" />
+                  <input type="text" id="profileEmailInput" readonly class="profile-input" />
                   <div id="emailVerificationBadge" style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                     <!-- Will be populated by JS -->
                   </div>
@@ -1848,12 +1870,12 @@
 
               <div>
                 <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
-                <input type="text" id="profileUsernameInput" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #888; font-size: 11px;" />
+                <input type="text" id="profileUsernameInput" readonly class="profile-input" />
               </div>
               
               <div>
                 <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Bio</label>
-                <textarea id="profileBioInput" rows="4" placeholder="Tell us about yourself..." style="width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #e0e0e0; font-size: 11px; resize: none;"></textarea>
+                <textarea id="profileBioInput" rows="4" placeholder="Tell us about yourself..." class="profile-input" style="resize: none;"></textarea>
               </div>
 
               <button id="saveGeneralBtn" style="padding: 10px 12px; background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light)); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);">Save Changes</button>

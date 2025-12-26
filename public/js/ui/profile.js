@@ -105,11 +105,45 @@ export class Profile {
   }
 
   async loadProfile() {
+    this.showSkeleton();
     this.user = await Auth.verifyToken();
+    this.hideSkeleton();
     if (this.user) {
       this.updateUI();
     }
     return this.user;
+  }
+
+  getInitials(name) {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+  showSkeleton() {
+    const fields = ['profileEmailInput', 'profileUsernameInput', 'profileBioInput'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('skeleton');
+    });
+    
+    const pfpPlaceholder = document.getElementById('profilePfpPlaceholder');
+    if (pfpPlaceholder) pfpPlaceholder.classList.add('skeleton', 'skeleton-circle');
+  }
+
+  hideSkeleton() {
+    const fields = ['profileEmailInput', 'profileUsernameInput', 'profileBioInput'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('skeleton');
+    });
+
+    const pfpPlaceholder = document.getElementById('profilePfpPlaceholder');
+    if (pfpPlaceholder) pfpPlaceholder.classList.remove('skeleton', 'skeleton-circle');
   }
 
   updateUI() {
@@ -130,11 +164,19 @@ export class Profile {
       document.getElementById('headerPfp'),
       document.getElementById('libraryHeaderPfp'),
     ];
+    const initialsElements = [
+      document.getElementById('profileInitials'),
+      document.getElementById('headerInitials'),
+      document.getElementById('libraryHeaderInitials'),
+    ];
     const iconElements = [
       document.getElementById('profilePfpPlaceholder'),
       document.getElementById('headerUserIcon'),
       document.getElementById('libraryHeaderUserIcon'),
     ];
+
+    const initials = this.getInitials(this.user.username);
+    const accentColor = this.user.accentColor || '#8b5cf6';
 
     if (this.user.profilePicture) {
       pfpElements.forEach((el) => {
@@ -143,6 +185,9 @@ export class Profile {
           el.style.display = 'block';
         }
       });
+      initialsElements.forEach((el) => {
+        if (el) el.style.display = 'none';
+      });
       iconElements.forEach((el) => {
         if (el) el.style.display = 'none';
       });
@@ -150,8 +195,15 @@ export class Profile {
       pfpElements.forEach((el) => {
         if (el) el.style.display = 'none';
       });
+      initialsElements.forEach((el) => {
+        if (el) {
+          el.textContent = initials;
+          el.style.backgroundColor = accentColor;
+          el.style.display = 'flex';
+        }
+      });
       iconElements.forEach((el) => {
-        if (el) el.style.display = 'flex';
+        if (el) el.style.display = 'none';
       });
     }
   }

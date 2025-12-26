@@ -116,7 +116,31 @@ export class Editor {
     
     this.provider.on('sync', isSynced => {
         if (isSynced && this.yPages.length === 0) {
-
+            const newPage = new Y.Map();
+            const content = new Y.Text();
+            newPage.set('content', content);
+            this.yPages.push([newPage]);
+        }
+        if (isSynced) {
+             // After sync, ensure all existing pages are bound to awareness
+             Object.keys(this.pageQuillInstances).forEach(index => {
+                 if (!this.pageBindings[index]) {
+                     const pageQuill = this.pageQuillInstances[index];
+                     const pageMap = this.yPages.get(parseInt(index));
+                     if (pageMap) {
+                         const yText = pageMap.get('content');
+                         if (this.provider && this.provider.awareness) {
+                             const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
+                             this.pageBindings[index] = binding;
+                         }
+                     }
+                 }
+             });
+             this.renderAllPages();
+             this.saveToCache(docId);
+        }
+    });
+  }
 
   async reconnect(user = null) {
       console.log('Forcing editor reconnection...');

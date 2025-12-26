@@ -14,6 +14,43 @@ export class ImageManager {
     // Listen for scroll/resize to update overlay
     window.addEventListener('scroll', () => this.updateOverlayPosition(), true);
     window.addEventListener('resize', () => this.updateOverlayPosition());
+
+    this.setupDragAndDrop();
+  }
+
+  setupDragAndDrop() {
+    const container = document.getElementById('pagesContainer');
+    if (!container) return;
+
+    container.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      container.classList.add('drag-over');
+    });
+
+    container.addEventListener('dragleave', () => {
+      container.classList.remove('drag-over');
+    });
+
+    container.addEventListener('drop', (e) => {
+      e.preventDefault();
+      container.classList.remove('drag-over');
+
+      const files = e.dataTransfer.files;
+      if (files && files[0] && files[0].type.startsWith('image/')) {
+        this.handleFileUpload(files[0]);
+      }
+    });
+  }
+
+  handleFileUpload(file) {
+    if (!this.editor.quill) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const range = this.editor.quill.getSelection(true);
+      this.editor.quill.insertEmbed(range.index, 'image', e.target.result, 'user');
+    };
+    reader.readAsDataURL(file);
   }
 
   setupOverlay() {

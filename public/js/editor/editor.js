@@ -8,6 +8,7 @@ import { CursorManager } from '/js/managers/CursorManager.js';
 import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { ReadabilityManager } from '/js/managers/ReadabilityManager.js';
+import { NavigationManager } from '/js/managers/NavigationManager.js';
 import { Auth } from '/js/ui/auth.js';
 import { debounce } from '/js/core/utils.js';
 
@@ -34,6 +35,7 @@ export class Editor {
     this.imageManager = new ImageManager(this);
     this.toolbarController = new ToolbarController(this);
     this.readabilityManager = new ReadabilityManager(this);
+    this.navigationManager = new NavigationManager(this);
 
     this.initQuill();
     

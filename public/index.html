@@ -2689,6 +2689,12 @@
       <div class="ribbon-section">
         <div class="ribbon-section-title">Readability</div>
         <div class="ribbon-section-tools">
+          <button class="toolbar-btn" id="toggleOutline" title="Toggle Outline Sidebar">
+            <i class="fas fa-columns"></i> Sidebar
+          </button>
+          <button class="toolbar-btn" id="toggleMinimap" title="Toggle Minimap">
+            <i class="fas fa-map"></i> Navigator
+          </button>
           <button class="toolbar-btn" id="toggleLineNumbers" title="Toggle Line Numbers">
             <i class="fas fa-list-ol"></i> Numbers
           </button>
@@ -2754,8 +2760,27 @@
       <div id="pageTabsContainer"></div>
     </div>
 
-    <!-- Pages Container - Shows all pages like Word -->
-    <div class="pages-container" id="pagesContainer"></div>
+    <!-- Main Workspace -->
+    <div class="main-workspace">
+      <!-- Left Sidebar: Outline -->
+      <div class="sidebar" id="outlineSidebar">
+        <div class="sidebar-header">Document Outline</div>
+        <div id="outlineContainer" class="outline-container">
+          <div style="padding: 20px; color: #666; font-size: 12px;">Add headings to see them here</div>
+        </div>
+      </div>
+
+      <!-- Pages Container - Shows all pages like Word -->
+      <div class="pages-container" id="pagesContainer"></div>
+
+      <!-- Right Sidebar: Minimap -->
+      <div class="sidebar sidebar-right" id="minimapSidebar">
+        <div class="sidebar-header">Navigator</div>
+        <div id="minimap">
+          <!-- Canvas will be injected here -->
+        </div>
+      </div>
+    </div>
 
     <!-- Status Bar -->
     <div class="status-bar">

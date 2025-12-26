@@ -1653,7 +1653,7 @@
           flex-direction: column;
         "
       >
-        <!-- Header with Profile Info -->
+        <!-- Header (simplified) -->
         <div
           style="
             background: linear-gradient(
@@ -1669,7 +1669,7 @@
         >
           <h2
             style="
-              margin: 0 0 16px;
+              margin: 0;
               color: var(--accent-color-light);
               text-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.5);
               font-size: 18px;
@@ -1678,308 +1678,174 @@
           >
             User Profile
           </h2>
-
-          <!-- Photo Management Section -->
-          <div style="margin-bottom: 0; display: flex; flex-direction: column; align-items: center">
-            <div style="position: relative; width: 80px; height: 80px; margin-bottom: 12px">
-              <img
-                id="profilePfp"
-                src=""
-                alt="Profile"
-                style="
-                  width: 80px;
-                  height: 80px;
-                  border-radius: 50%;
-                  background: #1a1a1a;
-                  object-fit: cover;
-                  border: 3px solid var(--accent-color);
-                  box-shadow:
-                    0 0 20px rgba(var(--accent-color-rgb), 0.5),
-                    inset 0 0 15px rgba(var(--accent-color-rgb), 0.1);
-                  display: none;
-                "
-              />
-              <div
-                id="profilePfpPlaceholder"
-                style="
-                  width: 80px;
-                  height: 80px;
-                  border-radius: 50%;
-                  background: #1a1a1a;
-                  border: 3px solid var(--accent-color);
-                  box-shadow:
-                    0 0 20px rgba(var(--accent-color-rgb), 0.5),
-                    inset 0 0 15px rgba(var(--accent-color-rgb), 0.1);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                "
-              >
-                <i
-                  class="fas fa-user"
-                  style="font-size: 40px; color: var(--accent-color-light)"
-                ></i>
-              </div>
-              <label
-                for="pfpUpload"
-                style="
-                  position: absolute;
-                  bottom: -2px;
-                  right: -2px;
-                  background: linear-gradient(
-                    135deg,
-                    var(--accent-color),
-                    var(--accent-color-light)
-                  );
-                  color: white;
-                  width: 24px;
-                  height: 24px;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  cursor: pointer;
-                  border: 2px solid #000000;
-                  box-shadow: 0 0 12px rgba(var(--accent-color-rgb), 0.6);
-                  transition: all 0.3s ease;
-                  font-size: 10px;
-                "
-                onmouseover="
-                  this.style.boxShadow =
-                    '0 0 16px rgba(var(--accent-color-rgb), 0.8), 0 0 8px rgba(0,0,0,0.3)';
-                  this.style.transform = 'scale(1.1)';
-                "
-                onmouseout="
-                  this.style.boxShadow = '0 0 12px rgba(var(--accent-color-rgb), 0.6)';
-                  this.style.transform = 'scale(1)';
-                "
-              >
-                <i class="fas fa-camera"></i>
-              </label>
-              <input type="file" id="pfpUpload" accept="image/*" style="display: none" />
-            </div>
-            <h4
-              id="profileUsername"
-              style="
-                margin: 0;
-                color: var(--accent-color-lighter);
-                font-size: 14px;
-                font-weight: 600;
-              "
-            >
-              Username
-            </h4>
-          </div>
         </div>
 
         <!-- Profile Tabs -->
         <div
           style="
             display: flex;
-            gap: 16px;
-            padding: 16px 24px;
+            gap: 8px;
+            padding: 16px 24px 0;
             margin-top: 0;
             justify-content: center;
+            border-bottom: 1px solid #2a2a2a;
           "
         >
           <button
             class="profile-tab active"
-            data-tab="security"
+            data-tab="general"
             style="
               flex: 1;
-              max-width: 160px;
-              height: 40px;
-              background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light));
-              color: white;
+              height: 36px;
+              background: transparent;
+              color: var(--accent-color-lighter);
               border: none;
-              border-radius: 6px;
+              border-bottom: 2px solid var(--accent-color);
               cursor: pointer;
-              font-weight: 700;
+              font-weight: 600;
               font-size: 11px;
               text-transform: uppercase;
               letter-spacing: 0.6px;
               transition: all 0.3s ease;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              box-shadow: 0 4px 15px rgba(var(--accent-color-rgb), 0.4);
-            "
-            onmouseover="
-              this.style.boxShadow = '0 6px 20px rgba(var(--accent-color-rgb), 0.6)';
-              this.style.transform = 'translateY(-2px)';
-            "
-            onmouseout="
-              this.style.boxShadow = '0 4px 15px rgba(var(--accent-color-rgb), 0.4)';
-              this.style.transform = 'translateY(0)';
             "
           >
-            <i class="fas fa-lock" style="font-size: 11px"></i
-            ><span style="line-height: 1">Security</span>
+            General
           </button>
           <button
             class="profile-tab"
-            data-tab="personalization"
+            data-tab="appearance"
             style="
               flex: 1;
-              max-width: 160px;
-              height: 40px;
-              background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light));
-              color: white;
+              height: 36px;
+              background: transparent;
+              color: #6b7280;
               border: none;
-              border-radius: 6px;
+              border-bottom: 2px solid transparent;
               cursor: pointer;
-              font-weight: 700;
+              font-weight: 600;
               font-size: 11px;
               text-transform: uppercase;
               letter-spacing: 0.6px;
               transition: all 0.3s ease;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              box-shadow: 0 4px 15px rgba(var(--accent-color-rgb), 0.4);
-              opacity: 0.7;
-            "
-            onmouseover="
-              this.style.boxShadow = '0 6px 20px rgba(var(--accent-color-rgb), 0.6)';
-              this.style.transform = 'translateY(-2px)';
-              this.style.opacity = '0.9';
-            "
-            onmouseout="
-              this.style.boxShadow = '0 4px 15px rgba(var(--accent-color-rgb), 0.4)';
-              this.style.transform = 'translateY(0)';
-              this.style.opacity = this.classList.contains('active') ? '1' : '0.7';
             "
           >
-            <i class="fas fa-palette" style="font-size: 11px"></i
-            ><span style="line-height: 1">Personal</span>
+            Appearance
+          </button>
+          <button
+            class="profile-tab"
+            data-tab="security"
+            style="
+              flex: 1;
+              height: 36px;
+              background: transparent;
+              color: #6b7280;
+              border: none;
+              border-bottom: 2px solid transparent;
+              cursor: pointer;
+              font-weight: 600;
+              font-size: 11px;
+              text-transform: uppercase;
+              letter-spacing: 0.6px;
+              transition: all 0.3s ease;
+            "
+          >
+            Security
           </button>
         </div>
 
         <!-- Tab Content Container -->
         <div style="padding: 24px; flex: 1; overflow-y: auto">
-          <!-- Security Tab Content -->
-          <div class="profile-tab-content active" id="security-content" style="display: block">
-            <h3
-              style="
-                margin-bottom: 16px;
-                color: var(--accent-color-lighter);
-                font-size: 11px;
-                text-transform: uppercase;
-                letter-spacing: 0.8px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-              "
-            >
-              <i class="fas fa-lock" style="color: var(--accent-color); font-size: 10px"></i>Change
-              Password
-            </h3>
-            <div style="display: flex; flex-direction: column; gap: 10px">
-              <div style="position: relative">
-                <label
+          <!-- General Tab Content -->
+          <div class="profile-tab-content active" id="general-content" style="display: block">
+             <!-- Photo Management Section -->
+             <div style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: center">
+              <div style="position: relative; width: 80px; height: 80px; margin-bottom: 12px">
+                <img
+                  id="profilePfp"
+                  src=""
+                  alt="Profile"
                   style="
-                    font-size: 10px;
-                    color: var(--accent-color-light);
-                    text-transform: uppercase;
-                    letter-spacing: 0.3px;
-                    display: block;
-                    margin-bottom: 6px;
-                  "
-                  >Current Password</label
-                >
-                <input
-                  type="password"
-                  id="currentPassword"
-                  placeholder="Enter current password"
-                  style="
-                    width: 100%;
-                    padding: 10px 12px;
-                    border: 1px solid #2a2a2a;
-                    border-radius: 6px;
-                    background: #0d0520;
-                    color: #e0e0e0;
-                    font-size: 11px;
-                    transition: all 0.3s ease;
-                  "
-                  onfocus="
-                    this.style.borderColor = 'var(--accent-color)';
-                    this.style.boxShadow = '0 0 10px rgba(var(--accent-color-rgb), 0.25)';
-                  "
-                  onblur="
-                    this.style.borderColor = '#2a2a2a';
-                    this.style.boxShadow = 'none';
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: #1a1a1a;
+                    object-fit: cover;
+                    border: 3px solid var(--accent-color);
+                    box-shadow:
+                      0 0 20px rgba(var(--accent-color-rgb), 0.5),
+                      inset 0 0 15px rgba(var(--accent-color-rgb), 0.1);
+                    display: none;
                   "
                 />
-              </div>
-              <div style="position: relative">
-                <label
+                <div
+                  id="profilePfpPlaceholder"
                   style="
-                    font-size: 10px;
-                    color: var(--accent-color-light);
-                    text-transform: uppercase;
-                    letter-spacing: 0.3px;
-                    display: block;
-                    margin-bottom: 6px;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: #1a1a1a;
+                    border: 3px solid var(--accent-color);
+                    box-shadow:
+                      0 0 20px rgba(var(--accent-color-rgb), 0.5),
+                      inset 0 0 15px rgba(var(--accent-color-rgb), 0.1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                   "
-                  >New Password</label
                 >
-                <input
-                  type="password"
-                  id="newPassword"
-                  placeholder="Enter new password"
+                  <i
+                    class="fas fa-user"
+                    style="font-size: 40px; color: var(--accent-color-light)"
+                  ></i>
+                </div>
+                <label
+                  for="pfpUpload"
                   style="
-                    width: 100%;
-                    padding: 10px 12px;
-                    border: 1px solid #2a2a2a;
-                    border-radius: 6px;
-                    background: #0d0520;
-                    color: #e0e0e0;
-                    font-size: 11px;
+                    position: absolute;
+                    bottom: -2px;
+                    right: -2px;
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent-color),
+                      var(--accent-color-light)
+                    );
+                    color: white;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    border: 2px solid #000000;
+                    box-shadow: 0 0 12px rgba(var(--accent-color-rgb), 0.6);
                     transition: all 0.3s ease;
+                    font-size: 10px;
                   "
-                  onfocus="
-                    this.style.borderColor = 'var(--accent-color)';
-                    this.style.boxShadow = '0 0 10px rgba(var(--accent-color-rgb), 0.25)';
-                  "
-                  onblur="
-                    this.style.borderColor = '#2a2a2a';
-                    this.style.boxShadow = 'none';
-                  "
-                />
+                >
+                  <i class="fas fa-camera"></i>
+                </label>
+                <input type="file" id="pfpUpload" accept="image/*" style="display: none" />
               </div>
-              <button
-                id="updatePasswordBtn"
-                style="
-                  padding: 10px 12px;
-                  background: linear-gradient(
-                    135deg,
-                    var(--accent-color),
-                    var(--accent-color-light)
-                  );
-                  color: white;
-                  border: none;
-                  border-radius: 6px;
-                  cursor: pointer;
-                  font-weight: 600;
-                  font-size: 11px;
-                  text-transform: uppercase;
-                  letter-spacing: 0.3px;
-                  box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
-                  transition: all 0.3s ease;
-                  margin-top: 4px;
-                "
-                onmouseover="this.style.boxShadow = '0 0 20px rgba(var(--accent-color-rgb), 0.5)'"
-                onmouseout="this.style.boxShadow = '0 0 15px rgba(var(--accent-color-rgb), 0.3)'"
-              >
-                Update Password
-              </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div>
+                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
+                <input type="text" id="profileUsernameInput" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #888; font-size: 11px;" />
+              </div>
+              
+              <div>
+                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Bio</label>
+                <textarea id="profileBioInput" rows="4" placeholder="Tell us about yourself..." style="width: 100%; padding: 10px 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #e0e0e0; font-size: 11px; resize: none;"></textarea>
+              </div>
+
+              <button id="saveGeneralBtn" style="padding: 10px 12px; background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light)); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);">Save Changes</button>
             </div>
           </div>
 
-          <!-- Personalization Tab Content -->
-          <div class="profile-tab-content" id="personalization-content" style="display: none">
+          <!-- Appearance Tab Content -->
+          <div class="profile-tab-content" id="appearance-content" style="display: none">
             <!-- Theme Selection -->
             <div style="margin-bottom: 20px">
               <h3
@@ -2022,8 +1888,6 @@
                     text-transform: uppercase;
                     letter-spacing: 0.3px;
                   "
-                  onmouseover="this.style.boxShadow = '0 0 20px rgba(var(--accent-color-rgb), 0.5)'"
-                  onmouseout="this.style.boxShadow = '0 0 15px rgba(var(--accent-color-rgb), 0.3)'"
                 >
                   🌙 Dark
                 </button>
@@ -2043,14 +1907,6 @@
                     text-transform: uppercase;
                     letter-spacing: 0.3px;
                   "
-                  onmouseover="
-                    this.style.background = '#faf8ff';
-                    this.style.boxShadow = '0 0 12px rgba(var(--accent-color-rgb), 0.2)';
-                  "
-                  onmouseout="
-                    this.style.background = '#f0f0f0';
-                    this.style.boxShadow = 'none';
-                  "
                 >
                   ☀️ Light
                 </button>
@@ -2058,7 +1914,7 @@
             </div>
 
             <!-- Accent Color Selection -->
-            <div>
+            <div style="margin-bottom: 20px;">
               <h3
                 style="
                   margin-bottom: 12px;
@@ -2075,191 +1931,138 @@
                 >Accent Color
               </h3>
               <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
-                <button
-                  class="accent-color-btn"
-                  data-color="#8b5cf6"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #8b5cf6;
-                    border: 2px solid #a78bfa;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Purple"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(139, 92, 246, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(139, 92, 246, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#ec4899"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #ec4899;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Pink"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(236, 72, 153, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(236, 72, 153, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#3b82f6"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #3b82f6;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Blue"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(59, 130, 246, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(59, 130, 246, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#10b981"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #10b981;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Green"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#f59e0b"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #f59e0b;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Amber"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(245, 158, 11, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#ef4444"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #ef4444;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Red"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(239, 68, 68, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#06b6d4"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #06b6d4;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Cyan"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(6, 182, 212, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(6, 182, 212, 0.4)';
-                  "
-                ></button>
-                <button
-                  class="accent-color-btn"
-                  data-color="#39ff14"
-                  style="
-                    width: 100%;
-                    aspect-ratio: 1;
-                    background: #39ff14;
-                    border: 2px solid transparent;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
-                    transition: all 0.3s ease;
-                  "
-                  title="Neon Green"
-                  onmouseover="
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 0 12px rgba(57, 255, 20, 0.6)';
-                  "
-                  onmouseout="
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 0 8px rgba(57, 255, 20, 0.4)';
-                  "
-                ></button>
+                <button class="accent-color-btn" data-color="#8b5cf6" style="width: 100%; aspect-ratio: 1; background: #8b5cf6; border: 2px solid #a78bfa; border-radius: 6px; cursor: pointer;" title="Purple"></button>
+                <button class="accent-color-btn" data-color="#ec4899" style="width: 100%; aspect-ratio: 1; background: #ec4899; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Pink"></button>
+                <button class="accent-color-btn" data-color="#3b82f6" style="width: 100%; aspect-ratio: 1; background: #3b82f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Blue"></button>
+                <button class="accent-color-btn" data-color="#10b981" style="width: 100%; aspect-ratio: 1; background: #10b981; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Green"></button>
+                <button class="accent-color-btn" data-color="#f59e0b" style="width: 100%; aspect-ratio: 1; background: #f59e0b; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Amber"></button>
+                <button class="accent-color-btn" data-color="#ef4444" style="width: 100%; aspect-ratio: 1; background: #ef4444; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Red"></button>
+                <button class="accent-color-btn" data-color="#06b6d4" style="width: 100%; aspect-ratio: 1; background: #06b6d4; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Cyan"></button>
+                <button class="accent-color-btn" data-color="#39ff14" style="width: 100%; aspect-ratio: 1; background: #39ff14; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Neon Green"></button>
               </div>
+            </div>
+
+            <!-- Editor Preferences Placeholder -->
+            <div>
+              <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Editor Preferences</h3>
+              <p style="font-size: 12px; color: #888;">Coming soon...</p>
+            </div>
+          </div>
+
+          <!-- Security Tab Content -->
+          <div class="profile-tab-content" id="security-content" style="display: none">
+            <h3
+              style="
+                margin-bottom: 16px;
+                color: var(--accent-color-lighter);
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              "
+            >
+              <i class="fas fa-lock" style="color: var(--accent-color); font-size: 10px"></i>Change
+              Password
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div style="position: relative">
+                <label
+                  style="
+                    font-size: 10px;
+                    color: var(--accent-color-light);
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >Current Password</label
+                >
+                <input
+                  type="password"
+                  id="currentPassword"
+                  placeholder="Enter current password"
+                  style="
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #2a2a2a;
+                    border-radius: 6px;
+                    background: #0d0520;
+                    color: #e0e0e0;
+                    font-size: 11px;
+                    transition: all 0.3s ease;
+                  "
+                />
+              </div>
+              <div style="position: relative">
+                <label
+                  style="
+                    font-size: 10px;
+                    color: var(--accent-color-light);
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >New Password</label
+                >
+                <input
+                  type="password"
+                  id="newPassword"
+                  placeholder="Enter new password"
+                  style="
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #2a2a2a;
+                    border-radius: 6px;
+                    background: #0d0520;
+                    color: #e0e0e0;
+                    font-size: 11px;
+                    transition: all 0.3s ease;
+                  "
+                />
+              </div>
+              <button
+                id="updatePasswordBtn"
+                style="
+                  padding: 10px 12px;
+                  background: linear-gradient(
+                    135deg,
+                    var(--accent-color),
+                    var(--accent-color-light)
+                  );
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-weight: 600;
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.3px;
+                  box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+                  transition: all 0.3s ease;
+                  margin-top: 4px;
+                "
+              >
+                Update Password
+              </button>
+            </div>
+            
+            <div style="margin-top: 24px;">
+               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
+               <div style="background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
+                   <div style="font-size: 12px; color: #e0e0e0; font-weight: bold;">Current Session</div>
+                   <div style="font-size: 11px; color: #888;">Windows • Chrome • Just now</div>
+               </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Two-Factor Authentication</h3>
+               <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
+                   <span style="font-size: 12px; color: #e0e0e0;">Enable 2FA</span>
+                   <i class="fas fa-toggle-off" style="color: #666; font-size: 20px; cursor: pointer;" title="Not implemented"></i>
+               </div>
             </div>
           </div>
         </div>

@@ -9,12 +9,13 @@ exports.getProfile = async (req, res, next) => {
 };
 
 exports.updateProfile = async (req, res, next) => {
-  const { profilePicture, accentColor } = req.body;
+  const { profilePicture, accentColor, bio } = req.body;
   const user = await User.findById(req.user.id);
   if (!user) return next(new AppError('User not found', 404));
 
   if (profilePicture !== undefined) user.profilePicture = profilePicture;
   if (accentColor !== undefined) user.accentColor = accentColor;
+  if (bio !== undefined) user.bio = bio;
   
   await user.save();
 
@@ -22,7 +23,8 @@ exports.updateProfile = async (req, res, next) => {
   res.json({ 
       message: 'Profile updated successfully', 
       profilePicture: user.profilePicture,
-      accentColor: user.accentColor 
+      accentColor: user.accentColor,
+      bio: user.bio
   });
 };
 

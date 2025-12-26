@@ -148,7 +148,12 @@ export class Theme {
                 border-color: ${hexColor} !important; 
                 box-shadow: 0 0 50px rgba(${rgbString}, 0.4) !important; 
             }
-            .profile-tab.active { background: linear-gradient(135deg, ${hexColor}, ${lightColor}) !important; box-shadow: 0 4px 15px rgba(${rgbString}, 0.4) !important; }
+            .profile-tab.active { 
+                background: transparent !important; 
+                border-bottom: 2px solid ${hexColor} !important; 
+                color: ${hexColor} !important;
+                box-shadow: none !important;
+            }
             
             /* Scrollbars */
             ::-webkit-scrollbar-thumb { background: ${hexColor}60 !important; border: 1px solid ${hexColor}20 !important; }

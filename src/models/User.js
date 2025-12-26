@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '#8b5cf6',
   },
+  bio: {
+    type: String,
+    default: '',
+    maxlength: 500
+  },
   isEmailVerified: {
     type: Boolean,
     default: false,

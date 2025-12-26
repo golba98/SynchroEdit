@@ -212,6 +212,12 @@ export class App {
       reader.readAsDataURL(file);
     });
 
+    // Bio Update
+    addEvent('saveGeneralBtn', 'click', () => {
+        const bio = document.getElementById('profileBioInput')?.value;
+        this.profile.updateBio(bio);
+    });
+
     // Password Update
     addEvent('updatePasswordBtn', 'click', () => {
       const current = document.getElementById('currentPassword')?.value;

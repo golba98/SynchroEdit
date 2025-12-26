@@ -15,8 +15,11 @@ export class Profile {
   }
 
   updateUI() {
-    const profileUsername = document.getElementById('profileUsername');
-    if (profileUsername) profileUsername.textContent = this.user.username;
+    const profileUsernameInput = document.getElementById('profileUsernameInput');
+    if (profileUsernameInput) profileUsernameInput.value = this.user.username;
+
+    const profileBioInput = document.getElementById('profileBioInput');
+    if (profileBioInput) profileBioInput.value = this.user.bio || '';
 
     const pfpElements = [
       document.getElementById('profilePfp'),
@@ -61,6 +64,20 @@ export class Profile {
     } catch (err) {
       console.error('Error updating PFP:', err);
       alert('Failed to update profile picture');
+    }
+  }
+
+  async updateBio(bio) {
+    try {
+      const data = await Network.fetchAPI('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ bio }),
+      });
+      this.user.bio = data.bio;
+      alert('Profile info updated!');
+    } catch (err) {
+      console.error('Error updating bio:', err);
+      alert('Failed to update profile info');
     }
   }
 

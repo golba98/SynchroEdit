@@ -5,6 +5,7 @@ const http = require('http');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 const logger = require('./utils/logger');
 const globalErrorHandler = require('./middleware/errorMiddleware');
@@ -61,6 +62,7 @@ const apiLimiter = rateLimit({
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cookieParser());
 app.use('/api/', apiLimiter);
 
 // Routes

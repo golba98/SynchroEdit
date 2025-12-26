@@ -144,11 +144,55 @@ async function sendVerificationEmail(email, code) {
   }
 }
 
+async function sendPasswordResetEmail(email, resetUrl) {
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info(`DEV MODE: Password reset link for ${email}: ${resetUrl}`);
+  }
+
+  logger.info(`Attempting to send password reset email to ${email}`);
+
+  const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+            <h2 style="color: #8b5cf6; text-align: center;">SynchroEdit</h2>
+            <p style="color: #333; font-size: 16px;">Password Reset Request</p>
+            <p style="color: #666; font-size: 14px;">We received a request to reset your password. Click the button below to proceed:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #8b5cf6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block;">Reset Password</a>
+            </div>
+            <p style="color: #666; font-size: 14px;">This link is valid for 10 minutes.</p>
+            <p style="color: #999; font-size: 12px; text-align: center;">If you didn't request this, you can safely ignore this email.</p>
+        </div>
+    `;
+
+  if (RESEND_API_KEY) {
+    return await sendViaResend(email, html, 'SynchroEdit - Password Reset');
+  }
+
+  if (!SMTP_USER || !SMTP_PASS) {
+    logger.warn('SMTP config missing. Returning TRUE for DEV.');
+    return true;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"SynchroEdit" <${SMTP_FROM}>`,
+      to: email,
+      subject: 'SynchroEdit - Password Reset',
+      html,
+    });
+    return true;
+  } catch (err) {
+    logger.error(`SMTP Reset Password Failed: ${err.message}`);
+    return true; 
+  }
+}
+
 function generateVerificationCode() {
   return crypto.randomInt(100000, 1000000).toString();
 }
 
 module.exports = {
   sendVerificationEmail,
+  sendPasswordResetEmail,
   generateVerificationCode,
 };

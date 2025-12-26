@@ -9,16 +9,40 @@ export const Auth = {
     localStorage.removeItem('synchroEditToken');
   },
   async verifyToken() {
-    const token = this.getToken();
+    let token = this.getToken();
     if (!token || token === 'local-preview-token') {
       this.removeToken();
       return false;
     }
 
     try {
-      const response = await fetch('/api/user/profile', {
+      let response = await fetch('/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      // Attempt Refresh on 401
+      if (response.status === 401) {
+          try {
+              const refreshResponse = await fetch('/api/auth/refresh-token', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' }
+              });
+              
+              if (refreshResponse.ok) {
+                  const data = await refreshResponse.json();
+                  this.setToken(data.token);
+                  token = data.token;
+                  
+                  // Retry Profile Fetch
+                  response = await fetch('/api/user/profile', {
+                      headers: { Authorization: `Bearer ${token}` },
+                  });
+              }
+          } catch (e) {
+              // Refresh failed
+          }
+      }
+
       if (response.status === 401 || response.status === 403 || response.status === 404) {
         this.removeToken();
         return false;

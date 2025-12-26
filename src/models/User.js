@@ -52,6 +52,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // Password Reset Fields
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  
+  // Account Lockout Fields
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date
+  }
 });
 
 // Hash password before saving

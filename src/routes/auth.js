@@ -15,5 +15,8 @@ router.post('/signup', authLimiter, authController.signup);
 router.post('/verify-email', authController.verifyEmail);
 router.post('/resend-code', authController.resendCode);
 router.post('/login', authLimiter, authController.login);
+router.post('/forgot-password', authLimiter, authController.forgotPassword);
+router.post('/reset-password', authLimiter, authController.resetPassword);
+router.post('/refresh-token', authController.refreshToken); // To be implemented
 
 module.exports = router;

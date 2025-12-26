@@ -2,13 +2,41 @@ import { Auth } from '/js/ui/auth.js';
 
 export const Network = {
   async fetchAPI(url, options = {}) {
-    const token = Auth.getToken();
+    let token = Auth.getToken();
     const headers = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
       ...options.headers,
     };
-    const response = await fetch(url, { ...options, headers });
+    
+    let response = await fetch(url, { ...options, headers });
+    
+    // Interceptor: Check for 401 (Unauthorized)
+    if (response.status === 401) {
+        console.log('Token expired, attempting refresh...');
+        try {
+            // Call refresh endpoint
+            // Note: browser automatically sends cookies for same-origin requests
+            const refreshResponse = await fetch('/api/auth/refresh-token', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (refreshResponse.ok) {
+                const data = await refreshResponse.json();
+                Auth.setToken(data.token); // Update local token
+                
+                // Retry original request with new token
+                headers.Authorization = `Bearer ${data.token}`;
+                response = await fetch(url, { ...options, headers });
+            } else {
+                console.warn('Refresh failed, session expired.');
+            }
+        } catch (e) {
+            console.error('Token refresh failed', e);
+        }
+    }
+
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return response.json();
   },

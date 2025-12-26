@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     default: '',
     maxlength: 500
   },
+  showOnlineStatus: {
+    type: Boolean,
+    default: true,
+  },
   isEmailVerified: {
     type: Boolean,
     default: false,

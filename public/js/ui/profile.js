@@ -35,6 +35,72 @@ export class Profile {
     if (revokeOthersBtn) {
         revokeOthersBtn.addEventListener('click', () => this.revokeAllOtherSessions());
     }
+
+    // Privacy toggle listener
+    const privacyToggle = document.getElementById('privacyToggle');
+    if (privacyToggle) {
+        privacyToggle.addEventListener('click', () => this.togglePrivacy());
+    }
+
+    // PFP upload listener with validation
+    const pfpInput = document.getElementById('pfpUpload');
+    if (pfpInput) {
+        pfpInput.addEventListener('change', (e) => this.handlePfpUpload(e));
+    }
+  }
+
+  async handlePfpUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Security: Max 1MB check
+    if (file.size > 1024 * 1024) {
+      alert('File too large! Maximum size is 1MB.');
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      await this.updateProfilePicture(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async togglePrivacy() {
+    if (!this.user) return;
+    const newState = !this.user.showOnlineStatus;
+    
+    try {
+        const data = await Network.fetchAPI('/api/user/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ showOnlineStatus: newState })
+        });
+        
+        this.user.showOnlineStatus = data.showOnlineStatus;
+        this.updatePrivacyUI();
+        
+        // Notify editor if it exists
+        if (window.editor) {
+            window.editor.updateUser(this.user);
+        }
+    } catch (err) {
+        console.error('Failed to toggle privacy:', err);
+        alert('Failed to update privacy settings');
+    }
+  }
+
+  updatePrivacyUI() {
+    const toggle = document.getElementById('privacyToggle');
+    if (!toggle) return;
+
+    if (this.user.showOnlineStatus) {
+        toggle.className = 'fas fa-toggle-on';
+        toggle.style.color = 'var(--accent-color-light)';
+    } else {
+        toggle.className = 'fas fa-toggle-off';
+        toggle.style.color = '#666';
+    }
   }
 
   async loadProfile() {
@@ -56,6 +122,7 @@ export class Profile {
     if (profileBioInput) profileBioInput.value = this.user.bio || '';
 
     this.updateVerificationBadge();
+    this.updatePrivacyUI();
 
     const pfpElements = [
       document.getElementById('profilePfp'),
@@ -273,6 +340,7 @@ export class Profile {
       });
       this.user.profilePicture = data.profilePicture;
       this.updateUI();
+      if (window.editor) window.editor.updateUser(this.user);
       alert('Profile picture updated!');
     } catch (err) {
       console.error('Error updating PFP:', err);
@@ -317,6 +385,7 @@ export class Profile {
         body: JSON.stringify({ accentColor: color }),
       });
       this.user.accentColor = color;
+      if (window.editor) window.editor.updateUser(this.user);
     } catch (err) {
       console.error('Error syncing accent color:', err);
     }

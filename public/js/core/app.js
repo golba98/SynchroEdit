@@ -197,21 +197,12 @@ export class App {
         tab.classList.add('active');
         const targetContent = document.getElementById(`${targetTab}-content`);
         if (targetContent) targetContent.style.display = 'block';
-        
+
         // Load sessions if security tab opened
         if (targetTab === 'security') {
             this.profile.loadSessions();
         }
       });
-    });
-
-    // PFP Upload
-    addEvent('pfpUpload', 'change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onloadend = () => this.profile.updateProfilePicture(reader.result);
-      reader.readAsDataURL(file);
     });
 
     // Bio Update

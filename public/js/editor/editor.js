@@ -111,10 +111,13 @@ export class Editor {
         { params: { documentId: docId, ticket: ticket } }
     );
     
-    this.provider.awareness.setLocalStateField('user', {
-        name: user.username,
-        color: user.accentColor || user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
-    });
+    if (user.showOnlineStatus !== false) {
+        this.provider.awareness.setLocalStateField('user', {
+            username: user.username,
+            profilePicture: user.profilePicture,
+            color: user.accentColor || user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
+        });
+    }
     
     this.provider.awareness.on('change', () => {
         const states = this.provider.awareness.getStates();
@@ -158,6 +161,21 @@ export class Editor {
       }
       const docId = new URLSearchParams(window.location.search).get('doc');
       await this.connectWebSocket(docId, this.user);
+  }
+
+  updateUser(user) {
+    this.user = user;
+    if (this.provider && this.provider.awareness) {
+        if (user.showOnlineStatus !== false) {
+            this.provider.awareness.setLocalStateField('user', {
+                username: user.username,
+                profilePicture: user.profilePicture,
+                color: user.accentColor || user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
+            });
+        } else {
+            this.provider.awareness.setLocalStateField('user', null);
+        }
+    }
   }
 
   async saveToCache(docId) {

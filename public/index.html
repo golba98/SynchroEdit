@@ -1822,11 +1822,13 @@
                     transition: all 0.3s ease;
                     font-size: 10px;
                   "
+                  title="Upload new photo (Max 1MB)"
                 >
                   <i class="fas fa-camera"></i>
                 </label>
                 <input type="file" id="pfpUpload" accept="image/*" style="display: none" />
               </div>
+              <span style="font-size: 9px; color: #666; margin-top: -8px; margin-bottom: 12px;">Max 1MB</span>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -2086,10 +2088,13 @@
             </div>
 
             <div style="margin-top: 24px;">
-               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Two-Factor Authentication</h3>
+               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Privacy</h3>
                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
-                   <span style="font-size: 12px; color: #e0e0e0;">Enable 2FA</span>
-                   <i class="fas fa-toggle-off" style="color: #666; font-size: 20px; cursor: pointer;" title="Not implemented"></i>
+                   <div style="display: flex; flex-direction: column;">
+                       <span style="font-size: 12px; color: #e0e0e0;">Show my online status to others</span>
+                       <span style="font-size: 10px; color: #666; margin-top: 2px;">When off, your cursor and presence are hidden from collaborators.</span>
+                   </div>
+                   <i id="privacyToggle" class="fas fa-toggle-on" style="color: var(--accent-color-light); font-size: 20px; cursor: pointer;"></i>
                </div>
             </div>
           </div>

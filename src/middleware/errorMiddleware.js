@@ -14,7 +14,7 @@ const globalErrorHandler = (err, req, res, next) => {
     });
   } else {
     // Production mode
-    if (err.isOperational) {
+    if (err.isOperational || (err.statusCode >= 400 && err.statusCode < 500)) {
       res.status(err.statusCode).json({
         status: err.status,
         message: err.message,

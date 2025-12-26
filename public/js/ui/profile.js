@@ -20,6 +20,7 @@ export class Profile {
         tab.addEventListener('click', () => {
             if (tab.getAttribute('data-tab') === 'security') {
                 this.loadSessions();
+                this.loadLoginHistory();
             }
         });
     });
@@ -279,6 +280,81 @@ export class Profile {
           console.error('Error loading sessions:', err);
           container.innerHTML = '<div style="font-size: 11px; color: #ef4444; text-align: center; padding: 10px;">Failed to load sessions</div>';
       }
+  }
+
+  async loadLoginHistory() {
+      const tbody = document.getElementById('loginHistoryTableBody');
+      if (!tbody || !this.user.loginHistory) return;
+
+      tbody.innerHTML = '';
+      if (this.user.loginHistory.length === 0) {
+          tbody.innerHTML = '<tr><td style="padding: 12px; color: #666; text-align: center;">No login history available</td></tr>';
+          return;
+      }
+
+      this.user.loginHistory.forEach((timestamp, index) => {
+          const date = new Date(timestamp);
+          const row = document.createElement('tr');
+          row.style.borderBottom = index === this.user.loginHistory.length - 1 ? 'none' : '1px solid #2a2a2a';
+          
+          row.innerHTML = `
+              <td style="padding: 10px 12px; color: #e0e0e0;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <i class="fas fa-sign-in-alt" style="color: #666; font-size: 10px;"></i>
+                      <span>${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</span>
+                  </div>
+              </td>
+              <td style="padding: 10px 12px; color: #666; text-align: right;">
+                  ${index === 0 ? '<span style="color: var(--accent-color-light); font-weight: 600; font-size: 8px; text-transform: uppercase;">Most Recent</span>' : ''}
+              </td>
+          `;
+          tbody.appendChild(row);
+      });
+  }
+
+  promptIdentityConfirmation() {
+      return new Promise((resolve) => {
+          const modal = document.getElementById('confirmIdentityModal');
+          const input = document.getElementById('confirmIdentityPassword');
+          const submitBtn = document.getElementById('submitConfirmIdentity');
+          const cancelBtn = document.getElementById('cancelConfirmIdentity');
+
+          if (!modal || !input || !submitBtn || !cancelBtn) {
+              return resolve(null);
+          }
+
+          modal.style.display = 'flex';
+          input.value = '';
+          input.focus();
+
+          const handleConfirm = () => {
+              const password = input.value;
+              if (!password) return;
+              cleanup();
+              resolve(password);
+          };
+
+          const handleCancel = () => {
+              cleanup();
+              resolve(null);
+          };
+
+          const handleKeydown = (e) => {
+              if (e.key === 'Enter') handleConfirm();
+              if (e.key === 'Escape') handleCancel();
+          };
+
+          const cleanup = () => {
+              modal.style.display = 'none';
+              submitBtn.removeEventListener('click', handleConfirm);
+              cancelBtn.removeEventListener('click', handleCancel);
+              input.removeEventListener('keydown', handleKeydown);
+          };
+
+          submitBtn.addEventListener('click', handleConfirm);
+          cancelBtn.addEventListener('click', handleCancel);
+          input.addEventListener('keydown', handleKeydown);
+      });
   }
 
   async revokeSession(sessionId) {

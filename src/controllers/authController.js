@@ -268,6 +268,13 @@ exports.login = async (req, res, next) => {
 
   logger.info(`User logged in: ${user.username}`);
   
+  // Update Login History
+  user.loginHistory.unshift(new Date());
+  if (user.loginHistory.length > 5) {
+      user.loginHistory.pop();
+  }
+  await user.save();
+  
   await sendTokens(user, 200, req, res);
 };
 

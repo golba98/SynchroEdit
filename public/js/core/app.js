@@ -212,16 +212,24 @@ export class App {
     });
 
     // Password Update
-    addEvent('updatePasswordBtn', 'click', () => {
-      const current = document.getElementById('currentPassword')?.value;
+    addEvent('updatePasswordBtn', 'click', async () => {
       const next = document.getElementById('newPassword')?.value;
-      if (current && next) {
-        this.profile.updatePassword(current, next).then((success) => {
+      if (next) {
+        if (next.length < 8) {
+            alert('New password must be at least 8 characters long.');
+            return;
+        }
+
+        const current = await this.profile.promptIdentityConfirmation();
+        if (current) {
+          const success = await this.profile.updatePassword(current, next);
           if (success) {
-            document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
+            // Reset strength bar
+            const bar = document.getElementById('passwordStrengthBar');
+            if (bar) bar.style.width = '0%';
           }
-        });
+        }
       }
     });
 

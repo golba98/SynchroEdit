@@ -334,6 +334,7 @@ export class Editor {
         if (this.readabilityManager.showLineNumbers) {
             this.readabilityManager.updateGutter(pageIndex);
         }
+        this.pageManager.checkAndCreateNewPage(pageIndex);
     });
     
     // Bind Y.Text (if provider/awareness is ready)
@@ -390,28 +391,6 @@ export class Editor {
   deletePage(index) {
       if (this.yPages.length > 1) {
           this.yPages.delete(index, 1);
-      }
-  }
-  
-  mergeWithPreviousPage(index) {
-      if (index <= 0) return;
-      
-      const prevPageMap = this.yPages.get(index - 1);
-      const currPageMap = this.yPages.get(index);
-      
-      const prevText = prevPageMap.get('content');
-      const currText = currPageMap.get('content');
-      
-      // Move content to previous page
-      // Y.Text doesn't support direct append easily without formatted delta
-      // Actually, we can insert content. 
-      // Simplified: We rely on user to manually move content if they delete the page break,
-      // or we programmatically move it.
-      
-      // For now, let's just delete the empty page if it's empty
-      if (currText.length === 0) {
-          this.deletePage(index);
-          this.switchToPage(index - 1, 'end');
       }
   }
 

@@ -92,8 +92,9 @@ export class Theme {
             .toolbar-btn.active { background: linear-gradient(135deg, ${hexColor} 0%, ${lightColor} 100%) !important; color: white !important; box-shadow: 0 0 15px rgba(${rgbString}, 0.4) !important; }
             
             /* Editor Container & Background */
-            .pages-container { background: linear-gradient(135deg, #0a0a0a 0%, ${hexColor}15 50%, #0a0a0a 100%) !important; }
-            body.light-theme .pages-container { background: linear-gradient(135deg, #f5f5f5 0%, ${hexColor}08 50%, #f5f5f5 100%) !important; }
+            .main-workspace { background: linear-gradient(135deg, #0a0a0a 0%, ${hexColor}15 50%, #0a0a0a 100%) !important; }
+            body.light-theme .main-workspace { background: linear-gradient(135deg, #f5f5f5 0%, ${hexColor}08 50%, #f5f5f5 100%) !important; }
+            .pages-container { background: transparent !important; }
 
             .editor-container { border-color: ${hexColor} !important; box-shadow: 0 0 40px rgba(${rgbString}, 0.15) !important; }
             .editor-container::after { background: radial-gradient(ellipse at center, rgba(${rgbString}, 0.3) 0%, rgba(${rgbString}, 0.1) 40%, transparent 70%) !important; opacity: 0.6; }

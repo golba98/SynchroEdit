@@ -18,6 +18,8 @@ export class NavigationManager {
 
     addEvent('toggleOutline', 'click', () => this.toggleOutline());
     addEvent('toggleMinimap', 'click', () => this.toggleMinimap());
+    addEvent('closeOutline', 'click', () => this.toggleOutline());
+    addEvent('closeMinimap', 'click', () => this.toggleMinimap());
 
     // Listen for editor changes to update navigation
     this.editor.doc.getArray('pages').observeDeep(() => {

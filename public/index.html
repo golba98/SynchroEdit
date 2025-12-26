@@ -2764,7 +2764,10 @@
     <div class="main-workspace">
       <!-- Left Sidebar: Outline -->
       <div class="sidebar" id="outlineSidebar">
-        <div class="sidebar-header">Document Outline</div>
+        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Document Outline</span>
+          <button id="closeOutline" style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px;"><i class="fas fa-times"></i></button>
+        </div>
         <div id="outlineContainer" class="outline-container">
           <div style="padding: 20px; color: #666; font-size: 12px;">Add headings to see them here</div>
         </div>
@@ -2775,7 +2778,10 @@
 
       <!-- Right Sidebar: Minimap -->
       <div class="sidebar sidebar-right" id="minimapSidebar">
-        <div class="sidebar-header">Navigator</div>
+        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Navigator</span>
+          <button id="closeMinimap" style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px;"><i class="fas fa-times"></i></button>
+        </div>
         <div id="minimap">
           <!-- Canvas will be injected here -->
         </div>

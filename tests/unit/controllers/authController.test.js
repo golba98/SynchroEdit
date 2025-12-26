@@ -130,4 +130,17 @@ describe('Auth Controller Unit Tests', () => {
           expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ token: 'mock-token' }));
       });
   });
+
+  describe('logout', () => {
+    it('should clear refresh token cookie and return success', () => {
+        authController.logout(req, res);
+        
+        expect(res.cookie).toHaveBeenCalledWith('refreshToken', '', expect.objectContaining({
+            expires: expect.any(Date),
+            httpOnly: true
+        }));
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Logged out successfully' });
+    });
+  });
 });

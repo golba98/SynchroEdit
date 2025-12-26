@@ -53,7 +53,12 @@ export const Auth = {
       return false;
     }
   },
-  logout() {
+  async logout() {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+        console.error('Logout failed:', err);
+    }
     this.removeToken();
     window.location.href = 'pages/login.html';
   },

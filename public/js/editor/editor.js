@@ -42,10 +42,10 @@ export class Editor {
     
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     this.provider = new WebsocketProvider(
-        `${protocol}://${window.location.host}/ws`, 
-        docId, // Room name becomes part of the path: /ws/docId
+        `${protocol}://${window.location.host}`, 
+        '', // Empty room name to force query-param only URL (e.g. /?documentId=...)
         this.doc,
-        { params: { token: token } } // documentId is now in path, removed from params
+        { params: { documentId: docId, token: token } }
     );
     
     this.provider.awareness.setLocalStateField('user', {

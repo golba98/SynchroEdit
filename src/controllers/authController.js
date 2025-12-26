@@ -58,6 +58,27 @@ const sendTokens = async (user, statusCode, req, res, message = undefined) => {
     res.status(statusCode).json(response);
 };
 
+exports.checkUsername = async (req, res, next) => {
+    try {
+        const { username } = req.body;
+        if (!username) return next(new AppError('Username is required', 400));
+
+        const user = await User.findOne({ username: username.trim() }).lean();
+        if (user) {
+            // Suggest alternatives
+            const suggestions = [
+                `${username}${Math.floor(Math.random() * 99)}`,
+                `${username}_edit`,
+                `sync_${username}`
+            ];
+            return res.json({ available: false, suggestions });
+        }
+        res.json({ available: true });
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.getWsTicket = (req, res, next) => {
     try {
         if (!req.user || !req.user.id) {

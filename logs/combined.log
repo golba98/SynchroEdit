@@ -3316,3 +3316,243 @@
 {"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:37:08"}
 {"errorLabelSet":{},"level":"error","message":"Error loading document state: Operation interrupted because client was closed","service":"synchroedit","stack":"MongoClientClosedError: Operation interrupted because client was closed\n    at ConnectionPool.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\cmap\\connection_pool.ts:486:20)\n    at Server.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\server.ts:251:22)\n    at Topology.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\topology.ts:491:21)\n    at MongoClient._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:749:20)\n    at MongoClient.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:731:29)\n    at NativeConnection.doClose (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\drivers\\node-mongodb-native\\connection.js:201:21)\n    at NativeConnection._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1264:18)\n    at NativeConnection.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1229:15)\n    at Object.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\tests\\setup.js:49:29)\n    at Promise.finally.completed (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1497:10)\n    at _callCircusHook (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:976:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTestsForDescribeBlock (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:891:7)\n    at run (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1918:21)\n    at jestAdapter (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\runner.js:101:19)\n    at runTestInternal (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:275:16)\n    at runTest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:343:7)","timestamp":"2025-12-26 23:37:09"}
 {"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:37:09"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:30"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:33"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 605441","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 987755","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 745183","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 900450","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Verification code resent to: test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 873345","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 978916","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 616029","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 344567","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:34"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 966690","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 305512","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 415163","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Profile updated for user: 694f04570b77337d8a2c6dec","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 559690","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"Profile updated for user: 694f04570b77337d8a2c6dfb","service":"synchroedit","timestamp":"2025-12-26 23:55:35"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 732830","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Password updated for user: 694f04580b77337d8a2c6e0c","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User logged in: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 345550","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 719094","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 739562","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 621104","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:36"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 832088","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Document created: 694f04596e347a357d10b249 by 694f04596e347a357d10b241","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 479472","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Document created: 694f04596e347a357d10b25a by 694f04596e347a357d10b252","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 129718","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 780770","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Document deleted: 694f04596e347a357d10b29b by 694f04596e347a357d10b295","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 112450","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 948368","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 176326","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 961670","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-26 23:55:37"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:38"}
+{"level":"info","message":"User logged in: sessiontest","service":"synchroedit","timestamp":"2025-12-26 23:55:38"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:39"}
+{"errorLabelSet":{},"level":"error","message":"Error loading document state: Operation interrupted because client was closed","service":"synchroedit","stack":"MongoClientClosedError: Operation interrupted because client was closed\n    at ConnectionPool.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\cmap\\connection_pool.ts:486:20)\n    at Server.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\server.ts:251:22)\n    at Topology.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\topology.ts:491:21)\n    at MongoClient._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:749:20)\n    at MongoClient.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:731:29)\n    at NativeConnection.doClose (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\drivers\\node-mongodb-native\\connection.js:201:21)\n    at NativeConnection._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1264:18)\n    at NativeConnection.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1229:15)\n    at Object.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\tests\\setup.js:49:29)\n    at Promise.finally.completed (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1497:10)\n    at _callCircusHook (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:976:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTestsForDescribeBlock (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:891:7)\n    at run (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1918:21)\n    at jestAdapter (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\runner.js:101:19)\n    at runTestInternal (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:275:16)\n    at runTest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:343:7)","timestamp":"2025-12-26 23:55:39"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-26 23:55:39"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:01:30"}
+{"level":"info","message":"New user signed up: user_1766786496565","service":"synchroedit","timestamp":"2025-12-27 00:01:37"}
+{"level":"info","message":"Document created: 694f05c5b1578f109d7645f0 by 694f05c1b1578f109d7645df","service":"synchroedit","timestamp":"2025-12-27 00:01:41"}
+{"level":"info","message":"New user signed up: ui_user_1766786518587","service":"synchroedit","timestamp":"2025-12-27 00:01:59"}
+{"level":"info","message":"Document created: 694f05dab1578f109d76461a by 694f05d7b1578f109d764609","service":"synchroedit","timestamp":"2025-12-27 00:02:02"}
+{"level":"info","message":"New user signed up: ui_user_1766786524380","service":"synchroedit","timestamp":"2025-12-27 00:02:05"}
+{"level":"info","message":"Document created: 694f05e0b1578f109d764647 by 694f05ddb1578f109d764633","service":"synchroedit","timestamp":"2025-12-27 00:02:08"}
+{"level":"info","message":"New user signed up: resp_user_1766786556890","service":"synchroedit","timestamp":"2025-12-27 00:02:38"}
+{"level":"info","message":"Document created: 694f0601b1578f109d764674 by 694f05feb1578f109d764663","service":"synchroedit","timestamp":"2025-12-27 00:02:41"}
+{"level":"info","message":"New user signed up: user_1766786564884","service":"synchroedit","timestamp":"2025-12-27 00:02:45"}
+{"level":"info","message":"Document created: 694f0608b1578f109d76469e by 694f0605b1578f109d76468d","service":"synchroedit","timestamp":"2025-12-27 00:02:48"}
+{"level":"info","message":"New user signed up: ui_user_1766786586737","service":"synchroedit","timestamp":"2025-12-27 00:03:07"}
+{"level":"info","message":"Document created: 694f061eb1578f109d7646c8 by 694f061bb1578f109d7646b7","service":"synchroedit","timestamp":"2025-12-27 00:03:10"}
+{"level":"info","message":"New user signed up: ui_user_1766786608225","service":"synchroedit","timestamp":"2025-12-27 00:03:29"}
+{"level":"info","message":"Document created: 694f0634b1578f109d7646f2 by 694f0631b1578f109d7646e1","service":"synchroedit","timestamp":"2025-12-27 00:03:32"}
+{"level":"info","message":"New user signed up: resp_user_1766786640735","service":"synchroedit","timestamp":"2025-12-27 00:04:02"}
+{"level":"info","message":"Document created: 694f0655b1578f109d76471c by 694f0652b1578f109d76470b","service":"synchroedit","timestamp":"2025-12-27 00:04:05"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:05:36"}
+{"level":"info","message":"New user signed up: user_1766786739508","service":"synchroedit","timestamp":"2025-12-27 00:05:40"}
+{"level":"info","message":"Document created: 694f06b814a5ff6ac13dea5b by 694f06b414a5ff6ac13dea4a","service":"synchroedit","timestamp":"2025-12-27 00:05:44"}
+{"level":"info","message":"New user signed up: ui_user_1766786761828","service":"synchroedit","timestamp":"2025-12-27 00:06:03"}
+{"level":"info","message":"Document created: 694f06ce14a5ff6ac13dea85 by 694f06cb14a5ff6ac13dea74","service":"synchroedit","timestamp":"2025-12-27 00:06:06"}
+{"level":"info","message":"New user signed up: ui_user_1766786767711","service":"synchroedit","timestamp":"2025-12-27 00:06:09"}
+{"level":"info","message":"Document created: 694f06d414a5ff6ac13deab2 by 694f06d114a5ff6ac13dea9e","service":"synchroedit","timestamp":"2025-12-27 00:06:12"}
+{"level":"info","message":"New user signed up: resp_user_1766786800164","service":"synchroedit","timestamp":"2025-12-27 00:06:41"}
+{"level":"info","message":"Document created: 694f06f414a5ff6ac13deadc by 694f06f114a5ff6ac13deacb","service":"synchroedit","timestamp":"2025-12-27 00:06:44"}
+{"level":"info","message":"New user signed up: user_1766786807438","service":"synchroedit","timestamp":"2025-12-27 00:06:48"}
+{"level":"info","message":"Document created: 694f06fb14a5ff6ac13deb09 by 694f06f814a5ff6ac13deaf8","service":"synchroedit","timestamp":"2025-12-27 00:06:51"}
+{"level":"info","message":"New user signed up: ui_user_1766786812602","service":"synchroedit","timestamp":"2025-12-27 00:06:53"}
+{"level":"info","message":"Document created: 694f070014a5ff6ac13deb39 by 694f06fd14a5ff6ac13deb28","service":"synchroedit","timestamp":"2025-12-27 00:06:56"}
+{"level":"info","message":"New user signed up: ui_user_1766786834326","service":"synchroedit","timestamp":"2025-12-27 00:07:15"}
+{"level":"info","message":"Document created: 694f071614a5ff6ac13deb63 by 694f071314a5ff6ac13deb52","service":"synchroedit","timestamp":"2025-12-27 00:07:18"}
+{"level":"info","message":"New user signed up: resp_user_1766786866515","service":"synchroedit","timestamp":"2025-12-27 00:07:47"}
+{"level":"info","message":"Document created: 694f073614a5ff6ac13deb90 by 694f073314a5ff6ac13deb7f","service":"synchroedit","timestamp":"2025-12-27 00:07:50"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:08:22"}
+{"level":"info","message":"New user signed up: user_1766786904901","service":"synchroedit","timestamp":"2025-12-27 00:08:25"}
+{"level":"info","message":"Document created: 694f075c5e53796dcf960170 by 694f07595e53796dcf96015f","service":"synchroedit","timestamp":"2025-12-27 00:08:28"}
+{"level":"info","message":"New user signed up: ui_user_1766786926247","service":"synchroedit","timestamp":"2025-12-27 00:08:47"}
+{"level":"info","message":"Document created: 694f07725e53796dcf96019a by 694f076f5e53796dcf960189","service":"synchroedit","timestamp":"2025-12-27 00:08:50"}
+{"level":"info","message":"New user signed up: ui_user_1766786931720","service":"synchroedit","timestamp":"2025-12-27 00:08:53"}
+{"level":"info","message":"Document created: 694f07785e53796dcf9601c7 by 694f07755e53796dcf9601b3","service":"synchroedit","timestamp":"2025-12-27 00:08:56"}
+{"level":"info","message":"New user signed up: resp_user_1766786964034","service":"synchroedit","timestamp":"2025-12-27 00:09:25"}
+{"level":"info","message":"Document created: 694f07985e53796dcf9601f4 by 694f07955e53796dcf9601e3","service":"synchroedit","timestamp":"2025-12-27 00:09:28"}
+{"level":"info","message":"New user signed up: user_1766786971247","service":"synchroedit","timestamp":"2025-12-27 00:09:32"}
+{"level":"info","message":"Document created: 694f079e5e53796dcf960221 by 694f079c5e53796dcf960210","service":"synchroedit","timestamp":"2025-12-27 00:09:34"}
+{"level":"info","message":"New user signed up: ui_user_1766786975650","service":"synchroedit","timestamp":"2025-12-27 00:09:37"}
+{"level":"info","message":"Document created: 694f07a35e53796dcf960251 by 694f07a05e53796dcf960240","service":"synchroedit","timestamp":"2025-12-27 00:09:39"}
+{"level":"info","message":"New user signed up: ui_user_1766786997651","service":"synchroedit","timestamp":"2025-12-27 00:09:59"}
+{"level":"info","message":"Document created: 694f07ba5e53796dcf96027b by 694f07b75e53796dcf96026a","service":"synchroedit","timestamp":"2025-12-27 00:10:02"}
+{"level":"info","message":"New user signed up: resp_user_1766787030306","service":"synchroedit","timestamp":"2025-12-27 00:10:31"}
+{"level":"info","message":"Document created: 694f07db5e53796dcf9602a5 by 694f07d75e53796dcf960294","service":"synchroedit","timestamp":"2025-12-27 00:10:35"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:11:24"}
+{"level":"info","message":"New user signed up: user_1766787086710","service":"synchroedit","timestamp":"2025-12-27 00:11:27"}
+{"level":"info","message":"Document created: 694f08126ba431302db13ef1 by 694f080f6ba431302db13ee0","service":"synchroedit","timestamp":"2025-12-27 00:11:30"}
+{"level":"info","message":"New user signed up: ui_user_1766787118136","service":"synchroedit","timestamp":"2025-12-27 00:11:59"}
+{"level":"info","message":"Document created: 694f08316ba431302db13f1b by 694f082f6ba431302db13f0a","service":"synchroedit","timestamp":"2025-12-27 00:12:01"}
+{"level":"info","message":"New user signed up: ui_user_1766787149598","service":"synchroedit","timestamp":"2025-12-27 00:12:31"}
+{"level":"info","message":"Document created: 694f08526ba431302db13f45 by 694f084e6ba431302db13f34","service":"synchroedit","timestamp":"2025-12-27 00:12:34"}
+{"level":"info","message":"New user signed up: resp_user_1766787157886","service":"synchroedit","timestamp":"2025-12-27 00:12:39"}
+{"level":"info","message":"Document created: 694f08596ba431302db13f63 by 694f08576ba431302db13f52","service":"synchroedit","timestamp":"2025-12-27 00:12:41"}
+{"level":"info","message":"New user signed up: user_1766787164373","service":"synchroedit","timestamp":"2025-12-27 00:12:45"}
+{"level":"info","message":"Document created: 694f08606ba431302db13f90 by 694f085d6ba431302db13f7f","service":"synchroedit","timestamp":"2025-12-27 00:12:48"}
+{"level":"info","message":"New user signed up: ui_user_1766787195860","service":"synchroedit","timestamp":"2025-12-27 00:13:17"}
+{"level":"info","message":"Document created: 694f087f6ba431302db13fba by 694f087d6ba431302db13fa9","service":"synchroedit","timestamp":"2025-12-27 00:13:19"}
+{"level":"info","message":"New user signed up: ui_user_1766787200965","service":"synchroedit","timestamp":"2025-12-27 00:13:22"}
+{"level":"info","message":"Document created: 694f08856ba431302db13fe7 by 694f08826ba431302db13fd6","service":"synchroedit","timestamp":"2025-12-27 00:13:25"}
+{"level":"info","message":"New user signed up: resp_user_1766787206826","service":"synchroedit","timestamp":"2025-12-27 00:13:28"}
+{"level":"info","message":"Document created: 694f088b6ba431302db14014 by 694f08886ba431302db14003","service":"synchroedit","timestamp":"2025-12-27 00:13:31"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:14:09"}
+{"level":"info","message":"New user signed up: user_1766787251954","service":"synchroedit","timestamp":"2025-12-27 00:14:12"}
+{"level":"info","message":"Document created: 694f08b7f5e950384a3a7c24 by 694f08b4f5e950384a3a7c13","service":"synchroedit","timestamp":"2025-12-27 00:14:15"}
+{"level":"info","message":"New user signed up: ui_user_1766787257122","service":"synchroedit","timestamp":"2025-12-27 00:14:18"}
+{"level":"info","message":"Document created: 694f08bdf5e950384a3a7c54 by 694f08baf5e950384a3a7c43","service":"synchroedit","timestamp":"2025-12-27 00:14:21"}
+{"level":"info","message":"New user signed up: ui_user_1766787262532","service":"synchroedit","timestamp":"2025-12-27 00:14:23"}
+{"level":"info","message":"Document created: 694f08c2f5e950384a3a7c81 by 694f08bff5e950384a3a7c6d","service":"synchroedit","timestamp":"2025-12-27 00:14:26"}
+{"level":"info","message":"New user signed up: resp_user_1766787269907","service":"synchroedit","timestamp":"2025-12-27 00:14:31"}
+{"level":"info","message":"Document created: 694f08caf5e950384a3a7c99 by 694f08c7f5e950384a3a7c88","service":"synchroedit","timestamp":"2025-12-27 00:14:34"}
+{"level":"info","message":"New user signed up: user_1766787277904","service":"synchroedit","timestamp":"2025-12-27 00:14:38"}
+{"level":"info","message":"Document created: 694f08d1f5e950384a3a7cc3 by 694f08cef5e950384a3a7cb2","service":"synchroedit","timestamp":"2025-12-27 00:14:41"}
+{"level":"info","message":"New user signed up: ui_user_1766787282277","service":"synchroedit","timestamp":"2025-12-27 00:14:43"}
+{"level":"info","message":"Document created: 694f08d6f5e950384a3a7cf3 by 694f08d3f5e950384a3a7ce2","service":"synchroedit","timestamp":"2025-12-27 00:14:46"}
+{"level":"info","message":"New user signed up: ui_user_1766787314322","service":"synchroedit","timestamp":"2025-12-27 00:15:16"}
+{"level":"info","message":"Document created: 694f08f6f5e950384a3a7d1d by 694f08f4f5e950384a3a7d0c","service":"synchroedit","timestamp":"2025-12-27 00:15:18"}
+{"level":"info","message":"New user signed up: resp_user_1766787322382","service":"synchroedit","timestamp":"2025-12-27 00:15:23"}
+{"level":"info","message":"Document created: 694f08fef5e950384a3a7d4a by 694f08fbf5e950384a3a7d39","service":"synchroedit","timestamp":"2025-12-27 00:15:26"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:16:34"}
+{"level":"info","message":"New user signed up: user_1766787397179","service":"synchroedit","timestamp":"2025-12-27 00:16:38"}
+{"level":"info","message":"New user signed up: ui_user_1766787428392","service":"synchroedit","timestamp":"2025-12-27 00:17:09"}
+{"level":"info","message":"New user signed up: ui_user_1766787460136","service":"synchroedit","timestamp":"2025-12-27 00:17:41"}
+{"level":"info","message":"New user signed up: resp_user_1766787492166","service":"synchroedit","timestamp":"2025-12-27 00:18:13"}
+{"level":"info","message":"New user signed up: user_1766787525043","service":"synchroedit","timestamp":"2025-12-27 00:18:46"}
+{"level":"info","message":"New user signed up: ui_user_1766787555870","service":"synchroedit","timestamp":"2025-12-27 00:19:17"}
+{"level":"info","message":"New user signed up: ui_user_1766787587867","service":"synchroedit","timestamp":"2025-12-27 00:19:49"}
+{"level":"info","message":"New user signed up: resp_user_1766787620364","service":"synchroedit","timestamp":"2025-12-27 00:20:21"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 00:21:47"}
+{"level":"info","message":"New user signed up: user_1766787709802","service":"synchroedit","timestamp":"2025-12-27 00:21:50"}
+{"level":"info","message":"New user signed up: ui_user_1766787741045","service":"synchroedit","timestamp":"2025-12-27 00:22:22"}
+{"level":"info","message":"New user signed up: ui_user_1766787772734","service":"synchroedit","timestamp":"2025-12-27 00:22:54"}
+{"level":"info","message":"New user signed up: resp_user_1766787804821","service":"synchroedit","timestamp":"2025-12-27 00:23:26"}
+{"level":"info","message":"New user signed up: user_1766787837830","service":"synchroedit","timestamp":"2025-12-27 00:23:58"}
+{"level":"info","message":"New user signed up: ui_user_1766787868639","service":"synchroedit","timestamp":"2025-12-27 00:24:30"}
+{"level":"info","message":"New user signed up: ui_user_1766787900644","service":"synchroedit","timestamp":"2025-12-27 00:25:02"}
+{"level":"info","message":"New user signed up: resp_user_1766787933363","service":"synchroedit","timestamp":"2025-12-27 00:25:34"}

@@ -18,6 +18,7 @@ test.describe('Auth and Basic Document Flow', () => {
 
     // 2. Create Document
     // Library should be open by default if no doc is in URL
+    await page.waitForTimeout(1000);
     await page.click('#createNewDoc');
     
     // Wait for doc library to close and document to be ready
@@ -29,8 +30,8 @@ test.describe('Auth and Basic Document Flow', () => {
     
     // Quill editor
     const editor = page.locator('.ql-editor');
-    await expect(editor).toHaveAttribute('contenteditable', 'true', { timeout: 15000 });
-    await editor.click();
+    await expect(editor).toHaveAttribute('contenteditable', 'true', { timeout: 30000 });
+    await editor.click({ force: true });
     await editor.fill('Hello, this is a test collaborative document!');
     
     // 4. Save

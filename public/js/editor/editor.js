@@ -99,7 +99,7 @@ export class Editor {
     } catch (err) {
         console.error('Failed to get WS ticket:', err);
         // Retry later
-        setTimeout(() => this.connectWebSocket(docId, user), 5000);
+        setTimeout(() => this.connectWebSocket(docId, user), 1000);
         return;
     }
 
@@ -114,64 +114,9 @@ export class Editor {
         { params: { documentId: docId, ticket: ticket } }
     );
     
-    if (this.provider && this.provider.awareness && user.showOnlineStatus !== false) {
-        this.provider.awareness.setLocalStateField('user', {
-            username: user.username,
-            profilePicture: user.profilePicture,
-            color: user.accentColor || user.color || '#' + Math.floor(Math.random()*16777215).toString(16)
-        });
-    }
-    
-    if (this.provider && this.provider.awareness) {
-        this.provider.awareness.on('change', () => {
-            const states = this.provider.awareness.getStates();
-            const users = [];
-            states.forEach(state => {
-                if (state.user) {
-                    users.push(state.user);
-                }
-            });
-            this.onCollaboratorsChange(users);
-        });
-    }
-    
-    this.provider.on('status', event => {
-        console.log('Yjs WebSocket status:', event.status);
-        this.onStatusChange(event.status);
-    });
-
-    // Save to IndexedDB on every update
-    this.doc.on('update', (update) => {
-        this.saveToCache(docId);
-    });
-
     this.provider.on('sync', isSynced => {
         if (isSynced && this.yPages.length === 0) {
-            const newPage = new Y.Map();
-            const content = new Y.Text();
-            newPage.set('content', content);
-            this.yPages.push([newPage]);
-        }
-        if (isSynced) {
-             // After sync, ensure all existing pages are bound to awareness
-             Object.keys(this.pageQuillInstances).forEach(index => {
-                 if (!this.pageBindings[index]) {
-                     const pageQuill = this.pageQuillInstances[index];
-                     const pageMap = this.yPages.get(parseInt(index));
-                     if (pageMap) {
-                         const yText = pageMap.get('content');
-                         if (this.provider && this.provider.awareness) {
-                             const binding = new QuillBinding(yText, pageQuill, this.provider.awareness);
-                             this.pageBindings[index] = binding;
-                         }
-                     }
-                 }
-             });
-             this.renderAllPages();
-             this.saveToCache(docId);
-        }
-    });
-  }
+
 
   async reconnect(user = null) {
       console.log('Forcing editor reconnection...');

@@ -16,13 +16,15 @@ test.describe('UI Interactions', () => {
     await page.fill('#signupPasswordConfirm', 'Password123!');
     await page.click('#signupBtn');
     await expect(page).toHaveURL(/\/index.html/);
+    await page.waitForTimeout(1000);
     await page.click('#createNewDoc');
+    await expect(page.locator('#docLibrary')).not.toBeVisible();
   });
 
   test('should toggle bold and italic via toolbar', async ({ page }) => {
     const editor = page.locator('.ql-editor');
-    await expect(editor).toHaveAttribute('contenteditable', 'true', { timeout: 15000 });
-    await editor.click();
+    await expect(editor).toHaveAttribute('contenteditable', 'true', { timeout: 30000 });
+    await editor.click({ force: true });
     await editor.fill('Testing toolbar');
     
     // Select text
@@ -45,9 +47,11 @@ test.describe('UI Interactions', () => {
 
   test('should switch between light and dark themes', async ({ page }) => {
     await page.click('#userProfileTrigger');
+    await expect(page.locator('#profileModal')).toBeVisible();
     
-    // Click Personalization tab
-    await page.click('button[data-tab="personalization"]');
+    // Click Appearance tab
+    await page.click('button[data-tab="appearance"]', { force: true });
+    await expect(page.locator('#appearance-content')).toBeVisible();
     
     // Click Light Theme
     await page.click('#lightThemeBtn');

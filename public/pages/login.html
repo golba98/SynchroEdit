@@ -8,6 +8,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="stylesheet" href="../css/styles.css" />
     <style>
       :root {
         --accent-color: #8b5cf6;
@@ -563,17 +564,15 @@
           <div class="title">Welcome Back</div>
           <div class="subtitle">Please login to continue to SynchroEdit</div>
 
-          <div class="input-group">
-            <label for="loginUsername">Username</label>
-            <div class="input-wrapper">
-              <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username" />
-            </div>
+          <div class="input-group floating-label-container">
+            <input type="text" id="loginUsername" placeholder=" " autocomplete="username" class="glow-on-hover input-glow-focus" />
+            <label for="loginUsername" class="floating-label">Username or Email</label>
           </div>
 
-          <div class="input-group">
-            <label for="loginPassword">Password</label>
-            <div class="input-wrapper">
-              <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+          <div class="input-group floating-label-container">
+            <div class="input-wrapper" style="width: 100%;">
+              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" class="glow-on-hover input-glow-focus" />
+              <label for="loginPassword" class="floating-label">Password</label>
               <span class="password-toggle" id="loginPasswordToggle"><i class="fas fa-eye"></i></span>
             </div>
             <div style="text-align: right; margin-top: 5px;">
@@ -596,33 +595,41 @@
           <div class="title">Create Account</div>
           <div class="subtitle">Join SynchroEdit today</div>
 
-          <div class="input-group">
-            <label for="signupUsername">Username</label>
-            <div class="input-wrapper">
-              <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="off" />
+          <div class="input-group floating-label-container">
+            <div class="input-wrapper" style="width: 100%;">
+              <input type="text" id="signupUsername" placeholder=" " autocomplete="off" class="glow-on-hover input-glow-focus" />
+              <label for="signupUsername" class="floating-label">Choose a username</label>
+              <div id="usernameStatusIcon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: none;"></div>
             </div>
+            <div id="usernameSuggestions" style="display: none; margin-top: 5px; font-size: 11px; color: var(--warning-color);"></div>
           </div>
 
-          <div class="input-group">
-            <label for="signupEmail">Email Address</label>
-            <div class="input-wrapper">
-              <input type="email" id="signupEmail" placeholder="Enter your email" autocomplete="email" />
-            </div>
+          <div class="input-group floating-label-container">
+            <input type="email" id="signupEmail" placeholder=" " autocomplete="email" class="glow-on-hover input-glow-focus" />
+            <label for="signupEmail" class="floating-label">Email Address</label>
+            <div id="emailSuggestion" style="display: none; margin-top: 5px; font-size: 11px; color: var(--accent-color-light); cursor: pointer;"></div>
           </div>
 
-          <div class="input-group">
-            <label for="signupPassword">Password</label>
-            <div class="input-wrapper">
-              <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password" />
+          <div class="input-group floating-label-container">
+            <div class="input-wrapper" style="width: 100%;">
+              <input type="password" id="signupPassword" placeholder=" " autocomplete="new-password" class="glow-on-hover input-glow-focus" />
+              <label for="signupPassword" class="floating-label">Create a password</label>
               <span class="password-toggle" id="signupPasswordToggle"><i class="fas fa-eye"></i></span>
             </div>
+            <div class="entropy-bar">
+              <div id="entropySegment" class="entropy-segment" style="width: 0%;"></div>
+            </div>
+            <ul id="passwordRequirements" style="list-style: none; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <li class="requirement-item" data-req="length"><i class="fas fa-circle"></i> 8+ chars</li>
+              <li class="requirement-item" data-req="upper"><i class="fas fa-circle"></i> 1 Uppercase</li>
+              <li class="requirement-item" data-req="number"><i class="fas fa-circle"></i> 1 Number</li>
+              <li class="requirement-item" data-req="symbol"><i class="fas fa-circle"></i> 1 Symbol</li>
+            </ul>
           </div>
 
-          <div class="input-group">
-            <label for="signupPasswordConfirm">Confirm Password</label>
-            <div class="input-wrapper">
-              <input type="password" id="signupPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password" />
-            </div>
+          <div class="input-group floating-label-container">
+            <input type="password" id="signupPasswordConfirm" placeholder=" " autocomplete="new-password" class="glow-on-hover input-glow-focus" />
+            <label for="signupPasswordConfirm" class="floating-label">Confirm Password</label>
           </div>
 
           <button class="login-btn" id="signupBtn">Create Account</button>
@@ -686,358 +693,6 @@
       </div>
     </div>
 
-    <script>
-      // ==========================
-      // SYNCHROBOT 2.0 LOGIC
-      // ==========================
-      const botRig = document.getElementById('botRig');
-      const pupils = document.querySelectorAll('.pupil');
-      let sleepTimer = null;
-      let isSleeping = false;
-
-      // Wake Up Function
-      function wakeUp() {
-        if (isSleeping) {
-          isSleeping = false;
-          botRig.classList.remove('sleeping');
-          // Startle animation
-          botRig.style.transform = 'scale(1.1)';
-          setTimeout(() => botRig.style.transform = '', 200);
-        }
-        resetSleepTimer();
-      }
-
-      function resetSleepTimer() {
-        clearTimeout(sleepTimer);
-        sleepTimer = setTimeout(() => {
-          if (!botRig.classList.contains('processing')) {
-            isSleeping = true;
-            botRig.classList.add('sleeping');
-            createZzz();
-          }
-        }, 30000); // 30 seconds idle
-      }
-
-      function createZzz() {
-        if (!isSleeping) return;
-        const z = document.createElement('div');
-        z.textContent = 'Zzz';
-        z.className = 'zzz-particle';
-        z.style.left = '60%';
-        z.style.top = '-20px';
-        document.querySelector('.bot-rig').appendChild(z);
-        setTimeout(() => { z.remove(); createZzz(); }, 2000);
-      }
-
-      // Input Tracking (Reading)
-      function updatePupils(length) {
-        // Map 0-20 chars to -10px to +10px
-        const maxOffset = 10;
-        const limit = 20;
-        const normalized = Math.min(length, limit) / limit; // 0 to 1
-        const offset = (normalized * maxOffset * 2) - maxOffset; // -10 to 10
-        
-        pupils.forEach(p => {
-          p.style.transform = `translate(calc(-50% + ${offset}px), -50%)`;
-        });
-      }
-
-      // Interaction Listeners
-      document.addEventListener('mousemove', wakeUp);
-      document.addEventListener('keydown', wakeUp);
-
-      // --- Username Interaction ---
-      const uInputs = [document.getElementById('loginUsername'), document.getElementById('signupUsername')];
-      uInputs.forEach(input => {
-        input.addEventListener('input', (e) => {
-          updatePupils(e.target.value.length);
-          if (e.target.value.length > 5 && e.inputType === 'insertText') {
-             // Micro-reaction for typing
-          }
-        });
-        input.addEventListener('focus', () => {
-          botRig.className = 'bot-rig'; // Reset states
-          updatePupils(input.value.length);
-        });
-      });
-
-      // --- Password Interaction (The Guardian) ---
-      const pInputs = [
-        document.getElementById('loginPassword'), 
-        document.getElementById('signupPassword'),
-        document.getElementById('signupPasswordConfirm')
-      ];
-      
-      function updateBotState(input, force = false) {
-          if (!force && document.activeElement !== input) return;
-          
-          // Clear all states first to avoid conflicts
-          botRig.classList.remove('secure', 'peeking', 'confused', 'searching');
-          
-          if (input.type === 'text') {
-              if (input.value.length === 0) {
-                  botRig.classList.add('searching');
-              } else {
-                  botRig.classList.add('peeking');
-                  updatePupils(input.value.length);
-              }
-          } else {
-              // Hidden -> Secure Mode
-              botRig.classList.add('secure');
-          }
-      }
-
-      pInputs.forEach(input => {
-        input.addEventListener('input', (e) => updateBotState(e.target));
-        input.addEventListener('focus', (e) => updateBotState(e.target));
-        
-        input.addEventListener('blur', () => {
-          // Only remove if we aren't clicking the toggle
-          setTimeout(() => {
-             if (!document.activeElement.classList.contains('password-toggle')) {
-                 botRig.classList.remove('secure', 'peeking', 'confused');
-             }
-          }, 100);
-        });
-      });
-
-      // --- Peek Toggle ---
-      document.querySelectorAll('.password-toggle').forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          // The click listener in main logic toggles the input type
-          // We just need to check the state after a microtask
-          setTimeout(() => {
-                        const input = toggle.parentElement.querySelector('input');
-            // Force update regardless of focus so bot reacts to the click
-            updateBotState(input, true);
-          }, 50);
-        });
-      });
-
-      // ==========================
-      // CORE AUTH LOGIC (Preserved)
-      // ==========================
-      
-      // Elements
-      const loginForm = document.getElementById('loginForm');
-      const signupForm = document.getElementById('signupForm');
-      const showSignup = document.getElementById('showSignup');
-      const showLogin = document.getElementById('showLogin');
-      
-      // Toggle Forms
-      showSignup.addEventListener('click', () => {
-        loginForm.classList.remove('active');
-        signupForm.classList.add('active');
-        botRig.className = 'bot-rig'; // Reset bot
-      });
-      showLogin.addEventListener('click', () => {
-        signupForm.classList.remove('active');
-        loginForm.classList.add('active');
-        botRig.className = 'bot-rig';
-      });
-      
-      // Back Button Handler
-      const backBtn = document.getElementById('signupBackBtn');
-      backBtn.addEventListener('click', () => {
-          showLogin.click();
-      });
-      
-      backBtn.addEventListener('mouseenter', () => {
-          backBtn.style.borderColor = 'var(--accent-color)';
-          backBtn.style.color = 'var(--accent-color)';
-      });
-      backBtn.addEventListener('mouseleave', () => {
-          backBtn.style.borderColor = '#333';
-          backBtn.style.color = '#b0b0b0';
-      });
-
-      // Password Toggles Logic
-      document.querySelectorAll('.password-toggle').forEach(toggle => {
-        toggle.addEventListener('click', () => {
-                      const input = toggle.parentElement.querySelector('input');
-          const type = input.type === 'password' ? 'text' : 'password';
-          input.type = type;
-          toggle.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-          
-                    // Update bot state: if showing password (type is text) and field is empty, show searching state
-                    const isPasswordVisible = type === 'text';
-                    const isEmpty = input.value === '';
-                    
-                    botRig.classList.remove('secure', 'peeking', 'searching');
-                    if (isPasswordVisible && isEmpty) {
-                      botRig.classList.add('searching');
-                    } else if (isPasswordVisible) {
-                      botRig.classList.add('peeking');
-                    } else {
-                      botRig.classList.add('secure');
-                    }
-                  });
-                  
-                  // Also update state when typing in password field
-                  const input = toggle.parentElement.querySelector('input');
-                  input.addEventListener('input', () => {
-                    botRig.classList.remove('secure', 'peeking', 'searching');
-                    if (input.type === 'text') { // password is visible
-                      if (input.value === '') {
-                        botRig.classList.add('searching');
-                      } else {
-                        botRig.classList.add('peeking');
-                      }
-                    } else {
-                      botRig.classList.add('secure');
-                    }
-                  });      });
-
-      // Login Handler
-      document.getElementById('loginBtn').addEventListener('click', async () => {
-        const username = document.getElementById('loginUsername').value;
-        const password = document.getElementById('loginPassword').value;
-        const msg = document.getElementById('loginStatusMessage');
-
-        // Processing State
-        botRig.className = 'bot-rig processing';
-        msg.textContent = '';
-
-        try {
-          // Dev Bypass
-          if (username === 'K9-Vortex' && password === 'password123') {
-             setTimeout(() => successSequence(username, 'dev-token'), 800);
-             return;
-          }
-
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-          const data = await response.json();
-
-          if (response.ok) {
-            successSequence(data.username, data.token);
-          } else {
-            errorSequence(data.message);
-          }
-        } catch (e) {
-          errorSequence('Network Error');
-        }
-      });
-
-      function successSequence(username, token) {
-        botRig.className = 'bot-rig success';
-        document.getElementById('loginStatusMessage').textContent = '✓ Welcome!';
-        document.getElementById('loginStatusMessage').className = 'status-message success';
-        
-        // Secure Flow: We rely on the HttpOnly cookie set by the server.
-        // We do not store the token in localStorage anymore.
-
-        setTimeout(() => {
-           const docId = new URLSearchParams(window.location.search).get('doc');
-           window.location.href = docId ? `../index.html?doc=${docId}` : '../index.html';
-        }, 1500);
-      }
-
-      function errorSequence(message) {
-        botRig.className = 'bot-rig error';
-        document.body.classList.add('error-flash');
-        setTimeout(() => document.body.classList.remove('error-flash'), 300);
-        
-        const msg = document.getElementById('loginStatusMessage');
-        msg.textContent = '✗ ' + message;
-        msg.className = 'status-message error';
-
-        setTimeout(() => {
-          botRig.classList.remove('error');
-          botRig.classList.remove('processing');
-        }, 1000);
-      }
-
-      // Signup Handler (Simplified for brevity, logic matches existing)
-      document.getElementById('signupBtn').addEventListener('click', async () => {
-         const username = document.getElementById('signupUsername').value;
-         const email = document.getElementById('signupEmail').value;
-         const password = document.getElementById('signupPassword').value;
-         const confirm = document.getElementById('signupPasswordConfirm').value;
-         const msg = document.getElementById('signupStatusMessage');
-
-         if(password !== confirm) {
-             msg.textContent = 'Passwords do not match';
-             msg.className = 'status-message error';
-             botRig.className = 'bot-rig error';
-             setTimeout(() => botRig.className = 'bot-rig', 500);
-             return;
-         }
-
-         botRig.className = 'bot-rig processing';
-
-         try {
-             const response = await fetch('/api/auth/signup', {
-                 method: 'POST',
-                 headers: {'Content-Type': 'application/json'},
-                 body: JSON.stringify({username, email, password})
-             });
-             const data = await response.json();
-             
-             if(response.ok) {
-                 if(data.token) {
-                     successSequence(data.username, data.token);
-                 } else {
-                     // Verification flow
-                     botRig.className = 'bot-rig'; // Reset
-                     msg.textContent = '✓ Check email for code';
-                     msg.className = 'status-message success';
-                     // Show Modal logic (reused from previous)
-                     document.getElementById('emailVerificationModal').style.display = 'flex';
-                     window.pendingSignupData = data;
-                 }
-             } else {
-                 errorSequence(data.message);
-             }
-         } catch(e) {
-             errorSequence('Network Error');
-         }
-      });
-
-      // Verification Modal Logic Re-binding
-      document.getElementById('verifyCodeBtn').addEventListener('click', async () => {
-          const code = document.getElementById('verificationCode').value;
-          const msg = document.getElementById('verificationMessage');
-          try {
-              const res = await fetch('/api/auth/verify-email', {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({email: window.pendingSignupData.email, verificationCode: code})
-              });
-              const data = await res.json();
-              if(res.ok) {
-                  successSequence(data.username, data.token);
-              } else {
-                  msg.textContent = data.message;
-                  msg.style.color = 'red';
-              }
-          } catch(e) { console.error(e); }
-      });
-
-      // Init
-      resetSleepTimer();
-      // Auto-load accent color if cached (optional)
-      const cachedUser = localStorage.getItem('synchroEditUser');
-      // If we had a way to get accent color without login, we'd set it here.
-      // For now, default purple is fine.
-
-      // Auto-Login Check (Restore Session)
-      (async () => {
-          try {
-              const res = await fetch('/api/auth/refresh-token', { method: 'POST' });
-              if (res.ok) {
-                  // User already has a valid session
-                  const docId = new URLSearchParams(window.location.search).get('doc');
-                  window.location.href = docId ? `../index.html?doc=${docId}` : '../index.html';
-              }
-          } catch (e) {
-              // Ignore, stay on login page
-          }
-      })();
-
-    </script>
+    <script type="module" src="../js/ui/authController.js"></script>
   </body>
 </html>

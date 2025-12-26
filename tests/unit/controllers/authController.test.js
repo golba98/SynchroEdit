@@ -186,6 +186,7 @@ describe('Auth Controller Unit Tests', () => {
               comparePassword: jest.fn().mockResolvedValue(true),
               isEmailVerified: true,
               sessions: [],
+              loginHistory: [],
               save: jest.fn().mockResolvedValue(true)
           };
           
@@ -201,6 +202,33 @@ describe('Auth Controller Unit Tests', () => {
               username: 'user'
           }));
       });
+  });
+
+  describe('checkUsername', () => {
+    it('should return available true if username not taken', async () => {
+        req.body = { username: 'available_user' };
+        User.findOne.mockReturnValue({
+            lean: jest.fn().mockResolvedValue(null)
+        });
+
+        await authController.checkUsername(req, res, next);
+
+        expect(res.json).toHaveBeenCalledWith({ available: true });
+    });
+
+    it('should return available false and suggestions if username taken', async () => {
+        req.body = { username: 'taken_user' };
+        User.findOne.mockReturnValue({
+            lean: jest.fn().mockResolvedValue({ username: 'taken_user' })
+        });
+
+        await authController.checkUsername(req, res, next);
+
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+            available: false,
+            suggestions: expect.any(Array)
+        }));
+    });
   });
 
   describe('logout', () => {

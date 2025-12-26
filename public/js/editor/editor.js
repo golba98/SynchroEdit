@@ -40,6 +40,7 @@ export class Editor {
     const docId = new URLSearchParams(window.location.search).get('doc');
     const token = Auth.getToken();
     const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
+    this.user = user;
     
     // 1. Instant Load from IndexedDB
     this.loadFromCache(docId).then(() => {
@@ -150,11 +151,13 @@ export class Editor {
     });
   }
 
-  async reconnect() {
+  async reconnect(user = null) {
       console.log('Forcing editor reconnection...');
+      if (user) {
+          this.user = user;
+      }
       const docId = new URLSearchParams(window.location.search).get('doc');
-      const user = { username: Auth.getToken() ? 'User' : 'Anonymous' }; // Simplified for reconnect
-      await this.connectWebSocket(docId, user);
+      await this.connectWebSocket(docId, this.user);
   }
 
   async saveToCache(docId) {

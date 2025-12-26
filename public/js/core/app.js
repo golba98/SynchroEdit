@@ -90,13 +90,10 @@ export class App {
         if (this.editor && this.editor.provider) {
           if (!this.editor.provider.wsconnected) {
              console.log('WS disconnected on wake, forcing reconnection...');
-             // Most providers have a connect() or disconnect/connect cycle
-             // For y-websocket, we can just let its internal reconnect logic work,
-             // but our Network.initWebSocket wrapper now fetches fresh tickets.
              
-             // If we are using our custom network.js WebSocket:
-             if (this.editor.socket && this.editor.socket.reconnect) {
-                 this.editor.socket.reconnect();
+             // Force reconnection with fresh ticket and updated user
+             if (this.editor.reconnect) {
+                 this.editor.reconnect(user);
              }
           }
         }

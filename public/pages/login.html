@@ -517,6 +517,28 @@
       .bot-rig.sleeping .eyelid.bottom { height: 50%; }
       .bot-rig.sleeping .antenna-bulb { opacity: 0.2; animation: none; }
       
+      /* 8. Confused Mode (Shown + Empty) */
+      .bot-rig.searching { transform: rotate(10deg); }
+      .bot-rig.searching .hand.left {
+        bottom: 90px;
+        left: 20px;
+        transform: rotate(-45deg);
+      }
+      .bot-rig.searching .hand.right {
+        bottom: -20px;
+        right: -10px;
+      }
+      .bot-rig.searching .eye.left .eyelid.top { height: 40%; }
+      .bot-rig.searching .eye.right .eyelid.top { height: 0%; }
+      .bot-rig.searching .mouth { 
+        width: 10px; 
+        height: 10px; 
+        border-radius: 50%; 
+        bottom: 15px; 
+        background: #333;
+      }
+      .bot-rig.searching .antenna-bulb { background: #ffd700; box-shadow: 0 0 15px #ffd700; }
+
       .zzz-particle {
         position: absolute;
         color: #b0b0b0;
@@ -552,8 +574,8 @@
             <label for="loginPassword">Password</label>
             <div class="input-wrapper">
               <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+              <span class="password-toggle" id="loginPasswordToggle"><i class="fas fa-eye"></i></span>
             </div>
-            <span class="password-toggle" id="loginPasswordToggle"><i class="fas fa-eye"></i></span>
             <div style="text-align: right; margin-top: 5px;">
                 <a href="forgot-password.html" style="font-size: 12px; color: var(--accent-color); text-decoration: none;">Forgot Password?</a>
             </div>
@@ -592,8 +614,8 @@
             <label for="signupPassword">Password</label>
             <div class="input-wrapper">
               <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password" />
+              <span class="password-toggle" id="signupPasswordToggle"><i class="fas fa-eye"></i></span>
             </div>
-            <span class="password-toggle" id="signupPasswordToggle"><i class="fas fa-eye"></i></span>
           </div>
 
           <div class="input-group">
@@ -750,15 +772,13 @@
           if (!force && document.activeElement !== input) return;
           
           // Clear all states first to avoid conflicts
-          botRig.classList.remove('secure', 'peeking', 'confused');
+          botRig.classList.remove('secure', 'peeking', 'confused', 'searching');
           
           if (input.type === 'text') {
-              // Visible -> Peek Mode
-              botRig.classList.add('peeking');
-              
               if (input.value.length === 0) {
-                  botRig.classList.add('confused');
+                  botRig.classList.add('searching');
               } else {
+                  botRig.classList.add('peeking');
                   updatePupils(input.value.length);
               }
           } else {
@@ -787,7 +807,7 @@
           // The click listener in main logic toggles the input type
           // We just need to check the state after a microtask
           setTimeout(() => {
-            const input = toggle.previousElementSibling.querySelector('input');
+                        const input = toggle.parentElement.querySelector('input');
             // Force update regardless of focus so bot reacts to the click
             updateBotState(input, true);
           }, 50);
@@ -834,38 +854,39 @@
       // Password Toggles Logic
       document.querySelectorAll('.password-toggle').forEach(toggle => {
         toggle.addEventListener('click', () => {
-          const input = toggle.previousElementSibling.querySelector('input');
+                      const input = toggle.parentElement.querySelector('input');
           const type = input.type === 'password' ? 'text' : 'password';
           input.type = type;
           toggle.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
           
-          // Update bot state: if showing password (type is text) and field is empty, show confused state
-          const isPasswordVisible = type === 'text';
-          const isEmpty = input.value === '';
-          
-          if (isPasswordVisible && isEmpty) {
-            botRig.className = 'bot-rig confused peeking';
-          } else if (isPasswordVisible) {
-            botRig.className = 'bot-rig peeking';
-          } else {
-            botRig.className = 'bot-rig secure';
-          }
-        });
-        
-        // Also update state when typing in password field
-        const input = toggle.previousElementSibling.querySelector('input');
-        input.addEventListener('input', () => {
-          if (input.type === 'text') { // password is visible
-            if (input.value === '') {
-              botRig.className = 'bot-rig confused peeking';
-            } else {
-              botRig.className = 'bot-rig peeking';
-            }
-          } else {
-            botRig.className = 'bot-rig secure';
-          }
-        });
-      });
+                    // Update bot state: if showing password (type is text) and field is empty, show searching state
+                    const isPasswordVisible = type === 'text';
+                    const isEmpty = input.value === '';
+                    
+                    botRig.classList.remove('secure', 'peeking', 'searching');
+                    if (isPasswordVisible && isEmpty) {
+                      botRig.classList.add('searching');
+                    } else if (isPasswordVisible) {
+                      botRig.classList.add('peeking');
+                    } else {
+                      botRig.classList.add('secure');
+                    }
+                  });
+                  
+                  // Also update state when typing in password field
+                  const input = toggle.parentElement.querySelector('input');
+                  input.addEventListener('input', () => {
+                    botRig.classList.remove('secure', 'peeking', 'searching');
+                    if (input.type === 'text') { // password is visible
+                      if (input.value === '') {
+                        botRig.classList.add('searching');
+                      } else {
+                        botRig.classList.add('peeking');
+                      }
+                    } else {
+                      botRig.classList.add('secure');
+                    }
+                  });      });
 
       // Login Handler
       document.getElementById('loginBtn').addEventListener('click', async () => {

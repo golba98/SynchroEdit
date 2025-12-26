@@ -13,7 +13,10 @@ const authenticateToken = (req, res, next) => {
   if (!token) return next(new AppError('Access denied', 401));
 
   jwt.verify(token, JWT_SECRET, async (err, user) => {
-    if (err) return next(new AppError('Invalid token', 403));
+    if (err) {
+      const status = err.name === 'TokenExpiredError' ? 401 : 403;
+      return next(new AppError(err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token', status));
+    }
 
     try {
       const dbUser = await User.findById(user.id);

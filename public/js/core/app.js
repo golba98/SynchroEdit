@@ -32,16 +32,7 @@ export class App {
   }
 
   async init() {
-    const profilePromise = this.profile.loadProfile();
-
-    let initialTask;
-    if (this.documentId) {
-      initialTask = Promise.resolve(); // Editor loads itself
-    } else {
-      initialTask = this.showLibrary();
-    }
-
-    this.user = await profilePromise;
+    this.user = await this.profile.loadProfile();
 
     if (!this.user) {
       const params = new URLSearchParams(window.location.search).get('doc');
@@ -70,7 +61,7 @@ export class App {
     if (this.documentId) {
         await this.loadDocument();
     } else {
-        await initialTask;
+        await this.showLibrary();
     }
   }
 

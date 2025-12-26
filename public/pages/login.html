@@ -410,6 +410,11 @@
       }
       .bot-rig.peeking .hand.left { left: 30px; } /* Stay relatively close */
       .bot-rig.peeking .hand.right { right: 30px; }
+
+      /* 3b. Confused (Empty + Visible) */
+      .bot-rig.confused { transform: rotate(5deg); }
+      .bot-rig.confused .eye.right .eyelid.top { height: 40%; } /* Raised eyebrow effect */
+      .bot-rig.confused .mouth { width: 10px; height: 10px; border-radius: 50%; bottom: 20px; }
       .bot-rig.peeking .eyelid.top { height: 0%; } /* Open Wide */
       .bot-rig.peeking .eyelid.bottom { height: 0%; }
       .bot-rig.peeking .pupil { width: 20px; height: 20px; border-radius: 50%; }
@@ -697,29 +702,36 @@
         document.getElementById('signupPasswordConfirm')
       ];
       
-      pInputs.forEach(input => {
-        input.addEventListener('input', (e) => {
-           // If showing password, track the eyes!
-           if (input.type === 'text') {
-               updatePupils(e.target.value.length);
-           }
-        });
-
-        input.addEventListener('focus', () => {
-          botRig.classList.add('secure');
-          botRig.classList.remove('peeking');
+      function updateBotState(input) {
+          if (document.activeElement !== input) return;
           
-          // If we focus and it's ALREADY visible (edge case), set peeking
+          botRig.classList.add('secure');
+          
           if (input.type === 'text') {
               botRig.classList.add('peeking');
+              if (input.value.length === 0) {
+                  botRig.classList.add('confused');
+              } else {
+                  botRig.classList.remove('confused');
+                  updatePupils(input.value.length);
+              }
+          } else {
+              botRig.classList.remove('peeking');
+              botRig.classList.remove('confused');
           }
-        });
+      }
+
+      pInputs.forEach(input => {
+        input.addEventListener('input', (e) => updateBotState(e.target));
+        input.addEventListener('focus', (e) => updateBotState(e.target));
+        
         input.addEventListener('blur', () => {
           // Only remove if we aren't clicking the toggle
           setTimeout(() => {
              if (!document.activeElement.classList.contains('password-toggle')) {
                  botRig.classList.remove('secure');
                  botRig.classList.remove('peeking');
+                 botRig.classList.remove('confused');
              }
           }, 100);
         });
@@ -732,10 +744,8 @@
           // We just need to check the state after a microtask
           setTimeout(() => {
             const input = toggle.previousElementSibling.querySelector('input');
-            if (input.type === 'text') {
-              botRig.classList.add('peeking');
-            } else {
-              botRig.classList.remove('peeking');
+            if (document.activeElement === input) {
+                updateBotState(input);
             }
           }, 50);
         });

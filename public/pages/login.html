@@ -376,7 +376,7 @@
         border: 2px solid var(--accent-color);
         border-radius: 50%;
         bottom: -20px; /* Default Chin Position */
-        transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s;
+        transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s, left 0.4s, right 0.4s; /* Added left/right transition */
         box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       }
 
@@ -390,7 +390,15 @@
 
       /* 2. Secure Mode (Password Focus) */
       .bot-rig.secure .hand {
-        bottom: 85px; /* Cover Eyes (Increased from 70px) */
+        bottom: 85px; /* Cover Eyes */
+      }
+      .bot-rig.secure .hand.left {
+        left: 40px; /* Move inward */
+        transform: rotate(-15deg); /* Slight tilt */
+      }
+      .bot-rig.secure .hand.right {
+        right: 40px; /* Move inward */
+        transform: rotate(15deg);
       }
       .bot-rig.secure .eyelid.top { height: 40%; } /* Squint */
       .bot-rig.secure .eyelid.bottom { height: 40%; }
@@ -399,6 +407,8 @@
       .bot-rig.peeking .hand {
         bottom: 50px; /* Lower slightly */
       }
+      .bot-rig.peeking .hand.left { left: 30px; } /* Stay relatively close */
+      .bot-rig.peeking .hand.right { right: 30px; }
       .bot-rig.peeking .eyelid.top { height: 0%; } /* Open Wide */
       .bot-rig.peeking .eyelid.bottom { height: 0%; }
       .bot-rig.peeking .pupil { width: 20px; height: 20px; border-radius: 50%; }

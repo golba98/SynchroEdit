@@ -708,19 +708,21 @@
       function updateBotState(input) {
           if (document.activeElement !== input) return;
           
-          botRig.classList.add('secure');
+          // Clear all states first to avoid conflicts
+          botRig.classList.remove('secure', 'peeking', 'confused');
           
           if (input.type === 'text') {
+              // Visible -> Peek Mode
               botRig.classList.add('peeking');
+              
               if (input.value.length === 0) {
                   botRig.classList.add('confused');
               } else {
-                  botRig.classList.remove('confused');
                   updatePupils(input.value.length);
               }
           } else {
-              botRig.classList.remove('peeking');
-              botRig.classList.remove('confused');
+              // Hidden -> Secure Mode
+              botRig.classList.add('secure');
           }
       }
 

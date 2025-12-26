@@ -332,31 +332,41 @@ export class App {
         );
     };
 
-    // 1. Try to load from Cache first for instant UI
+    // 1. Instant Cache Render
     const cachedData = localStorage.getItem('syncroedit_library_cache');
+    let hasRenderedCache = false;
+
     if (cachedData) {
         try {
             const docs = JSON.parse(cachedData);
-            renderList(docs);
+            if (Array.isArray(docs)) {
+                renderList(docs);
+                hasRenderedCache = true;
+            }
         } catch (e) {
             console.warn('Failed to parse library cache', e);
         }
     }
 
-    // 2. Fetch from Network in the background
+    // 2. Network Refresh (Stale-While-Revalidate)
     try {
       const data = await Network.getDocuments();
       const docs = data.documents || [];
+      const newCacheString = JSON.stringify(docs);
 
-      // Update cache
-      localStorage.setItem('syncroedit_library_cache', JSON.stringify(docs));
-
-      // Re-render with fresh data
-      renderList(docs);
+      // Only re-render if data actually changed
+      if (newCacheString !== cachedData) {
+          localStorage.setItem('syncroedit_library_cache', newCacheString);
+          renderList(docs);
+      } else if (!hasRenderedCache) {
+          // If we didn't have cache but network returned same (empty?) or cache was invalid
+          renderList(docs);
+      }
     } catch (err) {
       console.error('Error fetching documents from network:', err);
-      if (!cachedData) {
-          document.getElementById('documentList').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Failed to load documents.</td></tr>';
+      // If network fails and we didn't render cache, show error
+      if (!hasRenderedCache) {
+          document.getElementById('documentList').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Failed to load documents (Offline).</td></tr>';
       }
     }
   }

@@ -1,3 +1,4 @@
+import { get, set } from 'idb-keyval';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { QuillBinding } from 'y-quill';
@@ -7,7 +8,7 @@ import { CursorManager } from '/js/managers/CursorManager.js';
 import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { Auth } from '/js/ui/auth.js';
-import { debounce, Storage } from '/js/core/utils.js';
+import { debounce } from '/js/core/utils.js';
 
 export class Editor {
   constructor(containerId, options = {}) {
@@ -18,7 +19,6 @@ export class Editor {
     this.pageBindings = {}; // index -> QuillBinding
     this.currentPageIndex = 0;
     this.currentZoom = 100;
-    this.docId = new URLSearchParams(window.location.search).get('doc');
     
     // Callbacks
     this.onPageChange = options.onPageChange || (() => {});
@@ -37,19 +37,48 @@ export class Editor {
     
     // Yjs Setup
     this.doc = new Y.Doc();
+    const docId = new URLSearchParams(window.location.search).get('doc');
     const token = Auth.getToken();
     const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
     
-    // Phase 2: Load local snapshot for instant rendering
-    this.loadSnapshot();
+    // 1. Instant Load from IndexedDB
+    this.loadFromCache(docId).then(() => {
+        // Only connect after cache check (or concurrently, but we apply cache first)
+        this.connectWebSocket(docId, token, user);
+    });
 
+    this.yPages = this.doc.getArray('pages');
+    this.yPages.observe(event => {
+        this.renderAllPages();
+    });
+
+    this.setupTitleDebounce();
+    
+    // Render placeholder immediately for perceived performance
+    this.createPlaceholderPage();
+  }
+
+  async loadFromCache(docId) {
+      if (!docId) return;
+      try {
+          const cachedUpdate = await get(`doc-store-${docId}`);
+          if (cachedUpdate) {
+              console.log('Loaded document from IndexedDB cache');
+              Y.applyUpdate(this.doc, cachedUpdate);
+              this.renderAllPages(); // Force render immediately with cached content
+          }
+      } catch (err) {
+          console.warn('Failed to load from IndexedDB:', err);
+      }
+  }
+
+  connectWebSocket(docId, token, user) {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const wsUrl = `${protocol}://${window.location.host}/ws`;
     this.provider = new WebsocketProvider(
-        wsUrl,
-        this.docId,
+        `${protocol}://${window.location.host}`, 
+        '', // Empty room name to force query-param only URL (e.g. /?documentId=...)
         this.doc,
-        { params: { token: token } }
+        { params: { documentId: docId, token: token } }
     );
     
     this.provider.awareness.setLocalStateField('user', {
@@ -68,79 +97,43 @@ export class Editor {
         this.onCollaboratorsChange(users);
     });
     
-    this.statusTimeout = null;
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
-        
-        if (event.status === 'connected') {
-            if (this.statusTimeout) {
-                clearTimeout(this.statusTimeout);
-                this.statusTimeout = null;
-            }
-            this.onStatusChange(event.status);
-        } else {
-            // Delay reporting disconnected/connecting status to avoid flicker
-            if (!this.statusTimeout) {
-                this.statusTimeout = setTimeout(() => {
-                    this.onStatusChange(event.status);
-                    this.statusTimeout = null;
-                }, 5000);
-            }
-        }
+        this.onStatusChange(event.status);
     });
 
-    this.yPages = this.doc.getArray('pages');
-    this.yPages.observe(event => {
-        this.renderAllPages();
+    // Save to IndexedDB on every update
+    this.doc.on('update', (update) => {
+        this.saveToCache(docId);
     });
+    
+    // Optimization: y-websocket provider automatically implements the efficiency protocol.
+    // When connected, it exchanges State Vectors (SyncStep1) first, then only sends missing blocks (SyncStep2).
+    // Because we pre-loaded from IndexedDB, our local State Vector is populated.
+    // The server will see this and ONLY send the tiny difference (Delta), not the full 2MB doc.
     
     // Wait for initial sync to render or create default page
     this.provider.on('sync', isSynced => {
+        if (isSynced && this.yPages.length === 0) {
+            // Create initial page if empty
+            const newPage = new Y.Map();
+            const content = new Y.Text();
+            newPage.set('content', content);
+            this.yPages.push([newPage]);
+        }
         if (isSynced) {
-            if (this.yPages.length === 0) {
-                // Create initial page if empty
-                const newPage = new Y.Map();
-                const content = new Y.Text();
-                newPage.set('content', content);
-                this.yPages.push([newPage]);
-            }
-            this.renderAllPages();
-            this.saveSnapshot(); // Save once synced
+             this.renderAllPages();
+             this.saveToCache(docId); // Force save on full sync
         }
     });
-
-    this.doc.on('update', () => {
-        // Debounced save for performance
-        if (this.saveTimer) clearTimeout(this.saveTimer);
-        this.saveTimer = setTimeout(() => this.saveSnapshot(), 2000);
-    });
-
-    this.setupTitleDebounce();
-    
-    // Render placeholder immediately for perceived performance
-    this.createPlaceholderPage();
   }
 
-  async loadSnapshot() {
-    try {
-        const snapshot = await Storage.get(`snapshot_${this.docId}`);
-        if (snapshot) {
-            console.log('Loading instant snapshot from local storage...');
-            Y.applyUpdate(this.doc, snapshot, 'local-snapshot');
-            this.renderAllPages();
-        }
-    } catch (e) {
-        console.warn('Failed to load local snapshot', e);
-    }
-  }
-
-  async saveSnapshot() {
-    try {
-        const state = Y.encodeStateAsUpdate(this.doc);
-        await Storage.set(`snapshot_${this.docId}`, state);
-    } catch (e) {
-        console.warn('Failed to save snapshot', e);
-    }
+  async saveToCache(docId) {
+      if (!docId) return;
+      // Debounce saving if needed, but IDB is fast enough for occasional updates
+      // Y.encodeStateAsUpdate is efficient
+      const update = Y.encodeStateAsUpdate(this.doc);
+      await set(`doc-store-${docId}`, update);
   }
 
   createPlaceholderPage() {

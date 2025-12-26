@@ -229,6 +229,11 @@ function init(server) {
     conn.binaryType = 'arraybuffer';
     
     // Initialize Sync
+    // Optimization: Standard Yjs protocol exchange
+    // 1. Server sends SyncStep1 (Server State Vector)
+    // 2. Client receives, calculates diff, sends SyncStep2 (Missing updates) AND SyncStep1 (Client State Vector)
+    // 3. Server receives, sends SyncStep2 (Missing updates for client)
+    
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageSync);
     syncProtocol.writeSyncStep1(encoder, doc);

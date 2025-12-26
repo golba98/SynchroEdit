@@ -7,7 +7,7 @@ import { CursorManager } from '/js/managers/CursorManager.js';
 import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { Auth } from '/js/ui/auth.js';
-import { debounce } from '/js/core/utils.js';
+import { debounce, Storage } from '/js/core/utils.js';
 
 export class Editor {
   constructor(containerId, options = {}) {
@@ -18,6 +18,7 @@ export class Editor {
     this.pageBindings = {}; // index -> QuillBinding
     this.currentPageIndex = 0;
     this.currentZoom = 100;
+    this.docId = new URLSearchParams(window.location.search).get('doc');
     
     // Callbacks
     this.onPageChange = options.onPageChange || (() => {});
@@ -36,16 +37,19 @@ export class Editor {
     
     // Yjs Setup
     this.doc = new Y.Doc();
-    const docId = new URLSearchParams(window.location.search).get('doc');
     const token = Auth.getToken();
     const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
     
+    // Phase 2: Load local snapshot for instant rendering
+    this.loadSnapshot();
+
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl = `${protocol}://${window.location.host}/ws`;
     this.provider = new WebsocketProvider(
-        `${protocol}://${window.location.host}`, 
-        '', // Empty room name to force query-param only URL (e.g. /?documentId=...)
+        wsUrl,
+        this.docId,
         this.doc,
-        { params: { documentId: docId, token: token } }
+        { params: { token: token } }
     );
     
     this.provider.awareness.setLocalStateField('user', {
@@ -64,9 +68,25 @@ export class Editor {
         this.onCollaboratorsChange(users);
     });
     
+    this.statusTimeout = null;
     this.provider.on('status', event => {
         console.log('Yjs WebSocket status:', event.status);
-        this.onStatusChange(event.status);
+        
+        if (event.status === 'connected') {
+            if (this.statusTimeout) {
+                clearTimeout(this.statusTimeout);
+                this.statusTimeout = null;
+            }
+            this.onStatusChange(event.status);
+        } else {
+            // Delay reporting disconnected/connecting status to avoid flicker
+            if (!this.statusTimeout) {
+                this.statusTimeout = setTimeout(() => {
+                    this.onStatusChange(event.status);
+                    this.statusTimeout = null;
+                }, 5000);
+            }
+        }
     });
 
     this.yPages = this.doc.getArray('pages');
@@ -76,22 +96,51 @@ export class Editor {
     
     // Wait for initial sync to render or create default page
     this.provider.on('sync', isSynced => {
-        if (isSynced && this.yPages.length === 0) {
-            // Create initial page if empty
-            const newPage = new Y.Map();
-            const content = new Y.Text();
-            newPage.set('content', content);
-            this.yPages.push([newPage]);
-        }
         if (isSynced) {
-             this.renderAllPages();
+            if (this.yPages.length === 0) {
+                // Create initial page if empty
+                const newPage = new Y.Map();
+                const content = new Y.Text();
+                newPage.set('content', content);
+                this.yPages.push([newPage]);
+            }
+            this.renderAllPages();
+            this.saveSnapshot(); // Save once synced
         }
+    });
+
+    this.doc.on('update', () => {
+        // Debounced save for performance
+        if (this.saveTimer) clearTimeout(this.saveTimer);
+        this.saveTimer = setTimeout(() => this.saveSnapshot(), 2000);
     });
 
     this.setupTitleDebounce();
     
     // Render placeholder immediately for perceived performance
     this.createPlaceholderPage();
+  }
+
+  async loadSnapshot() {
+    try {
+        const snapshot = await Storage.get(`snapshot_${this.docId}`);
+        if (snapshot) {
+            console.log('Loading instant snapshot from local storage...');
+            Y.applyUpdate(this.doc, snapshot, 'local-snapshot');
+            this.renderAllPages();
+        }
+    } catch (e) {
+        console.warn('Failed to load local snapshot', e);
+    }
+  }
+
+  async saveSnapshot() {
+    try {
+        const state = Y.encodeStateAsUpdate(this.doc);
+        await Storage.set(`snapshot_${this.docId}`, state);
+    } catch (e) {
+        console.warn('Failed to save snapshot', e);
+    }
   }
 
   createPlaceholderPage() {

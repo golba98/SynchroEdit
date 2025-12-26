@@ -15,9 +15,20 @@ export class App {
     this.theme = new Theme();
     this.profile = new Profile();
     this.background = new DynamicBackground();
-    this.connectionTimer = null;
 
     this.init();
+    this.registerServiceWorker();
+  }
+
+  registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => console.log('Service Worker registered'))
+          .catch((err) => console.log('Service Worker registration failed:', err));
+      });
+    }
   }
 
   async init() {
@@ -297,29 +308,56 @@ export class App {
   async showLibrary() {
     const library = document.getElementById('docLibrary');
     const overlay = document.getElementById('libraryOverlay');
+    if (!library || !overlay) return;
+
     library.style.display = 'block';
     overlay.style.display = 'block';
     document.getElementById('closeLibrary').style.display = this.documentId ? 'block' : 'none';
 
+    const renderList = (docs) => {
+        UI.renderDocumentList(
+            document.getElementById('documentList'),
+            docs,
+            this.documentId,
+            (id) => (window.location.href = `?doc=${id}`),
+            async (id) => {
+              if (confirm('Delete this document?')) {
+                await Network.deleteDocument(id);
+                // After deletion, clear cache to force fresh fetch or update it
+                localStorage.removeItem('syncroedit_library_cache');
+                this.showLibrary();
+              }
+            },
+            this.user._id
+        );
+    };
+
+    // 1. Try to load from Cache first for instant UI
+    const cachedData = localStorage.getItem('syncroedit_library_cache');
+    if (cachedData) {
+        try {
+            const docs = JSON.parse(cachedData);
+            renderList(docs);
+        } catch (e) {
+            console.warn('Failed to parse library cache', e);
+        }
+    }
+
+    // 2. Fetch from Network in the background
     try {
       const data = await Network.getDocuments();
       const docs = data.documents || [];
 
-      UI.renderDocumentList(
-        document.getElementById('documentList'),
-        docs,
-        this.documentId,
-        (id) => (window.location.href = `?doc=${id}`),
-        async (id) => {
-          if (confirm('Delete this document?')) {
-            await Network.deleteDocument(id);
-            this.showLibrary();
-          }
-        },
-        this.user._id
-      );
+      // Update cache
+      localStorage.setItem('syncroedit_library_cache', JSON.stringify(docs));
+
+      // Re-render with fresh data
+      renderList(docs);
     } catch (err) {
-      console.error('Error showing library:', err);
+      console.error('Error fetching documents from network:', err);
+      if (!cachedData) {
+          document.getElementById('documentList').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Failed to load documents.</td></tr>';
+      }
     }
   }
 

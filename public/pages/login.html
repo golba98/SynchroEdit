@@ -705,8 +705,8 @@
         document.getElementById('signupPasswordConfirm')
       ];
       
-      function updateBotState(input) {
-          if (document.activeElement !== input) return;
+      function updateBotState(input, force = false) {
+          if (!force && document.activeElement !== input) return;
           
           // Clear all states first to avoid conflicts
           botRig.classList.remove('secure', 'peeking', 'confused');
@@ -734,9 +734,7 @@
           // Only remove if we aren't clicking the toggle
           setTimeout(() => {
              if (!document.activeElement.classList.contains('password-toggle')) {
-                 botRig.classList.remove('secure');
-                 botRig.classList.remove('peeking');
-                 botRig.classList.remove('confused');
+                 botRig.classList.remove('secure', 'peeking', 'confused');
              }
           }, 100);
         });
@@ -749,9 +747,8 @@
           // We just need to check the state after a microtask
           setTimeout(() => {
             const input = toggle.previousElementSibling.querySelector('input');
-            if (document.activeElement === input) {
-                updateBotState(input);
-            }
+            // Force update regardless of focus so bot reacts to the click
+            updateBotState(input, true);
           }, 50);
         });
       });

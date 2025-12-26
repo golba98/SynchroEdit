@@ -267,6 +267,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 10; /* Explicit Layer */
       }
 
       /* Antenna */
@@ -364,7 +365,7 @@
         top: 0;
         left: 0;
         pointer-events: none;
-        z-index: 20;
+        z-index: 100; /* Must be on top of screen */
       }
 
       .hand {
@@ -389,14 +390,14 @@
 
       /* 2. Secure Mode (Password Focus) */
       .bot-rig.secure .hand {
-        bottom: 70px; /* Cover Eyes */
+        bottom: 85px; /* Cover Eyes (Increased from 70px) */
       }
       .bot-rig.secure .eyelid.top { height: 40%; } /* Squint */
       .bot-rig.secure .eyelid.bottom { height: 40%; }
 
       /* 3. Peek Mode (Show Password) */
       .bot-rig.peeking .hand {
-        bottom: 45px; /* Lower slightly */
+        bottom: 50px; /* Lower slightly */
       }
       .bot-rig.peeking .eyelid.top { height: 0%; } /* Open Wide */
       .bot-rig.peeking .eyelid.bottom { height: 0%; }

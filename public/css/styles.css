@@ -8,6 +8,11 @@
   --success-color: #10b981;
   --transition-speed: 0.3s;
   --glow-intensity: 0;
+
+  /* Canvas Themes Default (Classic) */
+  --canvas-bg: #000000;
+  --canvas-text: #e0e0e0;
+  --canvas-border: var(--accent-color);
 }
 
 * {
@@ -1286,4 +1291,103 @@ body.light-theme .floating-label-container input:not(:placeholder-shown) + .floa
   color: white;
   text-align: center;
   padding: 20px;
+}
+
+/* Canvas Themes */
+.editor-container {
+  background: var(--canvas-bg) !important;
+  color: var(--canvas-text) !important;
+  border-color: var(--canvas-border) !important;
+}
+
+.canvas-classic {
+  --canvas-bg: #000000;
+  --canvas-text: #e0e0e0;
+}
+
+body.light-theme .canvas-classic {
+  --canvas-bg: #ffffff;
+  --canvas-text: #1a1a1a;
+}
+
+.canvas-sepia {
+  --canvas-bg: #f4ecd8;
+  --canvas-text: #5b4636;
+  --canvas-border: #d3c1a5;
+}
+
+.canvas-midnight {
+  --canvas-bg: #0f172a;
+  --canvas-text: #f8fafc;
+  --canvas-border: #334155;
+}
+
+.canvas-cyber {
+  --canvas-bg: #050505;
+  --canvas-text: #39ff14;
+  --canvas-border: #39ff14;
+}
+
+.canvas-cyber .ql-editor {
+  font-family: 'Courier New', monospace !important;
+}
+
+/* Whitespace Visualization */
+.show-invisibles .ql-editor p::after {
+  content: '¶';
+  color: rgba(var(--accent-color-rgb), 0.3);
+  margin-left: 4px;
+}
+
+/* Gutter & Line Numbers */
+.page-container-wrapper {
+  display: flex;
+  position: relative;
+}
+
+.line-numbers-gutter {
+  width: 40px;
+  background: rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(var(--accent-color-rgb), 0.1);
+  padding-top: 20px;
+  color: #666;
+  font-size: 12px;
+  text-align: right;
+  padding-right: 8px;
+  user-select: none;
+  font-family: monospace;
+}
+
+/* Focus Mode */
+body.focus-mode .header,
+body.focus-mode .ribbon-tabs,
+body.focus-mode .ribbon-content,
+body.focus-mode .status-bar,
+body.focus-mode .page-navigator,
+body.focus-mode .doc-title-container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+body.focus-mode .pages-container {
+  padding-top: 100px;
+}
+
+.focus-exit-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(var(--accent-color-rgb), 0.2);
+  color: white;
+  border: 1px solid var(--accent-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 10000;
+  display: none;
+}
+
+body.focus-mode .focus-exit-btn {
+  display: block;
 }

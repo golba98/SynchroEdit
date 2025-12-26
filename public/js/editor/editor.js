@@ -7,6 +7,7 @@ import { BorderManager } from '/js/managers/BorderManager.js';
 import { CursorManager } from '/js/managers/CursorManager.js';
 import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
+import { ReadabilityManager } from '/js/managers/ReadabilityManager.js';
 import { Auth } from '/js/ui/auth.js';
 import { debounce } from '/js/core/utils.js';
 
@@ -32,6 +33,7 @@ export class Editor {
     this.cursorManager = new CursorManager(this);
     this.imageManager = new ImageManager(this);
     this.toolbarController = new ToolbarController(this);
+    this.readabilityManager = new ReadabilityManager(this);
 
     this.initQuill();
     
@@ -314,6 +316,9 @@ export class Editor {
       placeholder: 'Start typing...',
       modules: { 
           toolbar: false,
+          syntax: {
+            highlight: text => hljs.highlightAuto(text).value,
+          },
           history: { // Disable Quill's history, use Yjs history
              userOnly: true 
           }
@@ -321,6 +326,13 @@ export class Editor {
     });
 
     this.pageQuillInstances[pageIndex] = pageQuill;
+    
+    // Update line numbers on change
+    pageQuill.on('text-change', () => {
+        if (this.readabilityManager.showLineNumbers) {
+            this.readabilityManager.updateGutter(pageIndex);
+        }
+    });
     
     // Bind Y.Text (if provider/awareness is ready)
     const yText = pageMap.get('content');
@@ -330,6 +342,7 @@ export class Editor {
     }
 
     this.cursorManager.setupPageListeners(pageQuill, pageIndex);
+    this.readabilityManager.onPageCreated(pageIndex, newPageContainer);
 
     const qlEditor = newPageContainer.querySelector('.ql-editor');
     if (qlEditor) {

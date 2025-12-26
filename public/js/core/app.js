@@ -242,22 +242,6 @@ export class App {
       btn.addEventListener('click', () => this.theme.applyAccentColor(btn.dataset.color));
     });
 
-    // Zoom
-    addEvent('zoomInBtn', 'click', () => {
-      if (this.editor && this.editor.currentZoom < 200) {
-        this.editor.currentZoom += 10;
-        this.editor.applyZoom();
-        this.updateZoomDisplay();
-      }
-    });
-    addEvent('zoomOutBtn', 'click', () => {
-      if (this.editor && this.editor.currentZoom > 50) {
-        this.editor.currentZoom -= 10;
-        this.editor.applyZoom();
-        this.updateZoomDisplay();
-      }
-    });
-
     // History
     addEvent('showHistoryBtn', 'click', () => this.showHistory());
     addEvent('closeHistoryModal', 'click', () => {
@@ -442,10 +426,6 @@ export class App {
         if (wordEl) wordEl.textContent = `Words: ${words}`;
       }
     }, 500);
-  }
-
-  updateZoomDisplay() {
-    document.getElementById('zoomPercent').textContent = `${this.editor.currentZoom}%`;
   }
 
   setupRibbonTabs() {

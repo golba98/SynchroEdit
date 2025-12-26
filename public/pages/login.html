@@ -873,8 +873,8 @@
         document.getElementById('loginStatusMessage').textContent = '✓ Welcome!';
         document.getElementById('loginStatusMessage').className = 'status-message success';
         
-        localStorage.setItem('synchroEditToken', token);
-        localStorage.setItem('synchroEditUser', username);
+        // Secure Flow: We rely on the HttpOnly cookie set by the server.
+        // We do not store the token in localStorage anymore.
 
         setTimeout(() => {
            const docId = new URLSearchParams(window.location.search).get('doc');
@@ -969,6 +969,20 @@
       const cachedUser = localStorage.getItem('synchroEditUser');
       // If we had a way to get accent color without login, we'd set it here.
       // For now, default purple is fine.
+
+      // Auto-Login Check (Restore Session)
+      (async () => {
+          try {
+              const res = await fetch('/api/auth/refresh-token', { method: 'POST' });
+              if (res.ok) {
+                  // User already has a valid session
+                  const docId = new URLSearchParams(window.location.search).get('doc');
+                  window.location.href = docId ? `../index.html?doc=${docId}` : '../index.html';
+              }
+          } catch (e) {
+              // Ignore, stay on login page
+          }
+      })();
 
     </script>
   </body>

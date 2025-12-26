@@ -23,6 +23,14 @@ const authenticateToken = (req, res, next) => {
         return next(new AppError('Email not verified', 403));
       }
 
+      // Verify Session exists
+      if (user.sessionId) {
+          const sessionExists = dbUser.sessions.some(s => s.sessionId === user.sessionId);
+          if (!sessionExists) {
+              return next(new AppError('Session expired or revoked', 401));
+          }
+      }
+
       req.user = user; // Now contains id, username, and sessionId
       next();
     } catch (dbErr) {

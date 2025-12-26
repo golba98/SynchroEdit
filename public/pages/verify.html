@@ -265,8 +265,9 @@
           const data = await response.json();
           if (response.ok) {
             setStatus('Email verified! Redirecting...', 'success');
-            localStorage.setItem('synchroEditToken', data.token);
-            localStorage.setItem('synchroEditUser', data.username || storedUsername || '');
+            if (data.username || storedUsername) {
+                localStorage.setItem('synchroEditUser', data.username || storedUsername);
+            }
             sessionStorage.removeItem('verificationEmail');
             sessionStorage.removeItem('verificationUsername');
             sessionStorage.removeItem('verificationMessage');

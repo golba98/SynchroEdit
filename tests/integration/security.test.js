@@ -42,4 +42,43 @@ describe('Security Integration Tests', () => {
       expect(res.body.message).toBe('Invalid verification code');
     });
   });
+
+  describe('Session Revocation Enforcement', () => {
+    it('should reject a valid JWT if its sessionId is removed from the database', async () => {
+        const testUser = {
+            username: 'sessiontest',
+            email: 'session@test.com',
+            password: 'TestPassword123!',
+            isEmailVerified: true
+        };
+        
+        // 1. Setup user and login
+        await require('../../src/models/User').create(testUser);
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({ username: testUser.username, password: testUser.password });
+        
+        const token = loginRes.body.token;
+
+        // 2. Verify it works initially
+        const profileRes = await request(app)
+            .get('/api/user/profile')
+            .set('Authorization', `Bearer ${token}`);
+        expect(profileRes.status).toBe(200);
+
+        // 3. Revoke the session manually in DB
+        const User = require('../../src/models/User');
+        const user = await User.findOne({ username: testUser.username });
+        user.sessions = [];
+        await user.save();
+
+        // 4. Verify it's now rejected
+        const rejectedRes = await request(app)
+            .get('/api/user/profile')
+            .set('Authorization', `Bearer ${token}`);
+        
+        expect(rejectedRes.status).toBe(401);
+        expect(rejectedRes.body.message).toMatch(/session expired or revoked/i);
+    });
+  });
 });

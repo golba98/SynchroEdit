@@ -10,6 +10,54 @@ const { createTicket } = require('../utils/ticketStore');
 const JWT_SECRET = process.env.JWT_SECRET;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
 
+/**
+ * Helper to generate tokens, create session, and send response
+ */
+const sendTokens = async (user, statusCode, req, res, message = undefined) => {
+    const sessionId = crypto.randomBytes(16).toString('hex');
+    const refreshToken = jwt.sign({ id: user._id, sessionId, jti: crypto.randomBytes(8).toString('hex') }, JWT_SECRET, {
+        expiresIn: '7d',
+    });
+
+    const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    user.sessions.push({
+        sessionId,
+        refreshToken: hashedToken,
+        userAgent: req.headers['user-agent'],
+        ipAddress: req.ip,
+        lastActive: new Date()
+    });
+
+    // Keep only last 5 sessions
+    if (user.sessions.length > 5) {
+        user.sessions.shift();
+    }
+    
+    await user.save();
+
+    const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId }, JWT_SECRET, {
+        expiresIn: '15m',
+    });
+
+    // Send Refresh Token as HTTP-Only Cookie
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    const response = {
+        token: accessToken,
+        username: user.username,
+        email: user.email
+    };
+    if (message) response.message = message;
+
+    res.status(statusCode).json(response);
+};
+
 exports.getWsTicket = (req, res, next) => {
     // req.user is set by authenticateToken middleware
     const userId = req.user.id;
@@ -73,14 +121,8 @@ exports.signup = async (req, res, next) => {
       message: 'If your email is not registered, you will receive a verification code.',
     });
   } else {
-    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
     logger.info(`New user signed up: ${user.username}`);
-    res.status(201).json({
-      token,
-      username: user.username,
-      email: user.email,
-      message: 'Signup successful (verification disabled).',
-    });
+    await sendTokens(user, 201, req, res, 'Signup successful (verification disabled).');
   }
 };
 
@@ -96,23 +138,11 @@ exports.verifyEmail = async (req, res, next) => {
     user.verificationCode = null;
     user.verificationCodeExpires = null;
     await user.save();
-    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-      expiresIn: '24h',
-    });
-    return res.status(200).json({
-      message: 'Verification disabled; user marked verified.',
-      token,
-      username: user.username,
-    });
+    return await sendTokens(user, 200, req, res, 'Verification disabled; user marked verified.');
   }
 
   if (user.isEmailVerified) {
-    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-      expiresIn: '24h',
-    });
-    return res
-      .status(200)
-      .json({ message: 'Email already verified', token, username: user.username });
+    return await sendTokens(user, 200, req, res, 'Email already verified');
   }
 
   if (!user.verificationCode || user.verificationCode !== verificationCode) {
@@ -127,39 +157,8 @@ exports.verifyEmail = async (req, res, next) => {
   user.verificationCode = null;
   user.verificationCodeExpires = null;
   
-  // Create Session
-  const sessionId = crypto.randomBytes(16).toString('hex');
-  const refreshToken = jwt.sign({ id: user._id, sessionId }, JWT_SECRET, {
-    expiresIn: '7d',
-  });
-
-  user.sessions.push({
-      sessionId,
-      refreshToken: crypto.createHash('sha256').update(refreshToken).digest('hex'),
-      userAgent: req.headers['user-agent'],
-      ipAddress: req.ip,
-      lastActive: new Date()
-  });
-
-  if (user.sessions.length > 5) user.sessions.shift();
-  await user.save();
-
   logger.info(`User email verified: ${user.username}`);
-
-  // Dual-Token System
-  const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId }, JWT_SECRET, {
-    expiresIn: '15m',
-  });
-
-  // Send Refresh Token as HTTP-Only Cookie
-  res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-  });
-
-  res.json({ message: 'Email verified successfully', token: accessToken, username: user.username });
+  await sendTokens(user, 200, req, res, 'Email verified successfully');
 };
 
 exports.resendCode = async (req, res, next) => {
@@ -258,40 +257,7 @@ exports.login = async (req, res, next) => {
 
   logger.info(`User logged in: ${user.username}`);
   
-  // Create Session
-  const sessionId = crypto.randomBytes(16).toString('hex');
-  const refreshToken = jwt.sign({ id: user._id, sessionId }, JWT_SECRET, {
-    expiresIn: '7d', // Long-lived
-  });
-
-  user.sessions.push({
-      sessionId,
-      refreshToken: crypto.createHash('sha256').update(refreshToken).digest('hex'),
-      userAgent: req.headers['user-agent'],
-      ipAddress: req.ip,
-      lastActive: new Date()
-  });
-
-  // Keep only last 5 sessions
-  if (user.sessions.length > 5) {
-      user.sessions.shift();
-  }
-  await user.save();
-
-  // Dual-Token System
-  const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId }, JWT_SECRET, {
-    expiresIn: '15m', // Short-lived
-  });
-
-  // Send Refresh Token as HTTP-Only Cookie
-  res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-  });
-
-  res.json({ token: accessToken, username: user.username });
+  await sendTokens(user, 200, req, res);
 };
 
 exports.logout = async (req, res, next) => {
@@ -351,15 +317,47 @@ exports.refreshToken = async (req, res, next) => {
 
         // Validate session
         const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-        const session = user.sessions.find(s => s.sessionId === decoded.sessionId && s.refreshToken === hashedToken);
+        const sessionIndex = user.sessions.findIndex(s => s.sessionId === decoded.sessionId && s.refreshToken === hashedToken);
         
-        if (!session) {
+        if (sessionIndex === -1) {
+            // Theft Detection: If we have a valid JWT but no matching DB session, 
+            // it means this token was already rotated (used). 
+            // Potential theft! Revoke all sessions for this family (or user).
+            
+            // For now, let's just Log and Block.
+            logger.warn(`Potential Token Theft detected for user ${user.username}. Session ID: ${decoded.sessionId}`);
+            
+            // Optional: Revoke that specific session ID entirely if it exists with a different token
+            user.sessions = user.sessions.filter(s => s.sessionId !== decoded.sessionId);
+            await user.save();
+            
             return res.status(403).json({ message: 'Session expired or revoked.' });
         }
+
+        // Token Rotation: Generate NEW Refresh Token
+        const newRefreshToken = jwt.sign({ id: user._id, sessionId: decoded.sessionId, jti: crypto.randomBytes(8).toString('hex') }, JWT_SECRET, {
+            expiresIn: '7d',
+        });
+        const newHashedToken = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+
+        // Update Session
+        user.sessions[sessionIndex].refreshToken = newHashedToken;
+        user.sessions[sessionIndex].lastActive = new Date();
+        user.sessions[sessionIndex].ipAddress = req.ip;
+        
+        await user.save();
 
         // Issue new Access Token
         const accessToken = jwt.sign({ id: user._id, username: user.username, sessionId: decoded.sessionId }, JWT_SECRET, {
             expiresIn: '15m',
+        });
+
+        // Send NEW Refresh Token as HTTP-Only Cookie
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         res.json({ token: accessToken });
@@ -440,23 +438,5 @@ exports.resetPassword = async (req, res, next) => {
     await user.save();
 
     // Log the user in immediately
-    const newToken = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-        expiresIn: '24h',
-    });
-
-    res.status(200).json({
-        message: 'Password successfully reset',
-        token: newToken,
-        username: user.username
-    });
-};
-
-exports.logout = (req, res) => {
-    res.cookie('refreshToken', '', {
-        httpOnly: true,
-        expires: new Date(0), // Expire immediately
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict'
-    });
-    res.status(200).json({ message: 'Logged out successfully' });
+    await sendTokens(user, 200, req, res, 'Password successfully reset');
 };

@@ -1,26 +1,33 @@
+let _accessToken = null;
+
 export const Auth = {
   getToken() {
-    return localStorage.getItem('synchroEditToken');
+    return _accessToken;
   },
   setToken(token) {
-    localStorage.setItem('synchroEditToken', token);
+    _accessToken = token;
   },
   removeToken() {
+    _accessToken = null;
+    // Clear any legacy local storage just in case
     localStorage.removeItem('synchroEditToken');
   },
   async verifyToken() {
     let token = this.getToken();
-    if (!token || token === 'local-preview-token') {
-      // If no token, we might still have a refresh cookie. 
-      // Let's try to refresh once before giving up.
-      const newToken = await this.tryRefresh();
-      if (newToken) {
-          // Retry with the new token immediately
-          return this.verifyToken();
+    
+    // If no token in memory, try to refresh immediately (Restore Session)
+    if (!token) {
+      token = await this.tryRefresh();
+      if (!token) {
+          // Final check: is there a legacy token we should migrate?
+          // (Optional, but good for UX during transition)
+          const legacy = localStorage.getItem('synchroEditToken');
+          if (legacy) {
+              localStorage.removeItem('synchroEditToken'); // Migrate once
+              // We could try to use it, but safer to just fail and force re-login if refresh failed
+          }
+          return false;
       }
-      
-      this.removeToken();
-      return false;
     }
 
     try {

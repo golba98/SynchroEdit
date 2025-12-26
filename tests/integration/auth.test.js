@@ -66,6 +66,11 @@ describe('Auth Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.message).toMatch(/verified successfully/i);
       expect(res.body.token).toBeTruthy();
+      
+      // Check for Refresh Token Cookie
+      const cookies = res.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      expect(cookies.some(c => c.includes('refreshToken'))).toBe(true);
 
       const updatedUser = await User.findOne({ email: testUser.email });
       expect(updatedUser.isEmailVerified).toBe(true);
@@ -103,6 +108,10 @@ describe('Auth Integration Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.token).toBeTruthy();
+      
+      const cookies = res.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      expect(cookies.some(c => c.includes('refreshToken'))).toBe(true);
     });
 
     it('should return 403 if email not verified', async () => {
@@ -144,6 +153,35 @@ describe('Auth Integration Tests', () => {
                 password: 'password'
             });
         
+        expect(res.status).toBe(401);
+    });
+  });
+
+  describe('POST /api/auth/refresh-token', () => {
+    it('should rotate tokens if valid refresh token provided in cookie', async () => {
+        // 1. Login to get cookie
+        await User.create({ ...testUser, isEmailVerified: true });
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({ username: testUser.username, password: testUser.password });
+        
+        const refreshTokenCookie = loginRes.headers['set-cookie'].find(c => c.startsWith('refreshToken='));
+
+        // 2. Use refresh token
+        const res = await request(app)
+            .post('/api/auth/refresh-token')
+            .set('Cookie', [refreshTokenCookie]);
+        
+        expect(res.status).toBe(200);
+        expect(res.body.token).toBeTruthy();
+        expect(res.headers['set-cookie']).toBeDefined();
+        
+        const newCookie = res.headers['set-cookie'].find(c => c.startsWith('refreshToken='));
+        expect(newCookie).not.toBe(refreshTokenCookie);
+    });
+
+    it('should return 401 if refresh cookie is missing', async () => {
+        const res = await request(app).post('/api/auth/refresh-token');
         expect(res.status).toBe(401);
     });
   });

@@ -3,8 +3,8 @@ export class NavigationManager {
     this.editor = editor;
     this.outlineContainer = document.getElementById('outlineContainer');
     this.minimapContainer = document.getElementById('minimap');
-    this.isOutlineVisible = true;
-    this.isMinimapVisible = true;
+    this.isOutlineVisible = false;
+    this.isMinimapVisible = false;
     this.collapsedSections = new Set(); // Stores heading node IDs or indices
 
     this.setupEventListeners();

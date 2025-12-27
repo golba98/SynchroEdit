@@ -44,12 +44,20 @@ export class PageManager {
 
         // splitIndex is the index of the character that FITS. 
         // We move everything AFTER it.
-        const moveStartIndex = splitIndex + 1;
+        let moveStartIndex = splitIndex + 1;
 
-        // Only split if we actually found something to move (if moveStartIndex < length)
+        // If we didn't find a split point (everything "fits" according to bounds),
+        // BUT we are still overflowing (scrollHeight > available),
+        // we must Force Split the last character (likely a trailing newline).
         if (moveStartIndex >= currentQuill.getLength()) {
-            this.isSplitting = false;
-            return;
+             // Force move the last character
+             moveStartIndex = Math.max(0, currentQuill.getLength() - 1);
+             
+             // If document is empty or single char that fits, really abort
+             if (moveStartIndex >= currentQuill.getLength()) {
+                 this.isSplitting = false;
+                 return;
+             }
         }
 
         const overflowDelta = currentQuill.getContents(moveStartIndex);

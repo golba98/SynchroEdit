@@ -25,6 +25,7 @@ export class PageManager {
       if (contentHeight > availableHeight) {
         this.isSplitting = true;
         const currentQuill = this.editor.pageQuillInstances[pageIndex];
+        const editorPaddingBottom = 20; // ql-editor padding
 
         // Find exactly where the text overflows
         // We start from the end and work backwards until we find a line that fits
@@ -36,26 +37,30 @@ export class PageManager {
         
         while (splitIndex > 0 && safeGuard < 5000) {
           const bounds = currentQuill.getBounds(splitIndex);
-          if (bounds && bounds.bottom <= availableHeight) break;
+          if (bounds && bounds.bottom <= availableHeight - editorPaddingBottom) break;
           splitIndex--;
           safeGuard++;
         }
 
-        // Only split if we actually found an overflow point that isn't the very end
-        if (splitIndex >= currentQuill.getLength() - 1) {
+        // splitIndex is the index of the character that FITS. 
+        // We move everything AFTER it.
+        const moveStartIndex = splitIndex + 1;
+
+        // Only split if we actually found something to move (if moveStartIndex < length)
+        if (moveStartIndex >= currentQuill.getLength()) {
             this.isSplitting = false;
             return;
         }
 
-        const overflowDelta = currentQuill.getContents(splitIndex);
+        const overflowDelta = currentQuill.getContents(moveStartIndex);
         const selection = currentQuill.getSelection();
-        const shouldMoveCursor = selection && selection.index >= splitIndex;
-        const relativeCursorIndex = shouldMoveCursor ? selection.index - splitIndex : 0;
+        const shouldMoveCursor = selection && selection.index >= moveStartIndex;
+        const relativeCursorIndex = shouldMoveCursor ? selection.index - moveStartIndex : 0;
         
         // Use Yjs transaction for atomic page split
         this.editor.doc.transact(() => {
             // Delete overflow from current page
-            currentQuill.deleteText(splitIndex, currentQuill.getLength() - splitIndex, 'user');
+            currentQuill.deleteText(moveStartIndex, currentQuill.getLength() - moveStartIndex, 'user');
 
             const nextPageExists = this.editor.pageQuillInstances[pageIndex + 1];
             

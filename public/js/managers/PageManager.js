@@ -21,8 +21,16 @@ export class PageManager {
     const maxTextBottom = availableHeight - editorPaddingBottom; // 976
     
     // Check if we are within a line-height (approx 24px) of the bottom
-    const threshold = 30; 
-    
+    const threshold = 80; 
+
+    // Additional guard: if the rendered content height already nearly fills the page,
+    // allow an earlier split to avoid extra Enter presses.
+    const editorEl = document.querySelector(`#editor-${pageIndex} .ql-editor`);
+    if (editorEl) {
+      const remaining = maxTextBottom - editorEl.scrollHeight;
+      if (remaining <= 40) return true;
+    }
+
     return bounds.bottom > maxTextBottom - threshold;
   }
 

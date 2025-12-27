@@ -1,82 +1,52 @@
-# 📄 SynchroEdit
+SYNCHROEDIT | PROJECT OVERVIEW
 
-SynchroEdit is a modern, real-time collaborative document editor designed with a minimalist "Dark OLED" aesthetic. It leverages CRDT (Conflict-free Replicated Data Types) for seamless, conflict-free collaboration similar to Google Docs.
+1. DESCRIPTION
+SynchroEdit is a real-time collaborative document editor. It features a 
+minimalist "Dark OLED" aesthetic and uses CRDT technology to allow 
+multiple people to edit the same document simultaneously without conflicts.
 
-## ✨ Key Features
+2. KEY FEATURES
+- Real-time Editing: Instant sync across all users via Yjs and WebSockets.
+- Visual Presence: See others' cursors with names and personalized colors.
+- OLED Theming: True black background with a dynamic accent color engine.
+- Math Support: Shorthand translation for mathematical symbols (e.g. sqrt).
+- Page Layout: A4-style pagination that creates new pages as you type.
+- Security: Secure login with JWT, hashed passwords, account lockouts, email verification, and password resets.
 
--   **Real-time Collaboration:** Powered by **Yjs** and **WebSockets** for instant, conflict-free editing across multiple users.
--   **Visual Presence:** Remote cursor tracking with name tags and user-specific accent colors.
--   **Dynamic Background:** Interactive canvas-based constellation background that follows the user's chosen accent color.
--   **Customizable UI:** True "OLED Black" dark mode and high-contrast light mode with user-definable accent colors.
--   **Math Editor (Roadmap):** Integrated shorthand translation (e.g., `sqrt(2)`) into formatted mathematical symbols.
--   **Rich Text Editing:** Full formatting suite (Bold, Italic, Lists, Alignment) powered by Quill.
--   **Multi-Page Layout:** Word-processor style multi-page experience with auto-paging.
--   **Secure Authentication:** JWT-based authentication with email verification (logged to console in dev mode).
--   **Persistence:** Automatic synchronization with MongoDB and debounced state saving.
+3. DYNAMIC THEME SYSTEM
+The UI is algorithmically generated based on your chosen accent color:
+- The system calculates lighter and darker shades automatically.
+- It applies these to button glows, borders, and selection highlights.
+- A canvas-based constellation background reacts to the chosen color.
 
-## 🛠️ Tech Stack
+4. TECHNICAL STACK
+- Frontend: Vanilla JavaScript (ES Modules), Tailwind CSS, Quill.js.
+- Sync Engine: Yjs (CRDT) over WebSockets.
+- Backend: Node.js and Express.
+- Database: MongoDB via Mongoose.
 
--   **Frontend:** Vanilla TypeScript/JavaScript (ES Modules), Tailwind CSS, Quill.js, Yjs.
--   **Backend:** Node.js, Express.js.
--   **Real-time Engine:** WebSockets (`ws` library) with Yjs sync protocol.
--   **Database:** MongoDB via Mongoose.
--   **Security:** JWT, bcryptjs, Helmet CSP, express-rate-limit.
 
-## 🚀 Getting Started
 
-### Prerequisites
+5. PROJECT STRUCTURE
+- /public/js/core: Main application and networking logic.
+- /public/js/editor: Editor initialization and Yjs bindings.
+- /public/js/ui: Theme engine and interface components.
+- /src/controllers: API request handlers.
+- /src/middleware: Express middleware.
+- /src/models: Database schemas for users and documents.
+- /src/routes: Express route definitions.
+- /src/sockets: Server-side WebSocket handling.
+- /src/utils: Utility functions.
 
--   Node.js (v16+)
--   MongoDB (Local or Atlas)
+6. QUICK START
+1. Clone the repository.
+2. Run "npm install".
+3. Create a .env file with:
+   - PORT: Server port (e.g., 3000)
+   - MONGODB_URI: Connection string for MongoDB
+   - JWT_SECRET: Secret key for JWT authentication
+   - (Optional) SMTP_USER, SMTP_PASS: For email verification/password reset
+4. Run "npm start".
 
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/golba98/SynchroEdit.git
-    cd SynchroEdit
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Configure Environment:**
-    Create a `.env` file in the root directory:
-    ```env
-    PORT=3000
-    MONGODB_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret_key
-    SMTP_USER=optional_smtp_user
-    SMTP_PASS=optional_smtp_password
-    ```
-
-4.  **Start the server:**
-    ```bash
-    npm start
-    ```
-
-## 📁 Project Structure
-
--   `/public`: Frontend assets, ES modules, and styles.
-    -   `/js/core`: Main application logic and network handling.
-    -   `/js/editor`: Real-time editor engine and Yjs bindings.
-    -   `/js/managers`: Page, border, and cursor management.
-    -   `/js/ui`: Theme, profile, and UI component controllers.
--   `/src`: Backend source code.
-    -   `/controllers`: API request handlers.
-    -   `/models`: Mongoose schemas.
-    -   `/routes`: Express route definitions.
-    -   `/sockets`: WebSocket and Yjs synchronization logic.
--   `/tests`: Comprehensive test suite.
-
-## 🧪 Development
-
--   **Run Tests:** `npm test`
--   **Linting:** `npm run lint`
--   **Formatting:** `npm run format`
-
-## 📜 License
-
-This project is licensed under the ISC License.
+7. LICENSE
+Licensed under the ISC License.

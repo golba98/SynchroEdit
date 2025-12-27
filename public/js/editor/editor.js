@@ -422,7 +422,31 @@ export class Editor {
       }
   }
 
+  isPageEffectivelyEmpty(pageIndex) {
+      const quill = this.pageQuillInstances[pageIndex];
+      if (!quill) return true;
+      const text = quill.getText().trim();
+      return quill.getLength() <= 1 || text === '';
+  }
+
+  removeTrailingEmptyPage(pageIndex) {
+      const isLastPage = pageIndex === this.yPages.length - 1;
+      if (!isLastPage || this.yPages.length <= 1) return false;
+      if (!this.isPageEffectivelyEmpty(pageIndex)) return false;
+      this.deletePage(pageIndex);
+      return true;
+  }
+
   switchToPage(pageIndex, cursorPosition = null) {
+    // If we're leaving an empty trailing page, remove it so navigation back collapses it.
+    const leavingIndex = this.currentPageIndex;
+    if (pageIndex !== leavingIndex) {
+      const removed = this.removeTrailingEmptyPage(leavingIndex);
+      if (removed && pageIndex >= this.yPages.length) {
+        pageIndex = this.yPages.length - 1;
+      }
+    }
+
     if (pageIndex < 0 || pageIndex >= this.yPages.length) return;
 
     this.currentPageIndex = pageIndex;

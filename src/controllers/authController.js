@@ -229,10 +229,19 @@ exports.login = async (req, res, next) => {
     return next(new AppError('Database connection error', 500));
   }
 
-  const { username, password } = req.body;
-  // We need password for comparePassword, but let's see if comparePassword is on instance
-  // Since comparePassword is a method, we need the full document if we use it.
-  const user = await User.findOne({ username });
+  let { username, password } = req.body;
+  if (username) username = username.trim();
+  if (password) password = password.trim();
+  
+  // Find user by username OR email
+  // The frontend sends 'username' field, but user might type email there.
+  const user = await User.findOne({ 
+      $or: [
+          { username: username }, 
+          { email: username.toLowerCase() } 
+      ] 
+  });
+  
   if (!user) return next(new AppError('Invalid username or password', 401));
 
   // Account Lockout Check

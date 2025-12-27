@@ -6,6 +6,8 @@ import { Theme } from '/js/ui/theme.js';
 import { Profile } from '/js/ui/profile.js';
 import { DynamicBackground } from '/js/ui/background.js';
 import { navigateTo } from '/js/core/utils.js';
+import { LibraryManager } from '/js/managers/LibraryManager.js';
+import { UIManager } from '/js/ui/UIManager.js';
 
 export class App {
   constructor() {
@@ -15,7 +17,11 @@ export class App {
     this.theme = new Theme();
     this.profile = new Profile();
     this.background = new DynamicBackground();
+    this.libraryManager = new LibraryManager(this);
+    this.uiManager = new UIManager(this);
+    this.connectionTimer = null;
 
+    window.app = this; // Expose app instance
     this.init();
     this.registerServiceWorker();
   }
@@ -40,6 +46,13 @@ export class App {
       return;
     }
 
+    // Remove Auth Guard
+    const authGuard = document.getElementById('authGuard');
+    if (authGuard) {
+        authGuard.style.opacity = '0';
+        setTimeout(() => authGuard.remove(), 500);
+    }
+
     // Sync Theme from Profile
     if (this.user.accentColor) {
         this.theme.applyAccentColor(this.user.accentColor);
@@ -54,14 +67,14 @@ export class App {
         }
     });
 
-    this.setupEventListeners();
-    this.setupRibbonTabs();
+    this.uiManager.setupEventListeners();
+    this.uiManager.setupRibbonTabs();
     this.setupVisibilityListener();
 
     if (this.documentId) {
         await this.loadDocument();
     } else {
-        await this.showLibrary();
+        await this.libraryManager.showLibrary();
     }
   }
 
@@ -100,12 +113,11 @@ export class App {
 
       this.editor = new Editor('pagesContainer', {
         user: this.user,
-        onPageChange: (index) => this.updateStatus(index),
+        onPageChange: (index) => this.uiManager.updateStatus(index),
         onTitleChange: (title) => {
             // Title synced via Yjs, just update UI if needed
-            // Editor updates the input value automatically
         },
-        onStatusChange: (status) => this.handleWSStatusChange(status),
+        onStatusChange: (status) => this.uiManager.handleWSStatusChange(status),
         onCollaboratorsChange: (users) => {
              UI.updateCollaboratorsUI(
               document.getElementById('activeCollaborators'),
@@ -119,328 +131,26 @@ export class App {
       document.getElementById('libraryOverlay').style.display = 'none';
     } catch (err) {
       console.error('Failed to load document:', err);
-      this.showLibrary();
+      this.libraryManager.showLibrary();
     }
   }
 
-  handleWSStatusChange(status) {
-    const overlay = document.getElementById('serverOfflineOverlay');
-    if (!overlay) return;
-
-    if (status === 'connected') {
-      // 1. Immediate Flush
-      if (this.connectionTimer) {
-          clearTimeout(this.connectionTimer);
-          this.connectionTimer = null;
-      }
-      overlay.style.display = 'none';
-    } else {
-      // 2. State Machine for Disconnect
-      if (document.visibilityState === 'visible') {
-          // If we are already waiting, don't restart the timer
-          if (!this.connectionTimer) {
-              this.connectionTimer = setTimeout(() => {
-                  if (document.visibilityState === 'visible') {
-                      UI.updateConnectionStatus(overlay, status);
-                      overlay.style.display = 'flex';
-                  }
-                  this.connectionTimer = null;
-              }, 5000); // 5-second patience
-          }
-      } else {
-          // If hidden, do nothing. We will check status immediately upon visibility change.
-      }
+  showTransitionOverlay(text = 'Loading...') {
+    const authGuard = document.getElementById('authGuard');
+    const authGuardText = document.getElementById('authGuardText');
+    if (authGuard) {
+      if (authGuardText) authGuardText.textContent = text;
+      authGuard.style.display = 'flex';
+      authGuard.style.opacity = '1';
     }
   }
 
-  setupEventListeners() {
-    const addEvent = (id, event, handler) => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener(event, handler);
-    };
-
-    // Navigation/Library
-    addEvent('menuBtn', 'click', () => this.showLibrary());
-    addEvent('createNewDoc', 'click', () => this.createNewDocument());
-    addEvent('closeLibrary', 'click', () => {
-      if (this.documentId) {
-        const docLibrary = document.getElementById('docLibrary');
-        const libraryOverlay = document.getElementById('libraryOverlay');
-        if (docLibrary) docLibrary.style.display = 'none';
-        if (libraryOverlay) libraryOverlay.style.display = 'none';
-      }
-    });
-
-    // Profile
-    addEvent('userProfileTrigger', 'click', () => {
-      const modal = document.getElementById('profileModal');
-      if (modal) modal.style.display = 'flex';
-    });
-    addEvent('libraryUserProfileTrigger', 'click', () => {
-      const modal = document.getElementById('profileModal');
-      if (modal) modal.style.display = 'flex';
-    });
-    addEvent('closeProfileModal', 'click', () => {
-      const modal = document.getElementById('profileModal');
-      if (modal) modal.style.display = 'none';
-    });
-    addEvent('logoutBtnProfile', 'click', () => Auth.logout());
-
-    // Profile Tabs
-    const profileTabs = document.querySelectorAll('.profile-tab');
-    const profileTabContents = document.querySelectorAll('.profile-tab-content');
-    profileTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
-        profileTabs.forEach((t) => t.classList.remove('active'));
-        profileTabContents.forEach((c) => (c.style.display = 'none'));
-        tab.classList.add('active');
-        const targetContent = document.getElementById(`${targetTab}-content`);
-        if (targetContent) targetContent.style.display = 'block';
-
-        // Load sessions if security tab opened
-        if (targetTab === 'security') {
-            this.profile.loadSessions();
-        }
-      });
-    });
-
-    // Bio Update
-    addEvent('saveGeneralBtn', 'click', () => {
-        const bio = document.getElementById('profileBioInput')?.value;
-        this.profile.updateBio(bio);
-    });
-
-    // Password Update
-    addEvent('updatePasswordBtn', 'click', async () => {
-      const next = document.getElementById('newPassword')?.value;
-      if (next) {
-        if (next.length < 8) {
-            alert('New password must be at least 8 characters long.');
-            return;
-        }
-
-        const current = await this.profile.promptIdentityConfirmation();
-        if (current) {
-          const success = await this.profile.updatePassword(current, next);
-          if (success) {
-            document.getElementById('newPassword').value = '';
-            // Reset strength bar
-            const bar = document.getElementById('passwordStrengthBar');
-            if (bar) bar.style.width = '0%';
-          }
-        }
-      }
-    });
-
-    // Theme
-    addEvent('darkThemeBtn', 'click', () => this.theme.applyTheme('dark'));
-    addEvent('lightThemeBtn', 'click', () => this.theme.applyTheme('light'));
-
-    // Accent Colors
-    document.querySelectorAll('.accent-color-btn').forEach((btn) => {
-      btn.addEventListener('click', () => this.theme.applyAccentColor(btn.dataset.color));
-    });
-
-    // History
-    addEvent('showHistoryBtn', 'click', () => this.showHistory());
-    addEvent('closeHistoryModal', 'click', () => {
-      const modal = document.getElementById('historyModal');
-      if (modal) modal.style.display = 'none';
-    });
-
-    // Save and Save As
-    addEvent('saveBtn', 'click', () => {
-      const saveBtn = document.getElementById('saveBtn');
-      const originalText = saveBtn.innerHTML;
-      saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
-      saveBtn.style.background = '#10b981';
-
-      // Yjs autosaves, so this is just visual feedback
-      // We could force a save via API if we wanted to be sure
-      
-      setTimeout(() => {
-        saveBtn.innerHTML = originalText;
-        saveBtn.style.background = '';
-      }, 2000);
-    });
-
-    addEvent('saveAsBtn', 'click', async () => {
-        alert('Save As is currently disabled during migration to Real-time engine.');
-        // Needs to be re-implemented to copy Yjs state
-    });
-
-    // Share
-    addEvent('shareBtn', 'click', () => {
-      const modal = document.getElementById('shareModal');
-      const input = document.getElementById('shareLink');
-      if (modal && input) {
-        input.value = window.location.href;
-        modal.style.display = 'flex';
-      }
-    });
-
-    addEvent('closeShareModal', 'click', () => {
-      const modal = document.getElementById('shareModal');
-      if (modal) modal.style.display = 'none';
-    });
-
-    addEvent('copyLinkBtn', 'click', () => {
-      const input = document.getElementById('shareLink');
-      input.select();
-      document.execCommand('copy');
-      const btn = document.getElementById('copyLinkBtn');
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-      setTimeout(() => (btn.innerHTML = original), 2000);
-    });
-  }
-
-  async showLibrary() {
-    const library = document.getElementById('docLibrary');
-    const overlay = document.getElementById('libraryOverlay');
-    if (!library || !overlay) return;
-
-    library.style.display = 'block';
-    overlay.style.display = 'block';
-    document.getElementById('closeLibrary').style.display = this.documentId ? 'block' : 'none';
-
-    const renderList = (docs) => {
-        UI.renderDocumentList(
-            document.getElementById('documentList'),
-            docs,
-            this.documentId,
-            (id) => (window.location.href = `?doc=${id}`),
-            async (id) => {
-              if (confirm('Delete this document?')) {
-                await Network.deleteDocument(id);
-                // After deletion, clear cache to force fresh fetch or update it
-                localStorage.removeItem('syncroedit_library_cache');
-                this.showLibrary();
-              }
-            },
-            this.user._id
-        );
-    };
-
-    // 1. Instant Cache Render
-    const cachedData = localStorage.getItem('syncroedit_library_cache');
-    let hasRenderedCache = false;
-
-    if (cachedData) {
-        try {
-            const docs = JSON.parse(cachedData);
-            if (Array.isArray(docs)) {
-                renderList(docs);
-                hasRenderedCache = true;
-            }
-        } catch (e) {
-            console.warn('Failed to parse library cache', e);
-        }
+  hideTransitionOverlay() {
+    const authGuard = document.getElementById('authGuard');
+    if (authGuard) {
+      authGuard.style.opacity = '0';
+      setTimeout(() => (authGuard.style.display = 'none'), 500);
     }
-
-    // 2. Network Refresh (Stale-While-Revalidate)
-    try {
-      const data = await Network.getDocuments();
-      const docs = data.documents || [];
-      const newCacheString = JSON.stringify(docs);
-
-      // Only re-render if data actually changed
-      if (newCacheString !== cachedData) {
-          localStorage.setItem('syncroedit_library_cache', newCacheString);
-          renderList(docs);
-      } else if (!hasRenderedCache) {
-          // If we didn't have cache but network returned same (empty?) or cache was invalid
-          renderList(docs);
-      }
-    } catch (err) {
-      console.error('Error fetching documents from network:', err);
-      
-      // Handle Auth Error (Token expired/invalid)
-      if (err.message && err.message.includes('401')) {
-          window.location.href = '/pages/login.html';
-          return;
-      }
-
-      // If network fails and we didn't render cache, show error
-      if (!hasRenderedCache) {
-          document.getElementById('documentList').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Failed to load documents (Offline).</td></tr>';
-      }
-    }
-  }
-
-  async createNewDocument() {
-    try {
-      const doc = await Network.createDocument();
-      window.location.href = `?doc=${doc._id}`;
-    } catch (err) {
-      alert('Failed to create document');
-    }
-  }
-
-  async showHistory() {
-    if (!this.documentId) return;
-    const modal = document.getElementById('historyModal');
-    const list = document.getElementById('historyList');
-    modal.style.display = 'flex';
-    list.innerHTML = 'Loading history...';
-
-    try {
-      const history = await Network.getHistory(this.documentId);
-      list.innerHTML = history
-        .map(
-          (item) => `
-                <div style="padding: 10px; border-bottom: 1px solid #2a2a2a;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <strong>${item.username}</strong>
-                        <small>${new Date(item.timestamp).toLocaleString()}</small>
-                    </div>
-                    <div>${item.action}</div>
-                    ${item.details ? `<div style="font-size: 11px; color: #666;">${item.details}</div>` : ''}
-                </div>
-            `
-        )
-        .join('');
-    } catch (err) {
-      list.innerHTML = 'Failed to load history';
-    }
-  }
-
-  updateStatus(pageIndex) {
-    document.getElementById('pageIndicator').textContent = `Page ${pageIndex + 1}`;
-    const totalPages = this.editor ? this.editor.pages.length : 1;
-    document.getElementById('pageIndicator').textContent += ` of ${totalPages}`;
-
-    if (this.statusTimeout) clearTimeout(this.statusTimeout);
-    this.statusTimeout = setTimeout(() => {
-      if (this.editor && this.editor.quill) {
-        const text = this.editor.quill.getText();
-        const chars = text.replace(/\s/g, '').length;
-        const words = text
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0).length;
-        const charEl = document.getElementById('charCount');
-        const wordEl = document.getElementById('wordCount');
-        if (charEl) charEl.textContent = `Characters: ${Math.max(0, chars)}`;
-        if (wordEl) wordEl.textContent = `Words: ${words}`;
-      }
-    }, 500);
-  }
-
-  setupRibbonTabs() {
-    const tabs = document.querySelectorAll('.ribbon-tab');
-    const ribbons = document.querySelectorAll('.ribbon-content');
-
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        tabs.forEach((t) => t.classList.remove('active'));
-        ribbons.forEach((r) => r.classList.remove('active'));
-        tab.classList.add('active');
-        const ribbon = document.getElementById(`${tab.dataset.tab}-ribbon`);
-        if (ribbon) ribbon.classList.add('active');
-      });
-    });
   }
 }
 

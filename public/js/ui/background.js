@@ -6,34 +6,99 @@ export class DynamicBackground {
     this.mouse = { x: null, y: null, radius: 150 };
     this.resizeTimeout = null;
     this.animationFrameId = null;
+    this.lastTypeTime = 0;
     
-    // Configuration
+    // Theme Configuration
+    this.currentTheme = localStorage.getItem('synchroEditBackgroundTheme') || 'dots';
+    
+    this.themes = {
+        dots: {
+            particleCount: 100,
+            connectionDistance: 120,
+            mouseDistance: 180,
+            baseSpeed: 0.3,
+            sizeRange: [1, 3],
+            type: 'dots'
+        },
+        math: {
+            particleCount: 40,
+            mouseDistance: 250,
+            baseSpeed: 0.1,
+            sizeRange: [16, 28],
+            type: 'math',
+            symbols: ['∑', 'π', '∞', '∆', 'Ω', '√', '∫', '≈', '≠', '±', 'θ', 'λ', 'φ', '∂']
+        },
+        code: {
+            particleCount: 60,
+            baseSpeed: 1.5,
+            sizeRange: [14, 18],
+            type: 'code',
+            symbols: ['{ }', '</>', '[]', '=>', '++', '&&', '||', '!=', '==', '??', '::', 'asm', 'std']
+        },
+        nature: {
+            particleCount: 30,
+            baseSpeed: 0.5,
+            sizeRange: [20, 35],
+            type: 'nature',
+            symbols: ['🍃', '🌸', '🌼', '🍀', '🍂', '🌹', '🌺']
+        }
+    };
+
     this.config = {
-        particleCount: 60, // Number of particles
-        connectionDistance: 120, // Max distance to draw line
-        mouseDistance: 180, // Interaction radius
-        baseSpeed: 0.3,
-        sizeRange: [1, 2.5],
-        color: 'rgba(var(--accent-color-rgb), 0.4)', // Default accent color
+        color: 'rgba(var(--accent-color-rgb), 0.4)',
         lineColor: 'rgba(var(--accent-color-rgb), 0.15)'
     };
 
     this.init();
   }
 
+    setTheme(themeName) {
+
+      if (this.themes[themeName]) {
+
+        if (window.app && window.app.theme) {
+
+          window.app.theme.showThemeToast('Updating Background...');
+
+        }
+
+        this.currentTheme = themeName;
+
+        localStorage.setItem('synchroEditBackgroundTheme', themeName);
+
+  
+          this.createParticles();
+          
+          // Re-append to workspace to ensure correct layering
+          const target = document.querySelector('.main-workspace');
+          if (target && this.canvas.parentElement !== target) {
+              target.prepend(this.canvas);
+          }
+
+          // Code theme uses a darker workspace background
+          if (themeName === 'code') {
+              document.body.classList.add('bg-code-mode');
+          } else {
+              document.body.classList.remove('bg-code-mode');
+          }
+      }
+  }
+
   init() {
     // Setup Canvas
     this.canvas.id = 'dynamic-background';
-    this.canvas.style.position = 'fixed';
+    this.canvas.style.position = 'absolute';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
-    this.canvas.style.zIndex = '-2'; // Behind everything (pages-container is -1 usually, let's check)
+    this.canvas.style.zIndex = '0'; // Behind text but above container base
     this.canvas.style.pointerEvents = 'none';
     
-    // Insert into body
-    document.body.prepend(this.canvas);
+    // Find workspace or fallback to body
+    const target = document.querySelector('.main-workspace') || document.body;
+    target.style.position = 'relative';
+    target.prepend(this.canvas);
     
     // Listeners
     window.addEventListener('resize', () => this.handleResize());
@@ -41,28 +106,42 @@ export class DynamicBackground {
         this.mouse.x = e.x;
         this.mouse.y = e.y;
     });
+    window.addEventListener('mousedown', (e) => this.handleClick(e));
     window.addEventListener('mouseout', () => {
         this.mouse.x = undefined;
         this.mouse.y = undefined;
     });
 
+    // Pulse on typing
+    document.addEventListener('keydown', () => {
+        this.lastTypeTime = Date.now();
+    });
+
     this.resize();
-    this.createParticles();
+    this.setTheme(this.currentTheme); // Initial particles
     this.animate();
     
-    // Theme listener
     window.addEventListener('theme-update', () => this.updateThemeColors());
     
-    // Also observe class attribute for light/dark toggle if not covered by event
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'class') {
-                this.updateThemeColors();
-            }
-        });
-    });
-    observer.observe(document.body, { attributes: true });
+    // Observer for light/dark mode
+    const observer = new MutationObserver(() => this.updateThemeColors());
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    
     this.updateThemeColors();
+  }
+
+  handleClick(e) {
+      if (this.currentTheme === 'dots') {
+          this.particles.forEach(p => {
+              const dx = p.x - e.clientX;
+              const dy = p.y - e.clientY;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              if (dist < 300) {
+                  p.directionX -= dx * 0.05;
+                  p.directionY -= dy * 0.05;
+              }
+          });
+      }
   }
 
   updateThemeColors() {
@@ -70,8 +149,10 @@ export class DynamicBackground {
       const styles = getComputedStyle(document.documentElement);
       const accentRgb = styles.getPropertyValue('--accent-color-rgb').trim() || '139, 92, 246';
       
+      this.isLight = isLight;
       this.config.color = isLight ? `rgba(${accentRgb}, 0.6)` : `rgba(${accentRgb}, 0.4)`;
       this.config.lineColor = isLight ? `rgba(${accentRgb}, 0.2)` : `rgba(${accentRgb}, 0.15)`;
+      this.accentRgb = accentRgb;
   }
 
   handleResize() {
@@ -89,22 +170,31 @@ export class DynamicBackground {
 
   createParticles() {
     this.particles = [];
-    const count = (this.canvas.width * this.canvas.height) / 15000; // Density based
-    const particleCount = Math.min(Math.max(count, 40), 120); // Clamp count
+    const theme = this.themes[this.currentTheme];
     
-    for (let i = 0; i < particleCount; i++) {
-      const size = Math.random() * (this.config.sizeRange[1] - this.config.sizeRange[0]) + this.config.sizeRange[0];
-      const x = Math.random() * ((this.canvas.width - size * 2) - (size * 2)) + size * 2;
-      const y = Math.random() * ((this.canvas.height - size * 2) - (size * 2)) + size * 2;
-      const directionX = (Math.random() * 2) - 1; // -1 to 1
-      const directionY = (Math.random() * 2) - 1; 
+    for (let i = 0; i < theme.particleCount; i++) {
+      const size = Math.random() * (theme.sizeRange[1] - theme.sizeRange[0]) + theme.sizeRange[0];
+      const x = Math.random() * this.canvas.width;
+      const y = Math.random() * this.canvas.height;
       
-      this.particles.push({
-          x, y, 
-          directionX: directionX * this.config.baseSpeed, 
-          directionY: directionY * this.config.baseSpeed, 
-          size
-      });
+      const p = {
+          x, y, size,
+          baseX: x, baseY: y,
+          directionX: (Math.random() * 2 - 1) * theme.baseSpeed,
+          directionY: (Math.random() * 2 - 1) * theme.baseSpeed,
+          angle: Math.random() * Math.PI * 2,
+          angleSpeed: (Math.random() - 0.5) * 0.01,
+          phase: Math.random() * Math.PI * 2,
+          orbitRadius: 20 + Math.random() * 30,
+          flicker: 0,
+          parallax: (size - theme.sizeRange[0]) / (theme.sizeRange[1] - theme.sizeRange[0]) + 0.5
+      };
+
+      if (theme.symbols) {
+          p.symbol = theme.symbols[Math.floor(Math.random() * theme.symbols.length)];
+      }
+
+      this.particles.push(p);
     }
   }
 
@@ -112,59 +202,112 @@ export class DynamicBackground {
     this.animationFrameId = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
+    const theme = this.themes[this.currentTheme];
+    const now = Date.now();
+    const typePulse = Math.max(0, 1 - (now - this.lastTypeTime) / 1000);
+    
     for (let i = 0; i < this.particles.length; i++) {
         let p = this.particles[i];
         
-        // Movement
-        p.x += p.directionX;
-        p.y += p.directionY;
-        
-        // Bounce
-        if (p.x > this.canvas.width || p.x < 0) p.directionX = -p.directionX;
-        if (p.y > this.canvas.height || p.y < 0) p.directionY = -p.directionY;
-        
-        // Interaction with mouse
-        // (Optional: push away or attract)
-        
-        // Draw Particle
-        this.ctx.beginPath();
-        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        this.ctx.fillStyle = this.config.color;
-        this.ctx.fill();
-        
-        // Connections
-        for (let j = i; j < this.particles.length; j++) {
-            let p2 = this.particles[j];
-            let distance = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
-            
-            if (distance < this.config.connectionDistance) {
+        switch(this.currentTheme) {
+            case 'math':
+                // Drifting orbital movement
+                p.phase += 0.003;
+                p.x += Math.cos(p.phase) * 0.3 + p.directionX;
+                p.y += Math.sin(p.phase) * 0.3 + p.directionY;
+                
+                this.ctx.save();
+                this.ctx.translate(p.x, p.y);
+                this.ctx.rotate(p.angle + (typePulse * 0.5));
+                this.ctx.font = `${p.size}px "Times New Roman"`;
+                
+                // Aesthetic Glow
+                this.ctx.shadowBlur = this.isLight ? 2 : 15;
+                this.ctx.shadowColor = `rgba(${this.accentRgb}, ${0.2 + typePulse * 0.4})`;
+                this.ctx.fillStyle = this.isLight ? `rgba(0, 0, 0, 0.15)` : `rgba(${this.accentRgb}, ${0.1 + typePulse * 0.2})`;
+                
+                this.ctx.fillText(p.symbol, 0, 0);
+                this.ctx.restore();
+                p.angle += p.angleSpeed;
+                break;
+
+            case 'code':
+                // Digital Rain style
+                p.y += p.directionY * (p.size / 12);
+                if (p.y > this.canvas.height + 50) {
+                    p.y = -50;
+                    p.x = Math.random() * this.canvas.width;
+                }
+                
+                if (Math.random() < 0.02) p.flicker = 20;
+                let codeAlpha = p.flicker > 0 ? 0.5 : 0.1;
+                if (p.flicker > 0) p.flicker--;
+
+                this.ctx.font = `bold ${p.size}px monospace`;
+                this.ctx.shadowBlur = p.flicker > 0 ? 10 : 0;
+                this.ctx.shadowColor = `rgba(${this.accentRgb}, 0.5)`;
+                this.ctx.fillStyle = this.isLight ? `rgba(0, 0, 0, ${codeAlpha})` : `rgba(${this.accentRgb}, ${codeAlpha})`;
+                this.ctx.fillText(p.symbol, p.x, p.y);
+                break;
+
+            case 'nature':
+                // Elegant leaf/flower drift
+                p.phase += 0.005;
+                p.y += theme.baseSpeed * p.parallax;
+                p.x += Math.sin(p.phase) * 1.2;
+                p.angle += p.angleSpeed * 2;
+                
+                if (p.y > this.canvas.height + 50) {
+                    p.y = -50;
+                    p.x = Math.random() * this.canvas.width;
+                }
+
+                this.ctx.save();
+                this.ctx.translate(p.x, p.y);
+                this.ctx.rotate(p.angle);
+                this.ctx.font = `${p.size}px Arial`;
+                this.ctx.globalAlpha = this.isLight ? 0.4 : 0.2;
+                this.ctx.shadowBlur = 5;
+                this.ctx.shadowColor = 'rgba(0,0,0,0.1)';
+                this.ctx.fillText(p.symbol, 0, 0);
+                this.ctx.restore();
+                break;
+
+            default: // Dots
+                p.x += p.directionX;
+                p.y += p.directionY;
+                
+                if (p.x > this.canvas.width || p.x < 0) p.directionX = -p.directionX;
+                if (p.y > this.canvas.height || p.y < 0) p.directionY = -p.directionY;
+                
+                // Draw sophisticated dot
                 this.ctx.beginPath();
-                this.ctx.strokeStyle = this.config.lineColor;
-                this.ctx.lineWidth = 1; // max width
-                // Fade out based on distance
-                const opacity = 1 - (distance / this.config.connectionDistance);
-                this.ctx.globalAlpha = opacity;
-                this.ctx.moveTo(p.x, p.y);
-                this.ctx.lineTo(p2.x, p2.y);
-                this.ctx.stroke();
-                this.ctx.globalAlpha = 1;
-            }
+                this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                const dotGrad = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+                dotGrad.addColorStop(0, this.config.color);
+                dotGrad.addColorStop(1, 'transparent');
+                this.ctx.fillStyle = dotGrad;
+                this.ctx.fill();
+
+                for (let j = i + 1; j < this.particles.length; j++) {
+                    let p2 = this.particles[j];
+                    let dist = Math.sqrt((p.x-p2.x)**2 + (p.y-p2.y)**2);
+                    if (dist < theme.connectionDistance) {
+                        this.ctx.beginPath();
+                        const lineAlpha = (1 - (dist / theme.connectionDistance)) * 0.2;
+                        this.ctx.strokeStyle = this.isLight ? `rgba(0, 0, 0, ${lineAlpha})` : `rgba(${this.accentRgb}, ${lineAlpha})`;
+                        this.ctx.lineWidth = 0.8;
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(p2.x, p2.y);
+                        this.ctx.stroke();
+                    }
+                }
         }
         
-        // Connect to mouse
-        if (this.mouse.x != null) {
-            let distance = Math.sqrt((p.x - this.mouse.x) ** 2 + (p.y - this.mouse.y) ** 2);
-             if (distance < this.config.mouseDistance) {
-                this.ctx.beginPath();
-                this.ctx.strokeStyle = this.config.lineColor;
-                const opacity = 1 - (distance / this.config.mouseDistance);
-                this.ctx.globalAlpha = opacity;
-                this.ctx.moveTo(p.x, p.y);
-                this.ctx.lineTo(this.mouse.x, this.mouse.y);
-                this.ctx.stroke();
-                this.ctx.globalAlpha = 1;
-             }
-        }
+        if (p.x < -100) p.x = this.canvas.width + 100;
+        if (p.x > this.canvas.width + 100) p.x = -100;
+        if (p.y < -100) p.y = this.canvas.height + 100;
+        if (p.y > this.canvas.height + 100) p.y = -100;
     }
   }
 }

@@ -3831,3 +3831,897 @@
 {"errorLabelSet":{},"level":"error","message":"Error loading document state: Operation interrupted because client was closed","service":"synchroedit","stack":"MongoClientClosedError: Operation interrupted because client was closed\n    at ConnectionPool.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\cmap\\connection_pool.ts:486:20)\n    at Server.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\server.ts:251:22)\n    at Topology.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\topology.ts:491:21)\n    at MongoClient._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:749:20)\n    at MongoClient.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:731:29)\n    at NativeConnection.doClose (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\drivers\\node-mongodb-native\\connection.js:201:21)\n    at NativeConnection._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1264:18)\n    at NativeConnection.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1229:15)\n    at Object.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\tests\\setup.js:49:29)\n    at Promise.finally.completed (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1497:10)\n    at _callCircusHook (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:976:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTestsForDescribeBlock (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:891:7)\n    at run (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1918:21)\n    at jestAdapter (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\runner.js:101:19)\n    at runTestInternal (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:275:16)\n    at runTest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:343:7)","timestamp":"2025-12-27 01:48:15"}
 {"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 01:48:16"}
 {"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 04:13:50"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 18:53:05"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 18:53:05"}
+{"level":"error","message":"Error: Can't find /favicon.ico on this server!","method":"GET","path":"/favicon.ico","service":"synchroedit","stack":"Error: Can't find /favicon.ico on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 18:53:28"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:236:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 18:53:42"}
+{"level":"error","message":"Error: Can't find /pages/login.html. on this server!","method":"GET","path":"/pages/login.html.","service":"synchroedit","stack":"Error: Can't find /pages/login.html. on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 18:53:54"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 18:53:58"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:236:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 18:54:19"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 18:54:43"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:236:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 18:56:24"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 18:56:28"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 18:57:58"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 18:57:58"}
+{"level":"info","message":"User logged in: tester","service":"synchroedit","timestamp":"2025-12-27 18:58:41"}
+{"level":"info","message":"Document created: 695010450ebe55d58c083c63 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 18:58:45"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 18:58:46"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 18:59:50"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:41"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:41"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:42"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:02:48"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:04:29"}
+{"level":"info","message":"Document created: 695011ac0ebe55d58c083d05 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:04:44"}
+{"level":"info","message":"Document created: 695011ad0ebe55d58c083d0c by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:04:45"}
+{"level":"info","message":"Document created: 695011b00ebe55d58c083d13 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:04:48"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:04:51"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:05:19"}
+{"level":"info","message":"Document deleted: 695011ac0ebe55d58c083d05 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:05:59"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:06:04"}
+{"level":"info","message":"Document deleted: 695010450ebe55d58c083c63 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:08:42"}
+{"level":"info","message":"Document deleted: 695011b00ebe55d58c083d13 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:08:44"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:08:45"}
+{"level":"info","message":"Document deleted: 695011ad0ebe55d58c083d0c by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:08:50"}
+{"level":"error","message":"Error: Document not found","method":"POST","path":"/api/documents/695011ad0ebe55d58c083d0c/recent","service":"synchroedit","stack":"Error: Document not found\n    at exports.addToRecent (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\documentController.js:52:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 19:13:19"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:13:19"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:13:25"}
+{"level":"info","message":"Document created: 695013bc0ebe55d58c083db8 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:13:32"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:13:33"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:17:40"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:19:15"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:19:15"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:19:48"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:19:48"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:19:54"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:20:06"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:21:08"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:21:09"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:22:20"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:22:20"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:22:27"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:23:01"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:23:59"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:23:59"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:24:05"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:24:39"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:25:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:28:32"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:28:32"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:29:05"}
+{"level":"info","message":"Document created: 69501792a652355f84d37bb9 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:29:54"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:29:54"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:30:41"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:31:40"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:31:40"}
+{"level":"info","message":"Document created: 69501801036f3b5e454bb9f3 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:31:45"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:31:46"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:32:13"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:34:45"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:34:45"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:47"}
+{"level":"info","message":"Document deleted: 69501801036f3b5e454bb9f3 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:51"}
+{"level":"info","message":"Document deleted: 69501792a652355f84d37bb9 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:53"}
+{"level":"info","message":"Document deleted: 695013bc0ebe55d58c083db8 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:54"}
+{"level":"info","message":"Document created: 695018bf9d0d05c2089d74af by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:55"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:34:56"}
+{"level":"info","message":"Document deleted: 695018bf9d0d05c2089d74af by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:35:14"}
+{"level":"info","message":"Document created: 695018d39d0d05c2089d74e6 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:35:15"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:35:15"}
+{"level":"info","message":"Document created: 695018ef9d0d05c2089d750a by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:35:43"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:35:43"}
+{"level":"info","message":"Document deleted: 695018ef9d0d05c2089d750a by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:36:49"}
+{"level":"info","message":"Document deleted: 695018d39d0d05c2089d74e6 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:36:50"}
+{"level":"info","message":"Document created: 695019339d0d05c2089d7544 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:36:51"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:36:52"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:39:10"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:39:10"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:39:19"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:44:12"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:44:12"}
+{"level":"info","message":"Document created: 69501af6ccc248cbf014227e by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:44:22"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:44:22"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:44:29"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 19:45:01"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:45:01"}
+{"level":"info","message":"Document created: 69501b24abd4af250676f1b9 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:45:08"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:45:08"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:45:17"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:21"}
+{"level":"info","message":"Document created: 69501b79abd4af250676f200 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:33"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:34"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:38"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:38"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:39"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:40"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:41"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:41"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:42"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:43"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:43"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:43"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:44"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:44"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:44"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:44"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:44"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:45"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:47"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:50"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:46:50"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:47:14"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:47:17"}
+{"level":"info","message":"Document deleted: 69501b24abd4af250676f1b9 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:47:57"}
+{"level":"info","message":"Document deleted: 69501af6ccc248cbf014227e by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:47:59"}
+{"level":"info","message":"Document deleted: 695019339d0d05c2089d7544 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:48:01"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:49:02"}
+{"level":"info","message":"Document created: 69501c62abd4af250676f339 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:50:26"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:50:26"}
+{"level":"info","message":"Document created: 69501c6dabd4af250676f357 by 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:50:37"}
+{"level":"debug","message":"Generated WS ticket for user 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:50:37"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:51:06"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:51:10"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:51:10"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:51:10"}
+{"level":"info","message":"Profile updated for user: 69501005cac4d516d93ebb25","service":"synchroedit","timestamp":"2025-12-27 19:51:11"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:51:21"}
+{"level":"error","message":"Error: Can't find /favicon.ico on this server!","method":"GET","path":"/favicon.ico","service":"synchroedit","stack":"Error: Can't find /favicon.ico on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 19:54:13"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:02"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:06"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 285753","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 804921","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 235375","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 270424","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Verification code resent to: test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 126565","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 619370","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 914438","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:07"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 166432","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-27 19:57:08"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 648553","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 884730","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 490197","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Profile updated for user: 69501df54ec00adbb5020989","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 815597","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Profile updated for user: 69501df54ec00adbb5020998","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 550863","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:09"}
+{"level":"info","message":"Password updated for user: 69501df54ec00adbb50209a9","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"User logged in: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 301725","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 519496","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 788413","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 933669","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-27 19:57:10"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:11"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 544158","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Document created: 69501df8fc6b1e45d2ab7235 by 69501df7fc6b1e45d2ab722d","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 104875","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Document created: 69501df8fc6b1e45d2ab7246 by 69501df8fc6b1e45d2ab723e","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 947053","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 109722","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Document deleted: 69501df8fc6b1e45d2ab7287 by 69501df8fc6b1e45d2ab7281","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 352383","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 348260","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 804906","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 116980","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-27 19:57:12"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:13"}
+{"errorLabelSet":{},"level":"error","message":"Error loading document state: Operation interrupted because client was closed","service":"synchroedit","stack":"MongoClientClosedError: Operation interrupted because client was closed\n    at ConnectionPool.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\cmap\\connection_pool.ts:486:20)\n    at Server.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\server.ts:251:22)\n    at Topology.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\topology.ts:491:21)\n    at MongoClient._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:749:20)\n    at MongoClient.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:731:29)\n    at NativeConnection.doClose (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\drivers\\node-mongodb-native\\connection.js:201:21)\n    at NativeConnection._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1264:18)\n    at NativeConnection.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1229:15)\n    at Object.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\tests\\setup.js:49:29)\n    at Promise.finally.completed (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1497:10)\n    at _callCircusHook (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:976:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTestsForDescribeBlock (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:891:7)\n    at run (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1918:21)\n    at jestAdapter (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\runner.js:101:19)\n    at runTestInternal (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:275:16)\n    at runTest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:343:7)","timestamp":"2025-12-27 19:57:14"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:14"}
+{"level":"info","message":"User logged in: sessiontest","service":"synchroedit","timestamp":"2025-12-27 19:57:15"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 19:57:15"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:07"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:15"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:40"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:46"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:50"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:245:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:05:52"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 20:14:10"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 20:14:10"}
+{"level":"error","message":"Error: Invalid username or password","method":"POST","path":"/api/auth/login","service":"synchroedit","stack":"Error: Invalid username or password\n    at exports.login (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\authController.js:264:19)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 20:14:25"}
+{"level":"info","message":"User logged in: tester","service":"synchroedit","timestamp":"2025-12-27 20:14:32"}
+{"level":"info","message":"Document created: 6950220bdd4e03823aa45741 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:14:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:14:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:14:43"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:23:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 20:24:08"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 20:24:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:24:14"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:25:06"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:25:10"}
+{"level":"info","message":"Document created: 69502506c693155276c7e6b4 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:27:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 20:27:18"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:02:46"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:02:46"}
+{"level":"info","message":"Document created: 69502d5f5ae6f0c58239087e by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:02:55"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:02:55"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:04:59"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:04:59"}
+{"level":"info","message":"Document created: 69502de0309e1b8de6baba1b by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:05:04"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:05:04"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:06:04"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:06:07"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:06:35"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:06:35"}
+{"level":"info","message":"Document created: 69502e40419a3bdc93468481 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:06:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:06:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:08:53"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:08:58"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:09:16"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:09:16"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:09:18"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:12:09"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:12:09"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:12:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:12:27"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:12:42"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:12:44"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:16:36"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:16:36"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:16:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:16:41"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:17:21"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:17:26"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:17:58"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:03"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:04"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:13"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:18"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:20"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:18:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:20:27"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:24:00"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:24:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:05"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:08"}
+{"level":"info","message":"Document deleted: 69502e40419a3bdc93468481 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:25"}
+{"level":"info","message":"Document deleted: 69502de0309e1b8de6baba1b by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:27"}
+{"level":"info","message":"Document deleted: 69502d5f5ae6f0c58239087e by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:28"}
+{"level":"info","message":"Document deleted: 69502506c693155276c7e6b4 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:30"}
+{"level":"info","message":"Document deleted: 6950220bdd4e03823aa45741 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:24:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:28:01"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:28:01"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:28:04"}
+{"level":"error","message":"Error: Document not found","method":"POST","path":"/api/documents/69502e40419a3bdc93468481/recent","service":"synchroedit","stack":"Error: Document not found\n    at exports.addToRecent (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\controllers\\documentController.js:52:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-27 21:28:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:28:08"}
+{"level":"error","message":"Error: Can't find /favicon.ico on this server!","method":"GET","path":"/favicon.ico","service":"synchroedit","stack":"Error: Can't find /favicon.ico on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 21:29:01"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:29:29"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:29:29"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 21:29:51"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 21:30:01"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:31:27"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:31:27"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 21:31:38"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:32:40"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:32:40"}
+{"level":"error","message":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","stack":"Error: Can't find /.well-known/appspecific/com.chrome.devtools.json on this server!\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\server.js:75:10\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:295:15\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:600:14)\n    at param (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:610:14)\n    at processParams (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:664:3)","timestamp":"2025-12-27 21:32:49"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:34:19"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:34:19"}
+{"level":"info","message":"Document created: 695034c09c2a0d2ca6949425 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:34:24"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:34:24"}
+{"level":"info","message":"User logged in: tester","service":"synchroedit","timestamp":"2025-12-27 21:35:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:35:14"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:41:38"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:41:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:41:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:41:43"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:43:23"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:43:44"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:44:11"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:47:25"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:47:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:47:28"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:47:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:50:11"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:50:11"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:50:11"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:50:14"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:53:48"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:53:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:53:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:54:01"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:54:39"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:54:43"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:55:06"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:55:26"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:55:54"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:56:04"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 21:56:40"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 21:56:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:56:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:56:47"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:57:26"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:57:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 21:58:09"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:02:48"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:02:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:02:53"}
+{"level":"error","message":"Error: Token expired","method":"GET","path":"/api/user/profile","service":"synchroedit","stack":"Error: Token expired\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\middleware\\auth.js:18:19\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jsonwebtoken\\verify.js:190:16\n    at getSecret (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at authenticateToken (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\middleware\\auth.js:15:7)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\router\\lib\\layer.js:152:17)","timestamp":"2025-12-27 22:06:38"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:06:38"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:06:40"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 22:06:49"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:08:20"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:08:20"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:11:29"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:11:29"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 22:12:39"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:13:49"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:13:49"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 22:13:53"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 22:13:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:14:03"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:14:36"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:15:09"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:15:42"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:16:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:16:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:17:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:17:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:18:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:19:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:19:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:20:06"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:20:39"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:26:15"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:26:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:26:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:27:30"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:28:03"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:28:36"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:29:09"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:29:42"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:30:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:30:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:31:09"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:31:42"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:32:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:32:48"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:33:25"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:33:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:33:29"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:33:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:33:42"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:34:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:34:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:35:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:35:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:36:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:36:51"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:37:13"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:37:13"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:37:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:38:01"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:38:34"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:38:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:38:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:38:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:38:36"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:38:44"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:39:17"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:40:56"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:40:56"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:41:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:41:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:41:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:42:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:42:32"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:43:05"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:43:38"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:43:45"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:43:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:43:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:43:47"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:44:20"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:44:53"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:44:57"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:44:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:44:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:45:01"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:45:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:46:07"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:46:40"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:46:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:46:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:46:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:47:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:47:51"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:48:24"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:48:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:48:59"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:49:29"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:49:29"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:50:02"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:53:28"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:53:28"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:56:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:56:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:57:06"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 22:57:23"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 22:57:23"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:57:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 22:57:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:01:24"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:01:24"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:03:20"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:03:20"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:05:32"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:05:32"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:05:40"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:09:51"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:09:51"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:11:04"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:12:09"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:12:09"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:12:25"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:13:05"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:13:28"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:13:28"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:13:36"}
+{"level":"info","message":"User logged in: tester","service":"synchroedit","timestamp":"2025-12-27 23:13:46"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:13:49"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:14:42"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:14:42"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:14:43"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:14:44"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:15:03"}
+{"level":"info","message":"User logged in: tester","service":"synchroedit","timestamp":"2025-12-27 23:15:35"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:17:18"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:17:18"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:19:03"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:19:03"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:20:02"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:20:02"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:21:55"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:21:55"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:23:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:24:30"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:25:03"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:25:16"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:25:16"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:26:30"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:27:00"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:27:00"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:29:44"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:29:44"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:33:46"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:34:13"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:34:46"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:35:19"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-27 23:35:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:35:52"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:36:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:36:58"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:37:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:37:59"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:37:59"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:38:19"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:38:19"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:38:22"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:38:26"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:38:59"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:39:30"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:40:02"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:40:09"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:40:09"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:40:12"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:40:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:40:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:41:10"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:41:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:41:29"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:42:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:42:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:42:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:43:14"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:43:44"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:44:18"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:44:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:44:18"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:44:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:44:30"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:45:03"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:45:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:45:20"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:45:53"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:46:26"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:46:59"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:47:32"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:47:51"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:47:51"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:47:51"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:47:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:48:11"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:48:44"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:49:17"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:49:50"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:50:23"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:50:56"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:51:02"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:51:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:51:07"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:51:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:52:13"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:52:46"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:52:51"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:53:24"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:53:57"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:54:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:55:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:56:03"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:58:31"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-27 23:58:45"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-27 23:58:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:58:45"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:58:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:59:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-27 23:59:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:00:24"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:00:57"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:01:21"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:01:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:01:21"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:01:29"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-28 00:01:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:02:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:02:06"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:02:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:03:12"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:03:31"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:03:31"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:03:31"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:03:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:04:07"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:04:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:05:14"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:06:05"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:06:08"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:06:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:06:08"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:06:11"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:06:38"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:06:59"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:07:11"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:07:44"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:07:56"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:08:15"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:08:48"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:09:06"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:09:06"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:09:07"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:09:15"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:09:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:09:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:08"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:10:25"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:10:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:31"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:35"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:39"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:10:41"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:11:04"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:11:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:08"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:34"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:35"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:40"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:41"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:44"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:47"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:54"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:57"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:12:58"}
+{"level":"info","message":"Profile updated for user: 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:13:02"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:13:13"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:13:16"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:13:16"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:13:16"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:13:24"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:13:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:14:05"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:14:35"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:14:39"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:14:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:14:39"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:14:42"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-28 00:14:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:15:15"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:15:33"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:15:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:15:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:15:37"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-28 00:15:48"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:16:11"}
+{"level":"debug","message":"Browser Noise (404): /.well-known/appspecific/com.chrome.devtools.json","service":"synchroedit","timestamp":"2025-12-28 00:16:43"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:16:45"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:16:54"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:16:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:16:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:16:58"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:17:31"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:18:04"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:18:37"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:19:10"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:19:43"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:20:16"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:20:49"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:21:22"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:21:25"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:21:25"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:21:27"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:22:00"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:22:33"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:23:06"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:23:28"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:24:01"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:24:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:25:07"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:25:40"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:26:13"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:26:46"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:19"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:27:34"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:27:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:34"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:37"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:46"}
+{"level":"info","message":"Document created: 69505d668a355136aec07756 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:50"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:50"}
+{"level":"info","message":"Document created: 69505d6a8a355136aec07786 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:54"}
+{"level":"debug","message":"Generated WS ticket for user 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:27:54"}
+{"level":"info","message":"Document deleted: 69505d6a8a355136aec07786 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:28:04"}
+{"level":"info","message":"Document deleted: 69505d668a355136aec07756 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:28:06"}
+{"level":"info","message":"Document deleted: 695034c09c2a0d2ca6949425 by 6950205876446cad8f01f511","service":"synchroedit","timestamp":"2025-12-28 00:28:08"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:49"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:52"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 519870","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 821333","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 820620","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 343639","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Verification code resent to: test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 765004","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"User email verified: testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 293413","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 445080","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"DEV MODE: Verification code for test@example.com is 872098","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"Attempting to send verification email to test@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"New user signed up (pending verification): testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:53"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:54"}
+{"level":"info","message":"User logged in: testuser","service":"synchroedit","timestamp":"2025-12-28 00:28:54"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:54"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 387654","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Document created: 69505da7c460f1d75ecb2ec9 by 69505da7c460f1d75ecb2ec1","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 946243","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Document created: 69505da7c460f1d75ecb2eda by 69505da7c460f1d75ecb2ed2","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 731568","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 935973","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Document deleted: 69505da7c460f1d75ecb2f1b by 69505da7c460f1d75ecb2f15","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 842802","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 650956","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 229889","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_doc@example.com is 277336","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Attempting to send verification email to test_doc@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"New user signed up (pending verification): testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"User email verified: testuser_doc","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:55"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 244739","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 775729","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 720223","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Profile updated for user: 69505da8adbf65b9d119b77d","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 831392","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Profile updated for user: 69505da8adbf65b9d119b78c","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 924026","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Password updated for user: 69505da8adbf65b9d119b79d","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User logged in: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 979097","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:56"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 420766","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 199277","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"DEV MODE: Verification code for test_user@example.com is 296404","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"Attempting to send verification email to test_user@example.com","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"warn","message":"Email configuration missing: SMTP_USER/PASS not set. returning TRUE for DEV mode.","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"New user signed up (pending verification): testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"User email verified: testuser_user","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:57"}
+{"errorLabelSet":{},"level":"error","message":"Error loading document state: Operation interrupted because client was closed","service":"synchroedit","stack":"MongoClientClosedError: Operation interrupted because client was closed\n    at ConnectionPool.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\cmap\\connection_pool.ts:486:20)\n    at Server.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\server.ts:251:22)\n    at Topology.closeCheckedOutConnections (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\sdam\\topology.ts:491:21)\n    at MongoClient._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:749:20)\n    at MongoClient.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongodb\\src\\mongo_client.ts:731:29)\n    at NativeConnection.doClose (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\drivers\\node-mongodb-native\\connection.js:201:21)\n    at NativeConnection._close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1264:18)\n    at NativeConnection.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\mongoose\\lib\\connection.js:1229:15)\n    at Object.close (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\tests\\setup.js:49:29)\n    at Promise.finally.completed (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1497:10)\n    at _callCircusHook (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:976:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTestsForDescribeBlock (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:891:7)\n    at run (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\jestAdapterInit.js:1918:21)\n    at jestAdapter (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-circus\\build\\runner.js:101:19)\n    at runTestInternal (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:275:16)\n    at runTest (C:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\node_modules\\jest-runner\\build\\index.js:343:7)","timestamp":"2025-12-28 00:28:58"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:58"}
+{"level":"info","message":"User logged in: sessiontest","service":"synchroedit","timestamp":"2025-12-28 00:28:58"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:28:59"}
+{"level":"error","message":"Error: User not found","method":"POST","path":"/api/documents","service":"synchroedit","stack":"Error: User not found\n    at c:\\Users\\jorda\\OneDrive\\Desktop\\1-JavaScript\\Personal\\1-SyncroEdit\\src\\middleware\\auth.js:23:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-28 00:33:58"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:35:38"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:35:38"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:41:09"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:41:09"}
+{"level":"info","message":"Secure Server running on http://localhost:3000","service":"synchroedit","timestamp":"2025-12-28 00:45:24"}
+{"level":"info","message":"Connected to MongoDB","service":"synchroedit","timestamp":"2025-12-28 00:45:24"}

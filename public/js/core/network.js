@@ -84,19 +84,14 @@ export const Network = {
           // This also verifies the session is still active
           const { ticket } = await this.fetchAPI('/api/auth/ws-ticket');
           
-          ws = new WebSocket(wsUrl);
+          const wsFullUrl = `${wsUrl}/?documentId=${documentId}&ticket=${ticket}`;
+          ws = new WebSocket(wsFullUrl);
 
           ws.onopen = () => {
             console.log('Connected to server');
             reconnectAttempts = 0;
             if (onStatusChange) onStatusChange('connected');
-            ws.send(
-              JSON.stringify({
-                type: 'join-document',
-                documentId,
-                ticket, // Use the fresh ticket
-              })
-            );
+            // No need to send join-document message as it is handled by URL params in upgrade
           };
 
           ws.onmessage = (event) => {

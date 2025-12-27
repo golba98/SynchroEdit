@@ -43,29 +43,29 @@
 
       .login-container {
         background: #0d0d0d;
-        border-radius: 20px;
+        border-radius: 60px;
         box-shadow:
           0 20px 60px rgba(0, 0, 0, 0.6),
           0 0 80px var(--accent-glow);
         border: 1px solid #2a2a2a;
         display: flex;
-        width: 900px;
-        min-height: 650px;
+        width: 1000px; /* Wider to fit both sections */
+        min-height: 600px;
         position: relative;
         z-index: 10;
         transition: box-shadow 0.5s;
+        overflow: hidden; /* Ensure rounded corners clip content */
       }
 
       .left-section {
         flex: 1;
-        padding: 25px 40px;
+        padding: 60px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         background: #000000;
         z-index: 2;
-        overflow: hidden;
-        max-height: 650px;
+        position: relative;
       }
 
       .title {
@@ -231,6 +231,79 @@
       .form-container.active { display: block; animation: fadeIn 0.5s ease; }
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+
+      /* Missing UI Styles */
+      .floating-label-container {
+        position: relative;
+        margin-top: 15px;
+      }
+
+      .floating-label {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        padding: 0 4px;
+        color: #666;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        z-index: 5;
+      }
+
+      .floating-label-container input:focus + .floating-label,
+      .floating-label-container input:not(:placeholder-shown) + .floating-label {
+        top: 0;
+        font-size: 11px;
+        color: var(--accent-color);
+        background: #000000;
+      }
+
+      .entropy-bar {
+        height: 6px;
+        width: 100%;
+        background: #1a1a1a;
+        border-radius: 3px;
+        margin-top: 8px;
+        overflow: hidden;
+        display: flex;
+        border: 1px solid #2a2a2a;
+      }
+
+      .entropy-segment {
+        height: 100%;
+        transition: width 0.3s ease, background 0.3s ease;
+      }
+
+      .requirement-item {
+        font-size: 11px;
+        color: #666;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .requirement-item.met {
+        color: #10b981;
+        text-decoration: line-through;
+      }
+
+      .requirement-item.met i {
+        color: #10b981;
+      }
+
+      .shake-animation {
+        animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
 
       /* =========================================
          SYNCHROBOT 2.0 - VISUAL RIG
@@ -559,6 +632,10 @@
   <body class="boot-up">
     <div class="login-container">
       <div class="left-section">
+        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 24px;">📄</div>
+          <div style="font-size: 20px; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">SynchroEdit</div>
+        </div>
         <!-- Login Form -->
         <div class="form-container active" id="loginForm">
           <div class="title">Welcome Back</div>
@@ -638,42 +715,34 @@
         </div>
       </div>
 
-      <!-- SYNCHROBOT 2.0 DISPLAY -->
-      <div class="right-section" id="botStage">
+      <!-- Right Section: SynchroBot 2.0 -->
+      <div class="right-section">
         <div class="character-container">
           <div class="bot-rig" id="botRig">
-            
             <div class="antenna-stalk"></div>
-            <div class="antenna-bulb" id="antenna"></div>
-
+            <div class="antenna-bulb"></div>
             <div class="head">
               <div class="face-screen">
-                <!-- Loader for Processing -->
                 <div class="loader"></div>
-
-                <div class="eyes-container" id="eyesContainer">
+                <div class="eyes-container">
                   <div class="eye left">
                     <div class="eyelid top"></div>
-                    <div class="eyelid bottom"></div>
                     <div class="pupil"></div>
+                    <div class="eyelid bottom"></div>
                   </div>
                   <div class="eye right">
                     <div class="eyelid top"></div>
-                    <div class="eyelid bottom"></div>
                     <div class="pupil"></div>
+                    <div class="eyelid bottom"></div>
                   </div>
                 </div>
-                
-                <div class="mouth" id="mouth"></div>
-              </div>
-
-              <!-- Floating Hands -->
-              <div class="hands-container">
-                <div class="hand left"></div>
-                <div class="hand right"></div>
+                <div class="mouth"></div>
               </div>
             </div>
-
+            <div class="hands-container">
+              <div class="hand left"></div>
+              <div class="hand right"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -691,6 +760,14 @@
         <button id="resendCodeBtn" style="width: 100%; padding: 12px; background: transparent; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 6px; cursor: pointer; font-weight: 600;">Resend Code</button>
         <div id="verificationMessage" style="margin-top: 16px; font-size: 13px"></div>
       </div>
+    </div>
+
+    <div id="redirectOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020d; z-index: 100000; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease-in-out;">
+       <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <div style="font-size: 48px; animation: float 3s ease-in-out infinite;">📄</div>
+          <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0;">Accessing Workspace</h2>
+          <div style="width: 40px; height: 40px; border: 3px solid rgba(139, 92, 246, 0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+       </div>
     </div>
 
     <script type="module" src="../js/ui/authController.js"></script>

@@ -1,15 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const http = require('http');
 const mongoose = require('mongoose');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
 
 const logger = require('./utils/logger');
 const globalErrorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError');
+const setupShutdownHandlers = require('./utils/shutdown');
+const setupMiddleware = require('./middleware/setupMiddleware');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
@@ -19,51 +17,17 @@ const documentSocket = require('./sockets/documentSocket');
 const app = express();
 const server = http.createServer(app);
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-    logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...', err);
-    process.exit(1);
-});
-
 // Initialize WebSocket
 const wss = documentSocket.init(server);
 
+// Setup Shutdown and Process Handlers
+setupShutdownHandlers(server, wss);
+
+// Setup Middleware
+setupMiddleware(app);
+
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
-
-// Security Middleware
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "unpkg.com", "esm.sh"],
-            scriptSrcAttr: ["'unsafe-inline'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "cdn.quilljs.com", "fonts.googleapis.com"],
-            fontSrc: ["'self'", "cdnjs.cloudflare.com", "fonts.gstatic.com", "data:"],
-            imgSrc: ["'self'", "data:", "blob:"],
-            mediaSrc: ["'self'", "data:", "blob:"],
-            connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"],
-        },
-    },
-}));
-
-app.set('trust proxy', 1);
-
-// Rate Limiting
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: { message: 'Too many requests from this IP, please try again after 15 minutes' },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-// Middleware
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(cookieParser());
-app.use('/api/', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -86,46 +50,6 @@ if (MONGODB_URI) {
 } else {
     logger.warn('MONGODB_URI not found in .env. Database features will not work.');
 }
-
-// Graceful Shutdown
-const gracefulShutdown = async (signal) => {
-    logger.info(`${signal} received. Starting graceful shutdown...`);
-    
-    documentSocket.broadcastMaintenance(wss);
-
-    // Give some time for maintenance broadcast to reach clients
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    server.close(async () => {
-        logger.info('HTTP server closed.');
-        
-        try {
-            await mongoose.connection.close();
-            logger.info('MongoDB connection closed.');
-            process.exit(0);
-        } catch (err) {
-            logger.error('Error during MongoDB closure:', err);
-            process.exit(1);
-        }
-    });
-
-    // If graceful shutdown takes too long, force exit
-    setTimeout(() => {
-        logger.error('Could not close connections in time, forcefully shutting down');
-        process.exit(1);
-    }, 10000);
-};
-
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-// Handle unhandled rejections
-process.on('unhandledRejection', (err) => {
-    logger.error('UNHANDLED REJECTION! 💥 Shutting down...', err);
-    server.close(() => {
-        process.exit(1);
-    });
-});
 
 if (require.main === module) {
     server.listen(PORT, () => {

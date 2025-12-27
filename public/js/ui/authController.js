@@ -13,7 +13,7 @@ export class AuthController {
     }
 
     init() {
-        this.resetSleepTimer();
+        if (this.botRig) this.resetSleepTimer();
         this.checkExistingSession();
     }
 
@@ -66,7 +66,7 @@ export class AuthController {
             });
             el.addEventListener('blur', () => {
                 setTimeout(() => {
-                    if (!document.activeElement.classList.contains('password-toggle')) {
+                    if (this.botRig && !document.activeElement.classList.contains('password-toggle')) {
                         this.botRig.classList.remove('secure', 'peeking', 'searching');
                     }
                 }, 100);
@@ -88,7 +88,6 @@ export class AuthController {
         const signupUsername = document.getElementById('signupUsername');
         let usernameTimeout;
         signupUsername?.addEventListener('input', (e) => {
-            this.updatePupils(e.target.value.length);
             clearTimeout(usernameTimeout);
             usernameTimeout = setTimeout(() => this.checkUsernameAvailability(e.target.value), 500);
         });
@@ -108,7 +107,7 @@ export class AuthController {
             signupForm.classList.remove('active');
             loginForm.classList.add('active');
         }
-        this.botRig.className = 'bot-rig';
+        if (this.botRig) this.botRig.className = 'bot-rig';
     }
 
     handleMagneticHover(e, el) {
@@ -170,6 +169,7 @@ export class AuthController {
 
     updateBotState(input, force = false) {
         if (!force && document.activeElement !== input) return;
+        if (!this.botRig) return;
         this.botRig.classList.remove('secure', 'peeking', 'confused', 'searching');
         if (input.type === 'text') {
             if (input.value.length === 0) this.botRig.classList.add('searching');
@@ -352,7 +352,7 @@ export class AuthController {
 
     setProcessing(val) {
         this.isProcessing = val;
-        this.botRig.classList.toggle('processing', val);
+        if (this.botRig) this.botRig.classList.toggle('processing', val);
         const btns = ['loginBtn', 'signupBtn'];
         btns.forEach(id => {
             const el = document.getElementById(id);
@@ -366,10 +366,16 @@ export class AuthController {
 
     successSequence(data) {
         Auth.setToken(data.token);
-        this.botRig.className = 'bot-rig success';
+        if (this.botRig) this.botRig.className = 'bot-rig success';
         const msgId = document.getElementById('loginForm').classList.contains('active') ? 'loginStatusMessage' : 'signupStatusMessage';
         document.getElementById(msgId).textContent = '✓ Welcome!';
         document.getElementById(msgId).className = 'status-message success';
+
+        const overlay = document.getElementById('redirectOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        }
 
         setTimeout(() => {
             const docId = new URLSearchParams(window.location.search).get('doc');
@@ -379,11 +385,25 @@ export class AuthController {
 
     errorSequence(message, formId) {
         this.setProcessing(false);
-        this.botRig.classList.add('error');
-        document.getElementById(formId).classList.add('shake-animation');
+        if (this.botRig) this.botRig.classList.add('error');
+        
+        const form = document.getElementById(formId);
+        form.classList.add('shake-animation');
+        
+        // Highlight inputs in red
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.style.borderColor = 'var(--error-color)';
+            input.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.2)';
+        });
+
         setTimeout(() => {
-            this.botRig.classList.remove('error');
-            document.getElementById(formId).classList.remove('shake-animation');
+            if (this.botRig) this.botRig.classList.remove('error');
+            form.classList.remove('shake-animation');
+            inputs.forEach(input => {
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+            });
         }, 1000);
 
         const msgId = formId === 'loginForm' ? 'loginStatusMessage' : 'signupStatusMessage';

@@ -47,6 +47,8 @@ export class Editor {
     this.readabilityManager = new ReadabilityManager(this);
     this.navigationManager = new NavigationManager(this);
     
+    this.setupGlobalListeners();
+
     // 1. Instant Load from IndexedDB
     this.loadFromCache(docId).then(() => {
         // Only connect after cache check (or concurrently, but we apply cache first)
@@ -58,9 +60,62 @@ export class Editor {
     });
 
     this.setupTitleDebounce();
+    this.setupScrollListener();
     
     // Render placeholder immediately for perceived performance
     this.createPlaceholderPage();
+  }
+
+  setupScrollListener() {
+    const container = document.getElementById('pagesContainer');
+    if (!container) return;
+
+    container.addEventListener('scroll', debounce(() => {
+        // If user is actively typing in a specific quill, prioritize that page's index
+        // to prevent the status bar from flickering while they work at the edge of a page.
+        if (document.activeElement && document.activeElement.closest('.ql-editor')) {
+            const activePageEl = document.activeElement.closest('.editor-container');
+            if (activePageEl) {
+                const activeIndex = Array.from(this.container.querySelectorAll('.editor-container')).indexOf(activePageEl);
+                if (activeIndex !== -1 && activeIndex !== this.currentPageIndex) {
+                    this.currentPageIndex = activeIndex;
+                    this.quill = this.pageQuillInstances[activeIndex];
+                    this.onPageChange(activeIndex);
+                    return;
+                }
+            }
+        }
+
+        const pages = this.container.querySelectorAll('.editor-container');
+        let closestPageIndex = this.currentPageIndex;
+        let minDistance = Infinity;
+
+        const containerRect = container.getBoundingClientRect();
+        const containerCenter = containerRect.top + (containerRect.height / 2);
+        const scale = this.currentZoom / 100;
+
+        pages.forEach((page, index) => {
+            const rect = page.getBoundingClientRect();
+            // Calculate center in logical space
+            const pageCenter = rect.top + (rect.height / 2);
+            
+            // At 50% zoom, the visual distance is half, but we want the logical priority.
+            // Using distance is fine, but we divide by scale to normalize.
+            const distance = Math.abs(pageCenter - containerCenter) / scale;
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestPageIndex = index;
+            }
+        });
+
+        if (closestPageIndex !== this.currentPageIndex) {
+            console.log(`[Scroll] Page changed from ${this.currentPageIndex} to ${closestPageIndex} (Closest to center)`);
+            this.currentPageIndex = closestPageIndex;
+            this.quill = this.pageQuillInstances[closestPageIndex];
+            this.onPageChange(closestPageIndex);
+        }
+    }, 150));
   }
 
   async loadFromCache(docId) {
@@ -113,10 +168,39 @@ export class Editor {
 
     this.provider = new WebsocketProvider(
         `${protocol}://${window.location.host}`, 
-        '', 
+        docId, // Pass docId as room name
         this.doc,
-        { params: { documentId: docId, ticket: ticket } }
+        { params: { ticket: ticket } } // Pass ticket as param
     );
+
+    this.provider.on('status', async ({ status }) => {
+        this.onStatusChange(status);
+        if (status === 'disconnected') {
+            console.log('[WebSocket] Disconnected. Fetching fresh ticket for next retry...');
+            try {
+                let response = await fetch('/api/auth/ws-ticket', {
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+                
+                if (response.status === 401) {
+                    const refreshed = await Auth.tryRefresh();
+                    if (refreshed) {
+                        response = await fetch('/api/auth/ws-ticket', {
+                            headers: { 'Authorization': `Bearer ${refreshed}` }
+                        });
+                    }
+                }
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.provider.params.ticket = data.ticket;
+                    console.log('[WebSocket] Ticket refreshed.');
+                }
+            } catch (err) {
+                console.warn('[WebSocket] Failed to refresh ticket:', err);
+            }
+        }
+    });
     
     this.provider.on('sync', isSynced => {
         if (isSynced && this.yPages.length === 0) {
@@ -293,10 +377,24 @@ export class Editor {
 
     this.applyZoom();
     
-    // Ensure active quill is set
+    // Ensure active quill is synced with current instance (might have been recreated)
+    if (this.pageQuillInstances[this.currentPageIndex]) {
+        this.quill = this.pageQuillInstances[this.currentPageIndex];
+    }
+
+    // Ensure active quill is set if not already
     if (!this.quill && this.pageQuillInstances[0]) {
         this.switchToPage(0);
     }
+  }
+
+  setupGlobalListeners() {
+    // Fallback: If user clicks the container but no editor is focused, focus the current one
+    this.container.addEventListener('click', (e) => {
+        if (e.target === this.container && this.quill) {
+            this.quill.focus();
+        }
+    });
   }
 
   destroyPageEditor(index) {
@@ -385,12 +483,8 @@ export class Editor {
         if (range) {
              const isAtBottom = this.pageManager.isCursorAtBottom(pageIndex, range.index);
              if (isAtBottom) {
+                 console.log(`[Input] Enter pressed at bottom of Page ${pageIndex}. Triggering break.`);
                  e.preventDefault();
-                 // Instead of moveToNextPage, we treat this as a forced split/flow trigger
-                 // But since it's "at bottom", we effectively want a new page.
-                 // We can use insertPageBreak here too, or just let standard behavior + overflow logic handle it.
-                 // If we let it insert a newline, it will likely overflow. 
-                 // But for UX, jumping to next page is nicer.
                  this.pageManager.insertPageBreak(pageIndex);
                  return;
              }
@@ -492,6 +586,7 @@ export class Editor {
 
     if (pageIndex < 0 || pageIndex >= this.yPages.length) return;
 
+    console.log(`[Switch] Switching to page ${pageIndex} (Previous: ${this.currentPageIndex})`);
     this.currentPageIndex = pageIndex;
     this.quill = this.pageQuillInstances[pageIndex];
 
@@ -512,11 +607,24 @@ export class Editor {
     const containers = document.querySelectorAll('.editor-container');
     const scale = this.currentZoom / 100;
     const pageHeight = 1056;
+    const TARGET_GAP = 40; // Desired visual gap in screen pixels
+
+    // Update layout engine height (logical pixels)
+    if (this.pageManager) {
+        this.pageManager.MAX_CONTENT_HEIGHT = (this.pageManager.PAGE_HEIGHT - this.pageManager.PAGE_PADDING_Y - this.pageManager.EDITOR_PADDING_BOTTOM);
+        console.log(`[Zoom] Level: ${this.currentZoom}%, Scale: ${scale}, MAX_CONTENT_HEIGHT: ${this.pageManager.MAX_CONTENT_HEIGHT}`);
+    }
 
     containers.forEach((container) => {
       container.style.transform = `scale(${scale})`;
       container.style.transformOrigin = 'top center';
-      container.style.marginBottom = `${40 + pageHeight * (scale - 1)}px`;
+      
+      // Calculate inverse margin:
+      // When scaled, the container's physical height is pageHeight * scale.
+      // The space it occupies in the flow is still pageHeight (unscaled) because transform doesn't change flow.
+      // So we need to subtract the 'shrunk' part and add the desired gap.
+      const shrunkAmount = pageHeight * (1 - scale);
+      container.style.marginBottom = `${TARGET_GAP - shrunkAmount}px`;
     });
   }
   

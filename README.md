@@ -1,52 +1,73 @@
-SYNCHROEDIT | PROJECT OVERVIEW
+# SynchroEdit
 
-1. DESCRIPTION
-SynchroEdit is a real-time collaborative document editor. It features a 
-minimalist "Dark OLED" aesthetic and uses CRDT technology to allow 
-multiple people to edit the same document simultaneously without conflicts.
+## 1. Description
+SynchroEdit is a high-performance, real-time collaborative document editor. It features a minimalist "Dark OLED" aesthetic and utilizes CRDT technology (**Yjs**) to allow seamless multi-user collaboration without merge conflicts.
 
-2. KEY FEATURES
-- Real-time Editing: Instant sync across all users via Yjs and WebSockets.
-- Visual Presence: See others' cursors with names and personalized colors.
-- OLED Theming: True black background with a dynamic accent color engine.
-- Math Support: Shorthand translation for mathematical symbols (e.g. sqrt).
-- Page Layout: A4-style pagination that creates new pages as you type.
-- Security: Secure login with JWT, hashed passwords, account lockouts, email verification, and password resets.
+## 2. Key Features
+- **Real-time Editing**: Instant synchronization across all users via Yjs and WebSockets.
+- **Visual Presence**: Live cursor tracking with user names and personalized accent colors.
+- **OLED Theming**: True black background with a dynamic, algorithmically-generated accent color engine.
+- **Page Layout Engine**: A4-style pagination that dynamically manages content flow and page creation.
+- **Robust Security**: Secure authentication with JWT, refresh tokens, Bcrypt hashing, account lockouts, and full email verification flows.
+- **Offline Support**: Document persistence via IndexedDB allows for instant loading and offline resiliency.
 
-3. DYNAMIC THEME SYSTEM
-The UI is algorithmically generated based on your chosen accent color:
-- The system calculates lighter and darker shades automatically.
-- It applies these to button glows, borders, and selection highlights.
-- A canvas-based constellation background reacts to the chosen color.
+## 3. Dynamic Theme System
+The UI adaptively generates its color palette based on a user's chosen accent color:
+- **Shade Generation**: The system calculates complementary lighter and darker shades on the fly.
+- **Visual Cohesion**: Themes are applied to button glows, borders, selection highlights, and UI transitions.
+- **Interactive Background**: A canvas-based constellation background reacts to the current theme.
 
-4. TECHNICAL STACK
-- Frontend: Vanilla JavaScript (ES Modules), Tailwind CSS, Quill.js.
-- Sync Engine: Yjs (CRDT) over WebSockets.
-- Backend: Node.js and Express.
-- Database: MongoDB via Mongoose.
+## 4. Technical Stack
+- **Frontend**: Vanilla JavaScript (ES Modules), Quill.js, Yjs.
+- **Sync Engine**: Yjs (CRDT) over WebSockets.
+- **Backend**: Node.js, Express.
+- **Database**: MongoDB via Mongoose.
+- **Storage**: IndexedDB (Frontend Cache).
 
+## 5. Project Structure
+The project follows a modular, manager-based architecture for maximum maintainability.
 
+### Frontend (`/public/js`)
+- **`/core`**: Core application lifecycle (`app.js`) and network abstraction.
+- **`/editor`**: The central `Editor` class and its primary integration logic.
+- **`/managers`**: Specialized logic handlers:
+    - `PageManager`: Handles pagination and layout engine logic.
+    - `LibraryManager`: Manages document listing, caching, and creation.
+    - `CursorManager`: Synchronizes remote cursors and awareness state.
+    - `BorderManager`, `ImageManager`, `NavigationManager`, etc.
+- **`/ui`**: Interface components and theme controllers.
+    - `UIManager`: Centralized event handling and modal orchestration.
+    - `ToolbarController`: Logic for the rich-text editing toolbar.
 
-5. PROJECT STRUCTURE
-- /public/js/core: Main application and networking logic.
-- /public/js/editor: Editor initialization and Yjs bindings.
-- /public/js/ui: Theme engine and interface components.
-- /src/controllers: API request handlers.
-- /src/middleware: Express middleware.
-- /src/models: Database schemas for users and documents.
-- /src/routes: Express route definitions.
-- /src/sockets: Server-side WebSocket handling.
-- /src/utils: Utility functions.
+### Backend (`/src`)
+- **`/controllers`**: Clean API request handlers.
+- **`/middleware`**: Modular Express middleware (Auth, Error handling, Security).
+- **`/models`**: Mongoose schemas for Users, Documents, Sessions, and History.
+- **`/routes`**: RESTful API route definitions.
+- **`/sockets`**: Real-time WebSocket event orchestration.
+- **`/utils`**: Server utilities including logging and graceful shutdown handlers.
 
-6. QUICK START
-1. Clone the repository.
-2. Run "npm install".
-3. Create a .env file with:
-   - PORT: Server port (e.g., 3000)
-   - MONGODB_URI: Connection string for MongoDB
-   - JWT_SECRET: Secret key for JWT authentication
-   - (Optional) SMTP_USER, SMTP_PASS: For email verification/password reset
-4. Run "npm start".
+## 6. Quick Start
+1. **Clone the repository**.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Configure Environment**: Create a `.env` file in the root:
+   ```env
+   PORT=3000
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   # Optional for Email Features
+   EMAIL_HOST=smtp.mailtrap.io
+   EMAIL_PORT=2525
+   EMAIL_USERNAME=your_username
+   EMAIL_PASSWORD=your_password
+   ```
+4. **Start the server**:
+   ```bash
+   npm start
+   ```
 
-7. LICENSE
+## 7. License
 Licensed under the ISC License.

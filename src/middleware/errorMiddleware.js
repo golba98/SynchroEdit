@@ -4,8 +4,19 @@ const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
+  // Silence common browser noise (404s for non-app assets)
+  const isNoise = err.statusCode === 404 && (
+      req.path.includes('com.chrome.devtools') || 
+      req.path.includes('favicon.ico') ||
+      req.path.includes('apple-touch-icon')
+  );
+
   if (process.env.NODE_ENV === 'development') {
-    logger.error(`Error: ${err.message}`, { stack: err.stack, path: req.path, method: req.method });
+    if (isNoise) {
+        logger.debug(`Browser Noise (404): ${req.path}`);
+    } else {
+        logger.error(`Error: ${err.message}`, { stack: err.stack, path: req.path, method: req.method });
+    }
     res.status(err.statusCode).json({
       status: err.status,
       error: err,

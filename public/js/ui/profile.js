@@ -48,6 +48,25 @@ export class Profile {
     if (pfpInput) {
         pfpInput.addEventListener('change', (e) => this.handlePfpUpload(e));
     }
+
+    // Collapsible sections
+    this.setupCollapsible('toggleLoginHistory', 'loginHistoryContainer');
+    this.setupCollapsible('toggleSessions', 'sessionListContainer');
+  }
+
+  setupCollapsible(headerId, containerId) {
+    const header = document.getElementById(headerId);
+    const container = document.getElementById(containerId);
+    if (!header || !container) return;
+
+    header.addEventListener('click', () => {
+        const isHidden = container.style.display === 'none';
+        container.style.display = isHidden ? (containerId === 'sessionListContainer' ? 'flex' : 'block') : 'none';
+        const icon = header.querySelector('i');
+        if (icon) {
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    });
   }
 
   async handlePfpUpload(e) {
@@ -277,7 +296,7 @@ export class Profile {
             el.style.color = '#10b981';
             el.querySelector('i').className = 'fas fa-check-circle';
         } else {
-            el.style.color = '#666';
+            el.style.color = document.body.classList.contains('light-theme') ? '#4b5563' : '#666';
             el.querySelector('i').className = 'fas fa-circle';
         }
     });
@@ -305,7 +324,8 @@ export class Profile {
           container.innerHTML = '';
           sessions.sort((a, b) => (a.isCurrent ? -1 : 1)).forEach(session => {
               const sessionEl = document.createElement('div');
-              sessionEl.style.cssText = 'background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between;';
+              sessionEl.className = 'session-item';
+              sessionEl.style.cssText = 'padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;';
               
               const info = this.parseUserAgent(session.userAgent);
               const lastActive = this.formatLastActive(session.lastActive);
@@ -313,7 +333,7 @@ export class Profile {
               sessionEl.innerHTML = `
                   <div style="flex: 1;">
                       <div style="display: flex; align-items: center; gap: 6px;">
-                          <span style="font-size: 11px; color: #e0e0e0; font-weight: 600;">${info.os} • ${info.browser}</span>
+                          <span class="session-info-main" style="font-size: 11px; font-weight: 600;">${info.os} • ${info.browser}</span>
                           ${session.isCurrent ? '<span style="font-size: 8px; background: var(--accent-color); color: white; padding: 1px 4px; border-radius: 4px; text-transform: uppercase;">Current</span>' : ''}
                       </div>
                       <div style="font-size: 10px; color: #666; margin-top: 2px;">${session.ipAddress} • ${lastActive}</div>
@@ -347,13 +367,13 @@ export class Profile {
       this.user.loginHistory.forEach((timestamp, index) => {
           const date = new Date(timestamp);
           const row = document.createElement('tr');
-          row.style.borderBottom = index === this.user.loginHistory.length - 1 ? 'none' : '1px solid #2a2a2a';
+          row.style.borderBottom = index === this.user.loginHistory.length - 1 ? 'none' : '1px solid rgba(139, 92, 246, 0.1)';
           
           row.innerHTML = `
-              <td style="padding: 10px 12px; color: #e0e0e0;">
+              <td style="padding: 10px 12px;" class="history-item-cell">
                   <div style="display: flex; align-items: center; gap: 8px;">
                       <i class="fas fa-sign-in-alt" style="color: #666; font-size: 10px;"></i>
-                      <span>${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</span>
+                      <span class="history-date-text">${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</span>
                   </div>
               </td>
               <td style="padding: 10px 12px; color: #666; text-align: right;">
@@ -507,15 +527,24 @@ export class Profile {
 
   async updateAccentColor(color) {
     if (!this.user) return;
-    try {
-      await Network.fetchAPI('/api/user/profile', {
-        method: 'PUT',
-        body: JSON.stringify({ accentColor: color }),
-      });
-      this.user.accentColor = color;
-      if (window.editor) window.editor.updateUser(this.user);
-    } catch (err) {
-      console.error('Error syncing accent color:', err);
-    }
+    
+    // UI Update is immediate
+    this.user.accentColor = color;
+    this.updateUI();
+    if (window.editor) window.editor.updateUser(this.user);
+
+    // Backend sync is debounced to prevent 429 Rate Limiting
+    if (this.colorDebounceTimeout) clearTimeout(this.colorDebounceTimeout);
+    this.colorDebounceTimeout = setTimeout(async () => {
+        try {
+          await Network.fetchAPI('/api/user/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ accentColor: color }),
+          });
+          console.log(`[Profile] Accent color synced to backend: ${color}`);
+        } catch (err) {
+          console.error('Error syncing accent color:', err);
+        }
+    }, 1000); // 1-second debounce
   }
 }

@@ -46,22 +46,24 @@ export const UI = {
         const safeTitle = escapeHTML(doc.title);
 
         return `
-                <tr class="doc-item" data-doc-id="${doc._id}" style="border-bottom: 1px solid #2a2a2a; cursor: pointer; transition: background 0.2s; ${isActive ? 'background: rgba(var(--accent-color-rgb), 0.15);' : ''}">
+                <tr class="doc-item" data-doc-id="${doc._id}">
                     <td style="padding: 16px 24px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <i class="fas fa-file-alt" style="color: var(--accent-color-light); font-size: 20px;"></i>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div class="doc-icon-container">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <div style="color: #e0e0e0; font-weight: 500;">${safeTitle}</div>
+                                    <div class="doc-title-text">${safeTitle}</div>
                                 </div>
-                                <div style="color: #b0b0b0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
+                                <div class="doc-meta-text" style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">${previewText}</div>
                             </div>
                         </div>
                     </td>
-                    <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${location}</td>
-                    <td style="padding: 16px 24px; color: #b0b0b0; font-size: 14px;">${dateStr}</td>
+                    <td class="doc-meta-text" style="padding: 16px 24px; font-size: 14px;">${location}</td>
+                    <td class="doc-meta-text" style="padding: 16px 24px; font-size: 14px;">${dateStr}</td>
                     <td style="padding: 16px 24px; text-align: center;">
-                        <button class="delete-doc-btn" data-doc-id="${doc._id}" style="background: none; border: none; color: #b0b0b0; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s;" title="Delete">
+                        <button class="delete-doc-btn" data-doc-id="${doc._id}" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>

@@ -15,7 +15,6 @@ exports.createTicket = (userId) => {
   
   // Cleanup
   setTimeout(() => tickets.delete(ticket), 30000);
-  console.log(`[DEBUG] Created ticket: ${ticket} for ${userId}`);
   return ticket;
 };
 
@@ -26,12 +25,17 @@ exports.createTicket = (userId) => {
  */
 exports.verifyTicket = (ticket) => {
   const data = tickets.get(ticket);
-  console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: ${!!data}`);
-  if (!data) return null;
+  if (!data) {
+    console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: false (Missing)`);
+    return null;
+  }
   
-  tickets.delete(ticket); // One-time use
+  if (Date.now() > data.expires) {
+    console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: true (Expired)`);
+    tickets.delete(ticket);
+    return null;
+  }
   
-  if (Date.now() > data.expires) return null;
-  
+  console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: true (Valid)`);
   return data.userId;
 };

@@ -3,10 +3,14 @@ export class ReadabilityManager {
     this.editor = editor;
     this.showLineNumbers = false;
     this.showInvisibles = false;
-    this.currentCanvasTheme = 'classic';
+    this.showPageGlow = localStorage.getItem('synchroEditPageGlow') === 'true';
+    this.showPageBorder = localStorage.getItem('synchroEditPageBorder') === 'true';
+    this.currentCanvasTheme = localStorage.getItem('synchroEditCanvasTheme') || 'classic';
     this.isFocusMode = false;
 
     this.setupEventListeners();
+    this.applyPageGlow();
+    this.applyPageBorder();
   }
 
   setupEventListeners() {
@@ -21,9 +25,49 @@ export class ReadabilityManager {
     addEvent('enterFocusMode', 'click', () => this.setFocusMode(true));
     addEvent('exitFocusMode', 'click', () => this.setFocusMode(false));
 
+    // Background Theme
+    const bgSelect = document.getElementById('backgroundThemeSelect');
+    if (bgSelect) {
+        // Initialize value from localStorage
+        const savedBg = localStorage.getItem('synchroEditBackgroundTheme') || 'dots';
+        bgSelect.value = savedBg;
+        bgSelect.addEventListener('change', (e) => {
+            if (window.app && window.app.background) {
+                window.app.background.setTheme(e.target.value);
+            }
+        });
+    }
+
+    // Page Glow
+    const glowToggle = document.getElementById('togglePageGlow');
+    if (glowToggle) {
+        glowToggle.checked = this.showPageGlow;
+        glowToggle.addEventListener('change', (e) => {
+            this.showPageGlow = e.target.checked;
+            localStorage.setItem('synchroEditPageGlow', this.showPageGlow);
+            this.applyPageGlow();
+        });
+    }
+
+    // Page Border
+    const borderToggle = document.getElementById('togglePageBorder');
+    if (borderToggle) {
+        borderToggle.checked = this.showPageBorder;
+        borderToggle.addEventListener('change', (e) => {
+            this.showPageBorder = e.target.checked;
+            localStorage.setItem('synchroEditPageBorder', this.showPageBorder);
+            this.applyPageBorder();
+        });
+    }
+
     // Zoom
     addEvent('zoomInBtn', 'click', () => this.updateZoom(10));
     addEvent('zoomOutBtn', 'click', () => this.updateZoom(-10));
+    addEvent('zoomPercent', 'click', () => {
+      this.editor.currentZoom = 100;
+      this.editor.applyZoom();
+      this.updateZoomDisplay();
+    });
     addEvent('zoom100', 'click', () => {
       this.editor.currentZoom = 100;
       this.editor.applyZoom();
@@ -50,7 +94,7 @@ export class ReadabilityManager {
     const containers = document.querySelectorAll('.editor-container');
     containers.forEach(container => {
       // Remove all canvas theme classes
-      container.classList.remove('canvas-classic', 'canvas-sepia', 'canvas-midnight', 'canvas-cyber');
+      container.classList.remove('canvas-classic', 'canvas-sepia', 'canvas-midnight', 'canvas-math');
       // Add new one
       container.classList.add(`canvas-${theme}`);
     });
@@ -108,6 +152,21 @@ export class ReadabilityManager {
     gutter.innerHTML = lines.map((_, i) => `<div>${i + 1}</div>`).join('');
   }
 
+  applyPageGlow() {
+    document.body.classList.toggle('glow-enabled', this.showPageGlow);
+    const containers = document.querySelectorAll('.editor-container');
+    containers.forEach(container => {
+        container.classList.toggle('glow-effect', this.showPageGlow);
+    });
+  }
+
+  applyPageBorder() {
+    const containers = document.querySelectorAll('.editor-container');
+    containers.forEach(container => {
+        container.classList.toggle('border-enabled', this.showPageBorder);
+    });
+  }
+
   setFocusMode(active) {
     this.isFocusMode = active;
     document.body.classList.toggle('focus-mode', active);
@@ -125,6 +184,12 @@ export class ReadabilityManager {
     }
     if (this.showInvisibles) {
       container.classList.add('show-invisibles');
+    }
+    if (this.showPageGlow) {
+      container.classList.add('glow-effect');
+    }
+    if (this.showPageBorder) {
+      container.classList.add('border-enabled');
     }
     if (this.showLineNumbers) {
       this.updateGutter(pageIndex);

@@ -17,6 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bitmaks/cm-web-fonts@latest/fonts.css" />
     <link rel="stylesheet" href="css/styles.css" />
     <!-- File Extraction Libraries -->
     <!-- External Libraries (Deferred for speed) -->
@@ -39,1017 +40,16 @@
         }
       }
     </script>
-    <style>
-      :root {
-        --accent-color: #8b5cf6;
-        --accent-color-rgb: 139, 92, 246;
-        --accent-color-light: #a78bfa;
-        --accent-color-lighter: #c4b5fd;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      option {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-      }
-
-      body.light-theme option {
-        background-color: #ffffff;
-        color: #1a1a1a;
-      }
-
-      body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(
-          135deg,
-          #0a0a0a 0%,
-          #1a0f2e 15%,
-          #0d0d0d 30%,
-          #1a0a2e 50%,
-          #0d0d0d 70%,
-          #0a0a0f 100%
-        );
-        height: 100vh;
-        color: #e0e0e0;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        transition:
-          background 0.3s ease,
-          color 0.3s ease;
-        color-scheme: dark;
-      }
-
-      /* Light Theme */
-      body.light-theme {
-        background: linear-gradient(
-          135deg,
-          #f5f5f5 0%,
-          #ffffff 15%,
-          #f8f8f8 30%,
-          #ffffff 50%,
-          #f8f8f8 70%,
-          #f5f5f5 100%
-        );
-        color: #1a1a1a;
-        color-scheme: light;
-      }
-
-      body.light-theme .header {
-        background: linear-gradient(
-          90deg,
-          #ffffff 0%,
-          #f8f8f8 25%,
-          #ffffff 50%,
-          #f8f8f8 75%,
-          #ffffff 100%
-        );
-        border-bottom: 2px solid var(--accent-color-lighter);
-        box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.25);
-      }
-
-      body.light-theme .logo {
-        color: var(--accent-color);
-        text-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4);
-      }
-
-      body.light-theme .doc-title {
-        color: #1a1a1a;
-      }
-
-      body.light-theme .doc-title:hover,
-      body.light-theme .doc-title:focus {
-        color: var(--accent-color);
-      }
-
-      body.light-theme .toolbar {
-        background-color: #faf8ff;
-        border-bottom: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .toolbar-group {
-        border-right: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .toolbar-btn {
-        color: #1a1a1a;
-      }
-
-      body.light-theme .toolbar-btn:hover {
-        background: #f3e8ff;
-        color: var(--accent-color);
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      body.light-theme .ribbon-section-title {
-        color: var(--accent-color) !important;
-        border-bottom: 1px solid var(--accent-color-lighter) !important;
-      }
-
-      body.light-theme .ribbon-btn:hover {
-        background: #f3e8ff !important;
-        color: var(--accent-color) !important;
-      }
-
-      body.light-theme .editor-container {
-        background: #ffffff;
-        border: 2px solid var(--accent-color-lighter);
-        box-shadow: 0 8px 24px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      body.light-theme .page-editor,
-      body.light-theme .ql-editor {
-        color: #1a1a1a !important;
-      }
-
-      body.light-theme .ql-editor.ql-blank::before {
-        color: var(--accent-color-lighter) !important;
-      }
-
-      body.light-theme .toolbar-btn,
-      body.light-theme input[type='text'],
-      body.light-theme input[type='password'],
-      body.light-theme textarea {
-        background: #faf8ff;
-        color: #1a1a1a;
-        border: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .toolbar-btn:hover {
-        background: #f3e8ff;
-        color: var(--accent-color);
-      }
-
-      body.light-theme #profileModal {
-        background: rgba(255, 255, 255, 0.9);
-      }
-
-      body.light-theme #profileModal > div {
-        background: #ffffff;
-        border: 2px solid var(--accent-color-lighter);
-        box-shadow: 0 0 40px rgba(var(--accent-color-rgb), 0.25);
-      }
-
-      body.light-theme #profileModal h2,
-      body.light-theme #profileModal h3,
-      body.light-theme #profileModal h4 {
-        color: var(--accent-color);
-      }
-
-      body.light-theme hr {
-        border-color: var(--accent-color-lighter);
-      }
-
-      body.light-theme .pages-container {
-        background: #faf8ff;
-      }
-
-      body.light-theme .toolbar {
-        background-color: #faf8ff;
-        border-bottom: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .toolbar-group {
-        border-right: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .toolbar-btn {
-        color: #1a1a1a;
-      }
-
-      body.light-theme .toolbar-btn:hover {
-        color: var(--accent-color);
-        background: #f3e8ff;
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      body.light-theme .ribbon {
-        background: #faf8ff;
-        border-bottom: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .ribbon-section-title {
-        color: var(--accent-color);
-        border-bottom: 1px solid var(--accent-color-lighter);
-      }
-
-      body.light-theme .ribbon-btn,
-      body.light-theme .toolbar-btn {
-        color: #1a1a1a;
-        background: transparent;
-      }
-
-      body.light-theme .ribbon-btn:hover,
-      body.light-theme .toolbar-btn:hover {
-        background: #f3e8ff;
-        color: var(--accent-color);
-      }
-
-      body.light-theme .status-bar {
-        background: #faf8ff;
-        border-top: 1px solid var(--accent-color-lighter);
-        color: #1a1a1a;
-      }
-
-      .header {
-        background: linear-gradient(
-          90deg,
-          #0a0a0a 0%,
-          #1a0f2e 25%,
-          #0d0d0d 50%,
-          #1a0a2e 75%,
-          #0a0a0a 100%
-        );
-        border-bottom: 1px solid #1a1a1a;
-        padding: 4px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.15);
-        min-height: 36px;
-        flex-shrink: 0;
-      }
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .header-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        flex: 1;
-      }
-
-      .logo {
-        font-size: 18px;
-        color: var(--accent-color-light);
-        font-weight: 700;
-        text-shadow:
-          0 0 30px rgba(var(--accent-color-rgb), 0.8),
-          0 0 60px rgba(var(--accent-color-rgb), 0.4);
-        letter-spacing: 1px;
-      }
-
-      .doc-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--accent-color-lighter);
-        background-color: transparent;
-        border: none;
-        outline: none;
-        padding: 0 12px;
-        border-radius: 6px;
-        transition: all 0.3s;
-        text-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
-      }
-
-      .doc-title:hover {
-        color: var(--accent-color-light);
-        background: rgba(var(--accent-color-rgb), 0.1);
-        text-shadow: 0 0 25px rgba(var(--accent-color-rgb), 0.5);
-      }
-
-      .doc-title:focus {
-        color: var(--accent-color-light);
-        background: rgba(var(--accent-color-rgb), 0.15);
-        box-shadow:
-          0 0 20px rgba(var(--accent-color-rgb), 0.3),
-          inset 0 0 10px rgba(var(--accent-color-rgb), 0.1);
-        text-shadow: 0 0 25px rgba(var(--accent-color-rgb), 0.6);
-      }
-
-      .toolbar {
-        background-color: #0a0a0a;
-        border-bottom: 1px solid #1a1a1a;
-        padding: 8px 24px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      body.light-theme .toolbar {
-        background-color: #faf8ff;
-        border-bottom: 2px solid #e0b5f6;
-      }
-
-      .toolbar-group {
-        display: flex;
-        gap: 4px;
-        align-items: center;
-        border-right: 1px solid #2a2a2a;
-        padding-right: 12px;
-      }
-
-      .toolbar-group:last-child {
-        border-right: none;
-        padding-right: 0;
-      }
-
-      .toolbar-btn {
-        background: none;
-        border: none;
-        padding: 4px 8px;
-        cursor: pointer;
-        font-size: 14px;
-        color: #b0b0b0;
-        border-radius: 4px;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .toolbar-btn:hover {
-        background-color: rgba(var(--accent-color-rgb), 0.15);
-        color: var(--accent-color-light);
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
-        border-radius: 6px;
-      }
-
-      .toolbar-btn:active {
-        background-color: rgba(var(--accent-color-rgb), 0.25);
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4);
-      }
-
-      .toolbar-btn.active {
-        background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-light) 100%);
-        color: #ffffff;
-        box-shadow:
-          0 0 25px rgba(var(--accent-color-rgb), 0.6),
-          inset 0 0 10px rgba(var(--accent-color-rgb), 0.2);
-        font-weight: 600;
-        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      }
-
-      select {
-        border: 1px solid var(--accent-color);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor: pointer;
-        background-color: #1a1a1a;
-        color: var(--accent-color-lighter);
-        min-width: 60px; /* Reduced from 80px */
-        height: 24px;
-        transition: all 0.3s;
-        box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      /* ... existing styles ... */
-
-      /* Specific widths for font controls */
-      .ql-font {
-        width: 100px !important; /* Reduced width */
-      }
-
-      .ql-size {
-        width: 60px !important; /* Reduced width */
-      }
-
-      select option {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-      }
-
-      select:hover {
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.4);
-        background-color: rgba(var(--accent-color-rgb), 0.05);
-      }
-
-      select:focus {
-        outline: none;
-        box-shadow:
-          0 0 20px rgba(var(--accent-color-rgb), 0.5),
-          inset 0 0 5px rgba(var(--accent-color-rgb), 0.1);
-      }
-
-      body.light-theme select,
-      body.light-theme .ql-align,
-      body.light-theme .ql-picker {
-        border: 1px solid var(--accent-color);
-        background-color: #f3e8ff;
-        color: var(--accent-color);
-        box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      body.light-theme select option {
-        background-color: #ffffff;
-        color: #1a1a1a;
-      }
-
-      body.light-theme select:hover,
-      body.light-theme .ql-align:hover,
-      body.light-theme .ql-picker:hover {
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.4);
-      }
-
-      /* Quill format select dropdown styling */
-      .ql-align,
-      .ql-picker {
-        border: 1px solid var(--accent-color) !important;
-        padding: 2px 6px !important;
-        border-radius: 4px !important;
-        font-size: 12px !important;
-        cursor: pointer !important;
-        background-color: #1a1a1a !important;
-        color: var(--accent-color-lighter) !important;
-        min-width: 80px !important;
-        height: 24px !important;
-        transition: all 0.3s !important;
-        box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2) !important;
-      }
-
-      /* Custom Fonts */
-      .ql-font-roboto {
-        font-family: 'Roboto', sans-serif;
-      }
-      .ql-font-open-sans {
-        font-family: 'Open Sans', sans-serif;
-      }
-      .ql-font-lato {
-        font-family: 'Lato', sans-serif;
-      }
-      .ql-font-montserrat {
-        font-family: 'Montserrat', sans-serif;
-      }
-      .ql-font-oswald {
-        font-family: 'Oswald', sans-serif;
-      }
-      .ql-font-merriweather {
-        font-family: 'Merriweather', serif;
-      }
-      .ql-font-arial {
-        font-family: 'Arial', sans-serif;
-      }
-      .ql-font-times-new-roman {
-        font-family: 'Times New Roman', serif;
-      }
-      .ql-font-courier-new {
-        font-family: 'Courier New', monospace;
-      }
-      .ql-font-georgia {
-        font-family: 'Georgia', serif;
-      }
-      .ql-font-verdana {
-        font-family: 'Verdana', sans-serif;
-      }
-
-      .ql-picker-label {
-        padding: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-      }
-
-      .ql-picker-options {
-        background-color: #1a1a1a !important;
-        border: 1px solid var(--accent-color) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
-      }
-
-      .ql-picker-item {
-        color: var(--accent-color-lighter) !important;
-      }
-
-      .ql-picker-item:hover {
-        background-color: rgba(var(--accent-color-rgb), 0.2) !important;
-        color: white !important;
-      }
-
-      body.light-theme .ql-picker-options {
-        background-color: #ffffff !important;
-        border: 1px solid var(--accent-color) !important;
-        box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.2) !important;
-      }
-
-      body.light-theme .ql-picker-item {
-        color: #1a1a1a !important;
-      }
-
-      body.light-theme .ql-picker-item:hover {
-        background-color: #f3e8ff !important;
-        color: var(--accent-color) !important;
-      }
-
-      .ql-align:hover {
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.4) !important;
-        background-color: rgba(var(--accent-color-rgb), 0.05) !important;
-      }
-
-      .ql-align:focus {
-        outline: none !important;
-        box-shadow:
-          0 0 20px rgba(var(--accent-color-rgb), 0.5),
-          inset 0 0 5px rgba(var(--accent-color-rgb), 0.1) !important;
-      }
-
-      /* Pages Container - Word-like view */
-      .pages-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 40px 20px 100px 20px;
-        background: linear-gradient(
-          135deg,
-          #0a0a0a 0%,
-          #1a0f2e 15%,
-          #0d0d0d 30%,
-          #1a0a2e 50%,
-          #0d0d0d 70%,
-          #0a0a0f 100%
-        );
-        overflow-y: auto;
-        overflow-x: hidden;
-        width: 100%;
-        flex: 1;
-        gap: 15px;
-        z-index: 10;
-        position: relative;
-        scroll-behavior: smooth;
-      }
-
-      .pages-container::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(
-          circle at 50% 30%,
-          rgba(var(--accent-color-rgb), 0.15) 0%,
-          rgba(var(--accent-color-rgb), 0.05) 30%,
-          transparent 70%
-        );
-        pointer-events: none;
-        z-index: -1;
-      }
-
-      .editor-container {
-        background: #000000;
-        padding: 40px 60px;
-        box-shadow:
-          0 10px 30px rgba(0, 0, 0, 0.8),
-          0 0 0 1px rgba(var(--accent-color-rgb), 0.1);
-        border: none;
-        border-radius: 0;
-        transform-origin: top center;
-        transition:
-          box-shadow 0.3s ease,
-          transform 0.3s ease;
-        max-width: 750px;
-        width: 750px;
-        height: 950px;
-        flex-shrink: 0;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        will-change: transform;
-      }
-
-      .editor-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(var(--accent-color-rgb), 0.6) 50%,
-          transparent 100%
-        );
-        z-index: 1;
-      }
-
-      .editor-container:hover {
-        box-shadow:
-          0 0 60px rgba(var(--accent-color-rgb), 0.6),
-          0 0 120px rgba(var(--accent-color-rgb), 0.3),
-          0 0 180px rgba(var(--accent-color-rgb), 0.15),
-          inset 0 0 30px rgba(var(--accent-color-rgb), 0.1),
-          inset 0 0 60px rgba(var(--accent-color-rgb), 0.05);
-        border-color: var(--accent-color-light);
-        transform: translateY(-2px);
-      }
-
-      .editor-container::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120%;
-        height: 80px;
-        background: radial-gradient(
-          ellipse at center,
-          rgba(var(--accent-color-rgb), 0.3) 0%,
-          rgba(var(--accent-color-rgb), 0.1) 40%,
-          transparent 70%
-        );
-        filter: blur(20px);
-        opacity: 0.6;
-      }
-
-      body.light-theme .editor-container::after {
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          #6b4ec9 20%,
-          #6b4ec9 80%,
-          transparent 100%
-        );
-      }
-
-      #editor {
-        flex: 1;
-        font-size: 16px;
-        line-height: 1.8;
-        color: #e0e0e0;
-        outline: none;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto;
-        overflow: hidden !important;
-        overflow-y: hidden !important;
-        overflow-x: hidden !important;
-      }
-
-      .page-editor {
-        flex: 1;
-        font-size: 16px;
-        line-height: 1.8;
-        color: #e0e0e0;
-        outline: none;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: 100%;
-        overflow: hidden !important;
-        overflow-y: hidden !important;
-        overflow-x: hidden !important;
-      }
-
-      .ql-editor {
-        padding: 20px 0 !important;
-        font-size: 16px !important;
-        line-height: 1.8 !important;
-        color: #e0e0e0 !important;
-      }
-
-      .ql-editor.ql-blank::before {
-        color: #6f6f6f !important;
-        font-style: italic;
-      }
-
-      /* Quill toolbar styling */
-      .ql-toolbar {
-        background: #0d0d0d !important;
-        border: 1px solid #2a2a2a !important;
-        border-radius: 4px 4px 0 0 !important;
-      }
-
-      .ql-toolbar button:hover,
-      .ql-toolbar button.ql-active {
-        color: var(--accent-color) !important;
-      }
-
-      /* Hide all scrollbars */
-      ::-webkit-scrollbar {
-        display: none;
-      }
-
-      ::-webkit-scrollbar-track {
-        display: none;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        display: none;
-      }
-
-      .ql-editor.ql-blank::before {
-        left: 0 !important;
-        right: 0 !important;
-        font-style: italic;
-        color: #4a4a4a;
-      }
-
-      #editor img {
-        max-width: 100%;
-        height: auto;
-        margin: 10px 0;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: border 0.2s;
-      }
-
-      #editor img:hover {
-        border: 2px solid var(--accent-color);
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.3);
-      }
-
-      .ql-container {
-        font-size: 16px;
-        border: none !important;
-      }
-
-      .ql-editor {
-        min-height: 100%;
-        padding: 0 !important;
-        border: none !important;
-      }
-
-      /* Hide Quill's default toolbar */
-      .ql-toolbar {
-        display: none !important;
-      }
-
-      .zoom-level {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-      }
-
-      #imageInput {
-        display: none;
-      }
-
-      /* Ribbon Tabs */
-      .ribbon-tabs {
-        background-color: #0a0a0a;
-        padding: 0 16px;
-        display: flex;
-        gap: 5px;
-        flex-shrink: 0;
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.2);
-      }
-
-      body.light-theme .ribbon-tabs {
-        background-color: #f8f8f8;
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
-      }
-
-      .ribbon-tab {
-        padding: 8px 16px;
-        cursor: pointer;
-        border: none;
-        background: none;
-        font-size: 13px;
-        color: #9ca3af;
-        border-bottom: 3px solid transparent;
-        transition: all 0.3s;
-        position: relative;
-      }
-
-      body.light-theme .ribbon-tab {
-        color: var(--accent-color);
-      }
-
-      .ribbon-tab:hover {
-        background-color: rgba(var(--accent-color-rgb), 0.1);
-        color: var(--accent-color-light);
-        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2) inset;
-      }
-
-      body.light-theme .ribbon-tab:hover {
-        background-color: #f3e8ff;
-        color: var(--accent-color);
-        box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.15) inset;
-      }
-
-      .ribbon-tab.active {
-        color: var(--accent-color-light);
-        border-bottom-color: var(--accent-color);
-        font-weight: 600;
-        text-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.6);
-        background: linear-gradient(
-          180deg,
-          rgba(var(--accent-color-rgb), 0.1) 0%,
-          transparent 100%
-        );
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.3);
-      }
-
-      body.light-theme .ribbon-tab.active {
-        color: #6b4ec9;
-        border-bottom-color: var(--accent-color);
-        text-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.4);
-        background: rgba(var(--accent-color-rgb), 0.1);
-      }
-
-      /* Ribbon Content */
-      .ribbon-content {
-        display: none;
-        background-color: #0a0a0a;
-        padding: 8px 16px;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-        min-height: 40px;
-        flex-shrink: 0;
-        box-shadow:
-          0 0 20px rgba(var(--accent-color-rgb), 0.15),
-          inset 0 0 10px rgba(var(--accent-color-rgb), 0.05);
-      }
-
-      body.light-theme .ribbon-content {
-        background-color: #faf8ff;
-        box-shadow:
-          0 0 15px rgba(var(--accent-color-rgb), 0.1),
-          inset 0 0 8px rgba(var(--accent-color-rgb), 0.03);
-      }
-
-      .ribbon-content.active {
-        display: flex;
-      }
-
-      .ribbon-section {
-        display: flex;
-        flex-direction: column;
-        border-right: 1px solid #2a2a2a;
-        padding-right: 6px;
-        margin-right: 4px;
-      }
-
-      body.light-theme .ribbon-section {
-        border-right: 1px solid #d0d0d0;
-      }
-
-      .ribbon-section-title {
-        font-size: 6px;
-        color: #6b7280;
-        margin-bottom: 1px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-      }
-
-      body.light-theme .ribbon-section-title {
-        color: #6b7280;
-      }
-
-      .ribbon-section-tools {
-        display: flex;
-        gap: 1px;
-        align-items: center;
-      }
-
-      .ribbon-section-tools .toolbar-btn {
-        padding: 2px 4px;
-        font-size: 12px;
-      }
-
-      .ribbon-section:last-child {
-        border-right: none;
-      }
-
-      .page-navigator {
-        background-color: #0a0a0a;
-        border-bottom: 1px solid #1a1a1a;
-        padding: 12px 24px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        overflow-x: auto;
-      }
-
-      body.light-theme .page-navigator {
-        background-color: #f8f8f8;
-        border-bottom: 1px solid #d0d0d0;
-      }
-
-      .page-tab {
-        background-color: #1a1a1a;
-        border: 1px solid #2a2a2a;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        color: #b0b0b0;
-        transition: all 0.2s;
-        white-space: nowrap;
-        position: relative;
-      }
-
-      body.light-theme .page-tab {
-        background-color: #f3e8ff;
-        border: 1px solid var(--accent-color-lighter);
-        color: #6b4ec9;
-      }
-
-      .page-tab:hover {
-        background-color: #252525;
-        color: var(--accent-color-light);
-      }
-
-      body.light-theme .page-tab:hover {
-        background-color: #ede9fe;
-        color: var(--accent-color);
-        border-color: #ddd6fe;
-      }
-
-      .page-tab.active {
-        background-color: var(--accent-color);
-        color: white;
-        border-color: var(--accent-color);
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4);
-      }
-
-      body.light-theme .page-tab.active {
-        background-color: var(--accent-color);
-        color: white;
-        border-color: var(--accent-color);
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4);
-      }
-
-      .page-tab.active::after {
-        content: '';
-        position: absolute;
-        bottom: -12px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: #4a90e2;
-      }
-
-      .page-tab .close-page {
-        margin-left: 8px;
-        cursor: pointer;
-        font-size: 12px;
-      }
-
-      .page-tab .close-page:hover {
-        color: #f44336;
-      }
-
-      .new-page-btn {
-        background-color: #4a90e2;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.2s;
-      }
-
-      .new-page-btn:hover {
-        background-color: #357abd;
-      }
-
-      .status-bar {
-        background-color: #0a0a0a;
-        border-top: 1px solid #1a1a1a;
-        padding: 6px 24px;
-        font-size: 12px;
-        color: #5f6368;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        box-sizing: border-box;
-        z-index: 1000;
-      }
-
-      /* Document Library Hover Styles */
-      #createNewDoc:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 0 40px rgba(var(--accent-color-rgb), 0.5);
-        background: #1a1a1a !important;
-      }
-
-      .doc-item:hover {
-        background: rgba(var(--accent-color-rgb), 0.1) !important;
-      }
-
-      .delete-doc-btn:hover {
-        background: rgba(var(--accent-color-rgb), 0.2) !important;
-        color: var(--accent-color-light) !important;
-      }
-
-      #docSearch:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.3);
-      }
-    </style>
   </head>
-  <body>
+  <body style="margin: 0; padding: 0;">
+    <div id="authGuard" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020d; z-index: 100000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-in-out;">
+       <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <div style="font-size: 40px; animation: pulse 2s infinite;">📄</div>
+          <div id="authGuardText" style="color: var(--accent-color-light); font-size: 14px; letter-spacing: 1px; font-weight: 500;">Verifying Session...</div>
+          <div style="width: 40px; height: 40px; border: 3px solid rgba(var(--accent-color-rgb), 0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+       </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
       <div class="header-left">
@@ -1080,6 +80,26 @@
         <div id="activeCollaborators" style="display: none; align-items: center">
           <!-- Active users will appear here -->
         </div>
+        
+        <div style="display: flex; gap: 10px; align-items: center">
+          <button
+            class="toolbar-btn"
+            id="saveBtn"
+            title="Save Document"
+            style="background: var(--accent-color); color: white; padding: 3px 6px; font-size: 12px"
+          >
+            <i class="fas fa-save"></i> Save
+          </button>
+          <button
+            class="toolbar-btn header-save-as-btn"
+            id="saveAsBtn"
+            title="Save As"
+            style="padding: 3px 6px; font-size: 12px"
+          >
+            <i class="fas fa-file-export"></i> Save As
+          </button>
+        </div>
+
         <div
           id="userProfileTrigger"
           style="cursor: pointer; display: flex; align-items: center; gap: 8px"
@@ -1101,7 +121,7 @@
           <div
             id="headerInitials"
             class="avatar-initials"
-            style="width: 32px; height: 32px; font-size: 14px; display: none;"
+            style="width: 32px; height: 32px; font-size: 14px; border-radius: 50%; display: none; align-items: center; justify-content: center;"
           ></div>
           <i
             id="headerUserIcon"
@@ -1113,18 +133,7 @@
     </div>
 
     <!-- Title Bar -->
-    <div
-      style="
-        background: #0a0a0a;
-        border-bottom: 1px solid #1a1a1a;
-        padding: 4px 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        min-height: 28px;
-        flex-shrink: 0;
-      "
-    >
+    <div class="title-bar">
       <input
         type="text"
         class="doc-title"
@@ -1132,24 +141,6 @@
         placeholder="Untitled document"
         style="margin: 0; width: auto; flex: 1; max-width: 400px"
       />
-      <div style="display: flex; gap: 10px; align-items: center">
-        <button
-          class="toolbar-btn"
-          id="saveBtn"
-          title="Save Document"
-          style="background: var(--accent-color); color: white; padding: 3px 6px; font-size: 12px"
-        >
-          <i class="fas fa-save"></i> Save
-        </button>
-        <button
-          class="toolbar-btn"
-          id="saveAsBtn"
-          title="Save As"
-          style="padding: 3px 6px; font-size: 12px"
-        >
-          <i class="fas fa-file-export"></i> Save As
-        </button>
-      </div>
     </div>
 
     <!-- Document Library Sidebar -->
@@ -1212,7 +203,7 @@
               <div
                 id="libraryHeaderInitials"
                 class="avatar-initials"
-                style="width: 32px; height: 32px; font-size: 14px; display: none;"
+                style="width: 32px; height: 32px; font-size: 14px; border-radius: 50%; display: none; align-items: center; justify-content: center;"
               ></div>
               <i
                 id="libraryHeaderUserIcon"
@@ -1220,7 +211,7 @@
                 style="font-size: 32px; color: var(--accent-color-light)"
               ></i>
             </div>
-            <button id="closeLibrary" class="toolbar-btn" style="padding: 12px 24px; display: none">
+            <button id="closeLibrary" class="toolbar-btn close-btn-gradient" style="padding: 10px 20px; border-radius: 6px; display: none">
               <i class="fas fa-times"></i> Close
             </button>
           </div>
@@ -1228,7 +219,7 @@
 
         <!-- New Document Section -->
         <div style="margin-bottom: 40px">
-          <h2 style="color: #e0e0e0; font-size: 20px; margin-bottom: 20px">New</h2>
+          <h2 style="font-size: 20px; margin-bottom: 20px" class="section-title">New</h2>
           <div
             style="
               display: grid;
@@ -1238,20 +229,7 @@
           >
             <div
               id="createNewDoc"
-              style="
-                background: #0d0d0d;
-                border: 2px solid #333;
-                border-radius: 8px;
-                padding: 20px;
-                cursor: pointer;
-                text-align: center;
-                transition: all 0.2s;
-                height: 220px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-              "
+              class="create-doc-card"
             >
               <div
                 style="
@@ -1273,22 +251,7 @@
               <div style="color: #e0e0e0; font-weight: 500">Blank document</div>
             </div>
 
-            <style>
-              body.light-theme #createNewDoc {
-                background: #f5f5f5;
-                border-color: #ccc;
-              }
-
-              body.light-theme #createNewDoc > div {
-                background: #ffffff;
-                border-color: #ccc;
-                color: var(--accent-color);
-              }
-
-              body.light-theme #createNewDoc > div:last-child {
-                color: #333;
-              }
-            </style>
+            <!-- Redundant inline styles removed -->
           </div>
         </div>
 
@@ -1298,51 +261,28 @@
             type="text"
             id="docSearch"
             placeholder="Search documents..."
-            style="
-              width: 100%;
-              max-width: 500px;
-              padding: 12px 16px;
-              border: 1px solid var(--accent-color);
-              border-radius: 24px;
-              font-size: 14px;
-              outline: none;
-              background: #1a1a1a;
-              color: #e0e0e0;
-            "
           />
         </div>
 
-        <style>
-          body.light-theme #docSearch {
-            background: #f3e8ff;
-            color: #1a1a1a;
-            border-color: var(--accent-color-light) !important;
-          }
-
-          body.light-theme #docSearch::placeholder {
-            color: var(--accent-color-light);
-          }
-        </style>
+        <!-- Redundant inline styles removed -->
 
         <!-- Recent Documents -->
         <div>
-          <h2 style="color: #e0e0e0; font-size: 20px; margin-bottom: 20px">Recent</h2>
+          <h2 style="font-size: 20px; margin-bottom: 20px" class="section-title">Recent</h2>
           <div
+            class="doc-list-container"
             style="
-              background: #0d0d0d;
               border-radius: 8px;
               overflow: hidden;
-              border: 1px solid #1a1a1a;
             "
           >
             <table style="width: 100%; border-collapse: collapse">
               <thead>
-                <tr style="background: #0a0a0a; border-bottom: 1px solid #2a2a2a">
+                <tr class="doc-list-header">
                   <th
                     style="
                       text-align: left;
                       padding: 16px 24px;
-                      color: #6b7280;
                       font-size: 12px;
                       font-weight: 500;
                       text-transform: uppercase;
@@ -1354,7 +294,6 @@
                     style="
                       text-align: left;
                       padding: 16px 24px;
-                      color: #6b7280;
                       font-size: 12px;
                       font-weight: 500;
                       text-transform: uppercase;
@@ -1366,7 +305,6 @@
                     style="
                       text-align: left;
                       padding: 16px 24px;
-                      color: #6b7280;
                       font-size: 12px;
                       font-weight: 500;
                       text-transform: uppercase;
@@ -1508,25 +446,12 @@
         </p>
         <button
           id="closeShareModal"
-          class="toolbar-btn"
+          class="toolbar-btn close-btn-gradient"
           style="
             width: 100%;
             padding: 12px;
-            background: #1a1a1a;
-            border: 1px solid var(--accent-color);
             border-radius: 4px;
             cursor: pointer;
-            color: var(--accent-color-lighter);
-            font-weight: 500;
-            transition: all 0.3s ease;
-          "
-          onmouseover="
-            this.style.background = 'rgba(var(--accent-color-rgb), 0.1)';
-            this.style.boxShadow = '0 0 15px rgba(var(--accent-color-rgb), 0.3)';
-          "
-          onmouseout="
-            this.style.background = '#1a1a1a';
-            this.style.boxShadow = 'none';
           "
         >
           Close
@@ -1598,12 +523,10 @@
           </h2>
           <button
             id="closeHistoryModal"
-            class="toolbar-btn"
+            class="toolbar-btn close-btn-gradient"
             style="
-              background: transparent;
-              border: none;
-              color: #b0b0b0;
-              font-size: 20px;
+              padding: 4px 12px;
+              border-radius: 6px;
               cursor: pointer;
             "
           >
@@ -1796,9 +719,12 @@
                     width: 80px;
                     height: 80px;
                     font-size: 32px;
+                    border-radius: 50%;
                     border: 3px solid var(--accent-color);
                     box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.5);
                     display: none;
+                    align-items: center;
+                    justify-content: center;
                   "
                 ></div>
                 <div
@@ -1857,7 +783,7 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
-                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Email Address</label>
+                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Email Address</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <input type="text" id="profileEmailInput" readonly class="profile-input" />
                   <div id="emailVerificationBadge" style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -1871,12 +797,12 @@
               </div>
 
               <div>
-                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
+                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
                 <input type="text" id="profileUsernameInput" readonly class="profile-input" />
               </div>
               
               <div>
-                <label style="font-size: 10px; color: var(--accent-color-light); text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Bio</label>
+                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Bio</label>
                 <textarea id="profileBioInput" rows="4" placeholder="Tell us about yourself..." class="profile-input" style="resize: none;"></textarea>
               </div>
 
@@ -1889,9 +815,9 @@
             <!-- Theme Selection -->
             <div style="margin-bottom: 20px">
               <h3
+                class="profile-section-title"
                 style="
                   margin-bottom: 12px;
-                  color: var(--accent-color-lighter);
                   font-size: 11px;
                   text-transform: uppercase;
                   letter-spacing: 0.8px;
@@ -1982,11 +908,65 @@
               </div>
             </div>
 
-            <!-- Editor Preferences Placeholder -->
+            <!-- Background Theme Selection -->
+            <div style="margin-bottom: 20px;">
+              <h3
+                style="
+                  margin-bottom: 12px;
+                  color: var(--accent-color-lighter);
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.8px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                "
+              >
+                <i class="fas fa-magic" style="color: var(--accent-color); font-size: 10px"></i
+                >Background Theme
+              </h3>
+              <select id="backgroundThemeSelect" class="profile-input" style="width: 100%; height: 36px;">
+                <option value="dots">Connected Dots (Classic)</option>
+                <option value="math">Floating Math Symbols</option>
+                <option value="code">Floating Code Blocks</option>
+                <option value="nature">Floating Nature Elements</option>
+              </select>
+            </div>
+
+            <!-- Editor Preferences -->
             <div>
               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Editor Preferences</h3>
-              <p style="font-size: 12px; color: #888;">Coming soon...</p>
+              <div class="preference-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(var(--accent-color-rgb), 0.05); border-radius: 6px; border: 1px solid rgba(var(--accent-color-rgb), 0.1);">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span class="preference-label" style="font-size: 12px; font-weight: 500;">Page Glow</span>
+                  <span class="preference-desc" style="font-size: 10px;">Adds a radiant light effect around the document</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                  <input type="checkbox" id="togglePageGlow" style="opacity: 0; width: 0; height: 0;">
+                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px;"></span>
+                </label>
+              </div>
+
+              <div class="preference-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(var(--accent-color-rgb), 0.05); border-radius: 6px; border: 1px solid rgba(var(--accent-color-rgb), 0.1); margin-top: 8px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span class="preference-label" style="font-size: 12px; font-weight: 500;">Page Border Accent</span>
+                  <span class="preference-desc" style="font-size: 10px;">Shows your accent color around the page perimeter</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                  <input type="checkbox" id="togglePageBorder" style="opacity: 0; width: 0; height: 0;">
+                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px;"></span>
+                </label>
+              </div>
             </div>
+
+            <style>
+              .switch input:checked + .slider { background-color: var(--accent-color); }
+              .slider:before {
+                position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+                background-color: white; transition: .4s; border-radius: 50%;
+              }
+              .switch input:checked + .slider:before { transform: translateX(14px); }
+            </style>
           </div>
 
           <!-- Security Tab Content -->
@@ -2009,9 +989,9 @@
                         <div style="display: flex; flex-direction: column; gap: 10px">
                           <div style="position: relative">
                             <label
+                              class="profile-label"
                               style="
                                 font-size: 10px;
-                                color: var(--accent-color-light);
                                 text-transform: uppercase;
                                 letter-spacing: 0.3px;
                                 display: block;
@@ -2022,21 +1002,19 @@
                             <input
                               type="password"
                               id="newPassword"
-                  placeholder="Enter new password"
-                  style="
-                    width: 100%;
-                    padding: 10px 12px;
-                    border: 1px solid #2a2a2a;
-                    border-radius: 6px;
-                    background: #0d0520;
-                    color: #e0e0e0;
-                    font-size: 11px;
-                    transition: all 0.3s ease;
-                  "
-                />
+                              class="profile-input"
+                              placeholder="Enter new password"
+                              style="
+                                width: 100%;
+                                padding: 10px 12px;
+                                border-radius: 6px;
+                                font-size: 11px;
+                                transition: all 0.3s ease;
+                              "
+                            />
                 <!-- Password Strength Meter -->
                 <div style="margin-top: 8px;">
-                  <div style="height: 4px; width: 100%; background: #1a1a1a; border-radius: 2px; overflow: hidden; margin-bottom: 8px;">
+                  <div class="entropy-bar" style="margin-bottom: 8px;">
                     <div id="passwordStrengthBar" style="height: 100%; width: 0%; transition: all 0.3s ease; background: #ef4444;"></div>
                   </div>
                   <ul id="passwordRequirements" style="list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
@@ -2074,8 +1052,11 @@
             </div>
             
             <div style="margin-top: 24px;">
-               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Login History</h3>
-               <div id="loginHistoryContainer" style="background: #0d0520; border-radius: 6px; border: 1px solid #2a2a2a; overflow: hidden;">
+               <div class="collapsible-header" id="toggleLoginHistory" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                 <h3 class="profile-section-title" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Login History</h3>
+                 <i class="fas fa-chevron-down" style="font-size: 10px; color: #666; transition: transform 0.3s;"></i>
+               </div>
+               <div id="loginHistoryContainer" style="display: none; background: #0d0520; border-radius: 6px; border: 1px solid #2a2a2a; overflow: hidden;">
                    <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
                        <tbody id="loginHistoryTableBody">
                            <!-- Populated by JS -->
@@ -2085,21 +1066,24 @@
             </div>
 
             <div style="margin-top: 24px;">
-               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                 <h3 style="margin: 0; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
-                 <button id="revokeAllOthersBtn" style="background: none; border: none; color: #ef4444; font-size: 9px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; font-weight: 600;">Revoke Others</button>
+               <div class="collapsible-header" id="toggleSessions" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                 <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 class="profile-section-title" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
+                    <button id="revokeAllOthersBtn" style="background: none; border: none; color: #ef4444; font-size: 9px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; font-weight: 600;">Revoke Others</button>
+                 </div>
+                 <i class="fas fa-chevron-down" style="font-size: 10px; color: #666; transition: transform 0.3s;"></i>
                </div>
-               <div id="sessionListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+               <div id="sessionListContainer" style="display: none; flex-direction: column; gap: 8px;">
                    <!-- Dynamically populated -->
                </div>
             </div>
 
             <div style="margin-top: 24px;">
                <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Privacy</h3>
-               <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
+               <div class="privacy-row" style="display: flex; align-items: center; justify-content: space-between; background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
                    <div style="display: flex; flex-direction: column;">
-                       <span style="font-size: 12px; color: #e0e0e0;">Show my online status to others</span>
-                       <span style="font-size: 10px; color: #666; margin-top: 2px;">When off, your cursor and presence are hidden from collaborators.</span>
+                       <span style="font-size: 12px; color: #e0e0e0;" class="privacy-text-main">Show my online status to others</span>
+                       <span class="preference-desc" style="font-size: 10px; margin-top: 2px;">When off, your cursor and presence are hidden from collaborators.</span>
                    </div>
                    <i id="privacyToggle" class="fas fa-toggle-on" style="color: var(--accent-color-light); font-size: 20px; cursor: pointer;"></i>
                </div>
@@ -2147,30 +1131,13 @@
           </button>
           <button
             id="closeProfileModal"
-            class="toolbar-btn"
+            class="toolbar-btn close-btn-gradient"
             style="
               flex: 1;
               padding: 10px 12px;
-              background: #1a1a1a;
-              border: 2px solid #2a2a2a;
               border-radius: 6px;
               cursor: pointer;
-              color: #e0e0e0;
-              transition: all 0.3s ease;
-              font-weight: 600;
               font-size: 11px;
-              text-transform: uppercase;
-              letter-spacing: 0.3px;
-            "
-            onmouseover="
-              this.style.borderColor = 'var(--accent-color)';
-              this.style.boxShadow = '0 0 15px rgba(var(--accent-color-rgb), 0.25)';
-              this.style.background = 'rgba(var(--accent-color-rgb), 0.1)';
-            "
-            onmouseout="
-              this.style.borderColor = '#2a2a2a';
-              this.style.boxShadow = 'none';
-              this.style.background = '#1a1a1a';
             "
           >
             ✕ Close
@@ -2218,15 +1185,14 @@
         <div class="ribbon-section-title">Font</div>
         <div class="ribbon-section-tools" id="editor-toolbar">
           <select class="ql-font" title="Font Family">
-            <option value="" selected>Sans Serif</option>
+            <option value="arial" selected>Arial</option>
             <option value="roboto">Roboto</option>
             <option value="open-sans">Open Sans</option>
             <option value="lato">Lato</option>
             <option value="montserrat">Montserrat</option>
             <option value="oswald">Oswald</option>
             <option value="merriweather">Merriweather</option>
-            <option value="arial">Arial</option>
-            <option value="times-new-roman">Times New Roman</option>
+            <option value="times-new-roman">New York (Times)</option>
             <option value="courier-new">Courier New</option>
             <option value="georgia">Georgia</option>
             <option value="verdana">Verdana</option>
@@ -2673,7 +1639,7 @@
             <option value="classic">Classic</option>
             <option value="sepia">Sepia</option>
             <option value="midnight">Midnight</option>
-            <option value="cyber">Cyber</option>
+            <option value="math">Math</option>
           </select>
         </div>
       </div>
@@ -2791,29 +1757,6 @@
     <!-- Status Bar -->
     <div class="status-bar">
       <div style="display: flex; justify-content: space-between; align-items: center; width: 100%">
-        <div style="display: flex; gap: 8px; align-items: center">
-          <button
-            class="toolbar-btn"
-            id="zoomOutBtn"
-            title="Zoom out"
-            style="padding: 4px 8px; font-size: 12px"
-          >
-            <i class="fas fa-minus"></i>
-          </button>
-          <span
-            id="zoomPercent"
-            style="color: #5f6368; font-size: 12px; min-width: 40px; text-align: center"
-            >100%</span
-          >
-          <button
-            class="toolbar-btn"
-            id="zoomInBtn"
-            title="Zoom in"
-            style="padding: 4px 8px; font-size: 12px"
-          >
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
         <div style="display: flex; gap: 16px">
           <span id="pageIndicator" style="color: #5f6368; font-size: 12px">Page 1</span> |
           <span id="charCount">Characters: 0</span> | <span id="wordCount">Words: 0</span>
@@ -2898,8 +1841,17 @@
         <span style="font-size: 14px; color: var(--accent-color-light)">Status check...</span>
       </div>
 
-      <style>
-        @keyframes float {
+    <!-- Theme Loading Toast -->
+    <div id="themeToast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(13, 5, 32, 0.9); border: 1px solid var(--accent-color); padding: 12px 24px; border-radius: 50px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(var(--accent-color-rgb), 0.3); backdrop-filter: blur(10px); transition: all 0.3s ease; opacity: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 16px; height: 16px; border: 2px solid var(--accent-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <span id="themeToastText" style="color: #e0e0e0; font-size: 13px; font-weight: 500; letter-spacing: 0.5px;">Applying Accent Color...</span>
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes float {
           0%,
           100% {
             transform: translateY(0);

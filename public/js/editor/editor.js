@@ -407,6 +407,8 @@ export class Editor {
     }
 
     // NAVIGATION
+    
+    // Horizontal Navigation (Left/Right)
     if (e.key === 'ArrowLeft' && pageIndex > 0) {
       const range = pageQuill.getSelection();
       if (range && range.index === 0) {
@@ -421,6 +423,31 @@ export class Editor {
         e.preventDefault();
         this.switchToPage(pageIndex + 1, 'start');
       }
+    }
+
+    // Vertical Navigation (Up/Down)
+    if (e.key === 'ArrowUp' && pageIndex > 0) {
+        const range = pageQuill.getSelection();
+        if (range) {
+            const [line] = pageQuill.getLine(range.index);
+            // If no previous line exists, we are at the top
+            if (!line.prev) {
+                e.preventDefault();
+                this.switchToPage(pageIndex - 1, 'end');
+            }
+        }
+    }
+
+    if (e.key === 'ArrowDown' && pageIndex < this.yPages.length - 1) {
+        const range = pageQuill.getSelection();
+        if (range) {
+            const [line] = pageQuill.getLine(range.index);
+            // If no next line exists, we are at the bottom
+            if (!line.next) {
+                e.preventDefault();
+                this.switchToPage(pageIndex + 1, 'start');
+            }
+        }
     }
   }
   

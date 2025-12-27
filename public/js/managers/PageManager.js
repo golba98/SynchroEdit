@@ -3,39 +3,38 @@ import * as Y from 'yjs';
 /**
  * PageManager
  * 
- * Implements the "Page Management and Page Forming Logic" using an iterative layout algorithm.
+ * Implements the "Page Management and Page Forming Logic" from page.md.
  * 
- * CORE LOGIC:
- * 1. Initialize Layout State (currentVerticalPosition = 0).
- * 2. Iterate Through Blocks (Lines in Quill).
- * 3. Determine Block's Rendered Height.
- * 4. Evaluate Page Break Conditions (Manual Break, Keep With Next, Overflow).
- * 5. Move content to next page (Create new page) or pull content back as needed.
+ * Core Mandate:
+ * "The system needs a layout engine that takes the ADM and iteratively places content onto pages. 
+ * It starts with page 1, fills it until an overflow trigger occurs, then creates page 2, and so on."
  */
 export class PageManager {
   constructor(editor) {
     this.editor = editor;
-    this.isReflowing = false; 
-    
-    // Page Constants
+    this.isReflowing = false;
+
+    // Constants (US Letter / A4 approximate)
     this.PAGE_HEIGHT = 1056; 
     this.PAGE_PADDING_Y = 60; // 30px top + 30px bottom
     this.EDITOR_PADDING_BOTTOM = 20; 
+    
+    // The visual "waterline" - content below this pixel value must go to next page
     this.MAX_CONTENT_HEIGHT = this.PAGE_HEIGHT - this.PAGE_PADDING_Y - this.EDITOR_PADDING_BOTTOM;
   }
 
   /**
-   * Triggers the iterative flow algorithm starting from the modified page.
+   * Main Entry Point: Called whenever content changes on a page.
+   * Acts as the "Layout Engine" trigger.
    */
-  handlePageUpdate(startPageIndex) {
+  handlePageUpdate(pageIndex) {
     if (this.isReflowing) return;
     this.isReflowing = true;
 
-    // We use requestAnimationFrame to ensure the browser has performed layout
-    // so our measurements (getBounds) are accurate.
+    // Wait for DOM to paint so measurements are accurate
     requestAnimationFrame(() => {
         try {
-            this.reflowPage(startPageIndex);
+            this.processPage(pageIndex);
         } finally {
             this.isReflowing = false;
         }
@@ -43,139 +42,116 @@ export class PageManager {
   }
 
   /**
-   * The core iterative layout engine for a single page.
-   * It measures blocks and decides if they stay, move to next, or if next page content comes here.
+   * Process a single page to enforce layout rules:
+   * 1. Check for Vertical Overflow (Push to Next)
+   * 2. Check for Underflow (Pull from Next)
    */
-  reflowPage(pageIndex) {
+  processPage(pageIndex) {
     const quill = this.editor.pageQuillInstances[pageIndex];
     if (!quill) return;
 
-    // 1. Initialize Layout State
-    // We don't track pixel-perfect absolute position from top of document, 
-    // but relative to the current page's content area.
+    // --- STEP 1: CHECK OVERFLOW (The "New Page" Trigger) ---
+    const overflowPoint = this.findOverflowPoint(quill);
     
-    // Check Overflow (Condition C)
-    const overflowInfo = this.findOverflowPoint(quill);
-    
-    if (overflowInfo.hasOverflow) {
-        // Move excess content to the next page
-        this.moveContentToNextPage(pageIndex, overflowInfo.splitIndex);
-        return; // The move triggers an update on next page, continuing the chain
-    } 
-    
-    // Check Underflow (Condition D - Pull Back)
-    // Only if we didn't overflow, we check if we can fit more from the next page.
-    this.checkUnderflowAndPull(pageIndex);
+    if (overflowPoint.hasOverflow) {
+        this.splitAndMoveToNextPage(pageIndex, overflowPoint.splitIndex);
+        return; // Moving content triggers update on next page, continuing the flow.
+    }
+
+    // --- STEP 2: CHECK UNDERFLOW (Dynamic Reflow / Pull Back) ---
+    // Only if we are NOT overflowing, we check if we can fit more.
+    this.attemptMergeFromNextPage(pageIndex);
   }
 
   /**
-   * Iterates through blocks to find where content exceeds the page height.
-   * @returns {Object} { hasOverflow: boolean, splitIndex: number }
+   * Identifies if and where content overflows the page boundary.
+   * Returns { hasOverflow: boolean, splitIndex: number }
    */
   findOverflowPoint(quill) {
       const totalLength = quill.getLength();
       if (totalLength === 0) return { hasOverflow: false, splitIndex: 0 };
 
-      // 1. Primary Check: getBounds of the last character
-      // This is the most accurate for "where is the text visually?"
-      const endBounds = quill.getBounds(Math.max(0, totalLength - 1));
-      
-      // 2. Secondary Check: scrollHeight of the editor element
-      // This catches cases where getBounds might be slightly off or inner elements (images) push height
-      // without updating the text cursor bounds immediately.
-      let isOverflowing = false;
-      if (endBounds && endBounds.bottom > this.MAX_CONTENT_HEIGHT) {
-          isOverflowing = true;
-      } else {
-          const editorEl = quill.root; // .ql-editor
-          if (editorEl && editorEl.scrollHeight > this.MAX_CONTENT_HEIGHT + 5) { // +5 buffer
-              isOverflowing = true;
-          }
+      // A. Quick Check: Scroll Height
+      // If the scrollHeight is within bounds, we likely don't need to do expensive checks.
+      const editorEl = quill.root;
+      if (editorEl.scrollHeight <= this.MAX_CONTENT_HEIGHT) {
+           // Double check bounds of last char just to be safe (e.g. negative margins?)
+           const endBounds = quill.getBounds(Math.max(0, totalLength - 1));
+           if (!endBounds || endBounds.bottom <= this.MAX_CONTENT_HEIGHT) {
+               return { hasOverflow: false, splitIndex: 0 };
+           }
       }
 
-      if (!isOverflowing) {
-          return { hasOverflow: false, splitIndex: 0 };
-      }
-
-      // We have confirmed overflow. Now we MUST find the split point.
-      // Binary search for the split point.
+      // B. Binary Search for the specific character causing overflow
+      // We want the last character that *FITS*, or the first that *DOESN'T*.
       let low = 0;
       let high = totalLength - 1;
-      let splitIndex = high;
-      let foundBoundsOverflow = false;
+      let splitIndex = -1;
 
       while (low <= high) {
           const mid = Math.floor((low + high) / 2);
           const bounds = quill.getBounds(mid);
           
           if (bounds && bounds.bottom > this.MAX_CONTENT_HEIGHT) {
-              splitIndex = mid;
+              splitIndex = mid; // This one is too low, try earlier
               high = mid - 1;
-              foundBoundsOverflow = true;
           } else {
-              low = mid + 1;
+              low = mid + 1; // This one fits, try later
           }
       }
 
-      // Fallback: If we detected scrollHeight overflow but binary search didn't find a 
-      // specific character exceeding bounds (rare, but happens with bottom-margin elements or big block images),
-      // we force split near the end.
-      if (!foundBoundsOverflow) {
-          // Walk backwards from end until we fit? 
-          // Or just take the last paragraph?
-          // Simplest robust fallback: Move the last block (paragraph).
-          const text = quill.getText();
-          const lastNewLine = text.lastIndexOf('\n', totalLength - 2); // Ignore trailing newline
-          if (lastNewLine > 0) {
-              splitIndex = lastNewLine + 1;
-          } else {
-              // Giant single line? Split at char limit? 
-              // Just split at end - 1 to force flow
-              splitIndex = Math.max(0, totalLength - 1);
-          }
+      if (splitIndex !== -1) {
+          return { hasOverflow: true, splitIndex: splitIndex };
       }
-      
-      return { hasOverflow: true, splitIndex: splitIndex };
+
+      // Fallback: ScrollHeight says yes, but bounds said no?
+      // This happens with empty newlines at the end or block elements.
+      if (editorEl.scrollHeight > this.MAX_CONTENT_HEIGHT) {
+          // Just split the last paragraph/block to force flow
+          return { hasOverflow: true, splitIndex: Math.max(0, totalLength - 2) };
+      }
+
+      return { hasOverflow: false, splitIndex: 0 };
   }
 
   /**
-   * Moves content starting from startIndex to the next page.
-   * Handles creating a new page if needed.
+   * Moves content from splitIndex onwards to the next page.
    */
-  moveContentToNextPage(pageIndex, startIndex) {
+  splitAndMoveToNextPage(pageIndex, splitIndex) {
       const currentQuill = this.editor.pageQuillInstances[pageIndex];
-      const lengthToMove = currentQuill.getLength() - startIndex;
+      const lengthToMove = currentQuill.getLength() - splitIndex;
+      
       if (lengthToMove <= 0) return;
 
-      const contentDelta = currentQuill.getContents(startIndex, lengthToMove);
+      const contentToMove = currentQuill.getContents(splitIndex, lengthToMove);
       
-      // Preserve selection relative to moved content
+      // Preserve selection state
       const selection = currentQuill.getSelection();
-      const shouldMoveCursor = selection && selection.index >= startIndex;
-      const relativeCursorIndex = shouldMoveCursor ? selection.index - startIndex : 0;
+      const shouldMoveCursor = selection && selection.index >= splitIndex;
+      const relativeCursorIndex = shouldMoveCursor ? selection.index - splitIndex : 0;
 
       this.editor.doc.transact(() => {
-          // 1. Remove from current
-          currentQuill.deleteText(startIndex, lengthToMove, 'user');
+          // 1. Delete from current page
+          currentQuill.deleteText(splitIndex, lengthToMove, 'user');
 
-          // 2. Add to next
+          // 2. Add to next page
           const nextPageIndex = pageIndex + 1;
           const nextQuill = this.editor.pageQuillInstances[nextPageIndex];
 
           if (nextQuill) {
               // Prepend to next page
-              nextQuill.updateContents([{ insert: '' }, ...contentDelta.ops], 'user');
+              nextQuill.updateContents([{ insert: '' }, ...contentToMove.ops], 'user');
           } else {
               // Create new page
               const newPageMap = new Y.Map();
               const yText = new Y.Text();
-              yText.applyDelta(contentDelta.ops);
+              yText.applyDelta(contentToMove.ops);
               newPageMap.set('content', yText);
               this.editor.yPages.insert(nextPageIndex, [newPageMap]);
           }
       });
 
-      // Handle Cursor
+      // Handle Cursor Focus
       if (shouldMoveCursor) {
           setTimeout(() => {
               const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
@@ -183,124 +159,112 @@ export class PageManager {
                   this.editor.switchToPage(pageIndex + 1);
                   nextQuill.setSelection(Math.max(0, relativeCursorIndex), 0);
               }
-          }, 20);
+          }, 50);
       }
 
-      // Ripple: The next page might now overflow
+      // Ripple: Check the next page now
       setTimeout(() => {
           this.handlePageUpdate(pageIndex + 1);
-      }, 20);
+      }, 50);
   }
 
   /**
-   * Logic to pull content from the next page if there is space.
-   * "Condition D" in the algorithm.
+   * Tries to pull content from the next page if there is space.
    */
-  checkUnderflowAndPull(pageIndex) {
+  attemptMergeFromNextPage(pageIndex) {
       const currentQuill = this.editor.pageQuillInstances[pageIndex];
       const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
-      if (!currentQuill || !nextQuill) return;
+      if (!nextQuill) return;
 
-      // 1. Calculate Remaining Space
+      // 1. Calculate Space Remaining
       const totalLength = currentQuill.getLength();
-      // Handle empty page case
-      const endBounds = totalLength > 0 ? currentQuill.getBounds(Math.max(0, totalLength - 1)) : { bottom: 0 };
-      if (!endBounds) return;
-
-      const currentBottom = endBounds.bottom;
-      const remainingSpace = this.MAX_CONTENT_HEIGHT - currentBottom;
-
-      // If we have less than a line's height of space (approx 20px), don't bother pulling
-      if (remainingSpace < 20) return;
-
-      // 2. Check First Block of Next Page
-      // We need to know how tall the first block (line) of the next page IS.
-      // This is tricky because it's rendered on the NEXT page (y=0).
-      // We have to estimate or trial-move it.
+      const endBounds = currentQuill.getBounds(Math.max(0, totalLength - 1));
       
-      // Let's grab the first line of the next page
-      // In Quill, lines are separated by \n. 
-      // We identify the first \n.
+      let currentBottom = 0;
+      if (endBounds) currentBottom = endBounds.bottom;
+      
+      const spaceRemaining = this.MAX_CONTENT_HEIGHT - currentBottom;
+
+      // If very little space, don't bother (hysteresis to prevent flickering)
+      if (spaceRemaining < 25) return; 
+
+      // 2. Identify "Block" to pull
+      // We pull the first line (paragraph) from the next page.
       const nextText = nextQuill.getText();
-      const firstNewLine = nextText.indexOf('\n');
-      
-      // If next page is empty or weird, stop
-      if (firstNewLine === -1 && nextQuill.getLength() > 0) {
-           // It's a single line document
-      }
-      
-      const lengthToPull = (firstNewLine === -1) ? nextQuill.getLength() : firstNewLine + 1;
-      
-      // We can't easily "measure" how tall this text WOULD be on the previous page 
-      // without moving it or using a hidden test container.
-      // Approximation: Use the height it currently occupies on the next page?
-      // No, because width might be same, but context (lists) might change.
-      // However, usually it's close.
-      
-      const nextFirstBlockBounds = nextQuill.getBounds(lengthToPull - 1);
-      // nextFirstBlockBounds.bottom is effectively the height of that block since it starts at 0.
-      
-      if (nextFirstBlockBounds && nextFirstBlockBounds.bottom <= remainingSpace) {
-          // IT FITS!
-          this.pullContentFromNextPage(pageIndex, lengthToPull);
-      }
-  }
+      let firstNewLine = nextText.indexOf('\n');
+      if (firstNewLine === -1) firstNewLine = nextText.length; // Pull everything if no newline
 
-  pullContentFromNextPage(pageIndex, lengthToPull) {
-      const currentQuill = this.editor.pageQuillInstances[pageIndex];
-      const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
-      
+      const lengthToPull = firstNewLine + 1; // Include the newline
+
+      // 3. Heuristic Check: Will it fit?
+      // Since we can't measure it before moving, we guess based on character count density 
+      // or just try it. A "Try and Revert" is expensive in Yjs.
+      // Better heuristic: Assume 1 line ~ 20px. 
+      // If we are pulling a huge paragraph, we might pull too much.
+      // Let's rely on the "Split" logic to fix it if we pull too much. 
+      // i.e., Pull it -> if it overflows -> Split logic will kick it back.
+      // This "Ping Pong" is risky if thresholds are identical.
+      // So we need a safety buffer. Only pull if we have SIGNIFICANT space (e.g. 50px).
+      if (spaceRemaining < 50) return;
+
       const contentToPull = nextQuill.getContents(0, lengthToPull);
 
       this.editor.doc.transact(() => {
-          // 1. Append to current
           currentQuill.updateContents(contentToPull, 'user');
-          
-          // 2. Remove from next
           nextQuill.deleteText(0, lengthToPull, 'user');
           
-          // 3. If next page is now empty, delete it
-          if (nextQuill.getLength() <= 1) { // Just a newline
+          if (nextQuill.getLength() <= 1) {
               this.editor.yPages.delete(pageIndex + 1, 1);
           }
       });
-      
-      // Recursive check: We pulled content, maybe we can pull MORE?
-      // Or maybe we overflowed (unlikely if logic is correct, but safe to check).
+
+      // Trigger update to verify fit (and potentially split back if we made a mistake)
       setTimeout(() => {
           this.handlePageUpdate(pageIndex);
-      }, 20);
+      }, 50);
   }
 
   /**
-   * Manual Page Break (Ctrl+Enter)
-   * Enforces Condition A.
+   * Manual Break Support (Ctrl+Enter)
    */
   insertPageBreak(pageIndex) {
       const currentQuill = this.editor.pageQuillInstances[pageIndex];
       if (!currentQuill) return;
-
+      
       const selection = currentQuill.getSelection();
       if (!selection) return;
 
-      // Force move everything after cursor to new page
-      this.moveContentToNextPage(pageIndex, selection.index);
+      this.splitAndMoveToNextPage(pageIndex, selection.index);
   }
 
+  /**
+   * Helper: Backspace Merge
+   */
   mergeWithPreviousPage(pageIndex) {
-    if (pageIndex <= 0) return;
-    // Standard backspace merge logic
-    // We treat this as a manual "pull all"
-    const nextQuill = this.editor.pageQuillInstances[pageIndex];
-    if (nextQuill) {
-        this.pullContentFromNextPage(pageIndex - 1, nextQuill.getLength());
-    }
+      if (pageIndex <= 0) return;
+      // Just pull everything from current to previous
+      const currentQuill = this.editor.pageQuillInstances[pageIndex];
+      const prevQuill = this.editor.pageQuillInstances[pageIndex - 1];
+      
+      const content = currentQuill.getContents();
+      const prevLength = prevQuill.getLength();
+      
+      this.editor.doc.transact(() => {
+          prevQuill.updateContents(content, 'user');
+          this.editor.yPages.delete(pageIndex, 1);
+      });
+      
+      setTimeout(() => {
+          prevQuill.focus();
+          prevQuill.setSelection(prevLength - 1, 0);
+          this.handlePageUpdate(pageIndex - 1);
+      }, 50);
   }
 
   isCursorAtBottom(pageIndex, cursorIndex) {
-    const currentQuill = this.editor.pageQuillInstances[pageIndex];
-    if (!currentQuill) return false;
-    const bounds = currentQuill.getBounds(cursorIndex);
-    return bounds && bounds.bottom > (this.MAX_CONTENT_HEIGHT - 40);
+      const currentQuill = this.editor.pageQuillInstances[pageIndex];
+      if (!currentQuill) return false;
+      const bounds = currentQuill.getBounds(cursorIndex);
+      return bounds && bounds.bottom > (this.MAX_CONTENT_HEIGHT - 30);
   }
 }

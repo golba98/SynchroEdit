@@ -1228,6 +1228,11 @@ body.light-theme .page-tab.active {
   border: 1px solid #1a1a1a;
 }
 
+body.light-theme .doc-list-container {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+}
+
 .section-title {
   color: #e0e0e0;
 }
@@ -1422,6 +1427,12 @@ body.light-theme .session-item {
 
 body.light-theme .history-date-text {
   color: #000000 !important;
+}
+
+body.light-theme .doc-list-header {
+  background: #f3f4f6 !important;
+}
+
 .profile-section-title {
   color: var(--accent-color-lighter);
 }

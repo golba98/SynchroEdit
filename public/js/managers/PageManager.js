@@ -76,32 +76,64 @@ export class PageManager {
       const totalLength = quill.getLength();
       if (totalLength === 0) return { hasOverflow: false, splitIndex: 0 };
 
-      // We scan to find the exact character where the bounds cross the MAX_CONTENT_HEIGHT.
-      // Optimization: Check the end first.
-      const endBounds = quill.getBounds(totalLength - 1);
-      if (!endBounds || endBounds.bottom <= this.MAX_CONTENT_HEIGHT) {
+      // 1. Primary Check: getBounds of the last character
+      // This is the most accurate for "where is the text visually?"
+      const endBounds = quill.getBounds(Math.max(0, totalLength - 1));
+      
+      // 2. Secondary Check: scrollHeight of the editor element
+      // This catches cases where getBounds might be slightly off or inner elements (images) push height
+      // without updating the text cursor bounds immediately.
+      let isOverflowing = false;
+      if (endBounds && endBounds.bottom > this.MAX_CONTENT_HEIGHT) {
+          isOverflowing = true;
+      } else {
+          const editorEl = quill.root; // .ql-editor
+          if (editorEl && editorEl.scrollHeight > this.MAX_CONTENT_HEIGHT + 5) { // +5 buffer
+              isOverflowing = true;
+          }
+      }
+
+      if (!isOverflowing) {
           return { hasOverflow: false, splitIndex: 0 };
       }
 
-      // Binary search for the split point to be efficient
+      // We have confirmed overflow. Now we MUST find the split point.
+      // Binary search for the split point.
       let low = 0;
       let high = totalLength - 1;
       let splitIndex = high;
+      let foundBoundsOverflow = false;
 
       while (low <= high) {
           const mid = Math.floor((low + high) / 2);
           const bounds = quill.getBounds(mid);
           
           if (bounds && bounds.bottom > this.MAX_CONTENT_HEIGHT) {
-              splitIndex = mid; // This char is outside, try earlier
+              splitIndex = mid;
               high = mid - 1;
+              foundBoundsOverflow = true;
           } else {
               low = mid + 1;
           }
       }
 
-      // splitIndex is the first character that DOES NOT fit (or fits very tightly).
-      // We should verify if we are splitting a block (line) or between blocks.
+      // Fallback: If we detected scrollHeight overflow but binary search didn't find a 
+      // specific character exceeding bounds (rare, but happens with bottom-margin elements or big block images),
+      // we force split near the end.
+      if (!foundBoundsOverflow) {
+          // Walk backwards from end until we fit? 
+          // Or just take the last paragraph?
+          // Simplest robust fallback: Move the last block (paragraph).
+          const text = quill.getText();
+          const lastNewLine = text.lastIndexOf('\n', totalLength - 2); // Ignore trailing newline
+          if (lastNewLine > 0) {
+              splitIndex = lastNewLine + 1;
+          } else {
+              // Giant single line? Split at char limit? 
+              // Just split at end - 1 to force flow
+              splitIndex = Math.max(0, totalLength - 1);
+          }
+      }
       
       return { hasOverflow: true, splitIndex: splitIndex };
   }

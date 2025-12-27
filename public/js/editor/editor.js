@@ -349,7 +349,8 @@ export class Editor {
         if (this.readabilityManager.showLineNumbers) {
             this.readabilityManager.updateGutter(pageIndex);
         }
-        this.pageManager.checkAndCreateNewPage(pageIndex);
+        // CALL THE NEW FLOW ALGORITHM
+        this.pageManager.handlePageUpdate(pageIndex);
     });
     
     // Bind Y.Text (if provider/awareness is ready)
@@ -370,19 +371,33 @@ export class Editor {
 
   handleKeyDown(e, pageIndex) {
     const pageQuill = this.pageQuillInstances[pageIndex];
+
+    // MANUAL PAGE BREAK (Ctrl + Enter)
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        this.pageManager.insertPageBreak(pageIndex);
+        return;
+    }
     
+    // STANDARD PAGE FLOW ON ENTER
     if (e.key === 'Enter') {
         const range = pageQuill.getSelection();
         if (range) {
              const isAtBottom = this.pageManager.isCursorAtBottom(pageIndex, range.index);
              if (isAtBottom) {
                  e.preventDefault();
-                 this.pageManager.moveToNextPage(pageIndex);
+                 // Instead of moveToNextPage, we treat this as a forced split/flow trigger
+                 // But since it's "at bottom", we effectively want a new page.
+                 // We can use insertPageBreak here too, or just let standard behavior + overflow logic handle it.
+                 // If we let it insert a newline, it will likely overflow. 
+                 // But for UX, jumping to next page is nicer.
+                 this.pageManager.insertPageBreak(pageIndex);
                  return;
              }
         }
     }
 
+    // BACKSPACE MERGE
     if (e.key === 'Backspace' && pageIndex > 0) {
       const range = pageQuill.getSelection();
       if ((range && range.index === 0 && range.length === 0) || pageQuill.getLength() <= 1) {
@@ -391,6 +406,7 @@ export class Editor {
       }
     }
 
+    // NAVIGATION
     if (e.key === 'ArrowLeft' && pageIndex > 0) {
       const range = pageQuill.getSelection();
       if (range && range.index === 0) {

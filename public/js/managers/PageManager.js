@@ -55,10 +55,22 @@ export class PageManager {
       const pageHeight = 1056; // Fixed page height in CSS (US Letter)
       const availableHeight = pageHeight - 60; // 30px padding top/bottom
       const contentHeight = qlEditor.scrollHeight;
+      
+      const currentQuill = this.editor.pageQuillInstances[pageIndex];
+      let isCursorOverflowing = false;
+      const MAX_TEXT_BOTTOM = 976; // 1056 - 60 - 20
 
-      if (contentHeight > availableHeight) {
+      const selection = currentQuill.getSelection();
+      if (selection) {
+          const bounds = currentQuill.getBounds(selection.index);
+          if (bounds && bounds.bottom > MAX_TEXT_BOTTOM) {
+              isCursorOverflowing = true;
+          }
+      }
+
+      if (contentHeight > availableHeight || isCursorOverflowing) {
         this.isSplitting = true;
-        const currentQuill = this.editor.pageQuillInstances[pageIndex];
+        // const currentQuill is already defined above
         const editorPaddingBottom = 20; // ql-editor padding
 
         // Find exactly where the text overflows

@@ -16,7 +16,7 @@ export class PageManager {
 
     // Constants (US Letter / A4 approximate)
     this.PAGE_HEIGHT = 1056; 
-    this.PAGE_PADDING_Y = 60; // 30px top + 30px bottom
+    this.PAGE_PADDING_Y = 80; // 30px top + 30px bottom + 20px editor top padding
     this.EDITOR_PADDING_BOTTOM = 20; 
     
     // The visual "waterline" - content below this pixel value must go to next page
@@ -74,6 +74,8 @@ export class PageManager {
       // A. Quick Check: Scroll Height
       // If the scrollHeight is within bounds, we likely don't need to do expensive checks.
       const editorEl = quill.root;
+      // Note: scrollHeight can be misleading with min-height: 100%. 
+      // We rely more on binary search or explicit bounds if it seems close.
       if (editorEl.scrollHeight <= this.MAX_CONTENT_HEIGHT) {
            // Double check bounds of last char just to be safe (e.g. negative margins?)
            const endBounds = quill.getBounds(Math.max(0, totalLength - 1));
@@ -121,9 +123,10 @@ export class PageManager {
       const currentQuill = this.editor.pageQuillInstances[pageIndex];
       const lengthToMove = currentQuill.getLength() - splitIndex;
       
-      if (lengthToMove <= 0) return;
-
-      const contentToMove = currentQuill.getContents(splitIndex, lengthToMove);
+      // If we are at the end (lengthToMove <= 0/1), we still might want to ensure the next page exists
+      // and focus it, rather than doing nothing. This fixes the "press enter multiple times" issue.
+      
+      const contentToMove = (lengthToMove > 0) ? currentQuill.getContents(splitIndex, lengthToMove) : null;
       
       // Preserve selection state
       const selection = currentQuill.getSelection();
@@ -131,8 +134,10 @@ export class PageManager {
       const relativeCursorIndex = shouldMoveCursor ? selection.index - splitIndex : 0;
 
       this.editor.doc.transact(() => {
-          // 1. Delete from current page
-          currentQuill.deleteText(splitIndex, lengthToMove, 'user');
+          // 1. Delete from current page (only if there is content to move)
+          if (contentToMove && lengthToMove > 0) {
+              currentQuill.deleteText(splitIndex, lengthToMove, 'user');
+          }
 
           // 2. Add to next page
           const nextPageIndex = pageIndex + 1;
@@ -140,12 +145,16 @@ export class PageManager {
 
           if (nextQuill) {
               // Prepend to next page
-              nextQuill.updateContents([{ insert: '' }, ...contentToMove.ops], 'user');
+              if (contentToMove && lengthToMove > 0) {
+                  nextQuill.updateContents([{ insert: '' }, ...contentToMove.ops], 'user');
+              }
           } else {
               // Create new page
               const newPageMap = new Y.Map();
               const yText = new Y.Text();
-              yText.applyDelta(contentToMove.ops);
+              if (contentToMove && lengthToMove > 0) {
+                  yText.applyDelta(contentToMove.ops);
+              }
               newPageMap.set('content', yText);
               this.editor.yPages.insert(nextPageIndex, [newPageMap]);
           }
@@ -265,6 +274,7 @@ export class PageManager {
       const currentQuill = this.editor.pageQuillInstances[pageIndex];
       if (!currentQuill) return false;
       const bounds = currentQuill.getBounds(cursorIndex);
-      return bounds && bounds.bottom > (this.MAX_CONTENT_HEIGHT - 30);
+      // Increased buffer from 30 to 50 to match the PAGE_PADDING_Y adjustment
+      return bounds && bounds.bottom > (this.MAX_CONTENT_HEIGHT - 50);
   }
 }

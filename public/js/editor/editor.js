@@ -370,6 +370,19 @@ export class Editor {
 
   handleKeyDown(e, pageIndex) {
     const pageQuill = this.pageQuillInstances[pageIndex];
+    
+    if (e.key === 'Enter') {
+        const range = pageQuill.getSelection();
+        if (range) {
+             const isAtBottom = this.pageManager.isCursorAtBottom(pageIndex, range.index);
+             if (isAtBottom) {
+                 e.preventDefault();
+                 this.pageManager.moveToNextPage(pageIndex);
+                 return;
+             }
+        }
+    }
+
     if (e.key === 'Backspace' && pageIndex > 0) {
       const range = pageQuill.getSelection();
       if ((range && range.index === 0 && range.length === 0) || pageQuill.getLength() <= 1) {

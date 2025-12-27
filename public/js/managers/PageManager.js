@@ -6,6 +6,40 @@ export class PageManager {
     this.isSplitting = false;
   }
 
+  isCursorAtBottom(pageIndex, cursorIndex) {
+    const currentQuill = this.editor.pageQuillInstances[pageIndex];
+    if (!currentQuill) return false;
+    
+    const bounds = currentQuill.getBounds(cursorIndex);
+    if (!bounds) return false;
+
+    const pageHeight = 1056; 
+    const availableHeight = pageHeight - 60; // 996
+    const editorPaddingBottom = 20;
+    
+    // The visual bottom limit for text
+    const maxTextBottom = availableHeight - editorPaddingBottom; // 976
+    
+    // Check if we are within a line-height (approx 24px) of the bottom
+    const threshold = 30; 
+    
+    return bounds.bottom > maxTextBottom - threshold;
+  }
+
+  moveToNextPage(pageIndex) {
+    const nextPageExists = this.editor.pageQuillInstances[pageIndex + 1];
+    
+    if (nextPageExists) {
+        this.editor.switchToPage(pageIndex + 1, 'start');
+    } else {
+        this.editor.addNewPage();
+        // Wait for Yjs observation -> render cycle
+        setTimeout(() => {
+           this.editor.switchToPage(pageIndex + 1, 'start');
+        }, 50);
+    }
+  }
+
   checkAndCreateNewPage(pageIndex) {
     if (this.isSplitting) return;
 

@@ -45,8 +45,8 @@ export class DynamicBackground {
     };
 
     this.config = {
-        color: 'rgba(var(--accent-color-rgb), 0.4)',
-        lineColor: 'rgba(var(--accent-color-rgb), 0.15)'
+        color: 'rgba(139, 92, 246, 0.4)',
+        lineColor: 'rgba(139, 92, 246, 0.15)'
     };
 
     this.init();

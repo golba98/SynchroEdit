@@ -147,12 +147,18 @@ export class DynamicBackground {
   updateThemeColors() {
       const isLight = document.body.classList.contains('light-theme');
       const styles = getComputedStyle(document.documentElement);
-      const accentRgb = styles.getPropertyValue('--accent-color-rgb').trim() || '139, 92, 246';
+      let accentRgb = styles.getPropertyValue('--accent-color-rgb').trim() || '139, 92, 246';
       
+      // If the computed value still contains a 'var(' (can happen in some edge cases with nested variables),
+      // we must strip it or use a hardcoded fallback to prevent Canvas API crashes.
+      if (accentRgb.includes('var(')) {
+          accentRgb = '139, 92, 246';
+      }
+
       this.isLight = isLight;
+      this.accentRgb = accentRgb;
       this.config.color = isLight ? `rgba(${accentRgb}, 0.6)` : `rgba(${accentRgb}, 0.4)`;
       this.config.lineColor = isLight ? `rgba(${accentRgb}, 0.2)` : `rgba(${accentRgb}, 0.15)`;
-      this.accentRgb = accentRgb;
   }
 
   handleResize() {
@@ -284,7 +290,14 @@ export class DynamicBackground {
                 this.ctx.beginPath();
                 this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 const dotGrad = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-                dotGrad.addColorStop(0, this.config.color);
+                
+                // Final safety check: if for any reason the color string is invalid, fallback to hardcoded
+                let finalColor = this.config.color;
+                if (!finalColor || typeof finalColor !== 'string' || finalColor.includes('var(')) {
+                    finalColor = 'rgba(139, 92, 246, 0.4)';
+                }
+
+                dotGrad.addColorStop(0, finalColor);
                 dotGrad.addColorStop(1, 'transparent');
                 this.ctx.fillStyle = dotGrad;
                 this.ctx.fill();

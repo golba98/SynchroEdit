@@ -3,6 +3,8 @@
 ## 1. Description
 SynchroEdit is a high-performance, real-time collaborative document editor. It features a minimalist "Dark OLED" aesthetic and utilizes CRDT technology (**Yjs**) to allow seamless multi-user collaboration without merge conflicts.
 
+Test it out here: https://syncroedit.online
+
 ## 2. Key Features
 - **Real-time Editing**: Instant synchronization across all users via Yjs and WebSockets.
 - **Visual Presence**: Live cursor tracking with user names and personalized accent colors.

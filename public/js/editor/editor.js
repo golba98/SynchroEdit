@@ -267,34 +267,49 @@ export class Editor {
 
     const pages = this.yPages.toArray();
     
-    // 1. Remove pages that no longer exist
-    Object.keys(this.pageQuillInstances).forEach(idxStr => {
-        const idx = parseInt(idxStr);
-        if (idx >= pages.length) {
-            const container = document.getElementById(`page-container-${idx}`);
-            if (container) container.remove();
-            
-            if (this.pageBindings[idx]) {
-                this.pageBindings[idx].destroy();
-                delete this.pageBindings[idx];
-            }
-            delete this.pageQuillInstances[idx];
-        }
-    });
-
-    // 2. Add or update pages
+    // 1. Reconcile bindings/editors (Handle insertions/shifts)
     pages.forEach((pageMap, index) => {
+        const yText = pageMap.get('content');
+        const currentBinding = this.pageBindings[index];
+        
+        // If there is a binding but it doesn't match the current Y.Text (index shift), destroy it
+        if (currentBinding && currentBinding.type !== yText) {
+            this.destroyPageEditor(index);
+        }
+        
+        // If no editor exists (or was just destroyed), create/recreate it
         if (!this.pageQuillInstances[index]) {
             this.createPageEditor(index, pageMap);
         }
     });
-    
+
+    // 2. Remove extra pages that no longer exist (Handle deletions from end)
+    Object.keys(this.pageQuillInstances).forEach(idxStr => {
+        const idx = parseInt(idxStr);
+        if (idx >= pages.length) {
+            this.destroyPageEditor(idx);
+        }
+    });
+
     this.applyZoom();
     
     // Ensure active quill is set
     if (!this.quill && this.pageQuillInstances[0]) {
         this.switchToPage(0);
     }
+  }
+
+  destroyPageEditor(index) {
+      const container = document.getElementById(`page-container-${index}`);
+      if (container) container.remove();
+      
+      if (this.pageBindings[index]) {
+          this.pageBindings[index].destroy();
+          delete this.pageBindings[index];
+      }
+      if (this.pageQuillInstances[index]) {
+          delete this.pageQuillInstances[index];
+      }
   }
 
   createPageEditor(pageIndex, pageMap) {

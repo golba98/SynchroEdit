@@ -86,23 +86,57 @@ export class PageManager {
       const editorEl = quill.root;
       
       // A. Quick Check: Scroll Height (Normalized)
-      // scrollHeight in some browsers is physical, in others logical. 
-      // We'll prioritize bounds which are reliably scaled by transforms.
       const lastCharBounds = quill.getBounds(Math.max(0, totalLength - 1));
       if (lastCharBounds && (lastCharBounds.bottom / scale) <= this.MAX_CONTENT_HEIGHT) {
           return { hasOverflow: false, splitIndex: 0 };
       }
 
-      // B. Binary Search for the specific character causing overflow
-      let low = 0;
-      let high = totalLength - 1;
+      // B. Optimized Search (Block-based then Binary)
+      // 1. Find the overflowing BLOCK (Paragraph/Line)
+      // This reduces search space from ~5000 chars to ~50 blocks.
+      const blocks = quill.getLines(0, totalLength);
+      let overflowBlock = null;
+      let blockStartIndex = 0;
+      let blockEndIndex = totalLength - 1;
+
+      for (const block of blocks) {
+          if (!block.domNode) continue;
+          
+          // Use getBoundingClientRect for the block (cheaper than getBounds per char)
+          // Note: We need to account for editor offset if we used page coordinates, 
+          // but Quill's getBounds is relative to editor. 
+          // block.domNode.getBoundingClientRect is viewport relative.
+          // We can approximate by checking if the block's bottom is way down.
+          // Better: Use block.domNode.offsetTop + block.domNode.offsetHeight if relative.
+          // Or simpler: Trust that binary search is robust, just narrow the range.
+          
+          const rect = block.domNode.getBoundingClientRect();
+          const editorRect = quill.root.getBoundingClientRect();
+          const relativeBottom = (rect.bottom - editorRect.top) / scale;
+
+          if (relativeBottom > this.MAX_CONTENT_HEIGHT) {
+              overflowBlock = block;
+              // Determine indices for this block
+              blockStartIndex = quill.getIndex(block);
+              blockEndIndex = blockStartIndex + block.length();
+              break;
+          }
+      }
+
+      // If no block identified (rare case if lastCharBounds said yes), default to full search
+      if (!overflowBlock) {
+           // Fallback range (already set to full doc)
+      }
+
+      // 2. Binary Search within the overflow block
+      let low = blockStartIndex;
+      let high = Math.min(blockEndIndex, totalLength - 1);
       let splitIndex = -1;
 
       while (low <= high) {
           const mid = Math.floor((low + high) / 2);
           const bounds = quill.getBounds(mid);
           
-          // Normalize physical pixels to logical pixels
           const logicalBottom = bounds ? (bounds.bottom / scale) : 0;
           
           if (logicalBottom > this.MAX_CONTENT_HEIGHT) {

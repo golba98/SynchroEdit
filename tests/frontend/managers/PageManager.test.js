@@ -22,6 +22,8 @@ describe('PageManager', () => {
       updateContents: jest.fn(),
       deleteText: jest.fn(),
       getLine: jest.fn(),
+      getLines: jest.fn(),
+      getIndex: jest.fn(),
       getText: jest.fn(),
       getContents: jest.fn(),
       root: document.createElement('div'),
@@ -33,6 +35,8 @@ describe('PageManager', () => {
       updateContents: jest.fn(),
       deleteText: jest.fn(),
       getLine: jest.fn(),
+      getLines: jest.fn(),
+      getIndex: jest.fn(),
       getText: jest.fn(),
       getContents: jest.fn(),
       root: document.createElement('div'),
@@ -180,16 +184,32 @@ describe('PageManager', () => {
   });
 
   describe('findOverflowPoint', () => {
-    it('should identify overflow using binary search', () => {
+    it('should identify overflow using block-based search', () => {
       // Setup
-      // Length = 200
-      mockQuillPage0.getLength.mockReturnValue(200);
+      mockQuillPage0.getLength.mockReturnValue(100);
       
-      // Mock getBounds to simulate linear content (10px per char index)
-      // MAX_HEIGHT = 956 (1056 - 80 - 20)
-      // We want overflow around 956.
-      // Index 95 -> 950px (Fit)
-      // Index 96 -> 960px (Overflow)
+      // Setup Blocks (Blots)
+      // Block 1: 0-50 (Fits)
+      // Block 2: 50-100 (Overflows)
+      const mockBlock1 = { 
+        length: () => 50, 
+        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) } 
+      };
+      const mockBlock2 = { 
+        length: () => 50, 
+        domNode: { getBoundingClientRect: () => ({ top: 500, bottom: 1000 }) } // Overflows MAX (956)
+      };
+      
+      mockQuillPage0.getLines.mockReturnValue([mockBlock1, mockBlock2]);
+      
+      // Helper to return index based on block identity
+      mockQuillPage0.getIndex.mockImplementation((block) => {
+          return block === mockBlock1 ? 0 : 50;
+      });
+
+      // Mock getBounds for binary search inside Block 2
+      // We expect binary search between 50 and 99.
+      // Let's say index 96 is the split point (height 960)
       mockQuillPage0.getBounds.mockImplementation((index) => {
           return { bottom: index * 10 };
       });
@@ -198,16 +218,21 @@ describe('PageManager', () => {
       const result = pageManager.findOverflowPoint(mockQuillPage0);
 
       // Verify
+      expect(mockQuillPage0.getLines).toHaveBeenCalled();
+      // Should find Block 2 as overflow candidate
+      // Should search strictly within range 50-99
       expect(result).toEqual({ hasOverflow: true, splitIndex: 96 });
     });
 
-    it('should return no overflow if all content fits', () => {
+    it('should return no overflow if all blocks fit', () => {
       // Setup
-      mockQuillPage0.getLength.mockReturnValue(50);
-      mockQuillPage0.getBounds.mockImplementation((index) => {
-          return { bottom: index * 10 };
-      });
-
+      mockQuillPage0.getLength.mockReturnValue(100);
+      const mockBlock1 = { 
+        length: () => 50, 
+        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) } 
+      };
+      mockQuillPage0.getLines.mockReturnValue([mockBlock1]);
+      
       // Execute
       const result = pageManager.findOverflowPoint(mockQuillPage0);
 

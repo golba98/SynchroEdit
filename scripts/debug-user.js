@@ -2,7 +2,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../src/models/User');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
+console.log('Targeting DB URI:', MONGO_URI);
 
 async function checkUser() {
   try {

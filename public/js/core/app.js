@@ -50,7 +50,10 @@ export class App {
     const authGuard = document.getElementById('authGuard');
     if (authGuard) {
         authGuard.style.opacity = '0';
-        setTimeout(() => authGuard.remove(), 500);
+        authGuard.style.pointerEvents = 'none';
+        setTimeout(() => {
+            if (authGuard.parentElement) authGuard.remove();
+        }, 6000); // Extended timeout to ensure page is fully ready
     }
 
     // Sync Theme from Profile

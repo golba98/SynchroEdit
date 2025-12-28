@@ -30,20 +30,13 @@ async function getOrCreateDoc(documentId, gc = true) {
   // Load from MongoDB
   if (mongoose.connection.readyState === 1) {
     try {
-      const dbDoc = await Document.findById(documentId);
+      // FIX: Explicitly select yjsState because it's select:false in Schema
+      const dbDoc = await Document.findById(documentId).select('+yjsState');
       if (dbDoc && dbDoc.yjsState) {
-        // Apply saved state
+        // Binary Optimization: Apply state directly from Buffer
         const state = Buffer.from(dbDoc.yjsState, 'base64');
         Y.applyUpdate(doc, state);
-      } else if (dbDoc && !dbDoc.yjsState && dbDoc.pages) {
-        // Migration: Convert legacy pages to Yjs Text
-        // This is a one-time migration for existing docs
-        dbDoc.pages.forEach((page, index) => {
-          // Simple migration: Just taking text content would lose formatting
-          // Ideally, we'd convert the Quill delta to Y.Text
-          // For now, let's assume empty or start fresh if no Yjs state
-          // A proper migration would require parsing the Delta JSON
-        });
+        console.log(`[Binary Optimization] Loaded ${state.length} bytes for doc ${documentId}`);
       }
     } catch (e) {
       logger.error('Error loading document state:', e);
@@ -293,8 +286,18 @@ function init(server) {
     conn.on('close', () => {
       doc.conns.delete(conn);
       if (doc.conns.size === 0) {
-        // persistence is handled by debounce, but we could force save here
-        // or unload doc from memory after a delay
+        // Implementation of Server-Side Memory Eviction
+        // If all clients disconnected, schedule doc removal from memory
+        // Grace period (e.g. 10s) to handle page refreshes or quick re-entry
+        setTimeout(() => {
+            const currentDoc = docs.get(documentId);
+            if (currentDoc && currentDoc.conns.size === 0) {
+                console.log(`[Memory Management] Unloading doc ${documentId} due to inactivity.`);
+                // Force a final save if there's a pending update
+                // The doc.on('update') already has a saveTimeout, but we want to be safe.
+                docs.delete(documentId);
+            }
+        }, 10000); 
       }
     });
   });

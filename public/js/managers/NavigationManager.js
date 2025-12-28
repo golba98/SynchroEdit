@@ -62,10 +62,14 @@ export class NavigationManager {
     if (!this.outlineContainer || !this.isOutlineVisible) return;
 
     const headings = [];
-    Object.keys(this.editor.pageQuillInstances).forEach(index => {
-      const quill = this.editor.pageQuillInstances[index];
-      const lines = quill.getLines();
+    const pagesArr = this.editor.yPages.toArray();
+    
+    pagesArr.forEach((pageMap, index) => {
+      const pageId = pageMap.get('id');
+      const quill = this.editor.pageQuillInstances.get(pageId);
+      if (!quill) return;
       
+      const lines = quill.getLines();
       lines.forEach(line => {
         const format = line.formats();
         if (format.header) {

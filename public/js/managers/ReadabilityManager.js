@@ -121,13 +121,18 @@ export class ReadabilityManager {
   }
 
   updateAllGutters() {
-    Object.keys(this.editor.pageQuillInstances).forEach(index => {
+    const pages = this.editor.yPages.toArray();
+    pages.forEach((_, index) => {
       this.updateGutter(index);
     });
   }
 
   updateGutter(pageIndex) {
-    const container = document.getElementById(`page-container-${pageIndex}`);
+    const pageMap = this.editor.yPages.get(pageIndex);
+    if (!pageMap) return;
+    const pageId = pageMap.get('id');
+
+    const container = document.getElementById(`page-container-${pageId}`);
     if (!container) return;
 
     let gutter = container.querySelector('.line-numbers-gutter');
@@ -145,7 +150,7 @@ export class ReadabilityManager {
 
     gutter.style.display = 'block';
     
-    const quill = this.editor.pageQuillInstances[pageIndex];
+    const quill = this.editor.pageQuillInstances.get(pageId);
     if (!quill) return;
 
     const lines = quill.getLines();

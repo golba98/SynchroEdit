@@ -151,6 +151,13 @@ export class UIManager {
       btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
       setTimeout(() => (btn.innerHTML = original), 2000);
     });
+
+    // Page Size
+    addEvent('pageSizeSelect', 'change', (e) => {
+      if (this.app.editor) {
+        this.app.editor.setPageSize(e.target.value);
+      }
+    });
   }
 
   setupRibbonTabs() {

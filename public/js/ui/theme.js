@@ -146,26 +146,32 @@ export class Theme {
             body.light-theme .main-workspace { background: #e9ecef !important; }
             .pages-container { background: transparent !important; }
 
-            /* Page Glow Overrides (Only if classes are present) */
-            .editor-container { border: none !important; outline: none !important; box-shadow: none !important; transition: outline-color 0.3s ease, box-shadow 0.3s ease !important; }
-            body.light-theme .editor-container { 
+            .page-scaler { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important; }
+            body.light-theme .page-scaler { 
                 background: #ffffff !important;
-                border: 1px solid #ced4da !important;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04) !important;
+            }
+
+            /* Page Glow Overrides (Only if classes are present) */
+            .editor-container { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; transition: outline-color 0.3s ease, box-shadow 0.3s ease !important; }
+            body.light-theme .editor-container { 
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
 
             .editor-container:hover { outline: none !important; box-shadow: none !important; }
             body.light-theme .editor-container:hover { border-color: #adb5bd !important; box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1) !important; }
             
-            .editor-container.border-enabled { outline: 2px solid ${hexColor} !important; }
-            .editor-container.border-enabled:hover { outline-color: ${lightColor} !important; }
+            .editor-container.border-enabled .page-scaler { outline: 2px solid ${hexColor} !important; }
+            .editor-container.border-enabled:hover .page-scaler { outline-color: ${lightColor} !important; }
             
-            .editor-container.glow-effect { box-shadow: 0 0 40px rgba(${rgbString}, 0.15) !important; }
-            body.light-theme .editor-container.glow-effect { box-shadow: 0 0 40px rgba(${rgbString}, 0.08), 0 10px 30px rgba(0,0,0,0.08) !important; }
+            .editor-container.glow-effect .page-scaler { box-shadow: 0 0 40px rgba(${rgbString}, 0.15) !important; }
+            body.light-theme .editor-container.glow-effect .page-scaler { box-shadow: 0 0 40px rgba(${rgbString}, 0.08), 0 10px 30px rgba(0,0,0,0.08) !important; }
 
-            .editor-container.glow-effect::after { background: radial-gradient(ellipse at center, rgba(${rgbString}, 0.3) 0%, rgba(${rgbString}, 0.1) 40%, transparent 70%) !important; opacity: 0.6; }
+            .editor-container.glow-effect .page-scaler::after { background: radial-gradient(ellipse at center, rgba(${rgbString}, 0.3) 0%, rgba(${rgbString}, 0.1) 40%, transparent 70%) !important; opacity: 0.6; }
             
-            body.light-theme .editor-container.glow-effect::after { background: linear-gradient(90deg, transparent 0%, ${hexColor} 20%, ${hexColor} 80%, transparent 100%) !important; }
+            body.light-theme .editor-container.glow-effect .page-scaler::after { background: linear-gradient(90deg, transparent 0%, ${hexColor} 20%, ${hexColor} 80%, transparent 100%) !important; }
             
             /* Page Navigator & Status Bar */
             .page-navigator { border-bottom-color: ${hexColor}40 !important; }

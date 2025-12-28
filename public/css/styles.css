@@ -101,10 +101,20 @@ body.light-theme .create-doc-card:hover {
 }
 
 .editor-container {
-  background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%);
+  background: transparent !important;
   border: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: none !important;
   outline: none;
+  max-width: none;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+  position: relative;
+  display: block;
+  overflow: visible;
+  margin-left: auto;
+  margin-right: auto;
+  transition: height 0.3s ease, width 0.3s ease;
 }
 
 #profileModal > div {
@@ -765,7 +775,7 @@ body.glow-enabled .pages-container::before {
   z-index: -1;
 }
 
-.editor-container {
+.page-scaler {
   background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%);
   padding: 30px 50px;
   box-shadow: none;
@@ -776,40 +786,36 @@ body.glow-enabled .pages-container::before {
     box-shadow 0.3s ease,
     outline-color 0.3s ease,
     transform 0.3s ease;
-  max-width: 816px;
   width: 816px;
   height: 1056px;
-  flex-shrink: 0;
-  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  will-change: transform;
-  outline: none;
+  overflow: visible;
+  position: relative;
 }
 
-.editor-container:hover {
+.editor-container:hover .page-scaler {
   outline: none;
   box-shadow: none;
 }
 
 /* Page Border Accent (Toggleable) */
-.editor-container.border-enabled {
+.editor-container.border-enabled .page-scaler {
   outline: 2px solid var(--accent-color);
 }
 
-.editor-container.border-enabled:hover {
+.editor-container.border-enabled:hover .page-scaler {
   outline-color: var(--accent-color-light);
 }
 
 /* Page Glow Effect (Toggleable) */
-.editor-container.glow-effect {
+.editor-container.glow-effect .page-scaler {
   box-shadow:
     0 0 40px rgba(var(--accent-color-rgb), 0.3),
     0 0 80px rgba(var(--accent-color-rgb), 0.1);
 }
 
-.editor-container.glow-effect:hover {
+.editor-container.glow-effect:hover .page-scaler {
   box-shadow:
     0 0 60px rgba(var(--accent-color-rgb), 0.6),
     0 0 120px rgba(var(--accent-color-rgb), 0.3),
@@ -819,7 +825,7 @@ body.glow-enabled .pages-container::before {
   transform: translateY(-2px);
 }
 
-.editor-container.glow-effect::after {
+.editor-container.glow-effect .page-scaler::after {
   content: '';
   position: absolute;
   bottom: -20px;
@@ -837,8 +843,14 @@ body.glow-enabled .pages-container::before {
   opacity: 0.6;
 }
 
-body.light-theme .editor-container.glow-effect::after {
-  background: linear-gradient(90deg, transparent 0%, #6b4ec9 20%, #6b4ec9 80%, transparent 100%);
+body.light-theme .page-scaler {
+  background: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-theme .page-editor,
+body.light-theme .ql-editor {
+  color: #111827 !important;
 }
 
 #editor {
@@ -1697,9 +1709,12 @@ body.light-theme .entropy-bar {
 }
 
 /* Canvas Themes */
-.editor-container {
+.page-scaler {
   background: var(--canvas-bg) !important;
   color: var(--canvas-text) !important;
+}
+
+.editor-container {
   border-color: var(--canvas-border);
 }
 
@@ -1833,13 +1848,9 @@ body.light-theme .profile-label {
   color: #000000 !important;
   font-weight: 700 !important;
 }
-  display: none;
-}
 
 body.focus-mode .focus-exit-btn {
-
   display: block;
-
 }
 
 

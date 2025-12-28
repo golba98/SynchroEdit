@@ -22,9 +22,31 @@ export class ImageManager {
     const container = document.getElementById('pagesContainer');
     if (!container) return;
 
+    // Support moving existing images between pages
+    container.addEventListener('dragstart', (e) => {
+        if (e.target.tagName === 'IMG') {
+            const blot = Quill.find(e.target);
+            if (blot) {
+                const quill = Quill.find(e.target.closest('.ql-container'));
+                const index = quill.getIndex(blot);
+                const delta = quill.getContents(index, 1);
+                
+                // Store image data and its origin
+                const imageData = {
+                    delta: delta,
+                    originPageId: e.target.closest('.editor-container').dataset.pageId,
+                    originIndex: index
+                };
+                e.dataTransfer.setData('application/syncroedit-image', JSON.stringify(imageData));
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        }
+    });
+
     container.addEventListener('dragover', (e) => {
       e.preventDefault();
       container.classList.add('drag-over');
+      e.dataTransfer.dropEffect = 'move';
     });
 
     container.addEventListener('dragleave', () => {
@@ -35,20 +57,91 @@ export class ImageManager {
       e.preventDefault();
       container.classList.remove('drag-over');
 
+      // 1. Handle Internal Move
+      const internalData = e.dataTransfer.getData('application/syncroedit-image');
+      if (internalData) {
+          const data = JSON.parse(internalData);
+          this.handleInternalImageMove(e, data);
+          return;
+      }
+
+      // 2. Handle External File Drop
       const files = e.dataTransfer.files;
       if (files && files[0] && files[0].type.startsWith('image/')) {
-        this.handleFileUpload(files[0]);
+        this.handleFileUpload(files[0], e);
       }
     });
   }
 
-  handleFileUpload(file) {
-    if (!this.editor.quill) return;
+  handleInternalImageMove(e, data) {
+      // Find target Quill instance based on drop coordinates
+      const targetElement = document.elementFromPoint(e.clientX, e.clientY);
+      const targetEditorContainer = targetElement.closest('.editor-container');
+      if (!targetEditorContainer) return;
+
+      const targetPageId = targetEditorContainer.dataset.pageId;
+      const targetQuill = this.editor.pageQuillInstances.get(targetPageId);
+      if (!targetQuill) return;
+
+      // Calculate drop index in target Quill
+      const range = targetQuill.getSelection(true);
+      const dropIndex = range ? range.index : targetQuill.getLength() - 1;
+
+      this.editor.doc.transact(() => {
+          // 1. Remove from origin
+          const originQuill = this.editor.pageQuillInstances.get(data.originPageId);
+          if (originQuill) {
+              originQuill.deleteText(data.originIndex, 1, 'user');
+          }
+
+          // 2. Insert at target
+          targetQuill.updateContents(data.delta, 'user');
+      });
+
+      // Reflow both pages
+      const pages = this.editor.yPages.toArray();
+      const targetIdx = pages.findIndex(p => p.get('id') === targetPageId);
+      this.editor.pageManager.performReflowCheck();
+  }
+
+  handleFileUpload(file, e = null) {
+    let targetQuill = this.editor.quill;
+    
+    // If dropped, find exactly where it was dropped
+    if (e && e.clientX) {
+        const targetElement = document.elementFromPoint(e.clientX, e.clientY);
+        const targetEditorContainer = targetElement ? targetElement.closest('.editor-container') : null;
+        if (targetEditorContainer) {
+            const pageId = targetEditorContainer.dataset.pageId;
+            targetQuill = this.editor.pageQuillInstances.get(pageId);
+        }
+    }
+
+    if (!targetQuill) {
+        console.warn('[ImageManager] No target Quill instance found for upload');
+        return;
+    }
     
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const range = this.editor.quill.getSelection(true);
-      this.editor.quill.insertEmbed(range.index, 'image', e.target.result, 'user');
+    reader.onload = (event) => {
+      const range = targetQuill.getSelection(true);
+      const index = range ? range.index : targetQuill.getLength() - 1;
+      
+      // Insert the image
+      targetQuill.insertEmbed(index, 'image', event.target.result, 'user');
+      
+      // Ensure reflow happens after insertion
+      // For data URLs, the image is often already "loaded" by the time we attach the listener
+      requestAnimationFrame(() => {
+          this.editor.pageManager.performReflowCheck();
+          
+          // Secondary check once the browser has definitely rendered the image
+          const images = targetQuill.root.querySelectorAll('img');
+          const lastImg = images[images.length - 1];
+          if (lastImg && !lastImg.complete) {
+              lastImg.onload = () => this.editor.pageManager.performReflowCheck();
+          }
+      });
     };
     reader.readAsDataURL(file);
   }

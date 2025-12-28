@@ -57,13 +57,37 @@ export class CursorManager {
     }
   }
 
-  scrollToCursor(pageIndex) {
+  scrollToCursor(pageIndex, behavior = 'smooth', cursorIndex = null) {
     const pageMap = this.editor.yPages.get(pageIndex);
     if (!pageMap) return;
     const pageId = pageMap.get('id');
     const container = document.getElementById(`page-container-${pageId}`);
-    if (container) {
-      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const scrollParent = document.getElementById('pagesContainer');
+    const quill = this.editor.pageQuillInstances.get(pageId);
+    
+    if (container && scrollParent && quill) {
+      const parentRect = scrollParent.getBoundingClientRect();
+      const pageRect = container.getBoundingClientRect();
+      
+      let targetY = pageRect.top - parentRect.top + scrollParent.scrollTop;
+
+      if (cursorIndex !== null) {
+          const bounds = quill.getBounds(cursorIndex);
+          if (bounds) {
+              const scale = (this.editor.currentZoom || 100) / 100;
+              // Add the relative cursor Y to the page top, adjusted for scale and padding
+              targetY += (bounds.top * scale);
+              
+              // Center the cursor in the viewport for better context
+              const viewportHeight = parentRect.height;
+              targetY -= (viewportHeight / 2);
+          }
+      }
+
+      scrollParent.scrollTo({
+          top: Math.max(0, targetY),
+          behavior: behavior
+      });
     }
   }
 }

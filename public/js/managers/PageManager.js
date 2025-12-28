@@ -16,21 +16,33 @@ export class PageManager {
     this.editor = editor;
     this.isReflowing = false;
     this.pendingUpdate = null;
+    this.cascadeCount = 0;
+    this.MAX_CASCADE = 5; // Prevent more than 5 automatic splits in a row
     
     // Initial Setup
     this.PAGE_HEIGHT = PAGE_SIZES.letter.height; 
-    this.MEASUREMENT_LEEWAY_PX = 2; // Very tight buffer
+    this.PAGE_WIDTH = PAGE_SIZES.letter.width;
+    this.PAGE_PADDING_Y = 40; // 20px top + 20px bottom
+    this.EDITOR_PADDING_BOTTOM = 20; // Reduced from 60 to allow ~2 more rows
+    
+    this.MEASUREMENT_LEEWAY_PX = 10; // Increased from 2 for more stability
+    this.HYSTERESIS_BUFFER = 40; // Space required before pulling content
     this.estimatedPageHeights = new Map(); 
     this.reflowTimeout = null;
+    this.isProcessingReflow = false;
+    this.pendingReflow = false;
+    this.updateWaterline();
+  }
 
-    // Waterline calculation
-    this.MAX_CONTENT_HEIGHT = this.PAGE_HEIGHT - 100; 
+  updateWaterline() {
+    this.MAX_CONTENT_HEIGHT = this.PAGE_HEIGHT - this.PAGE_PADDING_Y - this.EDITOR_PADDING_BOTTOM;
   }
 
   setPageSize(sizeName) {
       const size = PAGE_SIZES[sizeName] || PAGE_SIZES.letter;
       this.PAGE_HEIGHT = size.height;
-      this.MAX_CONTENT_HEIGHT = this.PAGE_HEIGHT - 100;
+      this.PAGE_WIDTH = size.width;
+      this.updateWaterline();
       this.performReflowCheck();
   }
 
@@ -39,17 +51,36 @@ export class PageManager {
   }
 
   handleContentChange(pageIndex, changeDelta, source) {
-    if (source !== 'user') return;
-
+    // We now allow 'api' source to trigger reflows so collaborators stay in sync.
+    // The debounce below prevents this from being too expensive during rapid remote sync.
     if (this.reflowTimeout) clearTimeout(this.reflowTimeout);
     this.reflowTimeout = setTimeout(() => {
-        requestAnimationFrame(() => this.performReflowCheck());
-    }, 50); 
+        this.performReflowCheck();
+    }, 100); 
   }
 
-  performReflowCheck() {
-    if (this.isReflowing) return;
-    this.isReflowing = true;
+  performReflowCheck(isAutoCascade = false) {
+    if (this.isProcessingReflow) {
+        this.pendingReflow = true;
+        return;
+    }
+    
+    if (isAutoCascade) {
+        this.cascadeCount++;
+    } else {
+        this.cascadeCount = 0;
+    }
+
+    if (this.cascadeCount > this.MAX_CASCADE) {
+        console.warn(`[PageManager] Max cascade reached (${this.MAX_CASCADE}). Scheduling safety reflow.`);
+        this.cascadeCount = 0;
+        // Schedule a safety reflow with a longer delay to ensure eventual stability
+        setTimeout(() => this.performReflowCheck(), 500);
+        return;
+    }
+
+    this.isProcessingReflow = true;
+    this.pendingReflow = false;
 
     try {
         const pages = this.editor.yPages.toArray();
@@ -60,17 +91,34 @@ export class PageManager {
             if (!quill) continue;
 
             const scale = this.getScale();
-            // Use precise last character check
             const totalLength = quill.getLength();
-            if (totalLength <= 1) continue;
+            
+            // Handle Empty Pages (except the last one)
+            if (totalLength <= 1 && i < pages.length - 1) {
+                this.editor.doc.transact(() => {
+                    this.editor.yPages.delete(i + 1, 1);
+                });
+                this.scheduleReflow(true);
+                return;
+            }
 
             const lastCharBounds = quill.getBounds(totalLength - 1);
             const actualBottom = (lastCharBounds ? lastCharBounds.bottom : 0) / scale;
 
             // --- OVERFLOW CHECK ---
             if (actualBottom > (this.MAX_CONTENT_HEIGHT + this.MEASUREMENT_LEEWAY_PX)) {
-                console.log(`[PageManager] Page ${i} OVERFLOW: ${actualBottom.toFixed(1)}px > ${this.MAX_CONTENT_HEIGHT}px`);
                 const overflow = this.findOverflowPointPrecise(quill);
+                
+                // Root Cause Fixer: If the very first element overflows, it's too big for any page.
+                // We must constrain it instead of moving it to an infinite loop of new pages.
+                if (overflow.hasOverflow && overflow.splitIndex === 0) {
+                    const constrained = this.constrainLargeElements(quill);
+                    if (constrained) {
+                        this.scheduleReflow(true);
+                        return;
+                    }
+                }
+
                 if (overflow.hasOverflow) {
                     this.splitAndMoveToNextPage(i, overflow.splitIndex);
                     return; 
@@ -78,136 +126,294 @@ export class PageManager {
             }
 
             // --- UNDERFLOW CHECK ---
-            if (actualBottom < (this.MAX_CONTENT_HEIGHT - 60)) {
+            // Oscillation Guard: Use a larger buffer for pulling than splitting
+            if (i < pages.length - 1 && actualBottom < (this.MAX_CONTENT_HEIGHT - this.HYSTERESIS_BUFFER)) {
                 const merged = this.attemptMergeFromNextPage(i);
                 if (merged) return; 
             }
         }
     } finally {
-        this.isReflowing = false;
+        this.isProcessingReflow = false;
+        if (this.pendingReflow) {
+            this.scheduleReflow(this.cascadeCount > 0);
+        }
     }
   }
 
-  findOverflowPointPrecise(quill) {
-      const totalLength = quill.getLength();
+  constrainLargeElements(quill) {
       const scale = this.getScale();
-      
-      // Binary search characters to find exactly where the waterline is crossed
+      const lines = quill.getLines();
+      let modified = false;
+
+      lines.forEach(line => {
+          const index = quill.getIndex(line);
+          const bounds = quill.getBounds(index + line.length() - 1);
+          const height = (bounds ? bounds.height : 0) / scale;
+
+          if (height > this.MAX_CONTENT_HEIGHT) {
+              // Look for images in this line
+              const ops = quill.getContents(index, line.length()).ops;
+              ops.forEach((op, opIdx) => {
+                  if (op.insert && op.insert.image) {
+                      console.log(`[PageManager] Constraining oversized image: ${height.toFixed(1)}px -> ${this.MAX_CONTENT_HEIGHT}px`);
+                      quill.formatText(index + opIdx, 1, {
+                          'height': `${Math.floor(this.MAX_CONTENT_HEIGHT - 10)}px`,
+                          'width': 'auto' // Maintain aspect ratio
+                      }, 'user');
+                      modified = true;
+                  }
+              });
+          }
+      });
+
+      return modified;
+  }
+
+  scheduleReflow(isCascade = false) {
+      if (this.reflowTimeout) clearTimeout(this.reflowTimeout);
+      this.reflowTimeout = setTimeout(() => {
+          this.performReflowCheck(isCascade);
+      }, isCascade ? 50 : 0);
+  }
+
+  findOverflowPointPrecise(quill) {
+      const scale = this.getScale();
+      const lines = quill.getLines();
+      if (lines.length === 0) return { hasOverflow: false, splitIndex: 0 };
+
+      // Optimized: First find the line that overflows
       let low = 0;
-      let high = totalLength - 1;
-      let splitIndex = -1;
+      let high = lines.length - 1;
+      let overflowingLineIndex = -1;
 
       while (low <= high) {
           const mid = Math.floor((low + high) / 2);
-          const bounds = quill.getBounds(mid);
+          const line = lines[mid];
+          const index = quill.getIndex(line);
+          const bounds = quill.getBounds(index + line.length() - 1);
           const logicalBottom = (bounds ? bounds.bottom : 0) / scale;
 
           if (logicalBottom > this.MAX_CONTENT_HEIGHT) {
-              splitIndex = mid;
+              overflowingLineIndex = mid;
               high = mid - 1;
           } else {
               low = mid + 1;
           }
       }
 
-      if (splitIndex > 0) return { hasOverflow: true, splitIndex };
-      return { hasOverflow: false, splitIndex: 0 };
+      if (overflowingLineIndex === -1) return { hasOverflow: false, splitIndex: 0 };
+
+      // Then find the exact character in that line if needed (usually the start of the line is the split point)
+      const targetLine = lines[overflowingLineIndex];
+      const splitIndex = quill.getIndex(targetLine);
+      
+      return { hasOverflow: true, splitIndex };
   }
 
   splitAndMoveToNextPage(pageIndex, splitIndex) {
       const currentPageMap = this.editor.yPages.get(pageIndex);
       const currentQuill = this.editor.pageQuillInstances.get(currentPageMap.get('id'));
       
+      const totalLength = currentQuill.getLength();
+      // Ensure we don't try to split at or after the mandatory trailing newline
+      const safeSplitIndex = Math.min(splitIndex, totalLength - 1);
+      
       const selection = currentQuill.getSelection();
-      const shouldMoveCursor = selection && selection.index >= splitIndex;
-      const relativeCursorIndex = shouldMoveCursor ? selection.index - splitIndex : 0;
+      const shouldMoveCursor = selection && selection.index >= safeSplitIndex;
+      const relativeCursorIndex = shouldMoveCursor ? selection.index - safeSplitIndex : 0;
 
-      const contentToMove = currentQuill.getContents(splitIndex);
-
-      console.log(`[PageManager] Splitting Page ${pageIndex} at index ${splitIndex}`);
+      // Get content excluding the mandatory trailing newline
+      const moveLength = totalLength - 1 - safeSplitIndex;
+      const contentToMove = moveLength > 0 ? currentQuill.getContents(safeSplitIndex, moveLength) : null;
 
       this.editor.doc.transact(() => {
-          currentQuill.deleteText(splitIndex, currentQuill.getLength() - splitIndex, 'user');
+          if (moveLength > 0) {
+              currentQuill.deleteText(safeSplitIndex, moveLength, 'user');
+          }
 
           const nextPageIndex = pageIndex + 1;
           const nextPageMap = this.editor.yPages.get(nextPageIndex);
           const nextQuill = nextPageMap ? this.editor.pageQuillInstances.get(nextPageMap.get('id')) : null;
 
           if (nextQuill) {
-              nextQuill.updateContents({ ops: [...contentToMove.ops] }, 'user');
+              if (contentToMove && contentToMove.ops && contentToMove.ops.length > 0) {
+                  nextQuill.updateContents(contentToMove, 'user');
+              }
           } else {
               const newPageMap = new Y.Map();
               newPageMap.set('id', Math.random().toString(36).substr(2, 9));
               const yText = new Y.Text();
-              yText.applyDelta(contentToMove.ops);
+              if (contentToMove && contentToMove.ops) {
+                  yText.applyDelta(contentToMove.ops);
+              }
               newPageMap.set('content', yText);
               this.editor.yPages.insert(nextPageIndex, [newPageMap]);
           }
       });
 
       if (shouldMoveCursor) {
-          requestAnimationFrame(() => {
-              this.editor.switchToPage(pageIndex + 1);
-              const nextPageMap = this.editor.yPages.get(pageIndex + 1);
-              if (nextPageMap) {
-                  const targetQuill = this.editor.pageQuillInstances.get(nextPageMap.get('id'));
-                  if (targetQuill) {
-                      targetQuill.focus();
-                      targetQuill.setSelection(Math.max(0, relativeCursorIndex), 0);
-                  }
-              }
-          });
+          // Immediately switch and restore selection
+          this.editor.switchToPage(pageIndex + 1, Math.max(0, relativeCursorIndex));
       }
 
-      requestAnimationFrame(() => this.performReflowCheck());
+      this.scheduleReflow(true);
   }
 
-  attemptMergeFromNextPage(pageIndex) {
-      // Underflow merges are temporarily disabled to prevent new pages from being collapsed immediately.
-      // This keeps only overflow-driven splits active, which guarantees new pages form as soon as content
-      // crosses the waterline.
-      return false;
-  }
-
-  isCursorAtBottom(pageIndex, cursorIndex) {
-      const pageMap = this.editor.yPages.get(pageIndex);
-      if (!pageMap) return false;
-      const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
-      if (!quill) return false;
-      const bounds = quill.getBounds(cursorIndex);
-      const scale = this.getScale();
-      const logicalBottom = (bounds ? bounds.bottom : 0) / scale;
-      return bounds && logicalBottom > (this.MAX_CONTENT_HEIGHT - 50);
-  }
-
-  insertPageBreak(pageIndex) {
-      const pageMap = this.editor.yPages.get(pageIndex);
-      if (!pageMap) return;
-      const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
-      const selection = quill.getSelection();
-      if (selection) this.splitAndMoveToNextPage(pageIndex, selection.index);
-  }
-
-  mergeWithPreviousPage(pageIndex) {
-      if (pageIndex <= 0) return;
-      const currentMap = this.editor.yPages.get(pageIndex);
-      const prevMap = this.editor.yPages.get(pageIndex - 1);
-      const currentQuill = this.editor.pageQuillInstances.get(currentMap.get('id'));
-      const prevQuill = this.editor.pageQuillInstances.get(prevMap.get('id'));
+      attemptMergeFromNextPage(pageIndex) {
+          const pages = this.editor.yPages.toArray();
+          if (pageIndex >= pages.length - 1) return false;
+    
+          const currentMap = pages[pageIndex];
+          const nextMap = pages[pageIndex + 1];
+          
+          const currentQuill = this.editor.pageQuillInstances.get(currentMap.get('id'));
+          const nextQuill = this.editor.pageQuillInstances.get(nextMap.get('id'));
+    
+          if (!currentQuill || !nextQuill) return false;
+    
+          const scale = this.getScale();
+          const selection = nextQuill.getSelection();
+          const shouldMoveCursor = selection !== null;
+          const joinPoint = Math.max(0, currentQuill.getLength() - 1);
+    
+          if (nextQuill.getLength() <= 1) {
+              this.editor.doc.transact(() => {
+                  this.editor.yPages.delete(pageIndex + 1, 1);
+              });
+                                  if (shouldMoveCursor) {
+                                      this.editor.switchToPage(pageIndex, joinPoint, 'auto');
+                                  }
+                                  this.scheduleReflow(true);
+                                  return true;
+                              }          // Aggressive Pull: Try to pull multiple lines as long as they fit
+          const lines = nextQuill.getLines();
+          let linesToMove = 0;
+          let cumulativeHeight = 0;
+          
+          // Calculate current bottom of the target page
+          const lastCharBounds = currentQuill.getBounds(joinPoint);
+          const currentBottom = (lastCharBounds ? lastCharBounds.bottom : 0) / scale;
+                const availableSpace = this.MAX_CONTENT_HEIGHT - currentBottom;
+          
+                if (availableSpace <= 5) return false; // Not enough room for even a tiny line    
+          for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const index = nextQuill.getIndex(line);
+              const bounds = nextQuill.getBounds(index + line.length() - 1);
+              const lineHeight = (bounds ? bounds.height : 20) / scale;
+    
+              if (cumulativeHeight + lineHeight < availableSpace) {
+                  cumulativeHeight += lineHeight;
+                  linesToMove++;
+              } else {
+                  break;
+              }
+          }
+    
+          if (linesToMove === 0) return false;
+    
+          // Calculate total length of content to move
+          let moveLength = 0;
+          for (let i = 0; i < linesToMove; i++) {
+              moveLength += lines[i].length();
+          }
+          
+          // Ensure we don't pull the mandatory trailing newline of the next page
+          moveLength = Math.min(moveLength, nextQuill.getLength() - 1);
+          if (moveLength <= 0) return false;
+    
+          const contentToMove = nextQuill.getContents(0, moveLength);
+          const relativeCursorIndex = shouldMoveCursor ? joinPoint + selection.index : 0;
+    
+                this.editor.doc.transact(() => {
+                    if (contentToMove && contentToMove.ops && contentToMove.ops.length > 0) {
+                        // Ensure we pass the delta directly, not wrapped in a redundant object
+                        currentQuill.updateContents({ 
+                            ops: [{ retain: joinPoint }, ...contentToMove.ops] 
+                        }, 'user');
+                        nextQuill.deleteText(0, moveLength, 'user');
+                    }
+                });    
+                if (shouldMoveCursor && selection.index < moveLength) {
+                    this.editor.switchToPage(pageIndex, relativeCursorIndex, 'auto');
+                }
+          
+                this.scheduleReflow(true);
+                return true;
+            }    isCursorAtBottom(pageIndex, cursorIndex) {
+        const pageMap = this.editor.yPages.get(pageIndex);
+        if (!pageMap) return false;
+        const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
+        if (!quill) return false;
+        const bounds = quill.getBounds(cursorIndex);
+              const scale = this.getScale();
+              const logicalBottom = (bounds ? bounds.bottom : 0) / scale;
+              return bounds && logicalBottom > (this.MAX_CONTENT_HEIGHT - 20);
+          }  
+    insertPageBreak(pageIndex) {
+        const pageMap = this.editor.yPages.get(pageIndex);
+        if (!pageMap) return;
+        const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
+        const selection = quill.getSelection();
+        if (selection) this.splitAndMoveToNextPage(pageIndex, selection.index);
+    }
+  
+        mergeWithPreviousPage(pageIndex) {
+  
+            if (pageIndex <= 0) return;
+  
+            const currentMap = this.editor.yPages.get(pageIndex);
+  
+            const prevMap = this.editor.yPages.get(pageIndex - 1);
+  
+            
+  
+            // Force mount the previous page so we can interact with its Quill instance
+  
+            this.editor.mountPage(prevMap.get('id'));
+  
+            
+  
+            const currentQuill = this.editor.pageQuillInstances.get(currentMap.get('id'));
+  
+            const prevQuill = this.editor.pageQuillInstances.get(prevMap.get('id'));
+  
+            
+  
+            if (!prevQuill || !currentQuill) return;
+  
       
-      const content = currentQuill.getContents();
-      const prevLength = prevQuill.getLength();
-      
-      this.editor.doc.transact(() => {
-          prevQuill.updateContents({ ops: [{ retain: prevLength - 1 }, ...content.ops] }, 'user');
-          this.editor.yPages.delete(pageIndex, 1);
-      });
-      
-      requestAnimationFrame(() => {
-          this.editor.switchToPage(pageIndex - 1);
-          prevQuill.focus();
-          prevQuill.setSelection(prevLength - 1, 0);
-          this.performReflowCheck();
-      });
-  }
-}
+  
+            // Get content excluding the trailing newline to avoid creating empty lines on merge
+  
+            const currentLength = currentQuill.getLength();
+  
+            const content = currentLength > 1 ? currentQuill.getContents(0, currentLength - 1) : { ops: [] };
+  
+            const joinPoint = Math.max(0, prevQuill.getLength() - 1);
+  
+            
+  
+            this.editor.doc.transact(() => {
+  
+                if (content.ops.length > 0) {
+  
+                    prevQuill.updateContents({ ops: [{ retain: joinPoint }, ...content.ops] }, 'user');
+  
+                }
+  
+                this.editor.yPages.delete(pageIndex, 1);
+  
+            });
+  
+            
+  
+                        this.editor.switchToPage(pageIndex - 1, joinPoint, 'auto');
+  
+            
+  
+                        this.scheduleReflow(true);
+  
+            
+  
+                    }}

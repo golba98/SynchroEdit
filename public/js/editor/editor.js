@@ -331,15 +331,13 @@ export class Editor {
   }
 
   renderAllPages(event = null) {
-    console.log(`[Editor] renderAllPages called. Pages in Yjs: ${this.yPages.length}`, event ? 'Update' : 'Full');
     if (!this.container) return;
 
-    // Nuclear removal of all placeholders
-    const placeholders = this.container.querySelectorAll('#page-placeholder, [id*="placeholder"]');
-    placeholders.forEach(p => {
-        console.log('[Editor] Purging placeholder:', p.id);
-        p.remove();
-    });
+    // Only clear placeholders on initial render or when explicitly needed
+    if (!event) {
+        const placeholders = this.container.querySelectorAll('#page-placeholder, [id*="placeholder"]');
+        placeholders.forEach(p => p.remove());
+    }
 
     const pages = this.yPages.toArray();
 
@@ -348,24 +346,20 @@ export class Editor {
         const existingContainers = Array.from(this.container.querySelectorAll('.editor-container'));
         const newIds = new Set(pages.map(p => p.get('id')));
 
-        // 1. Remove anything that isn't in the new list OR is an invalid/old node
         existingContainers.forEach(c => {
             const id = c.dataset.pageId;
             if (!id || !newIds.has(id)) {
-                console.log(`[Editor] Cleaning up stale container: ${id || 'unknown'}`);
                 if (id) this.removePageById(id);
                 else c.remove();
             }
         });
 
-        // 2. Re-order/Create containers
         pages.forEach((pageMap, index) => {
-            const pageId = pageMap.get('id');
-            if (!pageId) {
-                const newId = Math.random().toString(36).substr(2, 9);
-                pageMap.set('id', newId);
+            let finalId = pageMap.get('id');
+            if (!finalId) {
+                finalId = Math.random().toString(36).substr(2, 9);
+                pageMap.set('id', finalId);
             }
-            const finalId = pageMap.get('id');
             const container = document.getElementById(`page-container-${finalId}`);
             if (!container) {
                 this.createPageContainer(finalId, index);
@@ -400,9 +394,7 @@ export class Editor {
         });
     }
 
-    this.applyZoom();
-    
-    // Update active quill reference
+    // Update active quill reference if structure changed
     const currentPageMap = this.yPages.get(this.currentPageIndex);
     if (currentPageMap) {
         this.quill = this.pageQuillInstances.get(currentPageMap.get('id')) || null;
@@ -421,23 +413,14 @@ export class Editor {
 
   createPageContainer(pageId, pageIndex, insertBeforeNode = null) {
     if (document.getElementById(`page-container-${pageId}`)) return;
-    console.log(`[Editor] Creating container for Page ${pageId} at index ${pageIndex}`);
-
+    
     const newPageContainer = document.createElement('div');
     newPageContainer.className = 'editor-container';
     newPageContainer.id = `page-container-${pageId}`;
     newPageContainer.dataset.pageId = pageId;
-    
-    const pageHeight = this.pageManager ? this.pageManager.PAGE_HEIGHT : 1056;
-    const pageWidth = this.pageManager ? this.pageManager.PAGE_WIDTH : 816;
-    
-    // Outer container has physical scaled dimensions
-    const scale = this.currentZoom / 100;
-    newPageContainer.style.height = `${Math.floor(pageHeight * scale)}px`;
-    newPageContainer.style.width = `${Math.floor(pageWidth * scale)}px`;
 
     newPageContainer.innerHTML = `
-            <div class="page-scaler" style="transform: scale(${scale}); transform-origin: top center; width: ${pageWidth}px; height: ${pageHeight}px;">
+            <div class="page-scaler">
                 <div class="page-border-inner" style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; pointer-events: none; border: 1px solid transparent; z-index: 5;"></div>
                 <div id="editor-${pageId}" class="page-editor" data-page-id="${pageId}" style="position: relative; z-index: 1;"></div>
             </div>
@@ -465,8 +448,6 @@ export class Editor {
       const pageIndex = pages.findIndex(p => p.get('id') === pageId);
       const pageMap = pages[pageIndex];
       if (!pageMap) return;
-
-      console.log(`[Virtualization] Mounting Page ${pageId} (Index ${pageIndex})`);
 
       const pageQuill = new Quill(`#editor-${pageId}`, {
         theme: 'snow',
@@ -509,8 +490,6 @@ export class Editor {
       if (this.quill === this.pageQuillInstances.get(pageId) && document.activeElement && document.activeElement.closest(`#editor-${pageId}`)) {
           return;
       }
-
-      console.log(`[Virtualization] Unmounting Page ${pageId}`);
 
       const binding = this.pageBindings.get(pageId);
       if (binding) {
@@ -570,6 +549,7 @@ export class Editor {
       if ((range && range.index === 0 && range.length === 0) || pageQuill.getLength() <= 1) {
         e.preventDefault();
         this.pageManager.mergeWithPreviousPage(pageIndex);
+        return;
       }
     }
 
@@ -577,7 +557,7 @@ export class Editor {
       const range = pageQuill.getSelection();
       if (range && range.index === 0) {
         e.preventDefault();
-        this.switchToPage(pageIndex - 1, 'end');
+        this.switchToPage(pageIndex - 1, 'end', 'auto');
       }
     }
 
@@ -585,7 +565,7 @@ export class Editor {
       const range = pageQuill.getSelection();
       if (range && range.index >= pageQuill.getLength() - 1) {
         e.preventDefault();
-        this.switchToPage(pageIndex + 1, 'start');
+        this.switchToPage(pageIndex + 1, 'start', 'auto');
       }
     }
 
@@ -595,7 +575,7 @@ export class Editor {
             const [line] = pageQuill.getLine(range.index);
             if (!line.prev) {
                 e.preventDefault();
-                this.switchToPage(pageIndex - 1, 'end');
+                this.switchToPage(pageIndex - 1, 'end', 'auto');
             }
         }
     }
@@ -606,12 +586,12 @@ export class Editor {
             const [line] = pageQuill.getLine(range.index);
             if (!line.next) {
                 e.preventDefault();
-                this.switchToPage(pageIndex + 1, 'start');
+                this.switchToPage(pageIndex + 1, 'start', 'auto');
             }
         }
     }
   }
-  
+
   addNewPage() {
       const newPage = new Y.Map();
       newPage.set('id', Math.random().toString(36).substr(2, 9));
@@ -643,9 +623,11 @@ export class Editor {
       return true;
   }
 
-  switchToPage(pageIndex, cursorPosition = null) {
+  switchToPage(pageIndex, cursorPosition = null, scrollBehavior = 'smooth') {
     const leavingIndex = this.currentPageIndex;
-    if (pageIndex !== leavingIndex) {
+    const pageChanged = pageIndex !== leavingIndex;
+
+    if (pageChanged) {
       const removed = this.removeTrailingEmptyPage(leavingIndex);
       if (removed && pageIndex >= this.yPages.length) {
         pageIndex = this.yPages.length - 1;
@@ -661,15 +643,35 @@ export class Editor {
     this.quill = this.pageQuillInstances.get(pageId);
 
     if (this.quill) {
-      this.cursorManager.focus();
-      if (cursorPosition === 'end') {
-        this.cursorManager.setSelection(this.quill.getLength() - 1, 0);
+      this.quill.focus();
+      
+      if (typeof cursorPosition === 'number') {
+        this.quill.setSelection(cursorPosition, 0);
+      } else if (cursorPosition === 'end') {
+        this.quill.setSelection(Math.max(0, this.quill.getLength() - 1), 0);
       } else if (cursorPosition === 'start') {
-        this.cursorManager.setSelection(0, 0);
+        this.quill.setSelection(0, 0);
       }
 
-      this.cursorManager.scrollToCursor(pageIndex);
+      // Only scroll if we actually moved to a different page
+      if (pageChanged) {
+          const numericIndex = typeof cursorPosition === 'number' ? cursorPosition : null;
+          this.cursorManager.scrollToCursor(pageIndex, scrollBehavior, numericIndex);
+      }
       this.onPageChange(pageIndex);
+
+      // --- PREDICTIVE MOUNTING ---
+      // Pre-mount neighbors to eliminate virtualization lag during navigation
+      requestIdleCallback(() => {
+          if (pageIndex > 0) {
+              const prevId = this.yPages.get(pageIndex - 1).get('id');
+              this.mountPage(prevId);
+          }
+          if (pageIndex < this.yPages.length - 1) {
+              const nextId = this.yPages.get(pageIndex + 1).get('id');
+              this.mountPage(nextId);
+          }
+      });
     }
   }
 
@@ -679,37 +681,17 @@ export class Editor {
   }
 
   applyZoom() {
-    const containers = Array.from(this.container.querySelectorAll('.editor-container'));
     const scale = this.currentZoom / 100;
-    const pageHeight = this.pageManager ? this.pageManager.PAGE_HEIGHT : 1056;
     const pageWidth = this.pageManager ? this.pageManager.PAGE_WIDTH : 816;
-    const TARGET_GAP = 40; 
+    const pageHeight = this.pageManager ? this.pageManager.PAGE_HEIGHT : 1056;
+
+    document.documentElement.style.setProperty('--page-scale', scale);
+    document.documentElement.style.setProperty('--page-width', `${pageWidth}px`);
+    document.documentElement.style.setProperty('--page-height', `${pageHeight}px`);
 
     if (this.pageManager) {
-        this.pageManager.MAX_CONTENT_HEIGHT = (this.pageManager.PAGE_HEIGHT - this.pageManager.PAGE_PADDING_Y - this.pageManager.EDITOR_PADDING_BOTTOM);
+        this.pageManager.updateWaterline();
     }
-
-    requestAnimationFrame(() => {
-        containers.forEach((container) => {
-            const logicalHeight = pageHeight;
-            const logicalWidth = pageWidth;
-            const physicalHeight = Math.floor(logicalHeight * scale);
-            const physicalWidth = Math.floor(logicalWidth * scale);
-            
-            // Outer container takes physical space
-            container.style.height = `${physicalHeight}px`;
-            container.style.width = `${physicalWidth}px`;
-            container.style.marginBottom = `${TARGET_GAP}px`;
-            
-            // Inner scaler handles the transform
-            const scaler = container.querySelector('.page-scaler');
-            if (scaler) {
-                scaler.style.transform = `scale(${scale})`;
-                scaler.style.width = `${logicalWidth}px`;
-                scaler.style.height = `${logicalHeight}px`;
-            }
-        });
-    });
   }
   
   get pages() {

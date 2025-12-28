@@ -186,8 +186,66 @@ export class PageManager {
    * Tries to pull content from the next page if there is space.
    */
   attemptMergeFromNextPage(pageIndex) {
-      // Temporarily disabled to avoid ping-pong pulls that require multiple Enters.
-      return;
+      const currentQuill = this.editor.pageQuillInstances[pageIndex];
+      const nextQuill = this.editor.pageQuillInstances[pageIndex + 1];
+
+      if (!currentQuill || !nextQuill) return;
+
+      // 1. Check Space on Current Page
+      const currentLength = currentQuill.getLength();
+      // Use the bounds of the last character/newline to determine current bottom
+      const currentBounds = currentQuill.getBounds(Math.max(0, currentLength - 1));
+      const scale = this.getScale();
+      const currentBottom = currentBounds ? (currentBounds.bottom / scale) : 0;
+      const spaceRemaining = this.MAX_CONTENT_HEIGHT - currentBottom;
+
+      // Buffer to avoid precision issues and aggressive oscillation
+      if (spaceRemaining < 15) return; 
+
+      // 2. Identify Content to Pull (First Paragraph)
+      const nextText = nextQuill.getText();
+      const nextLength = nextQuill.getLength();
+      
+      // If next page is effectively empty (just a newline), we ignore it here.
+      if (nextLength <= 1) return;
+
+      const firstNewLine = nextText.indexOf('\n');
+      const pullLength = (firstNewLine === -1) ? nextLength : firstNewLine + 1;
+
+      // 3. Safety Check: Does at least one line fit?
+      const firstCharBounds = nextQuill.getBounds(0);
+      const firstLineHeight = firstCharBounds ? (firstCharBounds.height / scale) : 20;
+
+      if (firstLineHeight > spaceRemaining) {
+          // Not even a single line fits. Don't pull.
+          return;
+      }
+
+      // 4. Move Content
+      const contentToMove = nextQuill.getContents(0, pullLength);
+      let nextPageDeleted = false;
+
+      this.editor.doc.transact(() => {
+          // Append to current page
+          currentQuill.updateContents({ ops: contentToMove.ops }, 'user');
+
+          // Delete from next page
+          nextQuill.deleteText(0, pullLength, 'user');
+          
+          // Check if next page is now empty
+          if (nextQuill.getLength() <= 1) {
+              this.editor.yPages.delete(pageIndex + 1, 1);
+              nextPageDeleted = true;
+          }
+      });
+
+      // 5. Trigger Updates
+      setTimeout(() => {
+          this.handlePageUpdate(pageIndex);
+          if (!nextPageDeleted) {
+              this.handlePageUpdate(pageIndex + 1);
+          }
+      }, 50);
   }
 
   /**

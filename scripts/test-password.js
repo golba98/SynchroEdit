@@ -2,24 +2,40 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../src/models/User');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
 
-async function verifyPassword() {
+console.log('Connecting to:', MONGO_URI);
+
+async function testPassword() {
   try {
     await mongoose.connect(MONGO_URI);
-    
-    const user = await User.findOne({ username: 'tester' });
+    console.log('Connected to MongoDB');
+
+    const username = 'tester';
+    const password = 'password123';
+
+    const user = await User.findOne({ 
+        $or: [
+            { username: username }, 
+            { email: username.toLowerCase() } 
+        ] 
+    });
+
     if (!user) {
-        console.log('User not found');
+        console.log('❌ User not found');
         return;
     }
 
-    const isMatch = await user.comparePassword('password123');
-    console.log(`Password 'password123' match: ${isMatch ? 'YES ✅' : 'NO ❌'}`);
+    console.log(`User found: ${user.username}`);
+    console.log('Stored Hash:', user.password);
+
+    const isMatch = await user.comparePassword(password);
     
-    // Also test with trimmed space just in case
-    const isMatchSpace = await user.comparePassword('password123 ');
-    console.log(`Password 'password123 ' match: ${isMatchSpace ? 'YES ✅' : 'NO ❌'}`);
+    if (isMatch) {
+        console.log('✅ Password Match! Login should succeed.');
+    } else {
+        console.log('❌ Password Mismatch!');
+    }
 
   } catch (error) {
     console.error('Error:', error);
@@ -28,4 +44,4 @@ async function verifyPassword() {
   }
 }
 
-verifyPassword();
+testPassword();

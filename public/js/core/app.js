@@ -31,8 +31,30 @@ export class App {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')
-          .then((reg) => console.log('Service Worker registered'))
+          .then((reg) => {
+             console.log('Service Worker registered');
+             
+             // Check for updates
+             reg.onupdatefound = () => {
+               const installingWorker = reg.installing;
+               if (installingWorker) {
+                 installingWorker.onstatechange = () => {
+                   if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                     // New update available
+                     console.log('New update available, skipping waiting...');
+                     installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                   }
+                 };
+               }
+             };
+          })
           .catch((err) => console.log('Service Worker registration failed:', err));
+      });
+      
+      // Reload on controller change
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('Service Worker updated, refreshing...');
+        window.location.reload();
       });
     }
   }

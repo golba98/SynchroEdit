@@ -65,6 +65,14 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Handle messages safely
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  // Explicitly return nothing to indicate synchronous handling (or no handling)
+});
+
 // Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
   // Ignore API requests, WebSocket upgrades, and non-http/https schemes

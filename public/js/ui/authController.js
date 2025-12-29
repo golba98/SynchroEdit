@@ -15,6 +15,30 @@ export class AuthController {
     init() {
         if (this.botRig) this.resetSleepTimer();
         this.checkExistingSession();
+        this.checkAutoLogin();
+    }
+
+    checkAutoLogin() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        if (urlParams.get('autologin') === 'true' && isLocal) {
+            const userField = document.getElementById('loginUsername');
+            const passField = document.getElementById('loginPassword');
+            
+            if (userField && passField) {
+                userField.value = 'tester';
+                passField.value = 'TesterPassword123!';
+                // Trigger input events to update UI/Bot state
+                userField.dispatchEvent(new Event('input'));
+                passField.dispatchEvent(new Event('input'));
+                
+                // Small delay to let UI settle then login
+                setTimeout(() => {
+                    this.handleLogin();
+                }, 500);
+            }
+        }
     }
 
     async checkExistingSession() {

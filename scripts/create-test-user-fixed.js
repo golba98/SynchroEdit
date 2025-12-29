@@ -15,7 +15,7 @@ async function createTestUser() {
     const testUser = {
       username: 'tester',
       email: 'tester@example.com',
-      password: 'password123',
+      password: 'TesterPassword123!',
       isEmailVerified: true,
       bio: 'Automated Test User'
     };

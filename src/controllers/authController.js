@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const User = require('../models/User');
-const { sendVerificationEmail, sendPasswordResetEmail, generateVerificationCode } = require('../utils/email');
+const emailUtils = require('../utils/email');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 const { createTicket } = require('../utils/ticketStore');
@@ -129,7 +129,7 @@ exports.signup = async (req, res, next) => {
     });
   }
 
-  const verificationCode = generateVerificationCode();
+  const verificationCode = emailUtils.generateVerificationCode();
   const user = new User({
     username,
     email,
@@ -143,7 +143,7 @@ exports.signup = async (req, res, next) => {
   await user.save();
 
   if (EMAIL_VERIFICATION_ENABLED) {
-    const emailSent = await sendVerificationEmail(email, verificationCode);
+    const emailSent = await emailUtils.sendVerificationEmail(email, verificationCode);
     if (!emailSent) {
       await User.deleteOne({ _id: user._id });
       return next(new AppError('Failed to send verification email', 500));
@@ -210,12 +210,12 @@ exports.resendCode = async (req, res, next) => {
     return next(new AppError('Email already verified', 400));
   }
 
-  const verificationCode = generateVerificationCode();
+  const verificationCode = emailUtils.generateVerificationCode();
   user.verificationCode = verificationCode;
   user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
-  const emailSent = await sendVerificationEmail(email, verificationCode);
+  const emailSent = await emailUtils.sendVerificationEmail(email, verificationCode);
   if (!emailSent) {
     return next(new AppError('Failed to send email', 500));
   }
@@ -278,12 +278,12 @@ exports.login = async (req, res, next) => {
       user.verificationCodeExpires = null;
       await user.save();
     } else {
-      const verificationCode = generateVerificationCode();
+      const verificationCode = emailUtils.generateVerificationCode();
       user.verificationCode = verificationCode;
       user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
       await user.save();
 
-      sendVerificationEmail(user.email, verificationCode).catch((err) => {
+      emailUtils.sendVerificationEmail(user.email, verificationCode).catch((err) => {
         logger.error('Deferred verification email failed:', err);
       });
 
@@ -434,16 +434,20 @@ exports.forgotPassword = async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create Reset URL
-  // Assuming frontend is served from same domain or configured URL
-  // For now, let's assume /reset-password?token=...
-  // In production, use process.env.FRONTEND_URL
-  const protocol = req.protocol;
-  const host = req.get('host');
-  // If running locally with separate frontend dev server, this might need adjustment
-  const resetUrl = `${protocol}://${host}/pages/reset-password.html?token=${resetToken}`;
+  let baseUrl = process.env.FRONTEND_URL;
+
+  if (!baseUrl) {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+      baseUrl = `${req.protocol}://${req.get('host')}`;
+    } else {
+      return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
+    }
+  }
+
+  const resetUrl = `${baseUrl}/pages/reset-password.html?token=${resetToken}`;
 
   try {
-      await sendPasswordResetEmail(user.email, resetUrl);
+      await emailUtils.sendPasswordResetEmail(user.email, resetUrl);
       res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
   } catch (err) {
       user.passwordResetToken = undefined;

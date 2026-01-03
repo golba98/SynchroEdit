@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "dev": "cross-env DISABLE_SECURE_COOKIE=true node src/server.js",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "cross-env SKIP_DB_SETUP=true jest tests/unit",
     "test:integration": "jest tests/integration",
@@ -42,6 +43,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
+    "csrf-csrf": "^4.0.3",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",

@@ -7,6 +7,7 @@ const emailUtils = require('../utils/email');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 const { createTicket } = require('../utils/ticketStore');
+const { generateToken } = require('../utils/csrf');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
@@ -126,6 +127,11 @@ exports.getWsTicket = (req, res, next) => {
         logger.error('Error generating WS ticket:', err);
         next(err);
     }
+};
+
+exports.getCsrfToken = (req, res) => {
+    const token = generateToken(req, res);
+    res.json({ csrfToken: token });
 };
 
 exports.signup = async (req, res, next) => {

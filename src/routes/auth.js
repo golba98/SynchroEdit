@@ -34,5 +34,6 @@ router.post('/reset-password', generalAuthLimiter, authController.resetPassword)
 router.post('/refresh-token', authController.refreshToken); 
 router.post('/logout', authController.logout);
 router.get('/ws-ticket', authenticateToken, authController.getWsTicket);
+router.get('/csrf-token', authController.getCsrfToken);
 
 module.exports = router;

@@ -37,6 +37,10 @@ const setupMiddleware = (app) => {
     app.use(express.json({ limit: '10mb' }));
     app.use(express.urlencoded({ limit: '10mb', extended: true }));
     app.use(cookieParser());
+
+    const { doubleCsrfProtection } = require('../utils/csrf');
+    // Apply CSRF protection to all API routes
+    app.use('/api/', doubleCsrfProtection);
     
     // Apply limiter to API routes
     app.use('/api/', apiLimiter);

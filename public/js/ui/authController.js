@@ -1,4 +1,5 @@
 import { Auth } from '/js/ui/auth.js';
+import { Network } from '/js/core/network.js';
 
 export class AuthController {
     constructor() {
@@ -43,13 +44,10 @@ export class AuthController {
 
     async checkExistingSession() {
         try {
-            const res = await fetch('/api/auth/refresh-token', { method: 'POST' });
-            if (res.ok) {
-                const data = await res.json();
-                Auth.setToken(data.token);
-                const docId = new URLSearchParams(window.location.search).get('doc');
-                window.location.href = docId ? `../index.html?doc=${docId}` : '../index.html';
-            }
+            const data = await Network.fetchAPI('/api/auth/refresh-token', { method: 'POST' });
+            Auth.setToken(data.token);
+            const docId = new URLSearchParams(window.location.search).get('doc');
+            window.location.href = docId ? `../index.html?doc=${docId}` : '../index.html';
         } catch (e) { /* Ignore */ }
     }
 
@@ -257,12 +255,10 @@ export class AuthController {
         icon.innerHTML = '<i class="fas fa-spinner fa-spin" style="color: #666;"></i>';
 
         try {
-            const res = await fetch('/api/auth/check-username', {
+            const data = await Network.fetchAPI('/api/auth/check-username', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username })
             });
-            const data = await res.json();
             if (data.available) {
                 icon.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success-color);"></i>';
                 suggestions.style.display = 'none';
@@ -311,19 +307,17 @@ export class AuthController {
     async handleLogin() {
         const username = document.getElementById('loginUsername').value;
         const password = document.getElementById('loginPassword').value;
-        const msg = document.getElementById('loginStatusMessage');
 
         this.setProcessing(true);
         try {
-            const res = await fetch('/api/auth/login', {
+            const data = await Network.fetchAPI('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            const data = await res.json();
-            if (res.ok) this.successSequence(data);
-            else this.errorSequence(data.message, 'loginForm');
-        } catch (e) { this.errorSequence('Network Error', 'loginForm'); }
+            this.successSequence(data);
+        } catch (e) { 
+            this.errorSequence(e.message.replace('API error: ', 'Error ') || 'Login failed', 'loginForm'); 
+        }
     }
 
     async handleSignup() {
@@ -331,47 +325,40 @@ export class AuthController {
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
         const confirm = document.getElementById('signupPasswordConfirm').value;
-        const msg = document.getElementById('signupStatusMessage');
 
         if (password !== confirm) return this.errorSequence('Passwords do not match', 'signupForm');
 
         this.setProcessing(true);
         try {
-            const res = await fetch('/api/auth/signup', {
+            const data = await Network.fetchAPI('/api/auth/signup', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
             });
-            const data = await res.json();
-            if (res.ok) {
-                if (data.token) this.successSequence(data);
-                else {
-                    this.setProcessing(false);
-                    document.getElementById('emailVerificationModal').style.display = 'flex';
-                    window.pendingSignupEmail = email;
-                }
-            } else this.errorSequence(data.message, 'signupForm');
-        } catch (e) { this.errorSequence('Network Error', 'signupForm'); }
+            if (data.token) this.successSequence(data);
+            else {
+                this.setProcessing(false);
+                document.getElementById('emailVerificationModal').style.display = 'flex';
+                window.pendingSignupEmail = email;
+            }
+        } catch (e) { 
+            this.errorSequence(e.message.replace('API error: ', 'Error ') || 'Signup failed', 'signupForm'); 
+        }
     }
 
     async handleVerifyEmail() {
         const code = document.getElementById('verificationCode').value;
         const msg = document.getElementById('verificationMessage');
         try {
-            const res = await fetch('/api/auth/verify-email', {
+            const data = await Network.fetchAPI('/api/auth/verify-email', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: window.pendingSignupEmail, verificationCode: code })
             });
-            const data = await res.json();
-            if (res.ok) {
-                document.getElementById('emailVerificationModal').style.display = 'none';
-                this.successSequence(data);
-            } else {
-                msg.textContent = data.message;
-                msg.style.color = 'var(--error-color)';
-            }
-        } catch (e) { console.error(e); }
+            document.getElementById('emailVerificationModal').style.display = 'none';
+            this.successSequence(data);
+        } catch (e) { 
+            msg.textContent = e.message.replace('API error: ', 'Error ') || 'Verification failed';
+            msg.style.color = 'var(--error-color)';
+        }
     }
 
     setProcessing(val) {

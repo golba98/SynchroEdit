@@ -1,3 +1,5 @@
+import { Network } from '/js/core/network.js';
+
 let _accessToken = null;
 
 export const Auth = {
@@ -17,58 +19,28 @@ export const Auth = {
     
     // If no token in memory, try to refresh immediately (Restore Session)
     if (!token) {
-      token = await this.tryRefresh();
-      if (!token) {
-          // Final check: is there a legacy token we should migrate?
-          // (Optional, but good for UX during transition)
-          const legacy = localStorage.getItem('synchroEditToken');
-          if (legacy) {
-              localStorage.removeItem('synchroEditToken'); // Migrate once
-              // We could try to use it, but safer to just fail and force re-login if refresh failed
-          }
-          return false;
-      }
+        // Network.fetchAPI will handle refresh if we call an endpoint that requires auth
+        // but here we want to explicitly try it to see if we HAVE a session
     }
 
     try {
-      let response = await fetch('/api/user/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Attempt Refresh on 401
-      if (response.status === 401) {
-          const newToken = await this.tryRefresh();
-          if (newToken) {
-              response = await fetch('/api/user/profile', {
-                  headers: { Authorization: `Bearer ${newToken}` },
-              });
-          }
-      }
-
-      if (!response.ok) {
-        this.removeToken();
-        return false;
-      }
-      return await response.json();
+      const data = await Network.fetchAPI('/api/user/profile');
+      return data;
     } catch (err) {
       console.error('Token verification error:', err);
+      this.removeToken();
       return false;
     }
   },
 
   async tryRefresh() {
       try {
-          const refreshResponse = await fetch('/api/auth/refresh-token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' }
+          const data = await Network.fetchAPI('/api/auth/refresh-token', {
+              method: 'POST'
           });
-          
-          if (refreshResponse.ok) {
-              const data = await refreshResponse.json();
-              if (data.token) {
-                  this.setToken(data.token);
-                  return data.token; // Return the token
-              }
+          if (data.token) {
+              this.setToken(data.token);
+              return data.token;
           }
       } catch (e) {
           console.error('Refresh attempt failed', e);
@@ -77,7 +49,7 @@ export const Auth = {
   },
   async logout() {
     try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await Network.fetchAPI('/api/auth/logout', { method: 'POST' });
     } catch (err) {
         console.error('Logout failed:', err);
     }

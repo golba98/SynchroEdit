@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const emailUtils = require('../utils/email');
 const AppError = require('../utils/AppError');
@@ -9,6 +10,36 @@ const { createTicket } = require('../utils/ticketStore');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'false';
+
+// Pre-calculated dummy hash for timing attack mitigation (matches bcrypt cost)
+const DUMMY_HASH = '$2a$10$K9p/9.tW2m2.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.';
+
+/**
+ * Ensures a minimum response time to mitigate timing attacks.
+ * Adds a small amount of jitter to prevent statistical analysis.
+ */
+const ensureMinimumDelay = async (startTime, minDelayMs = 800) => {
+    const elapsed = Date.now() - startTime;
+    const remaining = minDelayMs - elapsed;
+    if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining + Math.random() * 200));
+    }
+};
+
+/**
+ * Constant-time string comparison to prevent timing attacks.
+ */
+const timingSafeCompare = (a, b) => {
+    if (typeof a !== 'string' || typeof b !== 'string') return false;
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) {
+        // Dummy comparison to keep timing more consistent
+        crypto.timingSafeEqual(bufA, bufA);
+        return false;
+    }
+    return crypto.timingSafeEqual(bufA, bufB);
+};
 
 /**
  * Helper to generate tokens, create session, and send response
@@ -98,6 +129,7 @@ exports.getWsTicket = (req, res, next) => {
 };
 
 exports.signup = async (req, res, next) => {
+  const startTime = Date.now();
   if (mongoose.connection.readyState !== 1) {
     return next(new AppError('Database connection error', 500));
   }
@@ -121,8 +153,8 @@ exports.signup = async (req, res, next) => {
   const existingUser = await User.findOne({ $or: [{ username }, { email }] }).lean();
   if (existingUser) {
     // Prevent enumeration: If user exists, we pretend success or return a generic message.
-    // Simulate delay to prevent timing attacks
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
+    // Simulate delay to match the time of user creation + email sending
+    await ensureMinimumDelay(startTime, 800);
 
     return res.status(200).json({
        message: 'If your email is not registered, you will receive a verification code.',
@@ -159,11 +191,15 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.verifyEmail = async (req, res, next) => {
+  const startTime = Date.now();
   const { email, verificationCode } = req.body;
 
   const user = await User.findOne({ email });
   // Prevent user enumeration by returning generic error
-  if (!user) return next(new AppError('Invalid verification code', 400));
+  if (!user) {
+      await ensureMinimumDelay(startTime, 500);
+      return next(new AppError('Invalid verification code', 400));
+  }
 
   if (!EMAIL_VERIFICATION_ENABLED) {
     user.isEmailVerified = true;
@@ -177,7 +213,8 @@ exports.verifyEmail = async (req, res, next) => {
     return await sendTokens(user, 200, req, res, 'Email already verified');
   }
 
-  if (!user.verificationCode || user.verificationCode !== verificationCode) {
+  if (!user.verificationCode || !timingSafeCompare(user.verificationCode, verificationCode)) {
+    await ensureMinimumDelay(startTime, 500);
     return next(new AppError('Invalid verification code', 400));
   }
 
@@ -194,16 +231,21 @@ exports.verifyEmail = async (req, res, next) => {
 };
 
 exports.resendCode = async (req, res, next) => {
+  const startTime = Date.now();
   if (!EMAIL_VERIFICATION_ENABLED) {
     return res.status(200).json({ message: 'Verification disabled; no code sent.' });
   }
 
   const { email } = req.body;
+  if (!email) return next(new AppError('Please provide an email address', 400));
 
   const user = await User.findOne({ email });
   if (!user) {
-    // Prevent user enumeration: return success even if user not found
-    return res.status(200).json({ message: 'If your email is registered, a code has been sent.' });
+    // Prevent enumeration: Return generic message even if email not found
+    await ensureMinimumDelay(startTime, 800);
+    return res.status(200).json({
+      message: 'If your email is registered, you will receive a new verification code.',
+    });
   }
 
   if (user.isEmailVerified) {
@@ -242,7 +284,11 @@ exports.login = async (req, res, next) => {
       ] 
   });
   
-  if (!user) return next(new AppError('Invalid username or password', 401));
+  if (!user) {
+      // Mitigate timing attack by performing a dummy hash comparison
+      await bcrypt.compare(password, DUMMY_HASH);
+      return next(new AppError('Invalid username or password', 401));
+  }
 
   // Account Lockout Check
   if (user.lockUntil && user.lockUntil > Date.now()) {
@@ -415,12 +461,14 @@ exports.refreshToken = async (req, res, next) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
+  const startTime = Date.now();
   const { email } = req.body;
   if (!email) return next(new AppError('Please provide an email address', 400));
 
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
-    // Prevent enumeration
+    // Prevent enumeration: Simulate delay to match hashing + DB write + email sending
+    await ensureMinimumDelay(startTime, 800);
     return res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
   }
 

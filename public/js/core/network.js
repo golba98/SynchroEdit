@@ -1,25 +1,65 @@
 import { Auth } from '/js/ui/auth.js';
 
+let _csrfToken = null;
+
 export const Network = {
+  async fetchCsrfToken() {
+    try {
+      const response = await fetch('/api/auth/csrf-token', { credentials: 'include' });
+      const data = await response.json();
+      _csrfToken = data.csrfToken;
+      return _csrfToken;
+    } catch (err) {
+      console.error('Failed to fetch CSRF token:', err);
+      return null;
+    }
+  },
+
   async fetchAPI(url, options = {}) {
+    if (!_csrfToken && !url.includes('/csrf-token')) {
+        await this.fetchCsrfToken();
+    }
+
     let token = Auth.getToken();
     const headers = {
-      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      'X-CSRF-Token': _csrfToken,
       ...options.headers,
     };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
     
-    let response = await fetch(url, { ...options, headers });
+    // Debug CSRF
+    // console.log(`[Network] Fetching ${url} with CSRF: ${_csrfToken ? _csrfToken.substring(0,10)+'...' : 'null'}`);
+
+    let response = await fetch(url, { ...options, headers, credentials: 'include' });
     
+    // Interceptor: Check for 403 (Forbidden) - could be CSRF failure
+    if (response.status === 403 && !url.includes('/csrf-token')) {
+        console.warn('Potential CSRF failure or access denied, retrying with fresh token...');
+        await this.fetchCsrfToken();
+        headers['X-CSRF-Token'] = _csrfToken;
+        response = await fetch(url, { ...options, headers, credentials: 'include' });
+    }
+
     // Interceptor: Check for 401 (Unauthorized)
-    if (response.status === 401) {
+    // Don't try to refresh if we are explicitly trying to login/signup/verify/logout or if we are already refreshing
+    const isAuthRequest = url.includes('/login') || url.includes('/signup') || url.includes('/verify-email') || url.includes('/logout') || url.includes('/refresh-token');
+    
+    if (response.status === 401 && !isAuthRequest) {
         console.log('Token expired, attempting refresh...');
         try {
             // Call refresh endpoint
             // Note: browser automatically sends cookies for same-origin requests
             const refreshResponse = await fetch('/api/auth/refresh-token', { 
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': _csrfToken
+                },
+                credentials: 'include'
             });
             
             if (refreshResponse.ok) {
@@ -30,10 +70,14 @@ export const Network = {
                 headers.Authorization = `Bearer ${data.token}`;
                 response = await fetch(url, { ...options, headers });
             } else {
-                console.warn('Refresh failed, session expired.');
+                console.warn('Refresh failed, session expired. Redirecting to login.');
+                await Auth.logout();
+                return;
             }
         } catch (e) {
             console.error('Token refresh failed', e);
+            await Auth.logout();
+            return;
         }
     }
 

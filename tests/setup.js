@@ -4,6 +4,11 @@
 // In jsdom (Frontend Tests), window is defined.
 const isNodeEnv = typeof window === 'undefined';
 
+if (isNodeEnv) {
+  // Mock CSRF protection for backend integration tests
+  jest.mock('../src/utils/csrf', () => require('./mocks/csrf'));
+}
+
 let mongoose;
 let MongoMemoryServer;
 let server;

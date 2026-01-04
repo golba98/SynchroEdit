@@ -38,13 +38,9 @@ body.light-theme option {
   color: #1a1a1a;
 }
 
-/* ==========================================
-   THEME ARCHITECTURE
-   ========================================== */
-
 /* Dark Mode Defaults (The "Self-Luminous" System) */
 body {
-  background: #05020d; 
+  background: #000000; 
   color: #e0e0e0;
   font-family: 'Roboto', 'Arial', sans-serif;
 }
@@ -573,6 +569,57 @@ body.light-theme .ql-picker:hover {
   font-family: 'Verdana', sans-serif;
 }
 
+.ql-font-lobster { font-family: 'Lobster', cursive; }
+.ql-font-pacifico { font-family: 'Pacifico', cursive; }
+.ql-font-bebas-neue { font-family: 'Bebas Neue', sans-serif; }
+.ql-font-anton { font-family: 'Anton', sans-serif; }
+.ql-font-dancing-script { font-family: 'Dancing Script', cursive; }
+.ql-font-shadows-into-light { font-family: 'Shadows Into Light', cursive; }
+.ql-font-abril-fatface { font-family: 'Abril Fatface', cursive; }
+.ql-font-playfair-display { font-family: 'Playfair Display', serif; }
+.ql-font-indie-flower { font-family: 'Indie Flower', cursive; }
+.ql-font-amatic-sc { font-family: 'Amatic SC', cursive; }
+.ql-font-caveat { font-family: 'Caveat', cursive; }
+.ql-font-comfortaa { font-family: 'Comfortaa', cursive; }
+.ql-font-righteous { font-family: 'Righteous', cursive; }
+.ql-font-cinzel { font-family: 'Cinzel', serif; }
+.ql-font-poppins { font-family: 'Poppins', sans-serif; }
+.ql-font-raleway { font-family: 'Raleway', sans-serif; }
+.ql-font-nunito { font-family: 'Nunito', sans-serif; }
+.ql-font-quicksand { font-family: 'Quicksand', sans-serif; }
+.ql-font-inconsolata { font-family: 'Inconsolata', monospace; }
+.ql-font-ubuntu { font-family: 'Ubuntu', sans-serif; }
+.ql-font-bitter { font-family: 'Bitter', serif; }
+.ql-font-dosis { font-family: 'Dosis', sans-serif; }
+.ql-font-josefin-sans { font-family: 'Josefin Sans', sans-serif; }
+.ql-font-libre-baskerville { font-family: 'Libre Baskerville', serif; }
+.ql-font-mulish { font-family: 'Mulish', sans-serif; }
+.ql-font-pt-sans { font-family: 'PT Sans', sans-serif; }
+.ql-font-pt-serif { font-family: 'PT Serif', serif; }
+.ql-font-titillium-web { font-family: 'Titillium Web', sans-serif; }
+.ql-font-varela-round { font-family: 'Varela Round', sans-serif; }
+.ql-font-zilla-slab { font-family: 'Zilla Slab', serif; }
+.ql-font-fira-sans { font-family: 'Fira Sans', sans-serif; }
+.ql-font-work-sans { font-family: 'Work Sans', sans-serif; }
+.ql-font-dm-sans { font-family: 'DM Sans', sans-serif; }
+.ql-font-ibm-plex-sans { font-family: 'IBM Plex Sans', sans-serif; }
+.ql-font-karla { font-family: 'Karla', sans-serif; }
+.ql-font-crimson-text { font-family: 'Crimson Text', serif; }
+.ql-font-source-sans-pro { font-family: 'Source Sans Pro', sans-serif; }
+.ql-font-source-serif-pro { font-family: 'Source Serif Pro', serif; }
+.ql-font-space-mono { font-family: 'Space Mono', monospace; }
+.ql-font-exo-2 { font-family: 'Exo 2', sans-serif; }
+.ql-font-kanit { font-family: 'Kanit', sans-serif; }
+.ql-font-maven-pro { font-family: 'Maven Pro', sans-serif; }
+.ql-font-signika { font-family: 'Signika', sans-serif; }
+.ql-font-bree-serif { font-family: 'Bree Serif', serif; }
+.ql-font-fjalla-one { font-family: 'Fjalla One', sans-serif; }
+.ql-font-patua-one { font-family: 'Patua One', serif; }
+.ql-font-arvo { font-family: 'Arvo', serif; }
+.ql-font-vollkorn { font-family: 'Vollkorn', serif; }
+.ql-font-old-standard-tt { font-family: 'Old Standard TT', serif; }
+.ql-font-great-vibes { font-family: 'Great Vibes', cursive; }
+
 .ql-picker-label {
   padding: 0 !important;
   display: flex !important;
@@ -629,26 +676,11 @@ body.light-theme .ql-picker-item:hover {
   overflow: hidden;
   position: relative;
   width: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(5, 5, 5, 0.3) 0%,
-    rgba(10, 10, 10, 0.2) 25%,
-    rgba(17, 17, 17, 0.1) 50%,
-    rgba(10, 10, 10, 0.2) 75%,
-    rgba(5, 5, 5, 0.3) 100%
-  );
+  background: transparent;
 }
 
 body.light-theme .main-workspace {
-  background: linear-gradient(
-    135deg,
-    rgba(245, 245, 245, 0.3) 0%,
-    rgba(255, 255, 255, 0.2) 15%,
-    rgba(248, 248, 248, 0.1) 30%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(248, 248, 248, 0.1) 70%,
-    rgba(245, 245, 245, 0.3) 100%
-  ) !important;
+  background: #f3f4f6 !important;
 }
 
 .sidebar {
@@ -754,12 +786,12 @@ body.light-theme .outline-item:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px 100px 20px;
+  padding: 60px 40px 120px 40px;
   background: transparent;
   overflow-y: auto;
   overflow-x: auto;
   flex: 1;
-  gap: 15px;
+  gap: 30px;
   z-index: 10;
   position: relative;
   scroll-behavior: smooth;
@@ -783,13 +815,13 @@ body.glow-enabled .pages-container::before {
 }
 
 .page-scaler {
-  background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%);
-  padding: 30px 50px;
-  box-shadow: none;
-  border: none !important;
-  border-radius: 12px;
+  background: #0d0d0d;
+  padding: 60px 80px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.6);
+  border: 1px solid #1a1a1a !important;
+  border-radius: 4px;
   transform: scale(var(--page-scale));
-  transform-origin: top center;
+  transform-origin: 0 0;
   transition:
     box-shadow 0.3s ease,
     outline-color 0.3s ease,
@@ -798,7 +830,7 @@ body.glow-enabled .pages-container::before {
   height: var(--page-height);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
 }
 
@@ -830,7 +862,6 @@ body.glow-enabled .pages-container::before {
     0 0 180px rgba(var(--accent-color-rgb), 0.15),
     inset 0 0 30px rgba(var(--accent-color-rgb), 0.1),
     inset 0 0 60px rgba(var(--accent-color-rgb), 0.05);
-  transform: translateY(-2px);
 }
 
 .editor-container.glow-effect .page-scaler::after {
@@ -863,8 +894,8 @@ body.light-theme .ql-editor {
 
 #editor {
   flex: 1;
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 15px;
+  line-height: 1.6;
   color: #e0e0e0;
   outline: none;
   padding: 0 !important;
@@ -877,8 +908,8 @@ body.light-theme .ql-editor {
 
 .page-editor {
   flex: 1;
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 15px;
+  line-height: 1.6;
   color: #e0e0e0;
   outline: none;
   padding: 0 !important;
@@ -890,7 +921,7 @@ body.light-theme .ql-editor {
 }
 
 .ql-container {
-  font-size: 16px;
+  font-size: 15px;
   border: none !important;
   height: 100%;
   display: flex;
@@ -900,17 +931,22 @@ body.light-theme .ql-editor {
 .ql-editor {
   flex: 1;
   min-height: 100%;
-  padding: 20px 0 !important;
-  font-size: 16px;
-  line-height: 1.8;
+  padding: 0 !important;
+  font-size: 15px;
+  line-height: 1.6;
   color: #e0e0e0;
   border: none !important;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
 }
 
 .ql-editor.ql-blank::before {
-  color: #6f6f6f !important;
+  color: #666 !important;
   font-style: italic;
+  font-weight: 300;
+  left: 0 !important;
+  right: 0 !important;
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 /* Quill toolbar styling */
@@ -928,21 +964,6 @@ body.light-theme .ql-editor {
 /* Hide all scrollbars */
 ::-webkit-scrollbar {
   display: none;
-}
-
-::-webkit-scrollbar-track {
-  display: none;
-}
-
-::-webkit-scrollbar-thumb {
-  display: none;
-}
-
-.ql-editor.ql-blank::before {
-  left: 0 !important;
-  right: 0 !important;
-  font-style: italic;
-  color: #4a4a4a;
 }
 
 #editor img {

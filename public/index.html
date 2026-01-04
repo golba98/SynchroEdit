@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&family=Lobster&family=Pacifico&family=Bebas+Neue&family=Anton&family=Dancing+Script:wght@400;700&family=Shadows+Into+Light&family=Abril+Fatface&family=Playfair+Display:wght@400;700&family=Indie+Flower&family=Amatic+SC:wght@400;700&family=Caveat:wght@400;700&family=Comfortaa:wght@400;700&family=Righteous&family=Cinzel:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Nunito:wght@400;700&family=Quicksand:wght@400;700&family=Inconsolata:wght@400;700&family=Ubuntu:wght@400;700&family=Bitter:wght@400;700&family=Dosis:wght@400;700&family=Josefin+Sans:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Mulish:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&family=Titillium+Web:wght@400;700&family=Varela+Round&family=Zilla+Slab:wght@400;700&family=Fira+Sans:wght@400;700&family=Work+Sans:wght@400;700&family=DM+Sans:wght@400;700&family=IBM+Plex+Sans:wght@400;700&family=Karla:wght@400;700&family=Crimson+Text:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Source+Serif+Pro:wght@400;700&family=Space+Mono:wght@400;700&family=Exo+2:wght@400;700&family=Kanit:wght@400;700&family=Maven+Pro:wght@400;700&family=Signika:wght@400;700&family=Bree+Serif&family=Fjalla+One&family=Patua+One&family=Arvo:wght@400;700&family=Vollkorn:wght@400;700&family=Old+Standard+TT:wght@400;700&family=Great+Vibes&display=swap"
       rel="stylesheet"
     />
     <link
@@ -64,7 +64,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: #05020d;
+        background: #000000;
         z-index: 100000;
         display: flex;
         align-items: center;
@@ -1290,6 +1290,7 @@
                 <option value="math">Floating Math Symbols</option>
                 <option value="code">Floating Code Blocks</option>
                 <option value="nature">Floating Nature Elements</option>
+                <option value="none">None</option>
               </select>
             </div>
 
@@ -1868,6 +1869,56 @@
             <option value="courier-new">Courier New</option>
             <option value="georgia">Georgia</option>
             <option value="verdana">Verdana</option>
+            <option value="lobster">Lobster</option>
+            <option value="pacifico">Pacifico</option>
+            <option value="bebas-neue">Bebas Neue</option>
+            <option value="anton">Anton</option>
+            <option value="dancing-script">Dancing Script</option>
+            <option value="shadows-into-light">Shadows Into Light</option>
+            <option value="abril-fatface">Abril Fatface</option>
+            <option value="playfair-display">Playfair Display</option>
+            <option value="indie-flower">Indie Flower</option>
+            <option value="amatic-sc">Amatic SC</option>
+            <option value="caveat">Caveat</option>
+            <option value="comfortaa">Comfortaa</option>
+            <option value="righteous">Righteous</option>
+            <option value="cinzel">Cinzel</option>
+            <option value="poppins">Poppins</option>
+            <option value="raleway">Raleway</option>
+            <option value="nunito">Nunito</option>
+            <option value="quicksand">Quicksand</option>
+            <option value="inconsolata">Inconsolata</option>
+            <option value="ubuntu">Ubuntu</option>
+            <option value="bitter">Bitter</option>
+            <option value="dosis">Dosis</option>
+            <option value="josefin-sans">Josefin Sans</option>
+            <option value="libre-baskerville">Libre Baskerville</option>
+            <option value="mulish">Mulish</option>
+            <option value="pt-sans">PT Sans</option>
+            <option value="pt-serif">PT Serif</option>
+            <option value="titillium-web">Titillium Web</option>
+            <option value="varela-round">Varela Round</option>
+            <option value="zilla-slab">Zilla Slab</option>
+            <option value="fira-sans">Fira Sans</option>
+            <option value="work-sans">Work Sans</option>
+            <option value="dm-sans">DM Sans</option>
+            <option value="ibm-plex-sans">IBM Plex Sans</option>
+            <option value="karla">Karla</option>
+            <option value="crimson-text">Crimson Text</option>
+            <option value="source-sans-pro">Source Sans Pro</option>
+            <option value="source-serif-pro">Source Serif Pro</option>
+            <option value="space-mono">Space Mono</option>
+            <option value="exo-2">Exo 2</option>
+            <option value="kanit">Kanit</option>
+            <option value="maven-pro">Maven Pro</option>
+            <option value="signika">Signika</option>
+            <option value="bree-serif">Bree Serif</option>
+            <option value="fjalla-one">Fjalla One</option>
+            <option value="patua-one">Patua One</option>
+            <option value="arvo">Arvo</option>
+            <option value="vollkorn">Vollkorn</option>
+            <option value="old-standard-tt">Old Standard TT</option>
+            <option value="great-vibes">Great Vibes</option>
           </select>
           <select class="ql-size" title="Font Size">
             <option value="8px">8</option>

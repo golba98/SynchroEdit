@@ -96,10 +96,10 @@ export class Theme {
 
     // Dynamic CSS generation
     styleEl.innerHTML = `
-            body { background: rgba(10, 10, 10, 0.8) !important; transition: background 0.45s ease-in-out !important; }
-            body.light-theme { background: rgba(233, 236, 239, 0.8) !important; }
-            body.glow-enabled { background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, ${hexColor}22 15%, rgba(13, 13, 13, 0.7) 30%, ${hexColor}15 50%, rgba(13, 13, 13, 0.7) 70%, rgba(10, 10, 15, 0.8) 100%) !important; }
-            body.light-theme.glow-enabled { background: radial-gradient(circle at 50% 30%, ${hexColor}08 0%, rgba(233, 236, 239, 0.8) 70%) !important; }
+            body { background: #000000 !important; transition: background 0.45s ease-in-out !important; }
+            body.light-theme { background: #f0f2f5 !important; }
+            body.glow-enabled { background: linear-gradient(135deg, #000000 0%, ${hexColor}08 15%, #020202 30%, ${hexColor}05 50%, #020202 70%, #000000 100%) !important; }
+            body.light-theme.glow-enabled { background: radial-gradient(circle at 50% 30%, ${hexColor}05 0%, #f0f2f5 70%) !important; }
             
             /* Selection Highlight */
             ::selection { background-color: rgba(${rgbString}, 0.4) !important; color: inherit !important; }
@@ -142,11 +142,10 @@ export class Theme {
             .toolbar-btn.active { background: linear-gradient(135deg, ${hexColor} 0%, ${lightColor} 100%) !important; color: white !important; box-shadow: 0 0 15px rgba(${rgbString}, 0.4) !important; }
             
             /* Editor Container & Background */
-            .main-workspace { background: linear-gradient(135deg, #050505 0%, #111111 50%, #050505 100%) !important; }
-            body.light-theme .main-workspace { background: #e9ecef !important; }
-            .pages-container { background: transparent !important; }
+            body.light-theme .main-workspace { background: #f0f2f5 !important; }
+            .pages-container { background: rgba(0, 0, 0, 0.2) !important; }
+            body.light-theme .pages-container { background: rgba(0, 0, 0, 0.03) !important; }
 
-            .page-scaler { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important; }
             body.light-theme .page-scaler { 
                 background: #ffffff !important;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04) !important;

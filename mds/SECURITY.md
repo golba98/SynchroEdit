@@ -17,8 +17,8 @@ This document outlines 20 identified security issues, vulnerabilities, and poten
 ## 5. Overly Permissive Content Security Policy (CSP) [FIXED]
 **Solution:** Tightened CSP by removing third-party CDNs, implementing cryptographic nonces for both scripts and styles, and adding real-time threshold-based violation alerting.
 
-## 6. Lack of CSRF Protection
-While the application uses JWTs, the `refreshToken` is stored in an HTTP-only cookie. Without explicit CSRF protection (like anti-CSRF tokens), certain cross-site requests might still be possible if not properly guarded by `SameSite` attributes.
+## 6. Lack of CSRF Protection [FIXED]
+**Solution:** Implemented the Double Submit Cookie pattern using the `csrf-csrf` library. All state-changing API requests (POST, PUT, DELETE) now require a valid `X-CSRF-Token` header and a matching encrypted cookie.
 
 ## 7. Auto-Login Backdoor on Localhost
 The frontend `authController.js` contains a `checkAutoLogin` feature that automatically logs in the `tester` user if `autologin=true` is in the URL and the host is `localhost`. This could be exploited if a developer's local environment is accessed.
@@ -109,8 +109,8 @@ An attacker can trigger the `signup` or `resend-code` endpoints repeatedly for a
 ### 35. Lack of "Disposable Email" Blocking
 The system allows signups from disposable email providers (e.g., Mailinator). These are often used for malicious purposes or to bypass trial limits/rate limits.
 
-### 36. Timing Attacks on Verification
-The `verifyEmail` function compares the code using `!==`. While for a 6-digit code this is hard to exploit, using `crypto.timingSafeEqual` is the standard for comparing any secret or sensitive token.
+### 36. Timing Attacks on Verification [FIXED]
+**Solution:** Replaced imprecise `setTimeout` with a robust `ensureMinimumDelay` function to normalize response times. Implemented `crypto.timingSafeEqual` for all sensitive string comparisons (verification codes, tokens).
 
 ### 37. No Account Ownership Confirmation for Resend
 The `resend-code` endpoint returns "If your email is registered..." regardless of whether the user is the one who initiated the signup. This can be used to probe if an email is in the pending verification state.

@@ -185,7 +185,10 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { Network } from '../js/core/network.js';
+      import { Auth } from '../js/ui/auth.js';
+
       const params = new URLSearchParams(window.location.search);
       const storedEmail = sessionStorage.getItem('verificationEmail');
       const email = storedEmail || params.get('email');
@@ -228,22 +231,16 @@
       async function sendCode() {
         setStatus('Sending code...', '');
         try {
-          const response = await fetch('/api/auth/resend-code', {
+          await Network.fetchAPI('/api/auth/resend-code', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
           });
-          if (response.ok) {
-            setStatus('Code sent. Check your email.', 'success');
-            codeInput.value = '';
-            codeInput.focus();
-          } else {
-            const data = await response.json();
-            setStatus(data.message || 'Unable to send code. Try again.', 'error');
-          }
+          setStatus('Code sent. Check your email.', 'success');
+          codeInput.value = '';
+          codeInput.focus();
         } catch (err) {
           console.error('Resend error:', err);
-          setStatus('Network error. Try again.', 'error');
+          setStatus(err.message.replace('API error: ', 'Error ') || 'Unable to send code. Try again.', 'error');
         }
       }
 
@@ -257,29 +254,27 @@
 
         setStatus('Verifying...', '');
         try {
-          const response = await fetch('/api/auth/verify-email', {
+          const data = await Network.fetchAPI('/api/auth/verify-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, verificationCode: code }),
           });
-          const data = await response.json();
-          if (response.ok) {
-            setStatus('Email verified! Redirecting...', 'success');
-            if (data.username || storedUsername) {
-                localStorage.setItem('synchroEditUser', data.username || storedUsername);
-            }
-            sessionStorage.removeItem('verificationEmail');
-            sessionStorage.removeItem('verificationUsername');
-            sessionStorage.removeItem('verificationMessage');
-            const redirectUrl = docId ? `../index.html?doc=${docId}` : '../index.html';
-            sessionStorage.removeItem('postLoginDocId');
-            setTimeout(() => (window.location.href = redirectUrl), 1200);
-          } else {
-            setStatus(data.message || 'Invalid code. Try again.', 'error');
+          
+          setStatus('Email verified! Redirecting...', 'success');
+          if (data.token) {
+              Auth.setToken(data.token);
           }
+          if (data.username || storedUsername) {
+              localStorage.setItem('synchroEditUser', data.username || storedUsername);
+          }
+          sessionStorage.removeItem('verificationEmail');
+          sessionStorage.removeItem('verificationUsername');
+          sessionStorage.removeItem('verificationMessage');
+          const redirectUrl = docId ? `../index.html?doc=${docId}` : '../index.html';
+          sessionStorage.removeItem('postLoginDocId');
+          setTimeout(() => (window.location.href = redirectUrl), 1200);
         } catch (err) {
           console.error('Verification error:', err);
-          setStatus('Network error. Try again.', 'error');
+          setStatus(err.message.replace('API error: ', 'Error ') || 'Invalid code. Try again.', 'error');
         }
       }
 

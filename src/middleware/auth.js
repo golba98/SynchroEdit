@@ -10,7 +10,10 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return next(new AppError('Access denied', 401));
+  // Explicitly check for "null" string which might come from frontend bugs
+  if (!token || token === 'null' || token === 'undefined') {
+      return next(new AppError('Access denied', 401));
+  }
 
   jwt.verify(token, JWT_SECRET, async (err, user) => {
     if (err) {

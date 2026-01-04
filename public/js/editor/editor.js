@@ -11,6 +11,7 @@ import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { ReadabilityManager } from '/js/managers/ReadabilityManager.js';
 import { NavigationManager } from '/js/managers/NavigationManager.js';
 import { Auth } from '/js/ui/auth.js';
+import { Network } from '/js/core/network.js';
 import { debounce } from '/js/core/utils.js';
 
 export class Editor {
@@ -159,21 +160,7 @@ export class Editor {
     
     let ticket;
     try {
-        const response = await fetch('/api/auth/ws-ticket', {
-            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-        });
-        
-        if (!response.ok) {
-            if (response.status === 401) {
-                const refreshed = await Auth.tryRefresh();
-                if (refreshed) {
-                    return this.connectWebSocket(docId, user);
-                }
-            }
-            throw new Error(`Failed to fetch ticket: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
+        const data = await Network.fetchAPI('/api/auth/ws-ticket');
         ticket = data.ticket;
     } catch (err) {
         console.error('Failed to get WS ticket:', err);
@@ -196,21 +183,8 @@ export class Editor {
         this.onStatusChange(status);
         if (status === 'disconnected') {
             try {
-                let response = await fetch('/api/auth/ws-ticket', {
-                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-                });
-                
-                if (response.status === 401) {
-                    const refreshed = await Auth.tryRefresh();
-                    if (refreshed) {
-                        response = await fetch('/api/auth/ws-ticket', {
-                            headers: { 'Authorization': `Bearer ${refreshed}` }
-                        });
-                    }
-                }
-
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await Network.fetchAPI('/api/auth/ws-ticket');
+                if (data && data.ticket) {
                     this.provider.params.ticket = data.ticket;
                 }
             } catch (err) {
@@ -290,7 +264,14 @@ export class Editor {
     Quill.register(Size, true);
 
     const Font = Quill.import('formats/font');
-    Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
+    Font.whitelist = [
+        'roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana',
+        'lobster', 'pacifico', 'bebas-neue', 'anton', 'dancing-script', 'shadows-into-light', 'abril-fatface', 'playfair-display', 'indie-flower', 'amatic-sc',
+        'caveat', 'comfortaa', 'righteous', 'cinzel', 'poppins', 'raleway', 'nunito', 'quicksand', 'inconsolata', 'ubuntu',
+        'bitter', 'dosis', 'josefin-sans', 'libre-baskerville', 'mulish', 'pt-sans', 'pt-serif', 'titillium-web', 'varela-round', 'zilla-slab',
+        'fira-sans', 'work-sans', 'dm-sans', 'ibm-plex-sans', 'karla', 'crimson-text', 'source-sans-pro', 'source-serif-pro', 'space-mono',
+        'exo-2', 'kanit', 'maven-pro', 'signika', 'bree-serif', 'fjalla-one', 'patua-one', 'arvo', 'vollkorn', 'old-standard-tt', 'great-vibes'
+    ];
     Quill.register(Font, true);
 
     const Parchment = Quill.import('parchment');

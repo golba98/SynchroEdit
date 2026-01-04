@@ -23,9 +23,6 @@ setupShutdownHandlers(server, wss);
 // Setup Middleware
 setupMiddleware(app);
 
-// Database Connection
-connectDB();
-
 // Routes
 setupRoutes(app);
 
@@ -40,9 +37,14 @@ app.use(globalErrorHandler);
 const PORT = process.env.PORT || 3000;
 
 if (require.main === module) {
-    server.listen(PORT, () => {
-        logger.info(`Secure Server running on http://localhost:${PORT}`);
-    });
+    (async () => {
+        // Database Connection
+        await connectDB();
+
+        server.listen(PORT, () => {
+            logger.info(`Secure Server running on http://localhost:${PORT}`);
+        });
+    })();
 }
 
 module.exports = { app, server };

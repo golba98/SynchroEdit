@@ -5,9 +5,13 @@ const connectDB = async () => {
     const MONGODB_URI = process.env.MONGODB_URI;
 
     if (!MONGODB_URI) {
-        logger.error('MONGODB_URI not found in .env. Exiting.');
+        logger.error('MONGODB_URI is missing from environment variables. Exiting.');
         process.exit(1);
     }
+
+    // Log a masked version of the URI for debugging
+    const maskedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+    logger.info(`Attempting to connect to MongoDB: ${maskedUri}`);
 
     try {
         await mongoose.connect(MONGODB_URI);

@@ -42,7 +42,7 @@ if (require.main === module) {
         await connectDB();
 
         server.listen(PORT, () => {
-            logger.info(`Secure Server running on http://localhost:${PORT}`);
+            logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
         });
     })();
 }

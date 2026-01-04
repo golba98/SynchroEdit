@@ -9,9 +9,15 @@ const connectDB = async () => {
         process.exit(1);
     }
 
-    // Log a masked version of the URI for debugging
-    const maskedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
-    logger.info(`Attempting to connect to MongoDB: ${maskedUri}`);
+    // Log the username and host for debugging, but hide the password
+    try {
+        const url = new URL(MONGODB_URI);
+        logger.info(`Attempting to connect to MongoDB as user: ${url.username} at host: ${url.host}`);
+    } catch (e) {
+        // Fallback for srv strings which URL parser might struggle with if not formatted perfectly
+        const maskedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+        logger.info(`Attempting to connect to MongoDB: ${maskedUri}`);
+    }
 
     try {
         await mongoose.connect(MONGODB_URI);

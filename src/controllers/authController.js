@@ -91,6 +91,9 @@ const sendTokens = async (user, statusCode, req, res, message = undefined) => {
 };
 
 exports.checkUsername = async (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return next(new AppError('Database connection error', 500));
+    }
     try {
         const { username } = req.body;
         if (!username) return next(new AppError('Username is required', 400));

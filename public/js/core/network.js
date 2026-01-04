@@ -1,18 +1,29 @@
 import { Auth } from '/js/ui/auth.js';
 
 let _csrfToken = null;
+let _csrfPromise = null;
 
 export const Network = {
   async fetchCsrfToken() {
-    try {
-      const response = await fetch('/api/auth/csrf-token', { credentials: 'include' });
-      const data = await response.json();
-      _csrfToken = data.csrfToken;
-      return _csrfToken;
-    } catch (err) {
-      console.error('Failed to fetch CSRF token:', err);
-      return null;
-    }
+    if (_csrfPromise) return _csrfPromise;
+
+    _csrfPromise = (async () => {
+      try {
+        const response = await fetch('/api/auth/csrf-token', { credentials: 'include' });
+        if (!response.ok) throw new Error(response.statusText);
+        const data = await response.json();
+        _csrfToken = data.csrfToken;
+        return _csrfToken;
+      } catch (err) {
+        console.error('Failed to fetch CSRF token:', err);
+        _csrfToken = null;
+        return null;
+      } finally {
+        _csrfPromise = null;
+      }
+    })();
+
+    return _csrfPromise;
   },
 
   async fetchAPI(url, options = {}) {

@@ -316,7 +316,10 @@ export class AuthController {
             });
             this.successSequence(data);
         } catch (e) { 
-            this.errorSequence(e.message.replace('API error: ', 'Error ') || 'Login failed', 'loginForm'); 
+            let msg = e.message;
+            if (msg.includes('401')) msg = 'Invalid username or password';
+            else msg = msg.replace('API error: ', 'Error ');
+            this.errorSequence(msg, 'loginForm'); 
         }
     }
 

@@ -264,7 +264,14 @@ export class Editor {
     Quill.register(Size, true);
 
     const Font = Quill.import('formats/font');
-    Font.whitelist = ['roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana'];
+    Font.whitelist = [
+        'roboto', 'open-sans', 'lato', 'montserrat', 'oswald', 'merriweather', 'arial', 'times-new-roman', 'courier-new', 'georgia', 'verdana',
+        'lobster', 'pacifico', 'bebas-neue', 'anton', 'dancing-script', 'shadows-into-light', 'abril-fatface', 'playfair-display', 'indie-flower', 'amatic-sc',
+        'caveat', 'comfortaa', 'righteous', 'cinzel', 'poppins', 'raleway', 'nunito', 'quicksand', 'inconsolata', 'ubuntu',
+        'bitter', 'dosis', 'josefin-sans', 'libre-baskerville', 'mulish', 'pt-sans', 'pt-serif', 'titillium-web', 'varela-round', 'zilla-slab',
+        'fira-sans', 'work-sans', 'dm-sans', 'ibm-plex-sans', 'karla', 'crimson-text', 'source-sans-pro', 'source-serif-pro', 'space-mono',
+        'exo-2', 'kanit', 'maven-pro', 'signika', 'bree-serif', 'fjalla-one', 'patua-one', 'arvo', 'vollkorn', 'old-standard-tt', 'great-vibes'
+    ];
     Quill.register(Font, true);
 
     const Parchment = Quill.import('parchment');

@@ -54,6 +54,6 @@ export const Auth = {
         console.error('Logout failed:', err);
     }
     this.removeToken();
-    window.location.href = 'pages/login.html';
+    window.location.href = '/pages/login.html';
   },
 };

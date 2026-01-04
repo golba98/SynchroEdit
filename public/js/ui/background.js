@@ -13,11 +13,11 @@ export class DynamicBackground {
     
     this.themes = {
         dots: {
-            particleCount: 100,
-            connectionDistance: 120,
+            particleCount: 70,
+            connectionDistance: 100,
             mouseDistance: 180,
-            baseSpeed: 0.3,
-            sizeRange: [1, 3],
+            baseSpeed: 0.1,
+            sizeRange: [2, 4],
             type: 'dots'
         },
         math: {
@@ -53,6 +53,17 @@ export class DynamicBackground {
   }
 
     setTheme(themeName) {
+      if (themeName === 'none') {
+          this.currentTheme = 'none';
+          localStorage.setItem('synchroEditBackgroundTheme', 'none');
+          this.particles = [];
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          if (this.animationFrameId) {
+             cancelAnimationFrame(this.animationFrameId);
+             this.animationFrameId = null;
+          }
+          return;
+      }
 
       if (this.themes[themeName]) {
 
@@ -95,6 +106,10 @@ export class DynamicBackground {
     this.canvas.style.zIndex = '0'; // Behind text but above container base
     this.canvas.style.pointerEvents = 'none';
     
+    // cleanup existing
+    const existing = document.getElementById('dynamic-background');
+    if (existing) existing.remove();
+
     // Find workspace or fallback to body
     const target = document.querySelector('.main-workspace') || document.body;
     target.style.position = 'relative';
@@ -119,7 +134,11 @@ export class DynamicBackground {
 
     this.resize();
     this.setTheme(this.currentTheme); // Initial particles
-    this.animate();
+    
+    // Only animate if not 'none' (setTheme handles the none check but animate is called explicitly here)
+    if (this.currentTheme !== 'none') {
+        this.animate();
+    }
     
     window.addEventListener('theme-update', () => this.updateThemeColors());
     
@@ -137,8 +156,10 @@ export class DynamicBackground {
               const dy = p.y - e.clientY;
               const dist = Math.sqrt(dx*dx + dy*dy);
               if (dist < 300) {
-                  p.directionX -= dx * 0.05;
-                  p.directionY -= dy * 0.05;
+                  // Apply impulse as a one-time addition
+                  const force = (1 - dist / 300) * 0.8;  // Reduced force, scales with distance
+                  p.directionX += (dx / dist) * force;
+                  p.directionY += (dy / dist) * force;
               }
           });
       }
@@ -146,19 +167,30 @@ export class DynamicBackground {
 
   updateThemeColors() {
       const isLight = document.body.classList.contains('light-theme');
+      const isGlow = document.body.classList.contains('glow-enabled');
       const styles = getComputedStyle(document.documentElement);
       let accentRgb = styles.getPropertyValue('--accent-color-rgb').trim() || '139, 92, 246';
       
-      // If the computed value still contains a 'var(' (can happen in some edge cases with nested variables),
-      // we must strip it or use a hardcoded fallback to prevent Canvas API crashes.
       if (accentRgb.includes('var(')) {
           accentRgb = '139, 92, 246';
       }
 
       this.isLight = isLight;
       this.accentRgb = accentRgb;
-      this.config.color = isLight ? `rgba(${accentRgb}, 0.6)` : `rgba(${accentRgb}, 0.4)`;
-      this.config.lineColor = isLight ? `rgba(${accentRgb}, 0.2)` : `rgba(${accentRgb}, 0.15)`;
+      
+      if (isLight) {
+          this.config.color = `rgba(${accentRgb}, 0.8)`;
+          this.config.lineColor = `rgba(${accentRgb}, 0.4)`;
+      } else {
+          // Dark mode visibility tuning
+          // If glow is OFF, we need higher opacity to make it pop against the flat black
+          // If glow is ON, we still want it visible but maybe slightly less intense so it doesn't clash
+          const dotAlpha = isGlow ? 0.7 : 0.9;
+          const lineAlpha = isGlow ? 0.3 : 0.5;
+          
+          this.config.color = `rgba(${accentRgb}, ${dotAlpha})`;
+          this.config.lineColor = `rgba(${accentRgb}, ${lineAlpha})`;
+      }
   }
 
   handleResize() {
@@ -183,11 +215,16 @@ export class DynamicBackground {
       const x = Math.random() * this.canvas.width;
       const y = Math.random() * this.canvas.height;
       
+      const baseDirX = (Math.random() * 2 - 1) * theme.baseSpeed;
+      const baseDirY = (Math.random() * 2 - 1) * theme.baseSpeed;
+      
       const p = {
           x, y, size,
           baseX: x, baseY: y,
-          directionX: (Math.random() * 2 - 1) * theme.baseSpeed,
-          directionY: (Math.random() * 2 - 1) * theme.baseSpeed,
+          directionX: baseDirX,
+          directionY: baseDirY,
+          baseDirX: baseDirX,  // Store original calm drift direction
+          baseDirY: baseDirY,  // Store original calm drift direction
           angle: Math.random() * Math.PI * 2,
           angleSpeed: (Math.random() - 0.5) * 0.01,
           phase: Math.random() * Math.PI * 2,
@@ -207,6 +244,11 @@ export class DynamicBackground {
   animate() {
     this.animationFrameId = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Reset canvas state to prevent persistence from other themes
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowColor = 'transparent';
+    this.ctx.globalAlpha = 1.0;
     
     const theme = this.themes[this.currentTheme];
     const now = Date.now();
@@ -230,7 +272,17 @@ export class DynamicBackground {
                 // Aesthetic Glow
                 this.ctx.shadowBlur = this.isLight ? 2 : 15;
                 this.ctx.shadowColor = `rgba(${this.accentRgb}, ${0.2 + typePulse * 0.4})`;
-                this.ctx.fillStyle = this.isLight ? `rgba(0, 0, 0, 0.15)` : `rgba(${this.accentRgb}, ${0.1 + typePulse * 0.2})`;
+                
+                // Parse base alpha from config to respect visibility settings
+                const alphaMatch = this.config.color.match(/[\d.]+\)$/);
+                const baseAlpha = alphaMatch ? parseFloat(alphaMatch[0]) : (this.isLight ? 0.2 : 0.4);
+                
+                // Apply pulse on top of base visibility
+                const currentAlpha = Math.min(1, baseAlpha + (typePulse * 0.2));
+
+                this.ctx.fillStyle = this.isLight 
+                    ? `rgba(0, 0, 0, ${currentAlpha})` 
+                    : `rgba(${this.accentRgb}, ${currentAlpha})`;
                 
                 this.ctx.fillText(p.symbol, 0, 0);
                 this.ctx.restore();
@@ -246,7 +298,7 @@ export class DynamicBackground {
                 }
                 
                 if (Math.random() < 0.02) p.flicker = 20;
-                let codeAlpha = p.flicker > 0 ? 0.5 : 0.1;
+                let codeAlpha = p.flicker > 0 ? 0.6 : 0.25;
                 if (p.flicker > 0) p.flicker--;
 
                 this.ctx.font = `bold ${p.size}px monospace`;
@@ -272,29 +324,41 @@ export class DynamicBackground {
                 this.ctx.translate(p.x, p.y);
                 this.ctx.rotate(p.angle);
                 this.ctx.font = `${p.size}px Arial`;
-                this.ctx.globalAlpha = this.isLight ? 0.4 : 0.2;
+                this.ctx.globalAlpha = this.isLight ? 0.5 : 0.35;
                 this.ctx.shadowBlur = 5;
                 this.ctx.shadowColor = 'rgba(0,0,0,0.1)';
                 this.ctx.fillText(p.symbol, 0, 0);
                 this.ctx.restore();
                 break;
 
-            default: // Dots
+            case 'dots':
+                // original calm drift speed and direction
+                const dampingFactor = 0.96; // Smooth deceleration
+                const returnSpeed = 0.02; // How quickly to return to base direction
+
+                // Apply damping to slow down the particle
+                p.directionX *= dampingFactor;
+                p.directionY *= dampingFactor;
+
+                // Gradually return to base calm drift direction
+                p.directionX += (p.baseDirX - p.directionX) * returnSpeed;
+                p.directionY += (p.baseDirY - p.directionY) * returnSpeed;
+
                 p.x += p.directionX;
                 p.y += p.directionY;
-                
+
                 if (p.x > this.canvas.width || p.x < 0) p.directionX = -p.directionX;
                 if (p.y > this.canvas.height || p.y < 0) p.directionY = -p.directionY;
-                
+
                 // Draw sophisticated dot
                 this.ctx.beginPath();
                 this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 const dotGrad = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-                
+
                 // Final safety check: if for any reason the color string is invalid, fallback to hardcoded
                 let finalColor = this.config.color;
                 if (!finalColor || typeof finalColor !== 'string' || finalColor.includes('var(')) {
-                    finalColor = 'rgba(139, 92, 246, 0.4)';
+                    finalColor = this.isLight ? 'rgba(139, 92, 246, 0.4)' : `rgba(${this.accentRgb}, 0.6)`;
                 }
 
                 dotGrad.addColorStop(0, finalColor);
@@ -304,17 +368,23 @@ export class DynamicBackground {
 
                 for (let j = i + 1; j < this.particles.length; j++) {
                     let p2 = this.particles[j];
-                    let dist = Math.sqrt((p.x-p2.x)**2 + (p.y-p2.y)**2);
+                    let dist = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
                     if (dist < theme.connectionDistance) {
                         this.ctx.beginPath();
-                        const lineAlpha = (1 - (dist / theme.connectionDistance)) * 0.2;
-                        this.ctx.strokeStyle = this.isLight ? `rgba(0, 0, 0, ${lineAlpha})` : `rgba(${this.accentRgb}, ${lineAlpha})`;
+                        const alphaMatch = this.config.lineColor.match(/[\d.]+\)$/);
+                        const baseAlpha = alphaMatch ? parseFloat(alphaMatch[0]) : 0.3;
+                        const lineAlpha = (1 - dist / theme.connectionDistance) * baseAlpha;
+                        
+                        this.ctx.strokeStyle = this.isLight
+                            ? `rgba(0, 0, 0, ${lineAlpha})`
+                            : `rgba(${this.accentRgb}, ${lineAlpha})`;
                         this.ctx.lineWidth = 0.8;
                         this.ctx.moveTo(p.x, p.y);
                         this.ctx.lineTo(p2.x, p2.y);
                         this.ctx.stroke();
                     }
                 }
+                break;
         }
         
         if (p.x < -100) p.x = this.canvas.width + 100;

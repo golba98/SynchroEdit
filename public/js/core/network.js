@@ -45,8 +45,8 @@ export const Network = {
     }
 
     // Interceptor: Check for 401 (Unauthorized)
-    // Don't try to refresh if we are explicitly trying to login/signup/verify
-    const isAuthRequest = url.includes('/login') || url.includes('/signup') || url.includes('/verify-email');
+    // Don't try to refresh if we are explicitly trying to login/signup/verify/logout or if we are already refreshing
+    const isAuthRequest = url.includes('/login') || url.includes('/signup') || url.includes('/verify-email') || url.includes('/logout') || url.includes('/refresh-token');
     
     if (response.status === 401 && !isAuthRequest) {
         console.log('Token expired, attempting refresh...');
@@ -70,10 +70,14 @@ export const Network = {
                 headers.Authorization = `Bearer ${data.token}`;
                 response = await fetch(url, { ...options, headers });
             } else {
-                console.warn('Refresh failed, session expired.');
+                console.warn('Refresh failed, session expired. Redirecting to login.');
+                await Auth.logout();
+                return;
             }
         } catch (e) {
             console.error('Token refresh failed', e);
+            await Auth.logout();
+            return;
         }
     }
 

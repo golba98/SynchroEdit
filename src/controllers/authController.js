@@ -404,6 +404,7 @@ exports.revokeAllOtherSessions = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
+        logger.debug('Refresh token missing in cookies');
         return res.status(401).json({ message: 'Refresh token not found, please login again.' });
     }
 
@@ -412,6 +413,7 @@ exports.refreshToken = async (req, res, next) => {
         
         const user = await User.findById(decoded.id);
         if (!user) {
+            logger.warn(`Refresh token user not found: ${decoded.id}`);
             return res.status(401).json({ message: 'User no longer exists.' });
         }
 
@@ -462,6 +464,7 @@ exports.refreshToken = async (req, res, next) => {
 
         res.json({ token: accessToken });
     } catch (err) {
+        logger.error('Refresh token error:', err);
         return res.status(403).json({ message: 'Invalid refresh token' });
     }
 };

@@ -48,13 +48,13 @@ exports.addToRecent = async (req, res, next) => {
   if (!user) return next(new AppError('User not found', 404));
 
   const docId = req.params.id;
-  const doc = await Document.findById(docId).select('owner sharedWith').lean();
+  const doc = await Document.findById(docId).select('owner sharedWith isPublic').lean();
   if (!doc) return next(new AppError('Document not found', 404));
 
   const isOwner = doc.owner.toString() === req.user.id;
   const isShared = doc.sharedWith && doc.sharedWith.some((id) => id.toString() === req.user.id);
 
-  if (!isOwner && !isShared) {
+  if (!isOwner && !isShared && !doc.isPublic) {
     return next(new AppError('Access denied', 403));
   }
 
@@ -72,6 +72,49 @@ exports.addToRecent = async (req, res, next) => {
 
   await user.save();
   res.json({ message: 'Added to recent' });
+};
+
+exports.updateSettings = async (req, res, next) => {
+  const docId = req.params.id;
+  const { isPublic } = req.body;
+
+  const doc = await Document.findById(docId);
+  if (!doc) return next(new AppError('Document not found', 404));
+
+  if (doc.owner.toString() !== req.user.id) {
+    return next(new AppError('Access denied. Only owner can change settings.', 403));
+  }
+
+  if (typeof isPublic === 'boolean') {
+    doc.isPublic = isPublic;
+  }
+
+  await doc.save();
+  res.json({
+    message: 'Settings updated',
+    isPublic: doc.isPublic
+  });
+};
+
+exports.getSettings = async (req, res, next) => {
+  const docId = req.params.id;
+  const doc = await Document.findById(docId).select('owner sharedWith isPublic').lean();
+  
+  if (!doc) return next(new AppError('Document not found', 404));
+
+  const isOwner = doc.owner.toString() === req.user.id;
+  const isShared = doc.sharedWith && doc.sharedWith.some((id) => id.toString() === req.user.id);
+  
+  // Even if public, we might want to restrict *viewing settings* to owner/collaborators?
+  // Or at least allow reading "isPublic" if you have access.
+  if (!isOwner && !isShared && !doc.isPublic) {
+      return next(new AppError('Access denied', 403));
+  }
+
+  res.json({
+      isPublic: doc.isPublic || false,
+      isOwner
+  });
 };
 
 exports.createDocument = async (req, res, next) => {

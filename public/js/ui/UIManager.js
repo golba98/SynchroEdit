@@ -128,13 +128,65 @@ export class UIManager {
     });
 
     // Share
-    addEvent('shareBtn', 'click', () => {
+    addEvent('shareBtn', 'click', async () => {
       const modal = document.getElementById('shareModal');
       const input = document.getElementById('shareLink');
+      const toggle = document.getElementById('linkSharingToggle');
+      const status = document.getElementById('linkSharingStatus');
+      
       if (modal && input) {
         input.value = window.location.href;
+        
+        // Load current settings
+        if (toggle && this.app.documentId) {
+            toggle.disabled = true;
+            toggle.parentElement.style.opacity = '0.5';
+            
+            try {
+                const settings = await Network.getDocumentSettings(this.app.documentId);
+                toggle.checked = settings.isPublic;
+                
+                // Only owner can change settings
+                if (!settings.isOwner) {
+                     toggle.disabled = true;
+                     toggle.title = "Only the document owner can change sharing settings.";
+                } else {
+                     toggle.disabled = false;
+                     toggle.parentElement.style.opacity = '1';
+                }
+            } catch (err) {
+                console.error("Failed to load settings", err);
+            }
+        }
+        
         modal.style.display = 'flex';
       }
+    });
+
+    addEvent('linkSharingToggle', 'change', async (e) => {
+        const enabled = e.target.checked;
+        const status = document.getElementById('linkSharingStatus');
+        
+        if (status) {
+            status.style.display = 'block';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        }
+        
+        try {
+            await Network.updateDocumentSettings(this.app.documentId, { isPublic: enabled });
+            if (status) {
+                status.innerHTML = '<i class="fas fa-check"></i> Updated successfully';
+                status.style.color = '#10b981';
+                setTimeout(() => status.style.display = 'none', 2000);
+            }
+        } catch (err) {
+            console.error("Failed to update settings", err);
+            e.target.checked = !enabled; // Revert
+            if (status) {
+                status.innerHTML = '<i class="fas fa-times"></i> Failed to update';
+                status.style.color = '#ef4444';
+            }
+        }
     });
 
     addEvent('closeShareModal', 'click', () => {

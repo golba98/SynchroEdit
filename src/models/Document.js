@@ -40,6 +40,10 @@ const documentSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  isPublic: {
+    type: Boolean,
+    default: false,
+  },
   lastModified: {
     type: Date,
     default: Date.now,

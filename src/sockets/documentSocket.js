@@ -189,13 +189,19 @@ function init(server) {
       const isViewer = 
         dbDoc.viewers && dbDoc.viewers.some((id) => id.toString() === userId);
 
-      if (!isOwner && !isShared && !isViewer) {
+      // Allow if public, but maybe we want to enforce read-only for public?
+      // For now, let's assume public means "collaborate" based on the UI text.
+      // If we wanted public read-only, we'd check dbDoc.isPublic and set readOnly = true.
+      // But the modal says "Anyone with this link can collaborate".
+      const isPublic = dbDoc.isPublic === true;
+
+      if (!isOwner && !isShared && !isViewer && !isPublic) {
         socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
         socket.destroy();
         return;
       }
 
-      const readOnly = isViewer && !isOwner && !isShared;
+      const readOnly = (isViewer && !isOwner && !isShared) || (isPublic && false); // Future proofing logic
 
       wss.handleUpgrade(request, socket, head, (ws) => {
         ws.isAlive = true;

@@ -123,6 +123,17 @@ export const Network = {
     return this.fetchAPI(`/api/documents/${docId}/history`);
   },
 
+  async getDocumentSettings(docId) {
+    return this.fetchAPI(`/api/documents/${docId}/settings`);
+  },
+
+  async updateDocumentSettings(docId, settings) {
+    return this.fetchAPI(`/api/documents/${docId}/settings`, {
+      method: 'PATCH',
+      body: JSON.stringify(settings),
+    });
+  },
+
   initWebSocket(documentId, onMessage, onStatusChange) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}`;

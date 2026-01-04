@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Testing
+tests
+test-results
+coverage
+playwright.config.js
+.jest
+
+# Git
+.git
+.gitignore
+
+# Environment variables (NEVER copy .env to image)
+.env
+.env.local
+.env.test
+
+# VSCode
+.vscode
+
+# Local specific
+tmp
+temp
+logs
+*.log
+scripts/start.bat

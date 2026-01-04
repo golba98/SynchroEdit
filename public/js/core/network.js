@@ -60,7 +60,7 @@ export const Network = {
     const isAuthRequest = url.includes('/login') || url.includes('/signup') || url.includes('/verify-email') || url.includes('/logout') || url.includes('/refresh-token');
     
     if (response.status === 401 && !isAuthRequest) {
-        console.log('Token expired, attempting refresh...');
+        // console.log('Token expired, attempting refresh...'); // Reduced noise
         try {
             // Call refresh endpoint
             // Note: browser automatically sends cookies for same-origin requests
@@ -81,12 +81,12 @@ export const Network = {
                 headers.Authorization = `Bearer ${data.token}`;
                 response = await fetch(url, { ...options, headers });
             } else {
-                console.warn('Refresh failed, session expired. Redirecting to login.');
+                // Silent failure - session expired, let the caller handle it (usually by redirecting)
                 await Auth.logout();
                 return;
             }
         } catch (e) {
-            console.error('Token refresh failed', e);
+            // console.error('Token refresh failed', e);
             await Auth.logout();
             return;
         }

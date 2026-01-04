@@ -65,6 +65,12 @@ export class App {
   }
 
   async init() {
+    // If we are on the login page, don't try to load the profile immediately.
+    // The login page handles its own authentication flow.
+    if (window.location.pathname.includes('login.html')) {
+        return;
+    }
+
     this.user = await this.profile.loadProfile();
 
     if (!this.user) {

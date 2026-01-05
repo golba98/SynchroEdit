@@ -85,11 +85,16 @@ exports.updateSettings = async (req, res, next) => {
     return next(new AppError('Access denied. Only owner can change settings.', 403));
   }
 
-  if (typeof isPublic === 'boolean') {
-    doc.isPublic = isPublic;
+  // Robust boolean conversion
+  if (isPublic === true || isPublic === 'true') {
+    doc.isPublic = true;
+  } else if (isPublic === false || isPublic === 'false') {
+    doc.isPublic = false;
   }
 
   await doc.save();
+  logger.info(`Document settings updated: ${docId} isPublic=${doc.isPublic} by ${req.user.id}`);
+  
   res.json({
     message: 'Settings updated',
     isPublic: doc.isPublic

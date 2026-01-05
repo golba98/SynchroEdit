@@ -27,7 +27,7 @@ export class PageManager extends Plugin {
     this.EDITOR_PADDING_BOTTOM = 20; // Reduced from 60 to allow ~2 more rows
     
     this.MEASUREMENT_LEEWAY_PX = 10; // Increased from 2 for more stability
-    this.HYSTERESIS_BUFFER = 40; // Space required before pulling content
+    this.HYSTERESIS_BUFFER = 80; // Space required before pulling content
     this.estimatedPageHeights = new Map(); 
     this.reflowTimeout = null;
     this.isProcessingReflow = false;
@@ -238,7 +238,14 @@ export class PageManager extends Plugin {
       
       // If we found a split point inside the line, use it.
       // Otherwise, default to start of line (though logicalBottom check above covers this).
-      const splitIndex = startIndex + splitOffset;
+      let splitIndex = startIndex + splitOffset;
+      
+      // Safety: Prevent splitting at 0 (moving entire page) if there's content.
+      // This prevents the "Delete Empty Page" infinite loop if the first char overflows.
+      // We force at least one character to stay.
+      if (splitIndex === 0 && quill.getLength() > 1) {
+          splitIndex = 1;
+      }
       
       return { hasOverflow: true, splitIndex };
   }

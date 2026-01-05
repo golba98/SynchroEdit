@@ -23,7 +23,7 @@ export class PageManager extends Plugin {
     // Initial Setup
     this.PAGE_HEIGHT = PAGE_SIZES.letter.height; 
     this.PAGE_WIDTH = PAGE_SIZES.letter.width;
-    this.PAGE_PADDING_Y = 40; // 20px top + 20px bottom
+    this.PAGE_PADDING_Y = 120; // 60px top + 60px bottom (Matches CSS)
     this.EDITOR_PADDING_BOTTOM = 20; // Reduced from 60 to allow ~2 more rows
     
     this.MEASUREMENT_LEEWAY_PX = 10; // Increased from 2 for more stability

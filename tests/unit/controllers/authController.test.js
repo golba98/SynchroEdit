@@ -250,12 +250,13 @@ describe('Auth Controller Unit Tests', () => {
   });
 
   describe('resetPassword', () => {
-    it('should reset password and return success message without logging in', async () => {
+    it('should reset password, clear sessions, and return success message without logging in', async () => {
       req.body = { token: 'valid-token', password: 'NewPassword123!' };
       const mockUser = {
         password: 'oldHash',
         passwordResetToken: 'hashedToken',
         passwordResetExpires: Date.now() + 10000,
+        sessions: [{ sessionId: 'old-session' }], // Simulate active sessions
         save: jest.fn().mockResolvedValue(true)
       };
 
@@ -274,6 +275,8 @@ describe('Auth Controller Unit Tests', () => {
       expect(mockUser.password).toBe('NewPassword123!');
       expect(mockUser.passwordResetToken).toBeUndefined();
       expect(mockUser.passwordResetExpires).toBeUndefined();
+      // Verify sessions are revoked
+      expect(mockUser.sessions).toEqual([]);
       expect(mockUser.save).toHaveBeenCalled();
       
       // Crucial check: Should NOT set cookie (no auto-login)

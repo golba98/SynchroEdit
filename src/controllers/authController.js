@@ -547,6 +547,9 @@ exports.resetPassword = async (req, res, next) => {
     user.loginAttempts = 0;
     user.lockUntil = undefined;
 
+    // Security: Revoke all existing sessions (log out all devices)
+    user.sessions = [];
+
     await user.save();
 
     // Do NOT log the user in immediately. Require manual login.

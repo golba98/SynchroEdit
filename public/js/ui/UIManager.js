@@ -132,7 +132,7 @@ export class UIManager {
       const modal = document.getElementById('shareModal');
       const input = document.getElementById('shareLink');
       const toggle = document.getElementById('linkSharingToggle');
-      const status = document.getElementById('linkSharingStatus');
+      const shareLinkContainer = document.getElementById('shareLinkContainer');
       
       if (modal && input) {
         input.value = window.location.href;
@@ -145,6 +145,12 @@ export class UIManager {
             try {
                 const settings = await Network.getDocumentSettings(this.app.documentId);
                 toggle.checked = settings.isPublic;
+
+                // Update link visual state
+                if (shareLinkContainer) {
+                    shareLinkContainer.style.opacity = settings.isPublic ? '1' : '0.5';
+                    shareLinkContainer.style.pointerEvents = settings.isPublic ? 'all' : 'none';
+                }
                 
                 // Only owner can change settings
                 if (!settings.isOwner) {
@@ -166,6 +172,7 @@ export class UIManager {
     addEvent('linkSharingToggle', 'change', async (e) => {
         const enabled = e.target.checked;
         const status = document.getElementById('linkSharingStatus');
+        const shareLinkContainer = document.getElementById('shareLinkContainer');
         
         if (status) {
             status.style.display = 'block';
@@ -174,6 +181,13 @@ export class UIManager {
         
         try {
             await Network.updateDocumentSettings(this.app.documentId, { isPublic: enabled });
+            
+            // Update link visual state
+            if (shareLinkContainer) {
+                shareLinkContainer.style.opacity = enabled ? '1' : '0.5';
+                shareLinkContainer.style.pointerEvents = enabled ? 'all' : 'none';
+            }
+
             if (status) {
                 status.innerHTML = '<i class="fas fa-check"></i> Updated successfully';
                 status.style.color = '#10b981';

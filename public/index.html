@@ -468,17 +468,34 @@
         >
           Share this document
         </h2>
+
+        <div style="margin-bottom: 24px; background: rgba(var(--accent-color-rgb), 0.05); padding: 12px; border-radius: 4px; border: 1px solid rgba(var(--accent-color-rgb), 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="color: var(--accent-color-light); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Link Sharing</div>
+                    <div style="color: #888; font-size: 11px;">When enabled, anyone with the link can access this document.</div>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 24px;">
+                    <input type="checkbox" id="linkSharingToggle" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 24px;"></span>
+                </label>
+            </div>
+            <div id="linkSharingStatus" style="font-size: 11px; margin-top: 8px; color: #aaa; display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Updating...
+            </div>
+        </div>
+        
         <p
           style="
             color: #d0d0d0;
-            margin-bottom: 16px;
-            border-left: 3px solid var(--accent-color);
-            padding-left: 12px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            padding-left: 4px;
           "
         >
-          Anyone with this link can collaborate on this document in real-time:
+          Share link:
         </p>
-        <div style="display: flex; gap: 8px; margin-bottom: 16px">
+        <div id="shareLinkContainer" style="display: flex; gap: 8px; margin-bottom: 24px; transition: opacity 0.3s ease;">
           <input
             type="text"
             id="shareLink"
@@ -520,22 +537,6 @@
           >
             <i class="fas fa-copy"></i> Copy
           </button>
-        </div>
-
-        <div style="margin-bottom: 24px; background: rgba(var(--accent-color-rgb), 0.05); padding: 12px; border-radius: 4px; border: 1px solid rgba(var(--accent-color-rgb), 0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="color: var(--accent-color-light); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Link Sharing</div>
-                    <div style="color: #888; font-size: 11px;">When enabled, anyone with the link can access this document.</div>
-                </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 24px;">
-                    <input type="checkbox" id="linkSharingToggle" style="opacity: 0; width: 0; height: 0;">
-                    <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 24px;"></span>
-                </label>
-            </div>
-            <div id="linkSharingStatus" style="font-size: 11px; margin-top: 8px; color: #aaa; display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Updating...
-            </div>
         </div>
 
         <p

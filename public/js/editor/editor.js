@@ -373,13 +373,27 @@ export class Editor {
   renderAllPages(event = null) {
     if (!this.container) return;
 
-    // Only clear placeholders on initial render or when explicitly needed
-    if (!event) {
+    // Always clear placeholders if we have real pages
+    if (this.yPages.length > 0) {
         const placeholders = this.container.querySelectorAll('#page-placeholder, [id*="placeholder"]');
         placeholders.forEach(p => p.remove());
     }
 
     const pages = this.yPages.toArray();
+
+    // Late Binding: Ensure existing pages get bound when provider becomes available
+    if (this.provider && this.provider.awareness) {
+        this.pageQuillInstances.forEach((quill, pageId) => {
+            if (!this.pageBindings.has(pageId)) {
+                const pageIndex = pages.findIndex(p => p.get('id') === pageId);
+                if (pageIndex !== -1) {
+                    const yText = pages[pageIndex].get('content');
+                    const binding = new QuillBinding(yText, quill, this.provider.awareness);
+                    this.pageBindings.set(pageId, binding);
+                }
+            }
+        });
+    }
 
     if (!event) {
         // Full Sync/Initial Render

@@ -218,6 +218,25 @@ export class Editor {
       };
       
       localStorage.setItem(`doc-view-${docId}`, JSON.stringify(viewState));
+      
+      // Save Instant Preview (HTML Snapshot)
+      // We grab the HTML of the currently active page (or page 0 if possible)
+      // Since we paginate, page 0 is usually the most relevant for "First Contentful Paint".
+      // But we can just use the current Quill instance if available.
+      if (this.quill && this.currentPageIndex === 0) {
+           localStorage.setItem(`doc-preview-${docId}`, this.quill.root.innerHTML);
+      } else {
+           // Fallback: Try to find Page 0
+           const pages = this.yPages.toArray();
+           if (pages.length > 0) {
+               const firstPageId = pages[0].get('id');
+               // We need the DOM element
+               const firstEditor = document.querySelector(`#editor-${firstPageId} .ql-editor`);
+               if (firstEditor) {
+                   localStorage.setItem(`doc-preview-${docId}`, firstEditor.innerHTML);
+               }
+           }
+      }
   }
 
   async connectWebSocket(docId, user) {
@@ -298,15 +317,22 @@ export class Editor {
       const placeholderId = 'page-placeholder';
       if (document.getElementById(placeholderId)) return;
       
+      const docId = new URLSearchParams(window.location.search).get('doc');
+      const previewHtml = localStorage.getItem(`doc-preview-${docId}`);
+      
       const newPageContainer = document.createElement('div');
       newPageContainer.className = 'editor-container loading-placeholder';
       newPageContainer.id = placeholderId;
-      newPageContainer.style.opacity = '0.7'; 
+      newPageContainer.style.opacity = previewHtml ? '0.5' : '0.7'; // Less opacity if we have content
+      
+      const contentHtml = previewHtml || '';
+      const placeholderAttr = previewHtml ? '' : 'data-placeholder="Loading document..."';
+
       newPageContainer.innerHTML = `
               <div class="page-scaler" style="transform-origin: top center; height: 100%; width: 100%;">
                 <div class="page-border-inner" style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; pointer-events: none; border: 1px solid transparent; z-index: 5;"></div>
                 <div class="page-editor ql-container ql-snow" style="position: relative; z-index: 1;">
-                    <div class="ql-editor" data-placeholder="Loading document..." contenteditable="false"></div>
+                    <div class="ql-editor" ${placeholderAttr} contenteditable="false">${contentHtml}</div>
                 </div>
               </div>
           `;

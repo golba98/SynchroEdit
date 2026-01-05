@@ -575,6 +575,11 @@ exports.resetPassword = async (req, res, next) => {
 
     await user.save();
 
+    // Security Alert: Notify user of password change
+    emailUtils.sendPasswordChangedEmail(user.email).catch(err => {
+        logger.error(`Failed to send password change alert to ${user.email}`, err);
+    });
+
     // Do NOT log the user in immediately. Require manual login.
     res.status(200).json({ message: 'Password reset successful. Please log in with your new password.' });
 };

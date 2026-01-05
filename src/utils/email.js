@@ -187,6 +187,43 @@ async function sendPasswordResetEmail(email, resetUrl) {
   }
 }
 
+async function sendPasswordChangedEmail(email) {
+  logger.info(`Sending password change alert to ${email}`);
+
+  const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff0f0; border-radius: 8px; border: 1px solid #ffcccc;">
+          <h2 style="color: #d32f2f; text-align: center;">Security Alert</h2>
+          <p style="color: #333; font-size: 16px;">Your password for <strong>SynchroEdit</strong> was just changed.</p>
+          <p style="color: #555; font-size: 14px;">If you performed this action, you can safely delete this email.</p>
+          <p style="color: #d32f2f; font-weight: bold; font-size: 14px;">If you did NOT change your password, please contact support immediately and recover your account.</p>
+          <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Timestamp: ${new Date().toUTCString()}</p>
+      </div>
+  `;
+
+  if (RESEND_API_KEY) {
+      return await sendViaResend(email, html, 'Security Alert: Password Changed');
+  }
+
+  if (!SMTP_USER || !SMTP_PASS) {
+      logger.info('DEV MODE: Password change alert simulated.');
+      return true;
+  }
+
+  try {
+      await transporter.sendMail({
+          from: `"SynchroEdit Security" <${SMTP_FROM}>`,
+          to: email,
+          subject: 'Security Alert: Password Changed',
+          html
+      });
+      return true;
+  } catch (err) {
+      logger.error(`Failed to send password change alert: ${err.message}`);
+      // Don't block the flow if alert fails, but log it critical
+      return false;
+  }
+}
+
 function generateVerificationCode() {
   return crypto.randomInt(100000, 1000000).toString();
 }
@@ -194,5 +231,6 @@ function generateVerificationCode() {
 module.exports = {
   sendVerificationEmail,
   sendPasswordResetEmail,
+  sendPasswordChangedEmail,
   generateVerificationCode,
 };

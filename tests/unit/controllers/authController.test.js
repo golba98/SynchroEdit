@@ -5,7 +5,12 @@ const { createTicket } = require('../../../src/utils/ticketStore');
 const jwt = require('jsonwebtoken');
 
 // Mock Dependencies
-jest.mock('../../../src/utils/email');
+jest.mock('../../../src/utils/email', () => ({
+  sendVerificationEmail: jest.fn(),
+  sendPasswordResetEmail: jest.fn(),
+  sendPasswordChangedEmail: jest.fn().mockResolvedValue(true),
+  generateVerificationCode: jest.fn().mockReturnValue('123456')
+}));
 jest.mock('../../../src/utils/ticketStore');
 jest.mock('jsonwebtoken');
 jest.mock('../../../src/utils/logger'); // Silence logs
@@ -337,6 +342,10 @@ describe('Auth Controller Unit Tests', () => {
         
         expect(mockUser.save).toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(200);
+
+        // Verify Security Alert Email
+        // Note: verify call signature might need adjusting based on how emailUtils is mocked
+        expect(require('../../../src/utils/email').sendPasswordChangedEmail).toHaveBeenCalled();
     });
   });
 });

@@ -58,4 +58,18 @@ describe('Email Utils Unit Tests', () => {
          await emailUtils.sendVerificationEmail('test@test.com', '123456');
          expect(mockSendMail).not.toHaveBeenCalled();
     });
+
+  describe('sendPasswordChangedEmail', () => {
+    it('should return true in DEV mode (missing SMTP credentials)', async () => {
+        // Ensure SMTP credentials are unset for this test
+        delete process.env.SMTP_USER;
+        delete process.env.SMTP_PASS;
+        delete process.env.RESEND_API_KEY;
+
+        const emailUtils = require('../../../src/utils/email');
+        const result = await emailUtils.sendPasswordChangedEmail('alert@test.com');
+        
+        expect(result).toBe(true);
+    });
+  });
 });

@@ -302,5 +302,41 @@ describe('Auth Controller Unit Tests', () => {
 
       expect(next).toHaveBeenCalledWith(expect.any(Error));
     });
+
+    it('should return 400 if MFA is enabled but code is missing', async () => {
+        req.body = { token: 'valid-token', password: 'NewPassword123!' };
+        const mockUser = {
+            mfaEnabled: true,
+            passwordResetToken: 'hashedToken',
+            passwordResetExpires: Date.now() + 10000
+        };
+        User.findOne.mockResolvedValue(mockUser);
+        
+        await authController.resetPassword(req, res, next);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ mfaRequired: true }));
+    });
+
+    it('should reset password with valid MFA code', async () => {
+        req.body = { token: 'valid-token', password: 'NewPassword123!', mfaCode: '123456' };
+        const mockUser = {
+            mfaEnabled: true,
+            mfaSecret: 'base32secret',
+            passwordResetToken: 'hashedToken',
+            passwordResetExpires: Date.now() + 10000,
+            save: jest.fn().mockResolvedValue(true),
+            sessions: []
+        };
+        User.findOne.mockResolvedValue(mockUser);
+        
+        const speakeasy = require('speakeasy');
+        jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(true);
+
+        await authController.resetPassword(req, res, next);
+        
+        expect(mockUser.save).toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
   });
 });

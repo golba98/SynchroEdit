@@ -83,7 +83,12 @@ const userSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
-  loginHistory: [Date]
+  loginHistory: [Date],
+  mfaEnabled: {
+    type: Boolean,
+    default: false
+  },
+  mfaSecret: String
 });
 
 // Hash password before saving

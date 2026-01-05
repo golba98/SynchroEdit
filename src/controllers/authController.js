@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const speakeasy = require('speakeasy');
 const User = require('../models/User');
 const emailUtils = require('../utils/email');
 const AppError = require('../utils/AppError');
@@ -531,6 +532,28 @@ exports.resetPassword = async (req, res, next) => {
 
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400));
+    }
+
+    // MFA Check
+    if (user.mfaEnabled) {
+        const { mfaCode } = req.body;
+        if (!mfaCode) {
+            return res.status(400).json({ 
+                status: 'fail',
+                message: 'Two-factor authentication code is required for this account.',
+                mfaRequired: true
+            });
+        }
+
+        const verified = speakeasy.totp.verify({
+            secret: user.mfaSecret,
+            encoding: 'base32',
+            token: mfaCode
+        });
+
+        if (!verified) {
+            return next(new AppError('Invalid two-factor authentication code.', 400));
+        }
     }
 
     // Password complexity check (Duplicate from signup, ideally helper function)

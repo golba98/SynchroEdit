@@ -13,6 +13,7 @@ pnpm-debug.log*
 .env.production.local
 *.env
 *.env.*
+env.bak
 
 # Logs
 logs/

@@ -113,7 +113,11 @@ self.addEventListener('fetch', (event) => {
       }
 
       // If NOT in cache, just fetch from network normally
-      return fetch(event.request);
+      return fetch(event.request).catch(err => {
+          console.warn('Service Worker: Fetch failed:', event.request.url);
+          // Return a 404 or offline page if desired, instead of letting the error bubble up
+          return new Response('Network Error', { status: 404, statusText: 'Network Error' });
+      });
     })
   );
 });

@@ -519,8 +519,8 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 exports.resetPassword = async (req, res, next) => {
-    const { token, password } = req.body;
-    if (!token || !password) return next(new AppError('Token and new password are required', 400));
+    const { token, password, username } = req.body;
+    if (!token || !password || !username) return next(new AppError('Token, username, and new password are required', 400));
 
     // Hash the token to compare with DB
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
@@ -532,6 +532,11 @@ exports.resetPassword = async (req, res, next) => {
 
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400));
+    }
+
+    // Username confirmation check (Anti-bot / Knowledge Check)
+    if (user.username !== username.trim()) {
+        return next(new AppError('Username confirmation failed. Please ensure you entered the correct username.', 400));
     }
 
     // MFA Check

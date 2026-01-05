@@ -98,7 +98,7 @@ export class DynamicBackground {
   init() {
     // Setup Canvas
     this.canvas.id = 'dynamic-background';
-    this.canvas.style.position = 'absolute';
+    this.canvas.style.position = 'fixed';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
     this.canvas.style.width = '100%';

@@ -1,19 +1,23 @@
-export class NavigationManager {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class NavigationManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.outlineContainer = document.getElementById('outlineContainer');
     this.minimapContainer = document.getElementById('minimap');
     this.isOutlineVisible = false;
     this.isMinimapVisible = false;
     this.collapsedSections = new Set(); // Stores heading node IDs or indices
+  }
 
+  init() {
     this.setupEventListeners();
   }
 
   setupEventListeners() {
     const addEvent = (id, event, handler) => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener(event, handler);
+      if (el) this.addDisposableListener(el, event, handler);
     };
 
     addEvent('toggleOutline', 'click', () => this.toggleOutline());
@@ -22,12 +26,15 @@ export class NavigationManager {
     addEvent('closeMinimap', 'click', () => this.toggleMinimap());
 
     // Listen for editor changes to update navigation
+    // Note: observeDeep doesn't return a cleanup function, so we can't easily dispose it via addDisposableListener.
+    // Ideally, we'd wrap this or manually clean it up in destroy().
+    // For now, we'll keep it as is, but mark it for future improvement.
     this.editor.doc.getArray('pages').observeDeep(() => {
         this.debounceUpdate();
     });
 
     // Intelligent Selection
-    document.addEventListener('mousedown', (e) => this.handleTripleClick(e));
+    this.addDisposableListener(document, 'mousedown', (e) => this.handleTripleClick(e));
   }
 
   debounceUpdate() {

@@ -1,19 +1,23 @@
-export class ImageManager {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class ImageManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.overlay = null;
     this.currentImage = null;
     this.resizeStart = { x: 0, y: 0, w: 0, h: 0 };
     this.isResizing = false;
+  }
 
+  init() {
     this.setupOverlay();
     
     // Listen for image clicks on the document
-    document.addEventListener('click', (e) => this.handleImageClick(e));
+    this.addDisposableListener(document, 'click', (e) => this.handleImageClick(e));
     
     // Listen for scroll/resize to update overlay
-    window.addEventListener('scroll', () => this.updateOverlayPosition(), true);
-    window.addEventListener('resize', () => this.updateOverlayPosition());
+    this.addDisposableListener(window, 'scroll', () => this.updateOverlayPosition());
+    this.addDisposableListener(window, 'resize', () => this.updateOverlayPosition());
 
     this.setupDragAndDrop();
   }
@@ -23,7 +27,7 @@ export class ImageManager {
     if (!container) return;
 
     // Support moving existing images between pages
-    container.addEventListener('dragstart', (e) => {
+    this.addDisposableListener(container, 'dragstart', (e) => {
         if (e.target.tagName === 'IMG') {
             const blot = Quill.find(e.target);
             if (blot) {
@@ -43,17 +47,17 @@ export class ImageManager {
         }
     });
 
-    container.addEventListener('dragover', (e) => {
+    this.addDisposableListener(container, 'dragover', (e) => {
       e.preventDefault();
       container.classList.add('drag-over');
       e.dataTransfer.dropEffect = 'move';
     });
 
-    container.addEventListener('dragleave', () => {
+    this.addDisposableListener(container, 'dragleave', () => {
       container.classList.remove('drag-over');
     });
 
-    container.addEventListener('drop', (e) => {
+    this.addDisposableListener(container, 'drop', (e) => {
       e.preventDefault();
       container.classList.remove('drag-over');
 
@@ -166,7 +170,7 @@ export class ImageManager {
         h.style.cursor = cursor;
         h.style.pointerEvents = 'auto';
         h.dataset.pos = pos;
-        h.addEventListener('mousedown', (e) => this.startResize(e, pos));
+        this.addDisposableListener(h, 'mousedown', (e) => this.startResize(e, pos));
         return h;
     };
     
@@ -202,12 +206,12 @@ export class ImageManager {
         btn.style.color = '#e0e0e0';
         btn.style.cursor = 'pointer';
         btn.style.padding = '4px 8px';
-        btn.addEventListener('click', (e) => {
+        this.addDisposableListener(btn, 'click', (e) => {
             e.stopPropagation();
             action();
         });
-        btn.addEventListener('mouseenter', () => btn.style.color = 'var(--accent-color)');
-        btn.addEventListener('mouseleave', () => btn.style.color = '#e0e0e0');
+        this.addDisposableListener(btn, 'mouseenter', () => btn.style.color = 'var(--accent-color)');
+        this.addDisposableListener(btn, 'mouseleave', () => btn.style.color = '#e0e0e0');
         return btn;
     };
     
@@ -219,8 +223,8 @@ export class ImageManager {
     document.body.appendChild(this.overlay);
     
     // Global mouse events for resizing
-    document.addEventListener('mousemove', (e) => this.handleResize(e));
-    document.addEventListener('mouseup', () => this.stopResize());
+    this.addDisposableListener(document, 'mousemove', (e) => this.handleResize(e));
+    this.addDisposableListener(document, 'mouseup', () => this.stopResize());
   }
 
   handleImageClick(e) {

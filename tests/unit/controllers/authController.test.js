@@ -294,13 +294,14 @@ describe('Auth Controller Unit Tests', () => {
         expect(require('../../../src/utils/email').sendPasswordChangedEmail).toHaveBeenCalled();
       });
   
-      it('should return error if username confirmation fails', async () => {
+      it('should burn token and return error if username confirmation fails', async () => {
           req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'wronguser' };
           
           const mockUser = {
               username: 'realuser',
               passwordResetToken: 'hashedToken',
-              passwordResetExpires: Date.now() + 10000
+              passwordResetExpires: Date.now() + 10000,
+              save: jest.fn().mockResolvedValue(true)
           };
     
           User.findOne.mockResolvedValue(mockUser);
@@ -309,6 +310,10 @@ describe('Auth Controller Unit Tests', () => {
     
           expect(next).toHaveBeenCalledWith(expect.any(Error));
           expect(next.mock.calls[0][0].message).toMatch(/confirmation failed/i);
+          
+          // Verify token burned
+          expect(mockUser.passwordResetToken).toBeUndefined();
+          expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
       });
   
       it('should return error if token is invalid or expired', async () => {
@@ -326,13 +331,14 @@ describe('Auth Controller Unit Tests', () => {
         expect(next).toHaveBeenCalledWith(expect.any(Error));
       });
   
-      it('should return 400 if MFA is enabled but code is missing', async () => {
+      it('should return 400 if MFA is enabled but code is missing (Token Preserved)', async () => {
           req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'mfauser' };
           const mockUser = {
               username: 'mfauser',
               mfaEnabled: true,
               passwordResetToken: 'hashedToken',
-              passwordResetExpires: Date.now() + 10000
+              passwordResetExpires: Date.now() + 10000,
+              save: jest.fn().mockResolvedValue(true)
           };
           User.findOne.mockResolvedValue(mockUser);
           
@@ -340,6 +346,34 @@ describe('Auth Controller Unit Tests', () => {
           
           expect(res.status).toHaveBeenCalledWith(400);
           expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ mfaRequired: true }));
+          
+          // Verify Token NOT burned
+          expect(mockUser.save).not.toHaveBeenCalled();
+      });
+
+      it('should burn token and return error if MFA code is invalid', async () => {
+          req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'mfauser', mfaCode: '000000' };
+          const mockUser = {
+              username: 'mfauser',
+              mfaEnabled: true,
+              mfaSecret: 'secret',
+              passwordResetToken: 'hashedToken',
+              passwordResetExpires: Date.now() + 10000,
+              save: jest.fn().mockResolvedValue(true)
+          };
+          User.findOne.mockResolvedValue(mockUser);
+
+          const speakeasy = require('speakeasy');
+          jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(false);
+
+          await authController.resetPassword(req, res, next);
+
+          expect(next).toHaveBeenCalledWith(expect.any(Error));
+          expect(next.mock.calls[0][0].message).toMatch(/Invalid two-factor/i);
+
+          // Verify token burned
+          expect(mockUser.passwordResetToken).toBeUndefined();
+          expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
       });
   
       it('should reset password with valid MFA code', async () => {

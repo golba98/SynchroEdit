@@ -534,9 +534,17 @@ exports.resetPassword = async (req, res, next) => {
         return next(new AppError('Token is invalid or has expired', 400));
     }
 
+    // Helper to invalidate token and return error
+    const invalidateAndError = async (message) => {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new AppError(message, 400));
+    };
+
     // Username confirmation check (Anti-bot / Knowledge Check)
     if (user.username !== username.trim()) {
-        return next(new AppError('Username confirmation failed. Please ensure you entered the correct username.', 400));
+        return await invalidateAndError('Username confirmation failed. Please ensure you entered the correct username.');
     }
 
     // MFA Check
@@ -557,14 +565,14 @@ exports.resetPassword = async (req, res, next) => {
         });
 
         if (!verified) {
-            return next(new AppError('Invalid two-factor authentication code.', 400));
+            return await invalidateAndError('Invalid two-factor authentication code.');
         }
     }
 
     // Password complexity check (Duplicate from signup, ideally helper function)
     const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
     if (!complexityRegex.test(password)) {
-        return next(new AppError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).', 400));
+        return await invalidateAndError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).');
     }
 
     user.password = password;

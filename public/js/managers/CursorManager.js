@@ -1,8 +1,14 @@
-export class CursorManager {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class CursorManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.currentRange = null;
   }
+
+  // init() is empty here because setupPageListeners is called externally by Editor.js when pages are mounted.
+  // However, I should check if there are global listeners to add.
+  // The current CursorManager doesn't seem to have global listeners in constructor.
 
   setupPageListeners(pageQuill, pageId) {
     // Selection Change
@@ -28,6 +34,13 @@ export class CursorManager {
     });
 
     // Mouse Down - Start Selection
+    // Since these are per-page listeners attached to Quill instances created dynamically,
+    // they are not "global" plugin listeners. They are lifecycle managed by mountPage/unmountPage in Editor.js.
+    // However, ideally, plugins should hook into "page:mount" events instead of Editor calling them directly.
+    // For this refactor step, I will keep the method public so Editor can call it, but in a "Perfect" plugin system,
+    // Editor would emit 'page-mounted' and this plugin would listen to it.
+    
+    // For now, adhering to the plan:
     pageQuill.root.addEventListener('mousedown', (e) => {
         const pages = this.editor.yPages.toArray();
         const pageIndex = pages.findIndex(p => p.get('id') === pageId);

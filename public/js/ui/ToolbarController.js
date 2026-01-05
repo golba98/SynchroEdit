@@ -1,6 +1,11 @@
-export class ToolbarController {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class ToolbarController extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
+  }
+
+  init() {
     this.setupToolbar();
   }
 
@@ -19,7 +24,7 @@ export class ToolbarController {
     // Standard formatting buttons
     Object.entries(buttons).forEach(([cls, fmt]) => {
       document.querySelectorAll(`.${cls}`).forEach((btn) => {
-        btn.addEventListener('click', (e) => {
+        this.addDisposableListener(btn, 'click', (e) => {
           e.preventDefault();
           if (!this.editor.quill) return;
 
@@ -40,20 +45,20 @@ export class ToolbarController {
 
     // Font and Size selects
     document.querySelectorAll('.ql-font').forEach((sel) => {
-      sel.addEventListener('change', (e) => {
+      this.addDisposableListener(sel, 'change', (e) => {
         if (this.editor.quill) this.editor.quill.format('font', e.target.value);
       });
     });
 
     document.querySelectorAll('.ql-size').forEach((sel) => {
-      sel.addEventListener('change', (e) => {
+      this.addDisposableListener(sel, 'change', (e) => {
         if (this.editor.quill) this.editor.quill.format('size', e.target.value);
       });
     });
 
     // Alignment
     document.querySelectorAll('.ql-align').forEach((sel) => {
-      sel.addEventListener('change', (e) => {
+      this.addDisposableListener(sel, 'change', (e) => {
         if (this.editor.quill) this.editor.quill.format('align', e.target.value);
       });
     });
@@ -69,7 +74,7 @@ export class ToolbarController {
 
     // Image & Video
     document.querySelectorAll('.ql-image').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      this.addDisposableListener(btn, 'click', () => {
         const input = document.getElementById('imageInput');
         if (input) input.click();
       });
@@ -77,7 +82,7 @@ export class ToolbarController {
 
     const imageInput = document.getElementById('imageInput');
     if (imageInput) {
-      imageInput.addEventListener('change', (e) => {
+      this.addDisposableListener(imageInput, 'change', (e) => {
         const file = e.target.files[0];
         if (file && this.editor.quill) {
           const reader = new FileReader();
@@ -97,8 +102,8 @@ export class ToolbarController {
     const indicator = document.getElementById(indicatorId);
 
     if (btn && picker) {
-      btn.addEventListener('click', () => picker.click());
-      picker.addEventListener('input', (e) => {
+      this.addDisposableListener(btn, 'click', () => picker.click());
+      this.addDisposableListener(picker, 'input', (e) => {
         const color = e.target.value;
         if (indicator) indicator.style.background = color;
         if (this.editor.quill) this.editor.quill.format(format, color);

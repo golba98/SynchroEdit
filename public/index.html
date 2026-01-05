@@ -2149,6 +2149,10 @@
               "
             />
           </div>
+          <div style="width: 1px; height: 24px; background: #333; margin: 0 8px;"></div>
+          <button class="toolbar-btn" id="toggleSearchBtn" title="Find and Replace (Ctrl+F)">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
       </div>
       <div class="ribbon-section">
@@ -2794,6 +2798,34 @@
           }
         }
       </style>
+    </div>
+
+    <!-- Search Dialog -->
+    <div id="searchDialog" style="display: none; position: fixed; top: 100px; right: 20px; width: 320px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10001; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-size: 14px; font-weight: 600; color: #e0e0e0;">Find & Replace</span>
+        <button id="closeSearchBtn" style="background: none; border: none; color: #888; cursor: pointer;"><i class="fas fa-times"></i></button>
+      </div>
+      
+      <div style="position: relative;">
+        <input type="text" id="findInput" placeholder="Find..." style="width: 100%; padding: 8px; padding-right: 60px; background: #0d0d0d; border: 1px solid #333; color: #e0e0e0; border-radius: 4px; font-size: 13px;">
+        <div id="searchMatchCount" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #666;"></div>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="replaceInput" placeholder="Replace with..." style="flex: 1; padding: 8px; background: #0d0d0d; border: 1px solid #333; color: #e0e0e0; border-radius: 4px; font-size: 13px;">
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: space-between;">
+        <div style="display: flex; gap: 4px;">
+          <button id="findPrevBtn" class="toolbar-btn" title="Previous Match" style="padding: 6px 10px; background: #333;"><i class="fas fa-chevron-left"></i></button>
+          <button id="findNextBtn" class="toolbar-btn" title="Next Match" style="padding: 6px 10px; background: #333;"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <button id="replaceBtn" class="toolbar-btn" style="padding: 6px 12px; font-size: 11px; background: #333;">Replace</button>
+          <button id="replaceAllBtn" class="toolbar-btn" style="padding: 6px 12px; font-size: 11px; background: #333;">All</button>
+        </div>
+      </div>
     </div>
 
     <!-- Hidden file input for images -->

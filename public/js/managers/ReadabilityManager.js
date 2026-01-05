@@ -1,13 +1,17 @@
-export class ReadabilityManager {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class ReadabilityManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.showLineNumbers = false;
     this.showInvisibles = false;
     this.showPageGlow = localStorage.getItem('synchroEditPageGlow') === 'true';
     this.showPageBorder = localStorage.getItem('synchroEditPageBorder') === 'true';
     this.currentCanvasTheme = localStorage.getItem('synchroEditCanvasTheme') || 'classic';
     this.isFocusMode = false;
+  }
 
+  init() {
     this.setupEventListeners();
     this.applyPageGlow();
     this.applyPageBorder();
@@ -16,7 +20,7 @@ export class ReadabilityManager {
   setupEventListeners() {
     const addEvent = (id, event, handler) => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener(event, handler);
+      if (el) this.addDisposableListener(el, event, handler);
     };
 
     addEvent('canvasThemeSelect', 'change', (e) => this.setCanvasTheme(e.target.value));
@@ -31,7 +35,7 @@ export class ReadabilityManager {
         // Initialize value from localStorage
         const savedBg = localStorage.getItem('synchroEditBackgroundTheme') || 'dots';
         bgSelect.value = savedBg;
-        bgSelect.addEventListener('change', (e) => {
+        this.addDisposableListener(bgSelect, 'change', (e) => {
             if (window.app && window.app.background) {
                 window.app.background.setTheme(e.target.value);
             }
@@ -42,7 +46,7 @@ export class ReadabilityManager {
     const glowToggle = document.getElementById('togglePageGlow');
     if (glowToggle) {
         glowToggle.checked = this.showPageGlow;
-        glowToggle.addEventListener('change', (e) => {
+        this.addDisposableListener(glowToggle, 'change', (e) => {
             this.showPageGlow = e.target.checked;
             localStorage.setItem('synchroEditPageGlow', this.showPageGlow);
             this.applyPageGlow();
@@ -53,7 +57,7 @@ export class ReadabilityManager {
     const borderToggle = document.getElementById('togglePageBorder');
     if (borderToggle) {
         borderToggle.checked = this.showPageBorder;
-        borderToggle.addEventListener('change', (e) => {
+        this.addDisposableListener(borderToggle, 'change', (e) => {
             this.showPageBorder = e.target.checked;
             localStorage.setItem('synchroEditPageBorder', this.showPageBorder);
             this.applyPageBorder();

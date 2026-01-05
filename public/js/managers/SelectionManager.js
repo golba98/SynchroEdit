@@ -1,24 +1,28 @@
-export class SelectionManager {
-  constructor(editor) {
-    this.editor = editor;
+import { Plugin } from '/js/core/Plugin.js';
+
+export class SelectionManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.isSelecting = false;
     this.startPoint = null; // { pageIndex, index }
     this.currentPoint = null; // { pageIndex, index }
     
     // Store overlay elements for cleanup
     this.overlays = [];
-    
+  }
+
+  init() {
     this.setupGlobalListeners();
   }
 
   setupGlobalListeners() {
     // Global tracking
-    document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-    document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+    this.addDisposableListener(document, 'mousemove', (e) => this.handleMouseMove(e));
+    this.addDisposableListener(document, 'mouseup', (e) => this.handleMouseUp(e));
     
     // Intercept Copy/Cut
-    document.addEventListener('copy', (e) => this.handleCopy(e));
-    document.addEventListener('cut', (e) => this.handleCut(e));
+    this.addDisposableListener(document, 'copy', (e) => this.handleCopy(e));
+    this.addDisposableListener(document, 'cut', (e) => this.handleCut(e));
   }
 
   handleMouseDown(pageIndex, range) {

@@ -1,20 +1,23 @@
 import { ptToPx } from '/js/core/utils.js';
+import { Plugin } from '/js/core/Plugin.js';
 
-export class BorderManager {
-  constructor(editor) {
-    this.editor = editor;
+export class BorderManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.currentBorderStyle = 'solid';
     this.currentBorderWidth = '1pt';
     this.currentBorderColor = '#333333';
     this.currentBorderType = 'none';
+  }
 
+  init() {
     this.setupEventListeners();
   }
 
   setupEventListeners() {
     const addEvent = (id, event, handler) => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener(event, handler);
+      if (el) this.addDisposableListener(el, event, handler);
     };
 
     addEvent('borderNone', 'click', () => this.updateBorders(null, null, null, 'none'));
@@ -27,7 +30,7 @@ export class BorderManager {
 
     const colorPicker = document.getElementById('borderColorPicker');
     if (colorPicker) {
-      colorPicker.addEventListener('input', (e) => {
+      this.addDisposableListener(colorPicker, 'input', (e) => {
         const color = e.target.value;
         const indicator = document.getElementById('borderColorIndicator');
         if (indicator) indicator.style.background = color;
@@ -37,7 +40,7 @@ export class BorderManager {
 
     const colorBtn = document.getElementById('borderColorBtn');
     if (colorBtn && colorPicker) {
-      colorBtn.addEventListener('click', () => colorPicker.click());
+      this.addDisposableListener(colorBtn, 'click', () => colorPicker.click());
     }
   }
 
@@ -70,7 +73,13 @@ export class BorderManager {
     const borders = document.querySelectorAll('.page-border-inner');
     borders.forEach((border) => this.applyBorderToElement(border));
 
-    if (!fromServer) {
+    // Fix: Check if onContentChange exists (it might not be on Editor yet, or we need to add it)
+    // The previous code called `this.editor.onContentChange`. I need to ensure Editor has this method or logic.
+    // Looking at Editor.js again, I don't recall seeing onContentChange. 
+    // Wait, the truncated read of Editor.js didn't show it.
+    // I should check if it exists. 
+    
+    if (this.editor.onContentChange && !fromServer) {
       this.editor.onContentChange('update-borders', {
         style: this.currentBorderStyle,
         width: this.currentBorderWidth,

@@ -10,6 +10,7 @@ import { ImageManager } from '/js/managers/ImageManager.js';
 import { ToolbarController } from '/js/ui/ToolbarController.js';
 import { ReadabilityManager } from '/js/managers/ReadabilityManager.js';
 import { NavigationManager } from '/js/managers/NavigationManager.js';
+import { SearchManager } from '/js/managers/SearchManager.js';
 import { Auth } from '/js/ui/auth.js';
 import { Network } from '/js/core/network.js';
 import { debounce } from '/js/core/utils.js';
@@ -40,15 +41,18 @@ export class Editor {
     this.user = user;
     this.yPages = this.doc.getArray('pages');
 
-    // Managers
-    this.pageManager = new PageManager(this);
-    this.borderManager = new BorderManager(this);
-    this.cursorManager = new CursorManager(this);
-    this.selectionManager = new SelectionManager(this);
-    this.imageManager = new ImageManager(this);
-    this.toolbarController = new ToolbarController(this);
-    this.readabilityManager = new ReadabilityManager(this);
-    this.navigationManager = new NavigationManager(this);
+    this.plugins = new Map();
+
+    // Register Core Plugins (Managers)
+    this.pageManager = this.registerPlugin(PageManager);
+    this.borderManager = this.registerPlugin(BorderManager);
+    this.cursorManager = this.registerPlugin(CursorManager);
+    this.selectionManager = this.registerPlugin(SelectionManager);
+    this.imageManager = this.registerPlugin(ImageManager);
+    this.toolbarController = this.registerPlugin(ToolbarController);
+    this.readabilityManager = this.registerPlugin(ReadabilityManager);
+    this.navigationManager = this.registerPlugin(NavigationManager);
+    this.searchManager = this.registerPlugin(SearchManager);
     
     this.setupGlobalListeners();
 
@@ -60,6 +64,16 @@ export class Editor {
 
     this.yPages.observe(event => {
         this.renderAllPages(event);
+    });
+
+    // Persistence: Save to IndexedDB on every update (debounced)
+    this.doc.on('update', debounce(() => {
+        this.saveToCache(docId);
+    }, 1000));
+
+    // Persistence: Save immediately on close
+    window.addEventListener('beforeunload', () => {
+        this.saveToCache(docId);
     });
 
     this.setupTitleDebounce();
@@ -380,6 +394,27 @@ export class Editor {
     if (currentPageMap) {
         this.quill = this.pageQuillInstances.get(currentPageMap.get('id')) || null;
     }
+  }
+
+  registerPlugin(PluginClass, options = {}) {
+      const pluginName = PluginClass.name;
+      if (this.plugins.has(pluginName)) {
+          console.warn(`Plugin ${pluginName} is already registered.`);
+          return this.plugins.get(pluginName);
+      }
+
+      const plugin = new PluginClass(this, options);
+      this.plugins.set(pluginName, plugin);
+
+      if (typeof plugin.init === 'function') {
+          plugin.init();
+      }
+
+      return plugin;
+  }
+
+  getPlugin(name) {
+      return this.plugins.get(name);
   }
 
   setupGlobalListeners() {

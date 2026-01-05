@@ -1,4 +1,5 @@
 import * as Y from 'yjs';
+import { Plugin } from '/js/core/Plugin.js';
 
 export const PAGE_SIZES = {
     a4: { height: 1123, width: 794 }, 
@@ -11,9 +12,9 @@ export const PAGE_SIZES = {
  * 
  * High-precision pagination engine.
  */
-export class PageManager {
-  constructor(editor) {
-    this.editor = editor;
+export class PageManager extends Plugin {
+  constructor(editor, options) {
+    super(editor, options);
     this.isReflowing = false;
     this.pendingUpdate = null;
     this.cascadeCount = 0;
@@ -96,7 +97,7 @@ export class PageManager {
             // Handle Empty Pages (except the last one)
             if (totalLength <= 1 && i < pages.length - 1) {
                 this.editor.doc.transact(() => {
-                    this.editor.yPages.delete(i + 1, 1);
+                    this.editor.yPages.delete(i, 1);
                 });
                 this.scheduleReflow(true);
                 return;
@@ -181,7 +182,7 @@ export class PageManager {
       const lines = quill.getLines();
       if (lines.length === 0) return { hasOverflow: false, splitIndex: 0 };
 
-      // Optimized: First find the line that overflows
+      // 1. Find the Block (Paragraph) that overflows
       let low = 0;
       let high = lines.length - 1;
       let overflowingLineIndex = -1;
@@ -203,9 +204,41 @@ export class PageManager {
 
       if (overflowingLineIndex === -1) return { hasOverflow: false, splitIndex: 0 };
 
-      // Then find the exact character in that line if needed (usually the start of the line is the split point)
+      // 2. Character-Level Precision
+      // If the block itself starts *before* the overflow but ends *after* it,
+      // we need to split *inside* the block.
       const targetLine = lines[overflowingLineIndex];
-      const splitIndex = quill.getIndex(targetLine);
+      const startIndex = quill.getIndex(targetLine);
+      const length = targetLine.length();
+      
+      // Binary search for the character that crosses the line
+      let charLow = 0;
+      let charHigh = length - 1;
+      let splitOffset = 0;
+      
+      // Optimization: If the start of the block is already overflowing, 
+      // we must split at the start (or constrain it if it's an image/huge text).
+      const startBounds = quill.getBounds(startIndex);
+      if (startBounds && (startBounds.top / scale) > this.MAX_CONTENT_HEIGHT) {
+          return { hasOverflow: true, splitIndex: startIndex };
+      }
+
+      while (charLow <= charHigh) {
+          const mid = Math.floor((charLow + charHigh) / 2);
+          const bounds = quill.getBounds(startIndex + mid);
+          const logicalBottom = (bounds ? bounds.bottom : 0) / scale;
+
+          if (logicalBottom > this.MAX_CONTENT_HEIGHT) {
+              splitOffset = mid;
+              charHigh = mid - 1;
+          } else {
+              charLow = mid + 1;
+          }
+      }
+      
+      // If we found a split point inside the line, use it.
+      // Otherwise, default to start of line (though logicalBottom check above covers this).
+      const splitIndex = startIndex + splitOffset;
       
       return { hasOverflow: true, splitIndex };
   }

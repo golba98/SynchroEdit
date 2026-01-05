@@ -549,6 +549,6 @@ exports.resetPassword = async (req, res, next) => {
 
     await user.save();
 
-    // Log the user in immediately
-    await sendTokens(user, 200, req, res, 'Password successfully reset');
+    // Do NOT log the user in immediately. Require manual login.
+    res.status(200).json({ message: 'Password reset successful. Please log in with your new password.' });
 };

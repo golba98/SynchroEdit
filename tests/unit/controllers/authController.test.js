@@ -248,4 +248,56 @@ describe('Auth Controller Unit Tests', () => {
         expect(res.json).toHaveBeenCalledWith({ message: 'Logged out successfully' });
     });
   });
+
+  describe('resetPassword', () => {
+    it('should reset password and return success message without logging in', async () => {
+      req.body = { token: 'valid-token', password: 'NewPassword123!' };
+      const mockUser = {
+        password: 'oldHash',
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        save: jest.fn().mockResolvedValue(true)
+      };
+
+      // Mock crypto.createHash
+      const mockHash = {
+        update: jest.fn().mockReturnThis(),
+        digest: jest.fn().mockReturnValue('hashedToken')
+      };
+      require('crypto').createHash = jest.fn().mockReturnValue(mockHash);
+
+      User.findOne.mockResolvedValue(mockUser);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(User.findOne).toHaveBeenCalled();
+      expect(mockUser.password).toBe('NewPassword123!');
+      expect(mockUser.passwordResetToken).toBeUndefined();
+      expect(mockUser.passwordResetExpires).toBeUndefined();
+      expect(mockUser.save).toHaveBeenCalled();
+      
+      // Crucial check: Should NOT set cookie (no auto-login)
+      expect(res.cookie).not.toHaveBeenCalled();
+      
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ 
+        message: 'Password reset successful. Please log in with your new password.' 
+      });
+    });
+
+    it('should return error if token is invalid or expired', async () => {
+      req.body = { token: 'invalid-token', password: 'NewPassword123!' };
+      
+      require('crypto').createHash = jest.fn().mockReturnValue({
+        update: jest.fn().mockReturnThis(),
+        digest: jest.fn().mockReturnValue('hashedInvalid')
+      });
+
+      User.findOne.mockResolvedValue(null);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
 });

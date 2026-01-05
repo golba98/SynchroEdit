@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:10000"
+    environment:
+      - PORT=10000
+      - MONGODB_URI=mongodb://mongo:27017/synchroedit
+      - JWT_SECRET=local_docker_jwt_secret
+      - NODE_ENV=production
+      - DISABLE_SECURE_COOKIE=true
+    depends_on:
+      - mongo
+    restart: always
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+volumes:
+  mongo-data:

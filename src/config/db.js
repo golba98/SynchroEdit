@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 
-const connectDB = async () => {
+const connectDB = async (retries = 5, delay = 5000) => {
     const MONGODB_URI = process.env.MONGODB_URI;
 
     if (!MONGODB_URI) {
@@ -19,12 +19,21 @@ const connectDB = async () => {
         logger.info(`Attempting to connect to MongoDB: ${maskedUri}`);
     }
 
-    try {
-        await mongoose.connect(MONGODB_URI);
-        logger.info('Connected to MongoDB');
-    } catch (err) {
-        logger.error('MongoDB connection error:', err);
-        process.exit(1);
+    for (let i = 0; i < retries; i++) {
+        try {
+            await mongoose.connect(MONGODB_URI);
+            logger.info('Connected to MongoDB');
+            return;
+        } catch (err) {
+            logger.error(`MongoDB connection attempt ${i + 1}/${retries} failed:`, err.message);
+            if (i < retries - 1) {
+                logger.info(`Retrying in ${delay / 1000} seconds...`);
+                await new Promise(res => setTimeout(res, delay));
+            } else {
+                logger.error('All MongoDB connection attempts failed. Exiting.');
+                process.exit(1);
+            }
+        }
     }
 };
 

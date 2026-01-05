@@ -163,10 +163,61 @@ export class Editor {
               console.log('Loaded document from IndexedDB cache');
               Y.applyUpdate(this.doc, cachedUpdate);
               this.renderAllPages(); 
+              
+              // Restore View State
+              const savedView = localStorage.getItem(`doc-view-${docId}`);
+              if (savedView) {
+                  const { scrollTop, pageIndex, cursorIndex } = JSON.parse(savedView);
+                  
+                  // Wait for render
+                  setTimeout(() => {
+                      if (typeof pageIndex === 'number') {
+                          // Force switch to ensure mount
+                          this.switchToPage(pageIndex);
+                          
+                          // Restore Scroll
+                          const container = document.getElementById('pagesContainer');
+                          if (container && scrollTop) {
+                              container.scrollTop = scrollTop;
+                          }
+
+                          // Restore Cursor
+                          if (typeof cursorIndex === 'number' && this.quill) {
+                              // We need to wait for the Quill instance to be ready and focused
+                              this.quill.setSelection(cursorIndex, 0);
+                              this.quill.blur(); // Don't force focus immediately to avoid jumping if user is just viewing
+                          }
+                      }
+                  }, 100);
+              }
           }
       } catch (err) {
           console.warn('Failed to load from IndexedDB:', err);
       }
+  }
+
+  async saveToCache(docId) {
+      if (!docId) return;
+      
+      // Save Yjs Update
+      const update = Y.encodeStateAsUpdate(this.doc);
+      await set(`doc-store-${docId}`, update);
+      
+      // Save View State
+      const container = document.getElementById('pagesContainer');
+      let cursorIndex = null;
+      if (this.quill) {
+          const range = this.quill.getSelection();
+          if (range) cursorIndex = range.index;
+      }
+      
+      const viewState = {
+          scrollTop: container ? container.scrollTop : 0,
+          pageIndex: this.currentPageIndex,
+          cursorIndex: cursorIndex
+      };
+      
+      localStorage.setItem(`doc-view-${docId}`, JSON.stringify(viewState));
   }
 
   async connectWebSocket(docId, user) {
@@ -241,12 +292,6 @@ export class Editor {
             this.provider.awareness.setLocalStateField('user', null);
         }
     }
-  }
-
-  async saveToCache(docId) {
-      if (!docId) return;
-      const update = Y.encodeStateAsUpdate(this.doc);
-      await set(`doc-store-${docId}`, update);
   }
 
   createPlaceholderPage() {

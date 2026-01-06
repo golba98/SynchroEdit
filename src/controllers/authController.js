@@ -152,8 +152,7 @@ exports.signup = async (req, res, next) => {
 
   // Password Complexity Policy
   // Min 8 chars, 1 Upper, 1 Lower, 1 Number, 1 Symbol
-  const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
-  if (!complexityRegex.test(password)) {
+  if (!User.PASSWORD_REGEX.test(password)) {
       return next(new AppError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).', 400));
   }
 
@@ -570,8 +569,7 @@ exports.resetPassword = async (req, res, next) => {
     }
 
     // Password complexity check (Duplicate from signup, ideally helper function)
-    const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
-    if (!complexityRegex.test(password)) {
+    if (!User.PASSWORD_REGEX.test(password)) {
         return await invalidateAndError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).');
     }
 

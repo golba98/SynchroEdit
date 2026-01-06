@@ -18,6 +18,7 @@ jest.mock('mongoose', () => {
   class MockSchema {
     constructor() {
       this.methods = {};
+      this.statics = {};
     }
     pre() {}
   }
@@ -28,6 +29,9 @@ jest.mock('mongoose', () => {
     save: jest.fn().mockResolvedValue(doc),
   }));
   
+  // Mock Static Property used in Controller
+  MockModel.PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
+
   MockModel.findOne = jest.fn();
   MockModel.findById = jest.fn();
   MockModel.deleteOne = jest.fn();

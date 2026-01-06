@@ -16,6 +16,12 @@ export class LibraryManager {
     const closeBtn = document.getElementById('closeLibrary');
     if (closeBtn) closeBtn.style.display = this.app.documentId ? 'block' : 'none';
 
+    // Bind FAB
+    const fab = document.getElementById('fabCreateDoc');
+    if (fab) {
+        fab.onclick = () => this.createNewDocument();
+    }
+
     const renderList = (docs) => {
       UI.renderDocumentList(
         document.getElementById('documentList'),

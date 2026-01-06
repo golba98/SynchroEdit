@@ -117,11 +117,25 @@ export class ToolbarController extends Plugin {
     if (imageInput) {
       this.addDisposableListener(imageInput, 'change', (e) => {
         const file = e.target.files[0];
+        
+        // Fallback: If no active quill (user hasn't clicked yet), use the first page
+        if (!this.editor.quill && this.editor.pageQuillInstances.size > 0) {
+            this.editor.quill = this.editor.pageQuillInstances.values().next().value;
+        }
+
         if (file && this.editor.quill) {
           const reader = new FileReader();
           reader.onload = (e) => {
+            // Get selection or default to end
             const range = this.editor.quill.getSelection(true);
-            this.editor.quill.insertEmbed(range.index, 'image', e.target.result);
+            const index = range ? range.index : this.editor.quill.getLength() - 1;
+            
+            this.editor.quill.insertEmbed(index, 'image', e.target.result);
+            
+            // Force a reflow check in case image overflows
+            if (this.editor.pageManager) {
+                setTimeout(() => this.editor.pageManager.performReflowCheck(), 100);
+            }
           };
           reader.readAsDataURL(file);
         }

@@ -208,6 +208,7 @@ export class AuthController {
         const reqs = {
             length: password.length >= 8,
             upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
             number: /[0-9]/.test(password),
             symbol: /[!@#$%^&*]/.test(password)
         };
@@ -226,12 +227,12 @@ export class AuthController {
         });
 
         const segment = document.getElementById('entropySegment');
-        const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
-        const percentage = (score / 4) * 100;
+        const colors = ['#ef4444', '#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
+        const percentage = (score / 5) * 100;
         segment.style.width = `${percentage}%`;
         segment.className = 'entropy-segment';
         if (score > 0) segment.style.backgroundColor = colors[score - 1];
-        if (score === 4) segment.classList.add('entropy-elite');
+        if (score === 5) segment.classList.add('entropy-elite');
     }
 
     checkPasswordMatch() {

@@ -91,4 +91,36 @@ describe('User Model Unit Tests', () => {
       expect(isMatch).toBe(false);
     });
   });
+
+  describe('Password Validation', () => {
+    it('should be invalid if password is too short', () => {
+      const user = new User({
+        username: 'valid',
+        email: 'valid@test.com',
+        password: 'short',
+      });
+      const err = user.validateSync();
+      expect(err.errors.password).toBeDefined();
+    });
+
+    it('should be invalid if password lacks complexity', () => {
+      const user = new User({
+        username: 'valid',
+        email: 'valid@test.com',
+        password: 'password123', // missing symbol/upper
+      });
+      const err = user.validateSync();
+      expect(err.errors.password).toBeDefined();
+    });
+
+    it('should be valid if password meets all requirements', () => {
+      const user = new User({
+        username: 'valid',
+        email: 'valid@test.com',
+        password: 'Password1!',
+      });
+      const err = user.validateSync();
+      expect(err).toBeUndefined();
+    });
+  });
 });

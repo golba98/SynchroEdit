@@ -1975,3 +1975,151 @@ body.bg-code-mode .main-workspace,
 body.bg-code-mode .pages-container {
   background-color: rgba(0, 0, 0, 0.3) !important;
 }
+
+/* =========================================
+   MOBILE & RESPONSIVE DASHBOARD (Fluid Layout)
+   ========================================= */
+
+/* Bottom Navigation (Mobile Only) */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #0a0a0a;
+  border-top: 1px solid #1a1a1a;
+  padding: 10px 0;
+  z-index: 9000;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav-item {
+  color: #666;
+  text-align: center;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.bottom-nav-item i {
+  font-size: 20px;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-color);
+}
+
+/* Floating Action Button (FAB) */
+.fab-create {
+  display: none;
+  position: fixed;
+  bottom: 80px; /* Above bottom nav */
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.4);
+  z-index: 9001;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.fab-create:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Media Queries */
+@media (max-width: 768px) {
+  /* Hide Desktop Elements */
+  #menuBtn, 
+  #localModeBadge,
+  .sidebar,
+  .sidebar-right {
+    display: none !important;
+  }
+  
+  /* Show Mobile Elements */
+  .bottom-nav { display: flex; }
+  .fab-create { display: flex; }
+  
+  /* Document Library Adjustments */
+  #docLibrary {
+    padding-bottom: 70px; /* Space for bottom nav */
+  }
+
+  #docLibrary > div {
+    padding: 20px !important; /* Reduce padding */
+  }
+
+  /* Grid to List Transformation */
+  #docLibrary .create-doc-card,
+  .doc-list-container {
+    width: 100%;
+  }
+
+  #createNewDoc {
+    display: none; /* Hide the big desktop card in favor of FAB */
+  }
+
+  /* Header adjustments */
+  .header {
+    padding: 8px 16px;
+  }
+  
+  #docTitle {
+    font-size: 16px;
+  }
+
+  /* Full Width Search */
+  #docSearch {
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+    max-width: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  /* Ribbon / Toolbar Mobile */
+  .ribbon-tabs {
+    overflow-x: auto;
+    padding: 0 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .ribbon-tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  /* Pages Container */
+  .pages-container {
+    padding: 20px 10px 100px 10px; /* More bottom padding for keyboard */
+  }
+  
+  .page-scaler {
+    width: 100% !important;
+    height: auto !important; /* Allow growing */
+    min-height: 500px;
+    padding: 20px;
+    transform: none !important; /* Disable scaling logic on mobile for native feel */
+  }
+  
+  .editor-container {
+    width: 100% !important;
+    height: auto !important;
+    margin-bottom: 20px;
+  }
+
+  /* Hide zoom controls on mobile (use pinch) */
+  .zoom-level { display: none; }
+}

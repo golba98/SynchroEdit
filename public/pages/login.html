@@ -306,6 +306,58 @@
       }
 
       /* =========================================
+         MOBILE RESPONSIVE ADJUSTMENTS
+         ========================================= */
+      @media (max-width: 768px) {
+        .login-container {
+            flex-direction: column-reverse; /* Stack: Bot on Top, Form on Bottom */
+            width: 95% !important;
+            min-height: auto;
+            border-radius: 30px;
+            overflow: visible; /* Allow bot to peek out if needed */
+        }
+
+        .left-section {
+            padding: 40px 25px;
+            background: #000000;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .right-section {
+            height: 250px; /* Reduced height for header */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .character-container {
+            width: 100%;
+            height: 100%;
+            transform: scale(0.7); /* Scale down bot */
+            transform-origin: center bottom;
+        }
+
+        /* Touch Optimizations */
+        .input-group input {
+            padding: 16px; /* Larger tap area */
+            font-size: 16px; /* Prevent auto-zoom on iOS */
+            min-height: 52px;
+        }
+
+        .login-btn {
+            padding: 18px;
+            min-height: 52px;
+            font-size: 18px;
+        }
+
+        .password-toggle {
+            padding: 10px; /* Expand hit area */
+            right: 10px;
+        }
+        
+        .title { font-size: 28px; }
+      }
+
+      /* =========================================
          SYNCHROBOT 2.0 - VISUAL RIG
          ========================================= */
       .right-section {
@@ -682,7 +734,7 @@
           </div>
 
           <div class="input-group floating-label-container">
-            <input type="email" id="signupEmail" placeholder=" " autocomplete="email" class="glow-on-hover input-glow-focus" />
+            <input type="email" id="signupEmail" placeholder=" " autocomplete="email" inputmode="email" class="glow-on-hover input-glow-focus" />
             <label for="signupEmail" class="floating-label">Email Address</label>
             <div id="emailSuggestion" style="display: none; margin-top: 5px; font-size: 11px; color: var(--accent-color-light); cursor: pointer;"></div>
           </div>
@@ -755,7 +807,7 @@
         <h2 style="color: #a78bfa; margin-bottom: 16px; font-size: 20px">Verify Your Email</h2>
         <p style="color: #b0b0b0; margin-bottom: 24px; font-size: 14px">We've sent a verification code to your email. Enter it below:</p>
         <div style="margin-bottom: 24px">
-          <input type="text" id="verificationCode" placeholder="Enter 6-digit code" style="width: 100%; padding: 12px; border: 1px solid #8b5cf6; border-radius: 6px; background: #1a1a1a; color: #e0e0e0; font-size: 16px; text-align: center; letter-spacing: 4px; outline: none;" maxlength="6" />
+          <input type="text" id="verificationCode" placeholder="Enter 6-digit code" inputmode="numeric" pattern="[0-9]*" style="width: 100%; padding: 12px; border: 1px solid #8b5cf6; border-radius: 6px; background: #1a1a1a; color: #e0e0e0; font-size: 16px; text-align: center; letter-spacing: 4px; outline: none;" maxlength="6" />
         </div>
         <button id="verifyCodeBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px;">Verify Code</button>
         <button id="resendCodeBtn" style="width: 100%; padding: 12px; background: transparent; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 6px; cursor: pointer; font-weight: 600;">Resend Code</button>

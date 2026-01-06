@@ -21,9 +21,26 @@ export class App {
     this.uiManager = new UIManager(this);
     this.connectionTimer = null;
 
+    // Offline Indicator
+    window.addEventListener('offline', () => this.showOfflineIndicator(true));
+    window.addEventListener('online', () => this.showOfflineIndicator(false));
+
     window.app = this; // Expose app instance
     this.init();
     this.registerServiceWorker();
+  }
+
+  showOfflineIndicator(isOffline) {
+      const el = document.getElementById('offlineIndicator');
+      if (el) {
+          el.style.display = isOffline ? 'block' : 'none';
+          if (!isOffline) {
+              // Reconnect logic if needed
+              if (this.editor && this.editor.reconnect && this.user) {
+                  this.editor.reconnect(this.user);
+              }
+          }
+      }
   }
 
   registerServiceWorker() {

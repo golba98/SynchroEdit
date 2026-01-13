@@ -16,6 +16,10 @@ export class LibraryManager {
     const closeBtn = document.getElementById('closeLibrary');
     if (closeBtn) closeBtn.style.display = this.app.documentId ? 'block' : 'none';
 
+    if (this.app.uiManager) {
+        this.app.uiManager.updateMobileUIState();
+    }
+
     // Bind FAB
     const fab = document.getElementById('fabCreateDoc');
     if (fab) {

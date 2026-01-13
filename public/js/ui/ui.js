@@ -86,37 +86,6 @@ export const UI = {
         onOpen(docItem.dataset.docId);
       }
     };
-
-    // Mobile Bottom Nav Setup (Simple routing for now)
-    const navHome = document.getElementById('navHome');
-    const navProfile = document.getElementById('navProfile');
-    const navShared = document.getElementById('navShared'); // Placeholder for now
-
-    if (navHome) {
-        navHome.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Show Library, Hide Editor logic if implemented globally
-            if (window.app && window.app.libraryManager) {
-                window.app.libraryManager.showLibrary();
-            }
-            UI.updateActiveNav('navHome');
-        });
-    }
-
-    if (navProfile) {
-        navProfile.addEventListener('click', (e) => {
-            e.preventDefault();
-            const modal = document.getElementById('profileModal');
-            if (modal) modal.style.display = 'flex';
-            UI.updateActiveNav('navProfile');
-        });
-    }
-  },
-
-  updateActiveNav(activeId) {
-      document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
-      const active = document.getElementById(activeId);
-      if (active) active.classList.add('active');
   },
 
   updateCollaboratorsUI(container, users, currentUsername) {

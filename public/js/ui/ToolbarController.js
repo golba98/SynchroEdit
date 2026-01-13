@@ -56,10 +56,13 @@ export class ToolbarController extends Plugin {
       });
     });
 
-    // Alignment
-    document.querySelectorAll('.ql-align').forEach((sel) => {
-      this.addDisposableListener(sel, 'change', (e) => {
-        if (this.editor.quill) this.editor.quill.format('align', e.target.value);
+    // Alignment (selects and buttons)
+    document.querySelectorAll('.ql-align').forEach((el) => {
+      const eventType = el.tagName === 'SELECT' ? 'change' : 'click';
+      this.addDisposableListener(el, eventType, (e) => {
+        if (!this.editor.quill) return;
+        const val = el.tagName === 'SELECT' ? e.target.value : el.getAttribute('value') || '';
+        this.editor.quill.format('align', val);
       });
     });
 

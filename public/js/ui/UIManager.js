@@ -8,6 +8,7 @@ export class UIManager {
   }
 
   setupEventListeners() {
+    this.setupMobileEvents();
     const addEvent = (id, event, handler) => {
       const el = document.getElementById(id);
       if (el) el.addEventListener(event, handler);
@@ -25,6 +26,7 @@ export class UIManager {
         const libraryOverlay = document.getElementById('libraryOverlay');
         if (docLibrary) docLibrary.style.display = 'none';
         if (libraryOverlay) libraryOverlay.style.display = 'none';
+        this.updateMobileUIState();
       }
     });
 
@@ -225,6 +227,112 @@ export class UIManager {
       }
     });
   }
+
+  setupMobileEvents() {
+    const isMobile = window.innerWidth <= 768;
+    
+    // FAB Logic
+    const fabCreate = document.getElementById('fabCreateDoc');
+    const fabEdit = document.getElementById('fabEditDoc');
+    const mobileToolbar = document.getElementById('mobileContextualToolbar');
+
+    if (fabCreate) {
+        fabCreate.addEventListener('click', () => {
+            this.app.libraryManager.createNewDocument();
+        });
+    }
+
+    if (fabEdit) {
+        fabEdit.addEventListener('click', () => {
+            if (this.app.editor && this.app.editor.quill) {
+                this.app.editor.quill.focus();
+                this.setMobileEditMode(true);
+            }
+        });
+    }
+
+    // Bottom Nav
+    const navItems = document.querySelectorAll('.bottom-nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            navItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            if (item.id === 'navHome') {
+                this.app.libraryManager.showLibrary();
+            } else if (item.id === 'navProfile') {
+                const modal = document.getElementById('profileModal');
+                if (modal) modal.style.display = 'flex';
+            }
+            // navShared is placeholder for now
+        });
+    });
+
+    // Mobile Toolbar Close Keyboard
+    const closeKbd = document.getElementById('mobileCloseKeyboard');
+    if (closeKbd) {
+        closeKbd.addEventListener('click', () => {
+            if (this.app.editor && this.app.editor.quill) {
+                this.app.editor.quill.blur();
+                this.setMobileEditMode(false);
+            }
+        });
+    }
+
+    // Initial state
+    this.updateMobileUIState();
+
+    // Listen for editor focus/blur to toggle toolbar
+    document.addEventListener('focusin', (e) => {
+        if (isMobile && e.target.closest('.ql-editor')) {
+            this.setMobileEditMode(true);
+        }
+    });
+
+    // We don't blur immediately on focusout because clicking a toolbar button might trigger focusout
+    // Instead, we rely on the Close Keyboard button or manual blur
+  }
+
+  updateMobileUIState() {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+
+    const fabCreate = document.getElementById('fabCreateDoc');
+    const fabEdit = document.getElementById('fabEditDoc');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const docLibrary = document.getElementById('docLibrary');
+
+    const isLibraryVisible = docLibrary && docLibrary.style.display !== 'none';
+    const hasDocument = !!this.app.documentId;
+
+    if (isLibraryVisible) {
+        if (fabCreate) fabCreate.style.display = 'flex';
+        if (fabEdit) fabEdit.style.display = 'none';
+        if (bottomNav) bottomNav.style.display = 'flex';
+    } else if (hasDocument) {
+        if (fabCreate) fabCreate.style.display = 'none';
+        if (fabEdit) fabEdit.style.display = 'flex';
+        if (bottomNav) bottomNav.style.display = 'none';
+    }
+  }
+
+  setMobileEditMode(active) {
+    const toolbar = document.getElementById('mobileContextualToolbar');
+    const fabEdit = document.getElementById('fabEditDoc');
+    const header = document.querySelector('.header');
+
+    if (active) {
+        if (toolbar) toolbar.style.display = 'block';
+        if (fabEdit) fabEdit.style.display = 'none';
+        if (header) header.style.height = '50px'; // Slimmer header in edit mode
+    } else {
+        if (toolbar) toolbar.style.display = 'none';
+        if (fabEdit) fabEdit.style.display = 'flex';
+        if (header) header.style.height = '60px';
+    }
+  }
+
 
   setupRibbonTabs() {
     const tabs = document.querySelectorAll('.ribbon-tab');

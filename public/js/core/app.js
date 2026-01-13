@@ -199,6 +199,10 @@ export class App {
 
       document.getElementById("docLibrary").style.display = "none";
       document.getElementById("libraryOverlay").style.display = "none";
+      
+      if (this.uiManager) {
+          this.uiManager.updateMobileUIState();
+      }
     } catch (err) {
       console.error("Failed to load document:", err);
       this.libraryManager.showLibrary();

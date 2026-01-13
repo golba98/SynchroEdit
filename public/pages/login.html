@@ -311,52 +311,72 @@
          MOBILE RESPONSIVE ADJUSTMENTS
          ========================================= */
       @media (max-width: 768px) {
+        body {
+            align-items: flex-start; /* Allow scrolling if needed, start from top */
+            padding: 20px 0;
+            overflow-y: auto; /* Enable scrolling on mobile */
+            min-height: 100dvh; /* Use dynamic viewport height */
+        }
+
         .login-container {
             flex-direction: column-reverse; /* Stack: Bot on Top, Form on Bottom */
-            width: 95% !important;
+            width: 90% !important;
+            max-width: 400px; /* Limit width on tablets */
             min-height: auto;
-            border-radius: 30px;
-            overflow: visible; /* Allow bot to peek out if needed */
+            border-radius: 24px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .left-section {
-            padding: 40px 25px;
+            padding: 30px 24px;
             background: #000000;
-            border-radius: 0 0 30px 30px;
+            border-radius: 0 0 24px 24px;
         }
 
         .right-section {
-            height: 250px; /* Reduced height for header */
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
-            border-radius: 30px 30px 0 0;
+            height: 160px; /* Drastically reduced height */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+            border-radius: 24px 24px 0 0;
+            border-bottom: 1px solid #1a1a1a;
         }
 
         .character-container {
             width: 100%;
             height: 100%;
-            transform: scale(0.7); /* Scale down bot */
+            transform: scale(0.45); /* Much smaller bot */
             transform-origin: center bottom;
+            margin-bottom: -10px; /* Pull it down slightly */
         }
 
         /* Touch Optimizations */
         .input-group input {
-            padding: 16px; /* Larger tap area */
+            padding: 14px;
             font-size: 16px; /* Prevent auto-zoom on iOS */
-            min-height: 52px;
+            min-height: 48px;
         }
 
         .login-btn {
-            padding: 18px;
-            min-height: 52px;
-            font-size: 18px;
+            padding: 16px;
+            min-height: 48px;
+            font-size: 16px;
         }
 
         .password-toggle {
-            padding: 10px; /* Expand hit area */
-            right: 10px;
+            padding: 12px;
+            right: 8px;
         }
         
-        .title { font-size: 28px; }
+        .title { 
+            font-size: 24px; 
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
       }
 
       /* =========================================

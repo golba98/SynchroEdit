@@ -18,6 +18,7 @@ jest.mock('mongoose', () => {
   class MockSchema {
     constructor() {
       this.methods = {};
+      this.statics = {};
     }
     pre() {}
   }
@@ -38,7 +39,10 @@ jest.mock('mongoose', () => {
       readyState: 1
     },
     Schema: MockSchema,
-    model: jest.fn(() => MockModel),
+    model: jest.fn((name, schema) => {
+        Object.assign(MockModel, schema.statics);
+        return MockModel;
+    }),
   };
 });
 

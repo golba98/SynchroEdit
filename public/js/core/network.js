@@ -134,6 +134,13 @@ export const Network = {
     });
   },
 
+  async transferOwnership(docId, newOwnerUsername) {
+    return this.fetchAPI(`/api/documents/${docId}/transfer`, {
+      method: 'POST',
+      body: JSON.stringify({ newOwnerUsername }),
+    });
+  },
+
   initWebSocket(documentId, onMessage, onStatusChange) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}`;

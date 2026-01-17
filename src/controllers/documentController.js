@@ -187,3 +187,46 @@ exports.getHistory = async (req, res, next) => {
 
   res.json(history);
 };
+
+exports.transferOwnership = async (req, res, next) => {
+  const docId = req.params.id;
+  const { newOwnerUsername } = req.body;
+
+  if (!newOwnerUsername) {
+    return next(new AppError('New owner username is required', 400));
+  }
+
+  const doc = await Document.findById(docId);
+  if (!doc) return next(new AppError('Document not found', 404));
+
+  if (doc.owner.toString() !== req.user.id) {
+    return next(new AppError('Access denied. Only the owner can transfer ownership.', 403));
+  }
+
+  const newOwner = await User.findOne({ username: newOwnerUsername });
+  if (!newOwner) {
+    return next(new AppError('User not found', 404));
+  }
+
+  if (newOwner._id.toString() === req.user.id) {
+    return next(new AppError('You are already the owner of this document', 400));
+  }
+
+  // Transfer ownership
+  doc.owner = newOwner._id;
+
+  // Add old owner to sharedWith if not already there, so they don't lose access immediately
+  if (!doc.sharedWith.includes(req.user.id)) {
+    doc.sharedWith.push(req.user.id);
+  }
+
+  // Remove new owner from sharedWith if they were there (cleanup)
+  doc.sharedWith = doc.sharedWith.filter(id => id.toString() !== newOwner._id.toString());
+
+  await doc.save();
+
+  logHistory(doc._id, req.user.id, req.user.username, `Transferred ownership to ${newOwnerUsername}`);
+  logger.info(`Document ownership transferred: ${docId} from ${req.user.username} to ${newOwnerUsername}`);
+
+  res.json({ message: `Ownership transferred to ${newOwnerUsername}` });
+};

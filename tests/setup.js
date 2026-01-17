@@ -18,13 +18,13 @@ let History;
 let mongoServer;
 
 if (isNodeEnv) {
-  mongoose = require('mongoose');
-  MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
-  
   // Only load server and models if we are NOT skipping DB setup (Integration Tests)
   // For Unit Tests (SKIP_DB_SETUP=true), we want to avoid loading these to prevent 
   // module caching that interferes with mocking.
   if (!process.env.SKIP_DB_SETUP) {
+    mongoose = require('mongoose');
+    MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
+    
     const serverModule = require('../src/server');
     server = serverModule.server;
     User = require('../src/models/User');

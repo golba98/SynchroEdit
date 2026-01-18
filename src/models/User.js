@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -23,7 +25,7 @@ const userSchema = new mongoose.Schema({
     minlength: [8, 'Password must be at least 8 characters long'],
     validate: {
       validator: function(v) {
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/.test(v);
+        return PASSWORD_REGEX.test(v);
       },
       message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*)'
     }
@@ -111,6 +113,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 // Expose Password Regex for Controller/Frontend usage consistency
-userSchema.statics.PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
+userSchema.statics.PASSWORD_REGEX = PASSWORD_REGEX;
 
 module.exports = mongoose.model('User', userSchema);

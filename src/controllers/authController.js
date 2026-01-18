@@ -17,6 +17,17 @@ const EMAIL_VERIFICATION_ENABLED = process.env.ENABLE_EMAIL_VERIFICATION !== 'fa
 const DUMMY_HASH = '$2a$10$K9p/9.tW2m2.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.8.';
 
 /**
+ * Validates password complexity against the shared policy.
+ * Throws AppError if validation fails.
+ */
+const validatePasswordComplexity = (password) => {
+    // Min 8 chars, 1 Upper, 1 Lower, 1 Number, 1 Symbol
+    if (!User.PASSWORD_REGEX.test(password)) {
+        throw new AppError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).', 400);
+    }
+};
+
+/**
  * Ensures a minimum response time to mitigate timing attacks.
  * Adds a small amount of jitter to prevent statistical analysis.
  */
@@ -151,9 +162,10 @@ exports.signup = async (req, res, next) => {
   }
 
   // Password Complexity Policy
-  // Min 8 chars, 1 Upper, 1 Lower, 1 Number, 1 Symbol
-  if (!User.PASSWORD_REGEX.test(password)) {
-      return next(new AppError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).', 400));
+  try {
+      validatePasswordComplexity(password);
+  } catch (err) {
+      return next(err);
   }
 
   username = username.trim();
@@ -568,9 +580,11 @@ exports.resetPassword = async (req, res, next) => {
         }
     }
 
-    // Password complexity check (Duplicate from signup, ideally helper function)
-    if (!User.PASSWORD_REGEX.test(password)) {
-        return await invalidateAndError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*).');
+    // Password complexity check
+    try {
+        validatePasswordComplexity(password);
+    } catch (err) {
+        return await invalidateAndError(err.message);
     }
 
     user.password = password;

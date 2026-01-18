@@ -1,3 +1,5 @@
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
+
 export function escapeHTML(str) {
   if (!str) return '';
   const div = document.createElement('div');

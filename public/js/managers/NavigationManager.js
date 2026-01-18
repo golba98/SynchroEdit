@@ -71,21 +71,45 @@ export class NavigationManager extends Plugin {
     const headings = [];
     const pagesArr = this.editor.yPages.toArray();
     
-    pagesArr.forEach((pageMap, index) => {
-      const pageId = pageMap.get('id');
-      const quill = this.editor.pageQuillInstances.get(pageId);
-      if (!quill) return;
+    pagesArr.forEach((pageMap, pageIndex) => {
+      const yText = pageMap.get('content');
+      if (!yText) return;
       
-      const lines = quill.getLines();
-      lines.forEach(line => {
-        const format = line.formats();
-        if (format.header) {
-          headings.push({
-            level: format.header,
-            text: line.domNode.textContent,
-            pageIndex: index,
-            node: line.domNode
-          });
+      const delta = yText.toDelta();
+      let currentLineText = '';
+      let currentLineStart = 0;
+      let pos = 0;
+
+      delta.forEach(op => {
+        if (op.insert) {
+          if (typeof op.insert === 'string') {
+            for (let i = 0; i < op.insert.length; i++) {
+              const char = op.insert[i];
+              if (char === '\n') {
+                // End of line - check for header attribute
+                if (op.attributes && op.attributes.header) {
+                  // Clean text (remove excessive whitespace if needed, but keeping it raw is usually fine)
+                  const text = currentLineText.trim();
+                  if (text) {
+                    headings.push({
+                      level: op.attributes.header,
+                      text: text,
+                      pageIndex: pageIndex,
+                      index: currentLineStart // Start position of the heading line
+                    });
+                  }
+                }
+                currentLineText = '';
+                currentLineStart = pos + 1;
+              } else {
+                currentLineText += char;
+              }
+              pos++;
+            }
+          } else {
+            // Embed (image etc) - counts as 1 char
+            pos++;
+          }
         }
       });
     });
@@ -95,24 +119,45 @@ export class NavigationManager extends Plugin {
       return;
     }
 
-    this.outlineContainer.innerHTML = headings.map((h, i) => `
-      <div class="outline-item outline-h${h.level} ${this.collapsedSections.has(i) ? 'collapsed' : ''}" data-index="${i}">
-        <i class="fas ${this.collapsedSections.has(i) ? 'fa-chevron-right' : 'fa-chevron-down'} fold-toggle" style="margin-right: 8px; width: 12px;"></i>
-        ${h.text || 'Untitled Section'}
-      </div>
-    `).join('');
+    // Sidebar Tree Folding Logic
+    let hideBelowLevel = Infinity;
+    
+    this.outlineContainer.innerHTML = headings.map((h, i) => {
+      // Check if we should stop hiding
+      if (h.level <= hideBelowLevel) {
+        hideBelowLevel = Infinity;
+      }
 
-    this.outlineContainer.querySelectorAll('.outline-item').forEach((el, i) => {
+      // If we are currently hiding, return empty string (don't render this item)
+      if (hideBelowLevel !== Infinity) {
+        return '';
+      }
+
+      // Check if this item is collapsed
+      const isCollapsed = this.collapsedSections.has(i);
+      if (isCollapsed) {
+        hideBelowLevel = h.level;
+      }
+
+      return `
+      <div class="outline-item outline-h${h.level} ${isCollapsed ? 'collapsed' : ''}" data-index="${i}">
+        <i class="fas ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} fold-toggle" style="margin-right: 8px; width: 12px; cursor: pointer;"></i>
+        ${this.escapeHTML(h.text || 'Untitled Section')}
+      </div>
+    `}).join('');
+
+    this.outlineContainer.querySelectorAll('.outline-item').forEach((el) => {
+      const index = parseInt(el.dataset.index);
       const toggle = el.querySelector('.fold-toggle');
+      
       toggle.onclick = (e) => {
           e.stopPropagation();
-          this.toggleSection(i, headings);
+          this.toggleSection(index);
       };
 
       el.onclick = () => {
-        const h = headings[i];
-        this.editor.switchToPage(parseInt(h.pageIndex));
-        h.node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const h = headings[index];
+        this.editor.switchToPage(parseInt(h.pageIndex), h.index);
         
         // Highlight active
         this.outlineContainer.querySelectorAll('.outline-item').forEach(item => item.classList.remove('active'));
@@ -120,6 +165,23 @@ export class NavigationManager extends Plugin {
       };
     });
   }
+
+  escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  toggleSection(index) {
+    if (this.collapsedSections.has(index)) {
+      this.collapsedSections.delete(index);
+    } else {
+      this.collapsedSections.add(index);
+    }
+    this.updateOutline();
+  }
+
+  // updateVisibility removed as it relied on unstable DOM manipulation
 
   updateMinimap() {
     if (!this.minimapContainer || !this.isMinimapVisible) return;
@@ -171,34 +233,6 @@ export class NavigationManager extends Plugin {
         const length = line.length();
         this.editor.quill.setSelection(index, length, 'user');
       }
-    }
-  }
-
-  toggleSection(index, headings) {
-    if (this.collapsedSections.has(index)) {
-      this.collapsedSections.delete(index);
-    } else {
-      this.collapsedSections.add(index);
-    }
-    
-    this.updateVisibility(index, headings);
-    this.updateOutline(); // Refresh icons
-  }
-
-  updateVisibility(index, headings) {
-    const currentHeading = headings[index];
-    const isCollapsed = this.collapsedSections.has(index);
-    
-    // Find next heading of same or higher level (lower number)
-    let nextHeading = headings.slice(index + 1).find(h => h.level <= currentHeading.level);
-    
-    // Iterate through DOM siblings
-    let nextNode = currentHeading.node.nextElementSibling;
-    const endNode = nextHeading ? nextHeading.node : null;
-
-    while (nextNode && nextNode !== endNode) {
-      nextNode.style.display = isCollapsed ? 'none' : '';
-      nextNode = nextNode.nextElementSibling;
     }
   }
 }

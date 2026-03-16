@@ -5,7 +5,12 @@ const {
     doubleCsrfProtection,
     generateCsrfToken,
 } = doubleCsrf({
-    getSecret: () => process.env.CSRF_SECRET || 'fallback-secret-for-dev-only',
+    getSecret: () => {
+        if (!process.env.CSRF_SECRET && process.env.NODE_ENV === 'production') {
+            throw new Error('CSRF_SECRET environment variable is required in production');
+        }
+        return process.env.CSRF_SECRET || 'development-only-fallback-secret-must-be-changed';
+    },
     cookieName: 'ps-csrf-secret', // Changed from x-csrf-token to avoid confusion
     cookieOptions: {
         httpOnly: true,
@@ -24,7 +29,7 @@ const {
              logger.debug(`[CSRF DEBUG] Header Token: ${token ? token.substring(0, 15) + '...' : 'MISSING'}`);
              logger.debug(`[CSRF DEBUG] Cookie: ${cookie ? cookie.substring(0, 15) + '...' : 'MISSING'}`);
         }
-        
+
         if (!token) {
             logger.debug(`CSRF token missing in header for ${req.method} ${req.url}`);
         }

@@ -18,7 +18,12 @@ exports.getDocuments = async (req, res, next) => {
     $or: [
       { owner: userId },
       { sharedWith: userId },
-      { _id: { $in: user ? user.recentDocuments : [] } },
+      {
+        $and: [
+          { _id: { $in: user ? user.recentDocuments : [] } },
+          { isPublic: true }
+        ]
+      },
     ],
   };
 

@@ -37,5 +37,7 @@ exports.verifyTicket = (ticket) => {
   }
   
   console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: true (Valid)`);
+  // Consume the ticket immediately to ensure single-use
+  tickets.delete(ticket);
   return data.userId;
 };

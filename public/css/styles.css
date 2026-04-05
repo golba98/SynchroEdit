@@ -406,6 +406,15 @@ body.light-theme .header-save-as-btn:hover {
   text-shadow: 0 0 25px rgba(var(--accent-color-rgb), 0.6);
 }
 
+/* Prevent Chrome autofill from breaking dark mode styling */
+.doc-title:-webkit-autofill,
+.doc-title:-webkit-autofill:hover, 
+.doc-title:-webkit-autofill:focus, 
+.doc-title:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--accent-color-lighter) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .toolbar {
   background-color: #0a0a0a;
   border-bottom: 1px solid #1a1a1a;
@@ -1313,6 +1322,14 @@ body.light-theme .doc-title:hover {
 body.light-theme .doc-title:focus {
   background: #ffffff !important;
   border: 1px solid var(--accent-color) !important;
+}
+
+body.light-theme .doc-title:-webkit-autofill,
+body.light-theme .doc-title:-webkit-autofill:hover, 
+body.light-theme .doc-title:-webkit-autofill:focus, 
+body.light-theme .doc-title:-webkit-autofill:active {
+  -webkit-text-fill-color: #000000 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .doc-item:hover {

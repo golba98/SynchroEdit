@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const User = require('../src/models/User');
+const User = require('../src/users/User');
 
 // Check both, prefer MONGODB_URI (what server.js uses)
 const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
@@ -43,3 +43,4 @@ async function createTestUser() {
 }
 
 createTestUser();
+

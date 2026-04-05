@@ -27,9 +27,9 @@ if (isNodeEnv) {
     
     const serverModule = require('../src/server');
     server = serverModule.server;
-    User = require('../src/models/User');
-    Document = require('../src/models/Document');
-    History = require('../src/models/History');
+    User = require('../src/users/User');
+    Document = require('../src/documents/Document');
+    History = require('../src/documents/History');
   }
 } else {
     // Frontend Test Environment Setup

@@ -1,5 +1,5 @@
 const logger = require('./logger');
-const History = require('../models/History');
+const History = require('../documents/History');
 
 async function logHistory(documentId, userId, username, action, details = '') {
   try {

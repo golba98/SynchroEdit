@@ -1,8 +1,8 @@
 const WebSocket = require('ws');
 const { server } = require('../../src/server');
 const mongoose = require('mongoose');
-const Document = require('../../src/models/Document');
-const User = require('../../src/models/User');
+const Document = require('../../src/documents/Document');
+const User = require('../../src/users/User');
 const { createTicket } = require('../../src/utils/ticketStore');
 
 // No mocks for internal modules, use real server behavior (integration)

@@ -6,6 +6,7 @@ const { authenticateToken } = require('../middleware/auth');
 router.get('/', authenticateToken, documentController.getDocuments);
 router.post('/', authenticateToken, documentController.createDocument);
 router.post('/:id/recent', authenticateToken, documentController.addToRecent);
+router.get('/:id/info', authenticateToken, documentController.getDocumentInfo);
 router.get('/:id/settings', authenticateToken, documentController.getSettings);
 router.patch('/:id/settings', authenticateToken, documentController.updateSettings);
 router.delete('/:id', authenticateToken, documentController.deleteDocument);

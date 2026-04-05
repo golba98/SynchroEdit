@@ -11,10 +11,19 @@ pnpm-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.docker
+.env.bak
 *.env
-*.env.*
+!.env.example
+!.env.docker.example
 env.bak
 tests/env.js
+
+# JWT Keys (if generated locally)
+jwtRS256.key
+jwtRS256.key.pub
+*.pem
+*.key
 
 # Logs
 logs/

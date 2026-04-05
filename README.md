@@ -50,26 +50,56 @@ The project follows a modular, manager-based architecture for maximum maintainab
 - **`/utils`**: Server utilities including logging and graceful shutdown handlers.
 
 ## 6. Quick Start
-1. **Clone the repository**.
+
+### Local Development
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/synchroedit.git
+   cd synchroedit
+   ```
+
 2. **Install dependencies**:
    ```bash
    npm install
    ```
-3. **Configure Environment**: Create a `.env` file in the root:
-   ```env
-   PORT=3000
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   # Optional for Email Features
-   EMAIL_HOST=smtp.mailtrap.io
-   EMAIL_PORT=2525
-   EMAIL_USERNAME=your_username
-   EMAIL_PASSWORD=your_password
+
+3. **Configure Environment**: 
+   Copy the example environment file and update it with your settings:
+   ```bash
+   cp .env.example .env
    ```
+   
+   Then edit `.env` and configure:
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `JWT_SECRET`: Generate a secure secret using:
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+     ```
+   - Generate RSA keys for JWT (optional but recommended):
+     ```bash
+     ssh-keygen -t rsa -b 2048 -m PEM -f jwtRS256.key
+     openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+     ```
+   - Configure email settings if you want email verification features
+
 4. **Start the server**:
    ```bash
    npm start
    ```
+
+### Docker Deployment
+1. **Copy and configure docker environment**:
+   ```bash
+   cp .env.docker.example .env
+   ```
+   Edit `.env` and set secure values for `JWT_SECRET` and RSA keys.
+
+2. **Start with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+**Security Note**: Never commit your `.env` file or any file containing secrets to version control. All sensitive configuration is excluded via `.gitignore`.
 
 ## 7. License
 Licensed under the ISC License.

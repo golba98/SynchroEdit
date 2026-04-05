@@ -4,11 +4,16 @@ services:
     ports:
       - "3000:10000"
     environment:
-      - PORT=10000
-      - MONGODB_URI=mongodb://mongo:27017/synchroedit
-      - JWT_SECRET=local_docker_jwt_secret
-      - NODE_ENV=production
-      - DISABLE_SECURE_COOKIE=true
+      - PORT=${PORT:-10000}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/synchroedit}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=${NODE_ENV:-production}
+      - DISABLE_SECURE_COOKIE=${DISABLE_SECURE_COOKIE:-true}
+      - JWT_CURRENT_KID=${JWT_CURRENT_KID:-v1}
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWT_PUBLIC_KEYS=${JWT_PUBLIC_KEYS}
+    env_file:
+      - .env
     depends_on:
       - mongo
     restart: always

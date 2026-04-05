@@ -19,25 +19,29 @@ exports.getDocuments = async (req, res, next) => {
       { owner: userId },
       { sharedWith: userId },
       {
-        $and: [
-          { _id: { $in: user ? user.recentDocuments : [] } },
-          { isPublic: true }
-        ]
+        $and: [{ _id: { $in: user ? user.recentDocuments : [] } }, { isPublic: true }],
       },
     ],
   };
 
   const totalDocuments = await Document.countDocuments(query);
   const documents = await Document.find(query)
-    .select('title lastModified lastModifiedBy pages owner')
+    .select('title lastModified lastModifiedBy pages owner sharedWith')
     .populate('lastModifiedBy', 'username')
     .sort({ lastModified: -1 })
     .skip(skip)
     .limit(limit)
     .lean();
 
+  // Add ownership status to each document
+  const documentsWithStatus = documents.map((doc) => ({
+    ...doc,
+    isOwner: doc.owner.toString() === userId,
+    isShared: doc.sharedWith && doc.sharedWith.some((id) => id.toString() === userId),
+  }));
+
   res.json({
-    documents,
+    documents: documentsWithStatus,
     pagination: {
       currentPage: page,
       totalPages: Math.ceil(totalDocuments / limit),
@@ -99,31 +103,32 @@ exports.updateSettings = async (req, res, next) => {
 
   await doc.save();
   logger.info(`Document settings updated: ${docId} isPublic=${doc.isPublic} by ${req.user.id}`);
-  
+
   res.json({
     message: 'Settings updated',
-    isPublic: doc.isPublic
+    isPublic: doc.isPublic,
   });
 };
 
 exports.getSettings = async (req, res, next) => {
   const docId = req.params.id;
   const doc = await Document.findById(docId).select('owner sharedWith isPublic').lean();
-  
+
   if (!doc) return next(new AppError('Document not found', 404));
 
   const isOwner = doc.owner.toString() === req.user.id;
   const isShared = doc.sharedWith && doc.sharedWith.some((id) => id.toString() === req.user.id);
-  
+
   // Even if public, we might want to restrict *viewing settings* to owner/collaborators?
   // Or at least allow reading "isPublic" if you have access.
   if (!isOwner && !isShared && !doc.isPublic) {
-      return next(new AppError('Access denied', 403));
+    return next(new AppError('Access denied', 403));
   }
 
   res.json({
-      isPublic: doc.isPublic || false,
-      isOwner
+    isPublic: doc.isPublic || false,
+    isOwner,
+    isShared,
   });
 };
 
@@ -153,14 +158,32 @@ exports.deleteDocument = async (req, res, next) => {
       if (index > -1) {
         user.recentDocuments.splice(index, 1);
         await user.save();
-        return res.json({ message: 'Removed from recent' });
+        return res.json({ message: 'Removed from recent', action: 'removed' });
       }
     }
     return next(new AppError('Document not found', 404));
   }
 
-  if (doc.owner.toString() !== req.user.id) {
-      return next(new AppError('Access denied', 403));
+  const isOwner = doc.owner.toString() === req.user.id;
+  const isShared = doc.sharedWith && doc.sharedWith.some((id) => id.toString() === req.user.id);
+
+  // If user is not the owner but has shared access, remove from recent only
+  if (!isOwner && isShared) {
+    const user = await User.findById(req.user.id);
+    if (user && user.recentDocuments) {
+      const index = user.recentDocuments.findIndex((id) => id.toString() === docId);
+      if (index > -1) {
+        user.recentDocuments.splice(index, 1);
+        await user.save();
+      }
+    }
+    logger.info(`Document removed from drive: ${docId} by ${req.user.id}`);
+    return res.json({ message: 'Removed from your drive', action: 'removed' });
+  }
+
+  // Only owner can permanently delete
+  if (!isOwner) {
+    return next(new AppError('Only the document owner can delete this document', 403));
   }
 
   await doc.deleteOne();
@@ -170,7 +193,7 @@ exports.deleteDocument = async (req, res, next) => {
   await History.deleteMany({ documentId: docId });
 
   logger.info(`Document deleted: ${docId} by ${req.user.id}`);
-  res.json({ message: 'Document deleted' });
+  res.json({ message: 'Document deleted', action: 'deleted' });
 };
 
 exports.getHistory = async (req, res, next) => {
@@ -226,12 +249,39 @@ exports.transferOwnership = async (req, res, next) => {
   }
 
   // Remove new owner from sharedWith if they were there (cleanup)
-  doc.sharedWith = doc.sharedWith.filter(id => id.toString() !== newOwner._id.toString());
+  doc.sharedWith = doc.sharedWith.filter((id) => id.toString() !== newOwner._id.toString());
 
   await doc.save();
 
-  logHistory(doc._id, req.user.id, req.user.username, `Transferred ownership to ${newOwnerUsername}`);
-  logger.info(`Document ownership transferred: ${docId} from ${req.user.username} to ${newOwnerUsername}`);
+  logHistory(
+    doc._id,
+    req.user.id,
+    req.user.username,
+    `Transferred ownership to ${newOwnerUsername}`
+  );
+  logger.info(
+    `Document ownership transferred: ${docId} from ${req.user.username} to ${newOwnerUsername}`
+  );
 
   res.json({ message: `Ownership transferred to ${newOwnerUsername}` });
+};
+
+exports.getDocumentInfo = async (req, res, next) => {
+  const docId = req.params.id;
+  const doc = await Document.findById(docId).select('owner sharedWith title').lean();
+
+  if (!doc) return next(new AppError('Document not found', 404));
+
+  const isOwner = doc.owner.toString() === req.user.id;
+  const isShared = doc.sharedWith && doc.sharedWith.some((id) => id.toString() === req.user.id);
+
+  if (!isOwner && !isShared) {
+    return next(new AppError('Access denied', 403));
+  }
+
+  res.json({
+    title: doc.title,
+    isOwner,
+    isShared,
+  });
 };

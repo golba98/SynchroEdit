@@ -8,7 +8,7 @@ test.describe('UI Interactions', () => {
     // Using dev-mode shortcut mentioned in login.html if available, 
     // or just register a new user. 
     // Since we want these tests to be independent, let's just register.
-    const testUser = `ui_user_${Date.now()}`;
+    const testUser = `ui_user_${test.info().project.name}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await page.click('#showSignup');
     await page.fill('#signupUsername', testUser);
     await page.fill('#signupEmail', `${testUser}@example.com`);

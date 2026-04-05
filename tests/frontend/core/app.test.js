@@ -27,6 +27,8 @@ describe('App Core Initialization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     document.body.innerHTML = `
+      <div id="authGuard" style="display: none; opacity: 0;"></div>
+      <div id="authGuardText"></div>
       <div id="docLibrary"></div>
       <div id="libraryOverlay"></div>
       <button id="closeLibrary"></button>
@@ -78,6 +80,9 @@ describe('App Core Initialization', () => {
     // Wait for async init
     await new Promise(process.nextTick);
 
+    expect(Profile.prototype.loadProfile).toHaveBeenCalledWith({ silent: true });
+    expect(document.getElementById('authGuard').style.display).toBe('none');
+
     const lib = document.getElementById('docLibrary');
     expect(lib.style.display).toBe('block');
     expect(Network.getDocuments).toHaveBeenCalled();
@@ -94,6 +99,9 @@ describe('App Core Initialization', () => {
     await new Promise(process.nextTick);
     await new Promise(process.nextTick); 
 
+    expect(Profile.prototype.loadProfile).toHaveBeenCalledWith({ silent: true });
+    expect(document.getElementById('authGuard').style.display).toBe('none');
+
     const lib = document.getElementById('docLibrary');
     expect(lib.style.display).toBe('none');
     expect(Network.addToRecent).toHaveBeenCalledWith('123');
@@ -106,6 +114,19 @@ describe('App Core Initialization', () => {
     await new Promise(process.nextTick);
 
     expect(Utils.navigateTo).toHaveBeenCalledWith('pages/login.html');
+    expect(document.getElementById('authGuard').style.display).toBe('none');
+  });
+
+  it('should preserve doc param when redirecting after failed session check', async () => {
+    global.URLSearchParams = jest.fn(() => ({
+      get: jest.fn().mockReturnValue('doc-42')
+    }));
+    Profile.prototype.loadProfile = jest.fn().mockResolvedValue(null);
+
+    const app = new App();
+    await new Promise(process.nextTick);
+
+    expect(Utils.navigateTo).toHaveBeenCalledWith('pages/login.html?doc=doc-42');
   });
 
   it('should not show connection overlay if page is hidden', async () => {
@@ -143,5 +164,22 @@ describe('App Core Initialization', () => {
     
     expect(overlay.style.display).toBe('flex');
     jest.useRealTimers();
+  });
+
+  it('should recheck session silently when tab becomes visible', async () => {
+    const app = new App();
+    await new Promise(process.nextTick);
+
+    Profile.prototype.loadProfile.mockClear();
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true
+    });
+
+    document.dispatchEvent(new Event('visibilitychange'));
+    await new Promise(process.nextTick);
+
+    expect(Profile.prototype.loadProfile).toHaveBeenCalledWith({ silent: true });
   });
 });

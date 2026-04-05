@@ -16,17 +16,23 @@ export class UIManager {
 
     // Navigation/Library
     addEvent('menuBtn', 'click', () => {
-      this.app.showTransitionOverlay('Opening Library...');
-      window.location.href = window.location.pathname; // Clear ?doc=...
+      this.app.libraryManager.showLibrary();
     });
     addEvent('createNewDoc', 'click', () => this.app.libraryManager.createNewDocument());
     addEvent('closeLibrary', 'click', () => {
       if (this.app.documentId) {
         const docLibrary = document.getElementById('docLibrary');
         const libraryOverlay = document.getElementById('libraryOverlay');
-        if (docLibrary) docLibrary.style.display = 'none';
-        if (libraryOverlay) libraryOverlay.style.display = 'none';
-        this.updateMobileUIState();
+        
+        // Smooth transition out
+        if (docLibrary) docLibrary.classList.remove('view-visible');
+        if (libraryOverlay) libraryOverlay.classList.remove('view-visible');
+        
+        setTimeout(() => {
+          if (docLibrary) docLibrary.style.display = 'none';
+          if (libraryOverlay) libraryOverlay.style.display = 'none';
+          this.updateMobileUIState();
+        }, 200);
       }
     });
 

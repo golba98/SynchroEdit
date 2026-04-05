@@ -71,7 +71,7 @@ MONGODB_URI=mongodb://localhost:27017/synchroedit
 
 Or use MongoDB Atlas:
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/synchroedit
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
 ```
 
 #### Email Configuration (Optional)

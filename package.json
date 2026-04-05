@@ -59,7 +59,7 @@
     "yjs": "^13.6.28"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-env": "^7.29.2",
     "@playwright/browser-chromium": "^1.57.0",
     "@playwright/test": "^1.57.0",
     "babel-jest": "^30.2.0",

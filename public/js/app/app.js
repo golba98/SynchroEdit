@@ -25,6 +25,9 @@ export class App {
     window.addEventListener('offline', () => this.showOfflineIndicator(true));
     window.addEventListener('online', () => this.showOfflineIndicator(false));
 
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', (event) => this.handlePopState(event));
+
     window.app = this; // Expose app instance
     this.init();
     this.registerServiceWorker();
@@ -162,36 +165,42 @@ export class App {
         console.warn("Recent list update failed:", err),
       );
 
-      this.editor = new Editor("pagesContainer", {
-        user: this.user,
-        onPageChange: (index) => this.uiManager.updateStatus(index),
-        onTitleChange: (title) => {
-          try {
-            const cache = localStorage.getItem("syncroedit_library_cache");
-            if (cache) {
-              const docs = JSON.parse(cache);
-              const docIndex = docs.findIndex((d) => d._id === this.documentId);
-              if (docIndex !== -1) {
-                docs[docIndex].title = title;
-                localStorage.setItem(
-                  "syncroedit_library_cache",
-                  JSON.stringify(docs),
-                );
+      // Create editor only if it doesn't exist or if switching to a different document
+      if (!this.editor) {
+        this.editor = new Editor("pagesContainer", {
+          user: this.user,
+          onPageChange: (index) => this.uiManager.updateStatus(index),
+          onTitleChange: (title) => {
+            try {
+              const cache = localStorage.getItem("syncroedit_library_cache");
+              if (cache) {
+                const docs = JSON.parse(cache);
+                const docIndex = docs.findIndex((d) => d._id === this.documentId);
+                if (docIndex !== -1) {
+                  docs[docIndex].title = title;
+                  localStorage.setItem(
+                    "syncroedit_library_cache",
+                    JSON.stringify(docs),
+                  );
+                }
               }
+            } catch (e) {
+              console.warn("Failed to update library cache title:", e);
             }
-          } catch (e) {
-            console.warn("Failed to update library cache title:", e);
-          }
-        },
-        onStatusChange: (status) => this.uiManager.handleWSStatusChange(status),
-        onCollaboratorsChange: (users) => {
-          UI.updateCollaboratorsUI(
-            document.getElementById("activeCollaborators"),
-            users,
-            this.user.username,
-          );
-        },
-      });
+          },
+          onStatusChange: (status) => this.uiManager.handleWSStatusChange(status),
+          onCollaboratorsChange: (users) => {
+            UI.updateCollaboratorsUI(
+              document.getElementById("activeCollaborators"),
+              users,
+              this.user.username,
+            );
+          },
+        });
+      } else if (this.editor.currentDocId !== this.documentId) {
+        // Switch to a different document
+        await this.editor.loadDocument(this.documentId);
+      }
 
       document.getElementById("docLibrary").style.display = "none";
       document.getElementById("libraryOverlay").style.display = "none";
@@ -222,6 +231,22 @@ export class App {
       authGuard.style.opacity = "0";
       authGuard.style.pointerEvents = "none";
       setTimeout(() => (authGuard.style.display = "none"), 500);
+    }
+  }
+
+  handlePopState(event) {
+    // Handle browser back/forward navigation
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get("doc");
+
+    if (docId && docId !== this.documentId) {
+      // Navigate to a different document
+      this.documentId = docId;
+      this.loadDocument();
+    } else if (!docId && this.documentId) {
+      // Navigate to library from document
+      this.documentId = null;
+      this.libraryManager.showLibrary();
     }
   }
 }

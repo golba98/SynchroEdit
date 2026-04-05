@@ -47,6 +47,33 @@ body {
 
 #docLibrary {
   background: rgba(5, 2, 13, 0.8) !important;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#docLibrary.view-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Apply will-change only when transitioning */
+#docLibrary[style*="display: block"] {
+  will-change: opacity, transform;
+}
+
+#libraryOverlay {
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#libraryOverlay.view-visible {
+  opacity: 1;
+}
+
+#libraryOverlay[style*="display: block"] {
+  will-change: opacity;
 }
 
 .doc-item {

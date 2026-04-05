@@ -4,15 +4,45 @@ import { UI } from '/js/features/ui/ui.js';
 export class LibraryManager {
   constructor(app) {
     this.app = app;
+    this.isTransitioning = false;
   }
 
   async showLibrary() {
+    // Prevent rapid transitions
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
     const library = document.getElementById('docLibrary');
     const overlay = document.getElementById('libraryOverlay');
-    if (!library || !overlay) return;
+    if (!library || !overlay) {
+      this.isTransitioning = false;
+      return;
+    }
 
+    // Update URL to remove ?doc= parameter without reload
+    if (this.app.documentId) {
+      const newUrl = window.location.pathname;
+      window.history.pushState({ view: 'library' }, '', newUrl);
+    }
+
+    // Prepare library for display (hidden initially for smooth transition)
     library.style.display = 'block';
     overlay.style.display = 'block';
+    
+    // Force reflow to ensure display change is applied
+    library.offsetHeight;
+    
+    // Add transition classes for smooth fade-in
+    requestAnimationFrame(() => {
+      library.classList.add('view-visible');
+      overlay.classList.add('view-visible');
+      
+      // Release transition lock after animation completes
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 250);
+    });
+
     const closeBtn = document.getElementById('closeLibrary');
     if (closeBtn) closeBtn.style.display = this.app.documentId ? 'block' : 'none';
 
@@ -32,8 +62,7 @@ export class LibraryManager {
         docs,
         this.app.documentId,
         (id) => {
-          this.app.showTransitionOverlay('Opening Document...');
-          window.location.href = `?doc=${id}`;
+          this.openDocument(id);
         },
         async (id) => {
           if (confirm('Delete this document?')) {
@@ -105,6 +134,44 @@ export class LibraryManager {
     } catch (err) {
       this.app.hideTransitionOverlay();
       alert('Failed to create document');
+    }
+  }
+
+  async openDocument(docId) {
+    // Prevent rapid transitions
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
+    try {
+      // Get library elements
+      const library = document.getElementById('docLibrary');
+      const overlay = document.getElementById('libraryOverlay');
+
+      // Start fade-out transition
+      if (library) library.classList.remove('view-visible');
+      if (overlay) overlay.classList.remove('view-visible');
+
+      // Wait for transition to complete (200ms)
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Hide library after transition
+      if (library) library.style.display = 'none';
+      if (overlay) overlay.style.display = 'none';
+
+      // Update URL with document ID
+      const newUrl = `${window.location.pathname}?doc=${docId}`;
+      window.history.pushState({ view: 'editor', docId }, '', newUrl);
+
+      // Update app state and load document
+      this.app.documentId = docId;
+      await this.app.loadDocument();
+      
+      // Release transition lock
+      this.isTransitioning = false;
+    } catch (err) {
+      console.error('Failed to open document:', err);
+      this.isTransitioning = false;
+      alert('Failed to open document');
     }
   }
 }

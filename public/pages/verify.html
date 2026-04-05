@@ -186,8 +186,8 @@
     </div>
 
     <script type="module">
-      import { Network } from '../js/core/network.js';
-      import { Auth } from '../js/ui/auth.js';
+      import { Network } from '../js/app/network.js';
+      import { Auth } from '../js/features/auth/auth.js';
 
       const params = new URLSearchParams(window.location.search);
       const storedEmail = sessionStorage.getItem('verificationEmail');
@@ -287,3 +287,4 @@
     </script>
   </body>
 </html>
+

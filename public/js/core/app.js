@@ -88,7 +88,7 @@ export class App {
         return;
     }
 
-    this.user = await this.profile.loadProfile();
+    this.user = await this.profile.loadProfile({ silent: true });
 
     if (!this.user) {
       const params = new URLSearchParams(window.location.search).get("doc");
@@ -96,16 +96,6 @@ export class App {
         params ? `pages/login.html?doc=${params}` : "pages/login.html",
       );
       return;
-    }
-
-    // Remove Auth Guard
-    const authGuard = document.getElementById("authGuard");
-    if (authGuard) {
-      authGuard.style.opacity = "0";
-      authGuard.style.pointerEvents = "none";
-      setTimeout(() => {
-        if (authGuard.parentElement) authGuard.remove();
-      }, 6000); // Extended timeout to ensure page is fully ready
     }
 
     // Sync Theme from Profile
@@ -139,7 +129,7 @@ export class App {
         console.log("Tab visible, checking session and connection...");
 
         // 1. Re-validate session (triggers refresh if needed)
-        const user = await this.profile.loadProfile();
+        const user = await this.profile.loadProfile({ silent: true });
         if (!user) {
           Auth.logout();
           return;
@@ -158,6 +148,12 @@ export class App {
         }
       }
     });
+  }
+
+  handleWSStatusChange(status) {
+    if (this.uiManager && this.uiManager.handleWSStatusChange) {
+      this.uiManager.handleWSStatusChange(status);
+    }
   }
 
   async loadDocument() {
@@ -216,6 +212,7 @@ export class App {
       if (authGuardText) authGuardText.textContent = text;
       authGuard.style.display = "flex";
       authGuard.style.opacity = "1";
+      authGuard.style.pointerEvents = "auto";
     }
   }
 
@@ -223,6 +220,7 @@ export class App {
     const authGuard = document.getElementById("authGuard");
     if (authGuard) {
       authGuard.style.opacity = "0";
+      authGuard.style.pointerEvents = "none";
       setTimeout(() => (authGuard.style.display = "none"), 500);
     }
   }

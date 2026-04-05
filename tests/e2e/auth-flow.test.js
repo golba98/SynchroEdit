@@ -6,7 +6,7 @@ test.describe('Auth and Basic Document Flow', () => {
     await page.goto('/pages/login.html');
     await page.click('#showSignup');
     
-    const testUser = `user_${Date.now()}`;
+    const testUser = `user_${test.info().project.name}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await page.fill('#signupUsername', testUser);
     await page.fill('#signupEmail', `${testUser}@example.com`);
     await page.fill('#signupPassword', 'Password123!');
@@ -47,5 +47,35 @@ test.describe('Auth and Basic Document Flow', () => {
     
     // Should be back at login page
     await expect(page).toHaveURL(/\/pages\/login.html/);
+  });
+
+  test('should keep session verification hidden during startup reloads', async ({ page }) => {
+    await page.goto('/pages/login.html');
+    const testUser = `startup_${test.info().project.name}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const csrfResponse = await page.request.get('/api/auth/csrf-token');
+    const { csrfToken } = await csrfResponse.json();
+
+    const signupResponse = await page.request.post('/api/auth/signup', {
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+      data: {
+        username: testUser,
+        email: `${testUser}@example.com`,
+        password: 'Password123!',
+      },
+    });
+
+    expect(signupResponse.ok()).toBeTruthy();
+
+    await page.goto('/index.html');
+
+    await expect(page.locator('#authGuard')).toBeHidden();
+    await expect(page.locator('#docLibrary')).toBeVisible();
+
+    await page.reload();
+
+    await expect(page.locator('#authGuard')).toBeHidden();
+    await expect(page.locator('#docLibrary')).toBeVisible();
   });
 });

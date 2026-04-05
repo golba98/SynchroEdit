@@ -123,13 +123,23 @@ export class Profile {
     }
   }
 
-  async loadProfile() {
-    this.showSkeleton();
+  async loadProfile(options = {}) {
+    const silent = typeof options === 'boolean' ? options : Boolean(options.silent);
+
+    if (!silent) {
+      this.showSkeleton();
+    }
+
     this.user = await Auth.verifyToken();
-    this.hideSkeleton();
+
+    if (!silent) {
+      this.hideSkeleton();
+    }
+
     if (this.user) {
       this.updateUI();
     }
+
     return this.user;
   }
 

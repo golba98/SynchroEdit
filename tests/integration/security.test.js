@@ -53,7 +53,7 @@ describe('Security Integration Tests', () => {
         };
         
         // 1. Setup user and login
-        await require('../../src/models/User').create(testUser);
+        await require('../../src/users/User').create(testUser);
         const loginRes = await request(app)
             .post('/api/auth/login')
             .send({ username: testUser.username, password: testUser.password });
@@ -67,7 +67,7 @@ describe('Security Integration Tests', () => {
         expect(profileRes.status).toBe(200);
 
         // 3. Revoke the session manually in DB
-        const User = require('../../src/models/User');
+        const User = require('../../src/users/User');
         const user = await User.findOne({ username: testUser.username });
         user.sessions = [];
         await user.save();
@@ -82,3 +82,4 @@ describe('Security Integration Tests', () => {
     });
   });
 });
+

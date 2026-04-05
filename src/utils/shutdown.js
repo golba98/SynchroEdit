@@ -1,6 +1,6 @@
 const logger = require('./logger');
 const mongoose = require('mongoose');
-const documentSocket = require('../sockets/documentSocket');
+const documentSocket = require('../documents/socket');
 
 const setupShutdownHandlers = (server, wss) => {
     const gracefulShutdown = async (signal) => {

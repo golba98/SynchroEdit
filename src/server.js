@@ -8,8 +8,8 @@ const AppError = require('./utils/AppError');
 const setupShutdownHandlers = require('./utils/shutdown');
 const setupMiddleware = require('./middleware/setupMiddleware');
 const connectDB = require('./config/db');
-const setupRoutes = require('./routes/index');
-const documentSocket = require('./sockets/documentSocket');
+const setupRoutes = require('./routes');
+const documentSocket = require('./documents/socket');
 
 const app = express();
 const server = http.createServer(app);

@@ -1,5 +1,5 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const mongoose = require('mongoose');
+const connectDB = require('../../src/config/db');
 
 async function start() {
   const mongoServer = await MongoMemoryServer.create();
@@ -15,6 +15,8 @@ async function start() {
   
   // Import the server
   const { server } = require('../../src/server');
+
+  await connectDB();
   
   server.listen(3000, () => {
     console.log('Test server is listening on port 3000');

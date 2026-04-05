@@ -20,7 +20,7 @@ test.describe('Responsiveness', () => {
   test('should display editor correctly on mobile', async ({ page }) => {
     // Login and create doc
     await page.goto('/pages/login.html');
-    const testUser = `resp_user_${Date.now()}`;
+    const testUser = `resp_user_${test.info().project.name}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await page.click('#showSignup');
     await page.fill('#signupUsername', testUser);
     await page.fill('#signupEmail', `${testUser}@example.com`);

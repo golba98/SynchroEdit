@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { app } = require('../../src/server');
-const User = require('../../src/models/User');
+const User = require('../../src/users/User');
 
 describe('User Integration Tests', () => {
   let token;

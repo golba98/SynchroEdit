@@ -4,6 +4,11 @@
 // In jsdom (Frontend Tests), window is defined.
 const isNodeEnv = typeof window === 'undefined';
 
+if (isNodeEnv) {
+  // Mock CSRF protection for backend integration tests
+  jest.mock('../src/utils/csrf', () => require('./mocks/csrf'));
+}
+
 let mongoose;
 let MongoMemoryServer;
 let server;
@@ -13,22 +18,22 @@ let History;
 let mongoServer;
 
 if (isNodeEnv) {
-  mongoose = require('mongoose');
-  MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
-  
   // Only load server and models if we are NOT skipping DB setup (Integration Tests)
-  // For Unit Tests (SKIP_DB_SETUP=true), we want to avoid loading these to prevent 
+  // For Unit Tests (SKIP_DB_SETUP=true), we want to avoid loading these to prevent
   // module caching that interferes with mocking.
   if (!process.env.SKIP_DB_SETUP) {
+    mongoose = require('mongoose');
+    MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
+
     const serverModule = require('../src/server');
     server = serverModule.server;
-    User = require('../src/models/User');
-    Document = require('../src/models/Document');
-    History = require('../src/models/History');
+    User = require('../src/users/User');
+    Document = require('../src/documents/Document');
+    History = require('../src/documents/History');
   }
 } else {
-    // Frontend Test Environment Setup
-    window.testEnv = true;
+  // Frontend Test Environment Setup
+  window.testEnv = true;
 }
 
 beforeAll(async () => {
@@ -51,7 +56,7 @@ afterAll(async () => {
     await mongoServer.stop();
   }
   if (server && server.listening) {
-      server.close();
+    server.close();
   }
 });
 
@@ -59,8 +64,8 @@ beforeEach(async () => {
   if (!isNodeEnv || process.env.SKIP_DB_SETUP) return;
 
   if (mongoose.connection.readyState !== 0) {
-      await User.deleteMany({});
-      await Document.deleteMany({});
-      await History.deleteMany({});
+    await User.deleteMany({});
+    await Document.deleteMany({});
+    await History.deleteMany({});
   }
 });

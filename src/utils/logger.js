@@ -11,18 +11,25 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { service: 'synchroedit' },
-  transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
+  transports: [],
 });
 
+// Add File transports only in non-production environments
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
+  logger.add(new winston.transports.File({ filename: 'logs/combined.log' }));
+}
+
+// Add Console transport for all environments
 if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     })
   );
+} else {
+  // Production: Log to console in JSON format (default)
+  logger.add(new winston.transports.Console());
 }
 
 module.exports = logger;

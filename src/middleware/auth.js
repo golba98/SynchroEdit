@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../users/User');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 
@@ -10,12 +10,17 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return next(new AppError('Access denied', 401));
+  // Explicitly check for "null" string which might come from frontend bugs
+  if (!token || token === 'null' || token === 'undefined') {
+    return next(new AppError('Access denied', 401));
+  }
 
   jwt.verify(token, JWT_SECRET, async (err, user) => {
     if (err) {
       const status = err.name === 'TokenExpiredError' ? 401 : 403;
-      return next(new AppError(err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token', status));
+      return next(
+        new AppError(err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token', status)
+      );
     }
 
     try {
@@ -28,10 +33,10 @@ const authenticateToken = (req, res, next) => {
 
       // Verify Session exists
       if (user.sessionId) {
-          const sessionExists = dbUser.sessions.some(s => s.sessionId === user.sessionId);
-          if (!sessionExists) {
-              return next(new AppError('Session expired or revoked', 401));
-          }
+        const sessionExists = dbUser.sessions.some((s) => s.sessionId === user.sessionId);
+        if (!sessionExists) {
+          return next(new AppError('Session expired or revoked', 401));
+        }
       }
 
       req.user = user; // Now contains id, username, and sessionId

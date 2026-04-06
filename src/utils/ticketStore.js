@@ -12,7 +12,7 @@ exports.createTicket = (userId) => {
   // Expires in 30 seconds
   const expires = Date.now() + 30000;
   tickets.set(ticket, { userId, expires });
-  
+
   // Cleanup
   setTimeout(() => tickets.delete(ticket), 30000);
   return ticket;
@@ -29,13 +29,15 @@ exports.verifyTicket = (ticket) => {
     console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: false (Missing)`);
     return null;
   }
-  
+
   if (Date.now() > data.expires) {
     console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: true (Expired)`);
     tickets.delete(ticket);
     return null;
   }
-  
+
   console.log(`[DEBUG] Verifying ticket: ${ticket}. Found: true (Valid)`);
+  // Consume the ticket immediately to ensure single-use
+  tickets.delete(ticket);
   return data.userId;
 };

@@ -2,22 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>SynchroEdit - Document Editor</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <!-- Quill Rich Text Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&family=Lobster&family=Pacifico&family=Bebas+Neue&family=Anton&family=Dancing+Script:wght@400;700&family=Shadows+Into+Light&family=Abril+Fatface&family=Playfair+Display:wght@400;700&family=Indie+Flower&family=Amatic+SC:wght@400;700&family=Caveat:wght@400;700&family=Comfortaa:wght@400;700&family=Righteous&family=Cinzel:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Nunito:wght@400;700&family=Quicksand:wght@400;700&family=Inconsolata:wght@400;700&family=Ubuntu:wght@400;700&family=Bitter:wght@400;700&family=Dosis:wght@400;700&family=Josefin+Sans:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Mulish:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&family=Titillium+Web:wght@400;700&family=Varela+Round&family=Zilla+Slab:wght@400;700&family=Fira+Sans:wght@400;700&family=Work+Sans:wght@400;700&family=DM+Sans:wght@400;700&family=IBM+Plex+Sans:wght@400;700&family=Karla:wght@400;700&family=Crimson+Text:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Source+Serif+Pro:wght@400;700&family=Space+Mono:wght@400;700&family=Exo+2:wght@400;700&family=Kanit:wght@400;700&family=Maven+Pro:wght@400;700&family=Signika:wght@400;700&family=Bree+Serif&family=Fjalla+One&family=Patua+One&family=Arvo:wght@400;700&family=Vollkorn:wght@400;700&family=Old+Standard+TT:wght@400;700&family=Great+Vibes&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bitmaks/cm-web-fonts@latest/fonts.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/bitmaks/cm-web-fonts@latest/fonts.css"
+    />
     <link rel="stylesheet" href="css/styles.css" />
     <!-- File Extraction Libraries -->
     <!-- External Libraries (Deferred for speed) -->
@@ -41,13 +52,70 @@
       }
     </script>
   </head>
-  <body style="margin: 0; padding: 0;">
-    <div id="authGuard" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020d; z-index: 100000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-in-out;">
-       <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-          <div style="font-size: 40px; animation: pulse 2s infinite;">📄</div>
-          <div id="authGuardText" style="color: var(--accent-color-light); font-size: 14px; letter-spacing: 1px; font-weight: 500;">Verifying Session...</div>
-          <div style="width: 40px; height: 40px; border: 3px solid rgba(var(--accent-color-rgb), 0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-       </div>
+  <body style="margin: 0; padding: 0">
+    <!-- Editor Skeleton (shown during document load) -->
+    <div id="editorSkeleton" class="editor-skeleton hidden">
+      <div class="skeleton-toolbar">
+        <div class="skeleton-toolbar-item skeleton-page"></div>
+        <div class="skeleton-toolbar-item skeleton-page"></div>
+        <div class="skeleton-toolbar-item skeleton-page"></div>
+        <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
+        <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
+        <div class="skeleton-toolbar-item skeleton-page"></div>
+        <div class="skeleton-toolbar-item skeleton-page"></div>
+      </div>
+      <div class="skeleton-paper">
+        <div class="skeleton-line skeleton-page"></div>
+        <div class="skeleton-line skeleton-page"></div>
+        <div class="skeleton-line skeleton-page"></div>
+        <div class="skeleton-line skeleton-page"></div>
+        <div class="skeleton-line skeleton-page"></div>
+      </div>
+    </div>
+
+    <div
+      id="authGuard"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        z-index: 100000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease-out;
+        opacity: 0;
+        pointer-events: none;
+        will-change: opacity;
+      "
+    >
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 20px">
+        <div style="font-size: 40px; animation: pulse 2s infinite">📄</div>
+        <div
+          id="authGuardText"
+          style="
+            color: var(--accent-color-light);
+            font-size: 14px;
+            letter-spacing: 1px;
+            font-weight: 500;
+          "
+        >
+          Verifying Session...
+        </div>
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(var(--accent-color-rgb), 0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          "
+        ></div>
+      </div>
     </div>
 
     <!-- Header -->
@@ -56,7 +124,17 @@
         <button class="toolbar-btn" id="menuBtn" title="Document Menu">
           <i class="fas fa-bars"></i>
         </button>
-        <div class="logo">📄 SynchroEdit</div>
+        <input
+          type="text"
+          class="doc-title"
+          id="docTitle"
+          name="docTitle"
+          placeholder="Untitled document"
+          autocomplete="off"
+          aria-label="Document Title"
+          title="Document Title"
+          style="margin: 0; width: auto; flex: 1; max-width: 400px"
+        />
         <div
           id="localModeBadge"
           style="
@@ -80,7 +158,7 @@
         <div id="activeCollaborators" style="display: none; align-items: center">
           <!-- Active users will appear here -->
         </div>
-        
+
         <div style="display: flex; gap: 10px; align-items: center">
           <button
             class="toolbar-btn"
@@ -121,7 +199,15 @@
           <div
             id="headerInitials"
             class="avatar-initials"
-            style="width: 32px; height: 32px; font-size: 14px; border-radius: 50%; display: none; align-items: center; justify-content: center;"
+            style="
+              width: 32px;
+              height: 32px;
+              font-size: 14px;
+              border-radius: 50%;
+              display: none;
+              align-items: center;
+              justify-content: center;
+            "
           ></div>
           <i
             id="headerUserIcon"
@@ -130,17 +216,6 @@
           ></i>
         </div>
       </div>
-    </div>
-
-    <!-- Title Bar -->
-    <div class="title-bar">
-      <input
-        type="text"
-        class="doc-title"
-        id="docTitle"
-        placeholder="Untitled document"
-        style="margin: 0; width: auto; flex: 1; max-width: 400px"
-      />
     </div>
 
     <!-- Document Library Sidebar -->
@@ -203,7 +278,15 @@
               <div
                 id="libraryHeaderInitials"
                 class="avatar-initials"
-                style="width: 32px; height: 32px; font-size: 14px; border-radius: 50%; display: none; align-items: center; justify-content: center;"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  font-size: 14px;
+                  border-radius: 50%;
+                  display: none;
+                  align-items: center;
+                  justify-content: center;
+                "
               ></div>
               <i
                 id="libraryHeaderUserIcon"
@@ -211,7 +294,11 @@
                 style="font-size: 32px; color: var(--accent-color-light)"
               ></i>
             </div>
-            <button id="closeLibrary" class="toolbar-btn close-btn-gradient" style="padding: 10px 20px; border-radius: 6px; display: none">
+            <button
+              id="closeLibrary"
+              class="toolbar-btn close-btn-gradient"
+              style="padding: 10px 20px; border-radius: 6px; display: none"
+            >
               <i class="fas fa-times"></i> Close
             </button>
           </div>
@@ -227,10 +314,7 @@
               gap: 20px;
             "
           >
-            <div
-              id="createNewDoc"
-              class="create-doc-card"
-            >
+            <div id="createNewDoc" class="create-doc-card">
               <div
                 style="
                   width: 120px;
@@ -257,11 +341,7 @@
 
         <!-- Search and Filter -->
         <div style="margin-bottom: 24px">
-          <input
-            type="text"
-            id="docSearch"
-            placeholder="Search documents..."
-          />
+          <input type="text" id="docSearch" placeholder="Search documents..." />
         </div>
 
         <!-- Redundant inline styles removed -->
@@ -269,13 +349,7 @@
         <!-- Recent Documents -->
         <div>
           <h2 style="font-size: 20px; margin-bottom: 20px" class="section-title">Recent</h2>
-          <div
-            class="doc-list-container"
-            style="
-              border-radius: 8px;
-              overflow: hidden;
-            "
-          >
+          <div class="doc-list-container" style="border-radius: 8px; overflow: hidden">
             <table style="width: 100%; border-collapse: collapse">
               <thead>
                 <tr class="doc-list-header">
@@ -379,17 +453,72 @@
         >
           Share this document
         </h2>
-        <p
+
+        <div
           style="
-            color: #d0d0d0;
-            margin-bottom: 16px;
-            border-left: 3px solid var(--accent-color);
-            padding-left: 12px;
+            margin-bottom: 24px;
+            background: rgba(var(--accent-color-rgb), 0.05);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
           "
         >
-          Anyone with this link can collaborate on this document in real-time:
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <div>
+              <div
+                style="
+                  color: var(--accent-color-light);
+                  font-weight: 600;
+                  font-size: 14px;
+                  margin-bottom: 4px;
+                "
+              >
+                Link Sharing
+              </div>
+              <div style="color: #888; font-size: 11px">
+                When enabled, anyone with the link can access this document.
+              </div>
+            </div>
+            <label
+              class="switch"
+              style="position: relative; display: inline-block; width: 40px; height: 24px"
+            >
+              <input
+                type="checkbox"
+                id="linkSharingToggle"
+                style="opacity: 0; width: 0; height: 0"
+              />
+              <span
+                class="slider"
+                style="
+                  position: absolute;
+                  cursor: pointer;
+                  top: 0;
+                  left: 0;
+                  right: 0;
+                  bottom: 0;
+                  background-color: #333;
+                  transition: 0.4s;
+                  border-radius: 24px;
+                "
+              ></span>
+            </label>
+          </div>
+          <div
+            id="linkSharingStatus"
+            style="font-size: 11px; margin-top: 8px; color: #aaa; display: none"
+          >
+            <i class="fas fa-spinner fa-spin"></i> Updating...
+          </div>
+        </div>
+
+        <p style="color: #d0d0d0; margin-bottom: 8px; font-size: 12px; padding-left: 4px">
+          Share link:
         </p>
-        <div style="display: flex; gap: 8px; margin-bottom: 16px">
+        <div
+          id="shareLinkContainer"
+          style="display: flex; gap: 8px; margin-bottom: 24px; transition: opacity 0.3s ease"
+        >
           <input
             type="text"
             id="shareLink"
@@ -430,6 +559,7 @@
             <i class="fas fa-copy"></i> Copy
           </button>
         </div>
+
         <p
           style="
             font-size: 12px;
@@ -447,12 +577,7 @@
         <button
           id="closeShareModal"
           class="toolbar-btn close-btn-gradient"
-          style="
-            width: 100%;
-            padding: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-          "
+          style="width: 100%; padding: 12px; border-radius: 4px; cursor: pointer"
         >
           Close
         </button>
@@ -524,11 +649,7 @@
           <button
             id="closeHistoryModal"
             class="toolbar-btn close-btn-gradient"
-            style="
-              padding: 4px 12px;
-              border-radius: 6px;
-              cursor: pointer;
-            "
+            style="padding: 4px 12px; border-radius: 6px; cursor: pointer"
           >
             <i class="fas fa-times"></i>
           </button>
@@ -692,8 +813,15 @@
         <div style="padding: 24px; flex: 1; overflow-y: auto">
           <!-- General Tab Content -->
           <div class="profile-tab-content active" id="general-content" style="display: block">
-             <!-- Photo Management Section -->
-             <div style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: center">
+            <!-- Photo Management Section -->
+            <div
+              style="
+                margin-bottom: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              "
+            >
               <div style="position: relative; width: 80px; height: 80px; margin-bottom: 12px">
                 <img
                   id="profilePfp"
@@ -778,35 +906,137 @@
                 </label>
                 <input type="file" id="pfpUpload" accept="image/*" style="display: none" />
               </div>
-              <span style="font-size: 9px; color: #666; margin-top: -8px; margin-bottom: 12px;">Max 1MB</span>
+              <span style="font-size: 9px; color: #666; margin-top: -8px; margin-bottom: 12px"
+                >Max 1MB</span
+              >
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 16px">
               <div>
-                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Email Address</label>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <input type="text" id="profileEmailInput" readonly class="profile-input" />
-                  <div id="emailVerificationBadge" style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <label
+                  for="profileEmailInput"
+                  class="profile-label"
+                  style="
+                    font-size: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >Email Address</label
+                >
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <input
+                    type="text"
+                    id="profileEmailInput"
+                    name="email"
+                    readonly
+                    class="profile-input"
+                  />
+                  <div
+                    id="emailVerificationBadge"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      font-size: 10px;
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      letter-spacing: 0.5px;
+                    "
+                  >
                     <!-- Will be populated by JS -->
                   </div>
                 </div>
-                <div id="resendVerificationContainer" style="display: none; margin-top: 8px;">
-                   <button id="resendVerificationBtn" style="background: none; border: none; color: var(--accent-color-light); font-size: 10px; cursor: pointer; text-decoration: underline; padding: 0;">Resend verification code</button>
-                   <span id="resendTimer" style="font-size: 10px; color: #666; margin-left: 8px; display: none;"></span>
+                <div id="resendVerificationContainer" style="display: none; margin-top: 8px">
+                  <button
+                    id="resendVerificationBtn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--accent-color-light);
+                      font-size: 10px;
+                      cursor: pointer;
+                      text-decoration: underline;
+                      padding: 0;
+                    "
+                  >
+                    Resend verification code
+                  </button>
+                  <span
+                    id="resendTimer"
+                    style="font-size: 10px; color: #666; margin-left: 8px; display: none"
+                  ></span>
                 </div>
               </div>
 
               <div>
-                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Username</label>
-                <input type="text" id="profileUsernameInput" readonly class="profile-input" />
-              </div>
-              
-              <div>
-                <label class="profile-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px;">Bio</label>
-                <textarea id="profileBioInput" rows="4" placeholder="Tell us about yourself..." class="profile-input" style="resize: none;"></textarea>
+                <label
+                  for="profileUsernameInput"
+                  class="profile-label"
+                  style="
+                    font-size: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >Username</label
+                >
+                <input
+                  type="text"
+                  id="profileUsernameInput"
+                  name="username"
+                  readonly
+                  class="profile-input"
+                />
               </div>
 
-              <button id="saveGeneralBtn" style="padding: 10px 12px; background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light)); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);">Save Changes</button>
+              <div>
+                <label
+                  for="profileBioInput"
+                  class="profile-label"
+                  style="
+                    font-size: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >Bio</label
+                >
+                <textarea
+                  id="profileBioInput"
+                  name="bio"
+                  rows="4"
+                  placeholder="Tell us about yourself..."
+                  class="profile-input"
+                  style="resize: none"
+                ></textarea>
+              </div>
+
+              <button
+                id="saveGeneralBtn"
+                style="
+                  padding: 10px 12px;
+                  background: linear-gradient(
+                    135deg,
+                    var(--accent-color),
+                    var(--accent-color-light)
+                  );
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-weight: 600;
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.3px;
+                  box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+                "
+              >
+                Save Changes
+              </button>
             </div>
           </div>
 
@@ -880,7 +1110,7 @@
             </div>
 
             <!-- Accent Color Selection -->
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px">
               <h3
                 style="
                   margin-bottom: 12px;
@@ -897,19 +1127,115 @@
                 >Accent Color
               </h3>
               <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
-                <button class="accent-color-btn" data-color="#8b5cf6" style="width: 100%; aspect-ratio: 1; background: #8b5cf6; border: 2px solid #a78bfa; border-radius: 6px; cursor: pointer;" title="Purple"></button>
-                <button class="accent-color-btn" data-color="#ec4899" style="width: 100%; aspect-ratio: 1; background: #ec4899; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Pink"></button>
-                <button class="accent-color-btn" data-color="#3b82f6" style="width: 100%; aspect-ratio: 1; background: #3b82f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Blue"></button>
-                <button class="accent-color-btn" data-color="#10b981" style="width: 100%; aspect-ratio: 1; background: #10b981; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Green"></button>
-                <button class="accent-color-btn" data-color="#f59e0b" style="width: 100%; aspect-ratio: 1; background: #f59e0b; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Amber"></button>
-                <button class="accent-color-btn" data-color="#ef4444" style="width: 100%; aspect-ratio: 1; background: #ef4444; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Red"></button>
-                <button class="accent-color-btn" data-color="#06b6d4" style="width: 100%; aspect-ratio: 1; background: #06b6d4; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Cyan"></button>
-                <button class="accent-color-btn" data-color="#39ff14" style="width: 100%; aspect-ratio: 1; background: #39ff14; border: 2px solid transparent; border-radius: 6px; cursor: pointer;" title="Neon Green"></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#8b5cf6"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #8b5cf6;
+                    border: 2px solid #a78bfa;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Purple"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#ec4899"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #ec4899;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Pink"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#3b82f6"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #3b82f6;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Blue"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#10b981"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #10b981;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Green"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#f59e0b"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #f59e0b;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Amber"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#ef4444"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #ef4444;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Red"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#06b6d4"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #06b6d4;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Cyan"
+                ></button>
+                <button
+                  class="accent-color-btn"
+                  data-color="#39ff14"
+                  style="
+                    width: 100%;
+                    aspect-ratio: 1;
+                    background: #39ff14;
+                    border: 2px solid transparent;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                  title="Neon Green"
+                ></button>
               </div>
             </div>
 
             <!-- Background Theme Selection -->
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px">
               <h3
                 style="
                   margin-bottom: 12px;
@@ -923,49 +1249,147 @@
                 "
               >
                 <i class="fas fa-magic" style="color: var(--accent-color); font-size: 10px"></i
-                >Background Theme
+                ><label for="backgroundThemeSelect">Background Theme</label>
               </h3>
-              <select id="backgroundThemeSelect" class="profile-input" style="width: 100%; height: 36px;">
+              <select
+                id="backgroundThemeSelect"
+                name="backgroundTheme"
+                class="profile-input"
+                style="width: 100%; height: 36px"
+              >
                 <option value="dots">Connected Dots (Classic)</option>
                 <option value="math">Floating Math Symbols</option>
                 <option value="code">Floating Code Blocks</option>
                 <option value="nature">Floating Nature Elements</option>
+                <option value="none">None</option>
               </select>
             </div>
 
             <!-- Editor Preferences -->
             <div>
-              <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Editor Preferences</h3>
-              <div class="preference-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(var(--accent-color-rgb), 0.05); border-radius: 6px; border: 1px solid rgba(var(--accent-color-rgb), 0.1);">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <span class="preference-label" style="font-size: 12px; font-weight: 500;">Page Glow</span>
-                  <span class="preference-desc" style="font-size: 10px;">Adds a radiant light effect around the document</span>
+              <h3
+                style="
+                  margin-bottom: 12px;
+                  color: var(--accent-color-lighter);
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.8px;
+                "
+              >
+                Editor Preferences
+              </h3>
+              <div
+                class="preference-row"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 10px 12px;
+                  background: rgba(var(--accent-color-rgb), 0.05);
+                  border-radius: 6px;
+                  border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                "
+              >
+                <div style="display: flex; flex-direction: column; gap: 2px">
+                  <span class="preference-label" style="font-size: 12px; font-weight: 500"
+                    >Page Glow</span
+                  >
+                  <span class="preference-desc" style="font-size: 10px"
+                    >Adds a radiant light effect around the document</span
+                  >
                 </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
-                  <input type="checkbox" id="togglePageGlow" style="opacity: 0; width: 0; height: 0;">
-                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px;"></span>
+                <label
+                  class="switch"
+                  style="position: relative; display: inline-block; width: 34px; height: 20px"
+                >
+                  <input
+                    type="checkbox"
+                    id="togglePageGlow"
+                    style="opacity: 0; width: 0; height: 0"
+                  />
+                  <span
+                    class="slider"
+                    style="
+                      position: absolute;
+                      cursor: pointer;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background-color: #333;
+                      transition: 0.4s;
+                      border-radius: 20px;
+                    "
+                  ></span>
                 </label>
               </div>
 
-              <div class="preference-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(var(--accent-color-rgb), 0.05); border-radius: 6px; border: 1px solid rgba(var(--accent-color-rgb), 0.1); margin-top: 8px;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <span class="preference-label" style="font-size: 12px; font-weight: 500;">Page Border Accent</span>
-                  <span class="preference-desc" style="font-size: 10px;">Shows your accent color around the page perimeter</span>
+              <div
+                class="preference-row"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 10px 12px;
+                  background: rgba(var(--accent-color-rgb), 0.05);
+                  border-radius: 6px;
+                  border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                  margin-top: 8px;
+                "
+              >
+                <div style="display: flex; flex-direction: column; gap: 2px">
+                  <span class="preference-label" style="font-size: 12px; font-weight: 500"
+                    >Page Border Accent</span
+                  >
+                  <span class="preference-desc" style="font-size: 10px"
+                    >Shows your accent color around the page perimeter</span
+                  >
                 </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
-                  <input type="checkbox" id="togglePageBorder" style="opacity: 0; width: 0; height: 0;">
-                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px;"></span>
+                <label
+                  class="switch"
+                  style="position: relative; display: inline-block; width: 34px; height: 20px"
+                >
+                  <input
+                    type="checkbox"
+                    id="togglePageBorder"
+                    style="opacity: 0; width: 0; height: 0"
+                  />
+                  <span
+                    class="slider"
+                    style="
+                      position: absolute;
+                      cursor: pointer;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background-color: #333;
+                      transition: 0.4s;
+                      border-radius: 20px;
+                    "
+                  ></span>
                 </label>
               </div>
             </div>
 
             <style>
-              .switch input:checked + .slider { background-color: var(--accent-color); }
-              .slider:before {
-                position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-                background-color: white; transition: .4s; border-radius: 50%;
+              .switch input:checked + .slider {
+                background-color: var(--accent-color);
               }
-              .switch input:checked + .slider:before { transform: translateX(14px); }
+              .slider:before {
+                position: absolute;
+                content: '';
+                height: 14px;
+                width: 14px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+              }
+              .switch input:checked + .slider:before {
+                transform: translateX(14px);
+              }
             </style>
           </div>
 
@@ -986,42 +1410,109 @@
               <i class="fas fa-lock" style="color: var(--accent-color); font-size: 10px"></i>Change
               Password
             </h3>
-                        <div style="display: flex; flex-direction: column; gap: 10px">
-                          <div style="position: relative">
-                            <label
-                              class="profile-label"
-                              style="
-                                font-size: 10px;
-                                text-transform: uppercase;
-                                letter-spacing: 0.3px;
-                                display: block;
-                                margin-bottom: 6px;
-                              "
-                              >New Password</label
-                            >
-                            <input
-                              type="password"
-                              id="newPassword"
-                              class="profile-input"
-                              placeholder="Enter new password"
-                              style="
-                                width: 100%;
-                                padding: 10px 12px;
-                                border-radius: 6px;
-                                font-size: 11px;
-                                transition: all 0.3s ease;
-                              "
-                            />
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div style="position: relative">
+                <label
+                  for="newPassword"
+                  class="profile-label"
+                  style="
+                    font-size: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >New Password</label
+                >
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  class="profile-input"
+                  placeholder="Enter new password"
+                  style="
+                    width: 100%;
+                    padding: 10px 12px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                    transition: all 0.3s ease;
+                  "
+                />
                 <!-- Password Strength Meter -->
-                <div style="margin-top: 8px;">
-                  <div class="entropy-bar" style="margin-bottom: 8px;">
-                    <div id="passwordStrengthBar" style="height: 100%; width: 0%; transition: all 0.3s ease; background: #ef4444;"></div>
+                <div style="margin-top: 8px">
+                  <div class="entropy-bar" style="margin-bottom: 8px">
+                    <div
+                      id="passwordStrengthBar"
+                      style="
+                        height: 100%;
+                        width: 0%;
+                        transition: all 0.3s ease;
+                        background: #ef4444;
+                      "
+                    ></div>
                   </div>
-                  <ul id="passwordRequirements" style="list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                    <li data-req="length" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> 8+ Characters</li>
-                    <li data-req="upper" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Uppercase</li>
-                    <li data-req="number" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Number</li>
-                    <li data-req="symbol" style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;"><i class="fas fa-circle" style="font-size: 4px;"></i> Symbol</li>
+                  <ul
+                    id="passwordRequirements"
+                    style="
+                      list-style: none;
+                      padding: 0;
+                      margin: 0;
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 4px;
+                    "
+                  >
+                    <li
+                      data-req="length"
+                      style="
+                        font-size: 9px;
+                        color: #666;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      "
+                    >
+                      <i class="fas fa-circle" style="font-size: 4px"></i> 8+ Characters
+                    </li>
+                    <li
+                      data-req="upper"
+                      style="
+                        font-size: 9px;
+                        color: #666;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      "
+                    >
+                      <i class="fas fa-circle" style="font-size: 4px"></i>
+                      Uppercase
+                    </li>
+                    <li
+                      data-req="number"
+                      style="
+                        font-size: 9px;
+                        color: #666;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      "
+                    >
+                      <i class="fas fa-circle" style="font-size: 4px"></i>
+                      Number
+                    </li>
+                    <li
+                      data-req="symbol"
+                      style="
+                        font-size: 9px;
+                        color: #666;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      "
+                    >
+                      <i class="fas fa-circle" style="font-size: 4px"></i>
+                      Symbol
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -1050,43 +1541,144 @@
                 Update Password
               </button>
             </div>
-            
-            <div style="margin-top: 24px;">
-               <div class="collapsible-header" id="toggleLoginHistory" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                 <h3 class="profile-section-title" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Login History</h3>
-                 <i class="fas fa-chevron-down" style="font-size: 10px; color: #666; transition: transform 0.3s;"></i>
-               </div>
-               <div id="loginHistoryContainer" style="display: none; background: #0d0520; border-radius: 6px; border: 1px solid #2a2a2a; overflow: hidden;">
-                   <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-                       <tbody id="loginHistoryTableBody">
-                           <!-- Populated by JS -->
-                       </tbody>
-                   </table>
-               </div>
+
+            <div style="margin-top: 24px">
+              <div
+                class="collapsible-header"
+                id="toggleLoginHistory"
+                style="
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 8px;
+                "
+              >
+                <h3
+                  class="profile-section-title"
+                  style="
+                    margin: 0;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                  "
+                >
+                  Login History
+                </h3>
+                <i
+                  class="fas fa-chevron-down"
+                  style="font-size: 10px; color: #666; transition: transform 0.3s"
+                ></i>
+              </div>
+              <div
+                id="loginHistoryContainer"
+                style="
+                  display: none;
+                  background: #0d0520;
+                  border-radius: 6px;
+                  border: 1px solid #2a2a2a;
+                  overflow: hidden;
+                "
+              >
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px">
+                  <tbody id="loginHistoryTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div style="margin-top: 24px;">
-               <div class="collapsible-header" id="toggleSessions" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <h3 class="profile-section-title" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Sessions</h3>
-                    <button id="revokeAllOthersBtn" style="background: none; border: none; color: #ef4444; font-size: 9px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; font-weight: 600;">Revoke Others</button>
-                 </div>
-                 <i class="fas fa-chevron-down" style="font-size: 10px; color: #666; transition: transform 0.3s;"></i>
-               </div>
-               <div id="sessionListContainer" style="display: none; flex-direction: column; gap: 8px;">
-                   <!-- Dynamically populated -->
-               </div>
+            <div style="margin-top: 24px">
+              <div
+                class="collapsible-header"
+                id="toggleSessions"
+                style="
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 12px;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <h3
+                    class="profile-section-title"
+                    style="
+                      margin: 0;
+                      font-size: 11px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.8px;
+                    "
+                  >
+                    Sessions
+                  </h3>
+                  <button
+                    id="revokeAllOthersBtn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: #ef4444;
+                      font-size: 9px;
+                      text-transform: uppercase;
+                      cursor: pointer;
+                      letter-spacing: 0.5px;
+                      font-weight: 600;
+                    "
+                  >
+                    Revoke Others
+                  </button>
+                </div>
+                <i
+                  class="fas fa-chevron-down"
+                  style="font-size: 10px; color: #666; transition: transform 0.3s"
+                ></i>
+              </div>
+              <div
+                id="sessionListContainer"
+                style="display: none; flex-direction: column; gap: 8px"
+              >
+                <!-- Dynamically populated -->
+              </div>
             </div>
 
-            <div style="margin-top: 24px;">
-               <h3 style="margin-bottom: 12px; color: var(--accent-color-lighter); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Privacy</h3>
-               <div class="privacy-row" style="display: flex; align-items: center; justify-content: space-between; background: #0d0520; padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a;">
-                   <div style="display: flex; flex-direction: column;">
-                       <span style="font-size: 12px; color: #e0e0e0;" class="privacy-text-main">Show my online status to others</span>
-                       <span class="preference-desc" style="font-size: 10px; margin-top: 2px;">When off, your cursor and presence are hidden from collaborators.</span>
-                   </div>
-                   <i id="privacyToggle" class="fas fa-toggle-on" style="color: var(--accent-color-light); font-size: 20px; cursor: pointer;"></i>
-               </div>
+            <div style="margin-top: 24px">
+              <h3
+                style="
+                  margin-bottom: 12px;
+                  color: var(--accent-color-lighter);
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.8px;
+                "
+              >
+                Privacy
+              </h3>
+              <div
+                class="privacy-row"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  background: #0d0520;
+                  padding: 12px;
+                  border-radius: 6px;
+                  border: 1px solid #2a2a2a;
+                "
+              >
+                <div style="display: flex; flex-direction: column">
+                  <span style="font-size: 12px; color: #e0e0e0" class="privacy-text-main"
+                    >Show my online status to others</span
+                  >
+                  <span class="preference-desc" style="font-size: 10px; margin-top: 2px"
+                    >When off, your cursor and presence are hidden from collaborators.</span
+                  >
+                </div>
+                <i
+                  id="privacyToggle"
+                  class="fas fa-toggle-on"
+                  style="color: var(--accent-color-light); font-size: 20px; cursor: pointer"
+                ></i>
+              </div>
             </div>
           </div>
         </div>
@@ -1196,6 +1788,56 @@
             <option value="courier-new">Courier New</option>
             <option value="georgia">Georgia</option>
             <option value="verdana">Verdana</option>
+            <option value="lobster">Lobster</option>
+            <option value="pacifico">Pacifico</option>
+            <option value="bebas-neue">Bebas Neue</option>
+            <option value="anton">Anton</option>
+            <option value="dancing-script">Dancing Script</option>
+            <option value="shadows-into-light">Shadows Into Light</option>
+            <option value="abril-fatface">Abril Fatface</option>
+            <option value="playfair-display">Playfair Display</option>
+            <option value="indie-flower">Indie Flower</option>
+            <option value="amatic-sc">Amatic SC</option>
+            <option value="caveat">Caveat</option>
+            <option value="comfortaa">Comfortaa</option>
+            <option value="righteous">Righteous</option>
+            <option value="cinzel">Cinzel</option>
+            <option value="poppins">Poppins</option>
+            <option value="raleway">Raleway</option>
+            <option value="nunito">Nunito</option>
+            <option value="quicksand">Quicksand</option>
+            <option value="inconsolata">Inconsolata</option>
+            <option value="ubuntu">Ubuntu</option>
+            <option value="bitter">Bitter</option>
+            <option value="dosis">Dosis</option>
+            <option value="josefin-sans">Josefin Sans</option>
+            <option value="libre-baskerville">Libre Baskerville</option>
+            <option value="mulish">Mulish</option>
+            <option value="pt-sans">PT Sans</option>
+            <option value="pt-serif">PT Serif</option>
+            <option value="titillium-web">Titillium Web</option>
+            <option value="varela-round">Varela Round</option>
+            <option value="zilla-slab">Zilla Slab</option>
+            <option value="fira-sans">Fira Sans</option>
+            <option value="work-sans">Work Sans</option>
+            <option value="dm-sans">DM Sans</option>
+            <option value="ibm-plex-sans">IBM Plex Sans</option>
+            <option value="karla">Karla</option>
+            <option value="crimson-text">Crimson Text</option>
+            <option value="source-sans-pro">Source Sans Pro</option>
+            <option value="source-serif-pro">Source Serif Pro</option>
+            <option value="space-mono">Space Mono</option>
+            <option value="exo-2">Exo 2</option>
+            <option value="kanit">Kanit</option>
+            <option value="maven-pro">Maven Pro</option>
+            <option value="signika">Signika</option>
+            <option value="bree-serif">Bree Serif</option>
+            <option value="fjalla-one">Fjalla One</option>
+            <option value="patua-one">Patua One</option>
+            <option value="arvo">Arvo</option>
+            <option value="vollkorn">Vollkorn</option>
+            <option value="old-standard-tt">Old Standard TT</option>
+            <option value="great-vibes">Great Vibes</option>
           </select>
           <select class="ql-size" title="Font Size">
             <option value="8px">8</option>
@@ -1215,7 +1857,9 @@
             <option value="48px">48</option>
             <option value="72px">72</option>
           </select>
-          <button class="ql-bold toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+          <button class="ql-bold toolbar-btn" title="Bold">
+            <i class="fas fa-bold"></i>
+          </button>
           <button class="ql-italic toolbar-btn" title="Italic">
             <i class="fas fa-italic"></i>
           </button>
@@ -1396,6 +2040,10 @@
               style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none"
             />
           </div>
+          <div style="width: 1px; height: 24px; background: #333; margin: 0 8px"></div>
+          <button class="toolbar-btn" id="toggleSearchBtn" title="Find and Replace (Ctrl+F)">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
       </div>
       <div class="ribbon-section">
@@ -1646,9 +2294,15 @@
       <div class="ribbon-section">
         <div class="ribbon-section-title">Zoom</div>
         <div class="ribbon-section-tools">
-          <button class="toolbar-btn" id="zoomOutBtn"><i class="fas fa-search-minus"></i></button>
-          <span id="zoomPercent" style="font-size: 12px; min-width: 40px; text-align: center;">100%</span>
-          <button class="toolbar-btn" id="zoomInBtn"><i class="fas fa-search-plus"></i></button>
+          <button class="toolbar-btn" id="zoomOutBtn">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <span id="zoomPercent" style="font-size: 12px; min-width: 40px; text-align: center"
+            >100%</span
+          >
+          <button class="toolbar-btn" id="zoomInBtn">
+            <i class="fas fa-search-plus"></i>
+          </button>
           <button class="toolbar-btn" id="zoom100">Reset</button>
         </div>
       </div>
@@ -1730,12 +2384,22 @@
     <div class="main-workspace">
       <!-- Left Sidebar: Outline -->
       <div class="sidebar" id="outlineSidebar">
-        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div
+          class="sidebar-header"
+          style="display: flex; justify-content: space-between; align-items: center"
+        >
           <span>Document Outline</span>
-          <button id="closeOutline" style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px;"><i class="fas fa-times"></i></button>
+          <button
+            id="closeOutline"
+            style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div id="outlineContainer" class="outline-container">
-          <div style="padding: 20px; color: #666; font-size: 12px;">Add headings to see them here</div>
+          <div style="padding: 20px; color: #666; font-size: 12px">
+            Add headings to see them here
+          </div>
         </div>
       </div>
 
@@ -1744,9 +2408,17 @@
 
       <!-- Right Sidebar: Minimap -->
       <div class="sidebar sidebar-right" id="minimapSidebar">
-        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div
+          class="sidebar-header"
+          style="display: flex; justify-content: space-between; align-items: center"
+        >
           <span>Navigator</span>
-          <button id="closeMinimap" style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px;"><i class="fas fa-times"></i></button>
+          <button
+            id="closeMinimap"
+            style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div id="minimap">
           <!-- Canvas will be injected here -->
@@ -1758,8 +2430,9 @@
     <div class="status-bar">
       <div style="display: flex; justify-content: space-between; align-items: center; width: 100%">
         <div style="display: flex; gap: 16px">
-          <span id="pageIndicator" style="color: #5f6368; font-size: 12px">Page 1</span> |
-          <span id="charCount">Characters: 0</span> | <span id="wordCount">Words: 0</span>
+          <span id="pageIndicator" style="color: #5f6368; font-size: 12px">Page 1</span>
+          | <span id="charCount">Characters: 0</span> |
+          <span id="wordCount">Words: 0</span>
         </div>
       </div>
     </div>
@@ -1841,17 +2514,54 @@
         <span style="font-size: 14px; color: var(--accent-color-light)">Status check...</span>
       </div>
 
-    <!-- Theme Loading Toast -->
-    <div id="themeToast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(13, 5, 32, 0.9); border: 1px solid var(--accent-color); padding: 12px 24px; border-radius: 50px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(var(--accent-color-rgb), 0.3); backdrop-filter: blur(10px); transition: all 0.3s ease; opacity: 0;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 16px; height: 16px; border: 2px solid var(--accent-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <span id="themeToastText" style="color: #e0e0e0; font-size: 13px; font-weight: 500; letter-spacing: 0.5px;">Applying Accent Color...</span>
+      <!-- Theme Loading Toast -->
+      <div
+        id="themeToast"
+        style="
+          display: none;
+          position: fixed;
+          bottom: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(13, 5, 32, 0.9);
+          border: 1px solid var(--accent-color);
+          padding: 12px 24px;
+          border-radius: 50px;
+          z-index: 10000;
+          box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(var(--accent-color-rgb), 0.3);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+          opacity: 0;
+        "
+      >
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div
+            style="
+              width: 16px;
+              height: 16px;
+              border: 2px solid var(--accent-color);
+              border-top-color: transparent;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+            "
+          ></div>
+          <span
+            id="themeToastText"
+            style="color: #e0e0e0; font-size: 13px; font-weight: 500; letter-spacing: 0.5px"
+            >Applying Accent Color...</span
+          >
+        </div>
       </div>
-    </div>
 
-    <style>
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @keyframes float {
+      <style>
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes float {
           0%,
           100% {
             transform: translateY(0);
@@ -1877,25 +2587,206 @@
       </style>
     </div>
 
+    <!-- Search Dialog -->
+    <div
+      id="searchDialog"
+      style="
+        display: none;
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        width: 320px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 10001;
+        flex-direction: column;
+        gap: 12px;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 4px;
+        "
+      >
+        <span style="font-size: 14px; font-weight: 600; color: #e0e0e0">Find & Replace</span>
+        <button
+          id="closeSearchBtn"
+          style="background: none; border: none; color: #888; cursor: pointer"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div style="position: relative">
+        <input
+          type="text"
+          id="findInput"
+          placeholder="Find..."
+          style="
+            width: 100%;
+            padding: 8px;
+            padding-right: 60px;
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+          "
+        />
+        <div
+          id="searchMatchCount"
+          style="
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #666;
+          "
+        ></div>
+      </div>
+
+      <div style="display: flex; gap: 8px">
+        <input
+          type="text"
+          id="replaceInput"
+          placeholder="Replace with..."
+          style="
+            flex: 1;
+            padding: 8px;
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+          "
+        />
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: space-between">
+        <div style="display: flex; gap: 4px">
+          <button
+            id="findPrevBtn"
+            class="toolbar-btn"
+            title="Previous Match"
+            style="padding: 6px 10px; background: #333"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            id="findNextBtn"
+            class="toolbar-btn"
+            title="Next Match"
+            style="padding: 6px 10px; background: #333"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div style="display: flex; gap: 4px">
+          <button
+            id="replaceBtn"
+            class="toolbar-btn"
+            style="padding: 6px 12px; font-size: 11px; background: #333"
+          >
+            Replace
+          </button>
+          <button
+            id="replaceAllBtn"
+            class="toolbar-btn"
+            style="padding: 6px 12px; font-size: 11px; background: #333"
+          >
+            All
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Hidden file input for images -->
     <input type="file" id="imageInput" accept="image/*" />
 
     <!-- Confirm Identity Modal -->
-    <div id="confirmIdentityModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 350px; padding: 24px; text-align: center;">
-            <div style="width: 48px; height: 48px; background: rgba(var(--accent-color-rgb), 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                <i class="fas fa-user-shield" style="color: var(--accent-color); font-size: 20px;"></i>
-            </div>
-            <h2 style="margin-bottom: 8px; color: var(--accent-color-lighter); font-size: 16px;">Confirm Identity</h2>
-            <p style="font-size: 12px; color: #888; margin-bottom: 20px;">Please enter your current password to confirm this sensitive action.</p>
-            
-            <input type="password" id="confirmIdentityPassword" placeholder="Current Password" style="width: 100%; padding: 12px; border: 1px solid #2a2a2a; border-radius: 6px; background: #0d0520; color: #e0e0e0; font-size: 13px; margin-bottom: 16px; text-align: center;" />
-            
-            <div style="display: flex; gap: 12px;">
-                <button id="cancelConfirmIdentity" style="flex: 1; padding: 10px; background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Cancel</button>
-                <button id="submitConfirmIdentity" style="flex: 1; padding: 10px; background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light)); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);">Confirm</button>
-            </div>
+    <div id="confirmIdentityModal" class="modal-overlay" style="display: none">
+      <div class="modal-content" style="max-width: 350px; padding: 24px; text-align: center">
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            background: rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+          "
+        >
+          <i class="fas fa-user-shield" style="color: var(--accent-color); font-size: 20px"></i>
         </div>
+        <h2 style="margin-bottom: 8px; color: var(--accent-color-lighter); font-size: 16px">
+          Confirm Identity
+        </h2>
+        <p style="font-size: 12px; color: #888; margin-bottom: 20px">
+          Please enter your current password to confirm this sensitive action.
+        </p>
+
+        <input
+          type="password"
+          id="confirmIdentityPassword"
+          placeholder="Current Password"
+          style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: #0d0520;
+            color: #e0e0e0;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+          "
+        />
+
+        <div style="display: flex; gap: 12px">
+          <button
+            id="cancelConfirmIdentity"
+            style="
+              flex: 1;
+              padding: 10px;
+              background: #1a1a1a;
+              color: #888;
+              border: 1px solid #2a2a2a;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 12px;
+              font-weight: 600;
+            "
+          >
+            Cancel
+          </button>
+          <button
+            id="submitConfirmIdentity"
+            style="
+              flex: 1;
+              padding: 10px;
+              background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light));
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 12px;
+              font-weight: 600;
+              box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+            "
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
     </div>
 
     <button id="exitFocusMode" class="focus-exit-btn">
@@ -1904,6 +2795,77 @@
 
     <!-- Script to initialize app -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script type="module" src="js/core/app.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="#" class="bottom-nav-item active" id="navHome">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="bottom-nav-item" id="navShared">
+        <i class="fas fa-users"></i>
+        <span>Shared</span>
+      </a>
+      <a href="#" class="bottom-nav-item" id="navProfile">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Mobile Floating Action Buttons -->
+    <div class="fab-create" id="fabCreateDoc" title="Create New Document">
+      <i class="fas fa-plus"></i>
+    </div>
+
+    <div class="fab-edit" id="fabEditDoc" title="Edit Document" style="display: none">
+      <i class="fas fa-pen"></i>
+    </div>
+
+    <!-- Mobile Contextual Toolbar (Fixed above keyboard) -->
+    <div id="mobileContextualToolbar" class="mobile-toolbar">
+      <div class="mobile-toolbar-scroll">
+        <button class="mobile-tool-btn ql-bold"><i class="fas fa-bold"></i></button>
+        <button class="mobile-tool-btn ql-italic"><i class="fas fa-italic"></i></button>
+        <button class="mobile-tool-btn ql-underline"><i class="fas fa-underline"></i></button>
+        <div class="mobile-tool-separator"></div>
+        <button class="mobile-tool-btn ql-list" value="ordered">
+          <i class="fas fa-list-ol"></i>
+        </button>
+        <button class="mobile-tool-btn ql-list" value="bullet">
+          <i class="fas fa-list-ul"></i>
+        </button>
+        <div class="mobile-tool-separator"></div>
+        <button class="mobile-tool-btn ql-align" value=""><i class="fas fa-align-left"></i></button>
+        <button class="mobile-tool-btn ql-align" value="center">
+          <i class="fas fa-align-center"></i>
+        </button>
+        <button class="mobile-tool-btn ql-image"><i class="fas fa-image"></i></button>
+        <div class="mobile-tool-separator"></div>
+        <button class="mobile-tool-btn" id="mobileCloseKeyboard">
+          <i class="fas fa-keyboard"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div
+      id="offlineIndicator"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #ef4444;
+        color: white;
+        text-align: center;
+        font-size: 10px;
+        padding: 4px;
+        z-index: 20000;
+      "
+    >
+      <i class="fas fa-wifi-slash"></i> Offline - Changes saved locally
+    </div>
+
+    <script type="module" src="js/app/app.js"></script>
   </body>
 </html>

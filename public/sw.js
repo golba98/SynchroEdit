@@ -3,23 +3,26 @@ const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/css/styles.css',
-  '/js/core/app.js',
-  '/js/core/network.js',
-  '/js/core/utils.js',
-  '/js/ui/ui.js',
-  '/js/ui/auth.js',
-  '/js/ui/theme.js',
-  '/js/ui/profile.js',
-  '/js/ui/background.js',
-  '/js/ui/authController.js',
-  '/js/editor/editor.js',
-  '/js/managers/PageManager.js',
-  '/js/managers/BorderManager.js',
-  '/js/managers/CursorManager.js',
-  '/js/managers/ImageManager.js',
-  '/js/managers/ReadabilityManager.js',
-  '/js/managers/NavigationManager.js',
-  '/js/ui/ToolbarController.js',
+  '/js/app/app.js',
+  '/js/app/network.js',
+  '/js/app/utils.js',
+  '/js/features/ui/ui.js',
+  '/js/features/auth/auth.js',
+  '/js/features/theme/theme.js',
+  '/js/features/profile/profile.js',
+  '/js/features/theme/background.js',
+  '/js/features/auth/authController.js',
+  '/js/features/editor/editor.js',
+  '/js/features/editor/managers/PageManager.js',
+  '/js/features/editor/managers/BorderManager.js',
+  '/js/features/editor/managers/CursorManager.js',
+  '/js/features/editor/managers/ImageManager.js',
+  '/js/features/library/LibraryManager.js',
+  '/js/features/editor/managers/ReadabilityManager.js',
+  '/js/features/editor/managers/SelectionManager.js',
+  '/js/features/editor/managers/NavigationManager.js',
+  '/js/features/ui/ToolbarController.js',
+  '/js/features/ui/UIManager.js',
   '/pages/login.html',
   '/pages/start.html',
   '/pages/forgot-password.html',
@@ -32,7 +35,7 @@ const ASSETS_TO_CACHE = [
   'https://unpkg.com/idb-keyval@6.2.1/dist/index.js',
   'https://esm.sh/yjs@13.6.28',
   'https://esm.sh/y-quill@1.0.0?deps=yjs@13.6.28',
-  '/js/vendor/y-websocket.js'
+  '/js/vendor/y-websocket.js',
 ];
 
 self.addEventListener('install', (event) => {
@@ -42,7 +45,9 @@ self.addEventListener('install', (event) => {
       // Use cache.addAll cautiously, if one fails, the whole install fails.
       // Better to map and catch errors if some assets might be missing.
       return Promise.allSettled(
-        ASSETS_TO_CACHE.map(url => cache.add(url).catch(err => console.warn(`Failed to cache ${url}:`, err)))
+        ASSETS_TO_CACHE.map((url) =>
+          cache.add(url).catch((err) => console.warn(`Failed to cache ${url}:`, err))
+        )
       );
     })
   );
@@ -65,44 +70,61 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Handle messages safely
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  // Explicitly return nothing to indicate synchronous handling (or no handling)
+});
+
 // Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
   // Ignore API requests, WebSocket upgrades, and non-http/https schemes
   if (
-      event.request.url.includes('/api/') || 
-      event.request.url.includes('/ws/') ||
-      event.request.url.includes('socket.io') ||
-      !event.request.url.startsWith('http')
+    event.request.url.includes('/api/') ||
+    event.request.url.includes('/ws/') ||
+    event.request.url.includes('socket.io') ||
+    !event.request.url.startsWith('http')
   ) {
     return;
   }
-  
+
   // Ignore non-GET requests
   if (event.request.method !== 'GET') {
-      return;
+    return;
   }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       // If we have a cached response, return it and update in background
       if (cachedResponse) {
-          const fetchPromise = fetch(event.request).then((networkResponse) => {
+        const fetchPromise = fetch(event.request)
+          .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
-                const responseClone = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
-                });
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone);
+              });
             }
             return networkResponse;
-          }).catch(err => {
-              console.debug('Service Worker: Background fetch failed, using cache:', event.request.url);
-              return cachedResponse;
+          })
+          .catch((err) => {
+            console.debug(
+              'Service Worker: Background fetch failed, using cache:',
+              event.request.url
+            );
+            return cachedResponse;
           });
-          return cachedResponse;
+        return cachedResponse;
       }
 
       // If NOT in cache, just fetch from network normally
-      return fetch(event.request);
+      return fetch(event.request).catch((err) => {
+        console.warn('Service Worker: Fetch failed:', event.request.url);
+        // Return a 404 or offline page if desired, instead of letting the error bubble up
+        return new Response('Network Error', { status: 404, statusText: 'Network Error' });
+      });
     })
   );
 });

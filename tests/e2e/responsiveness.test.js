@@ -3,16 +3,16 @@ const { test, expect } = require('@playwright/test');
 test.describe('Responsiveness', () => {
   test('should fit elements in viewport on mobile', async ({ page }) => {
     await page.goto('/pages/login.html');
-    
+
     // Check if login container width is not exceeding viewport width
     const viewport = page.viewportSize();
     const container = page.locator('.login-container');
     const box = await container.boundingBox();
-    
+
     // If it's not responsive, this might fail on small viewports
     // For Pixel 5, width is 393px. .login-container has width 900px in CSS.
     // So it will definitely overflow unless there's a media query I missed or it's scaled.
-    
+
     // Let's check if it's visible at least.
     await expect(container).toBeVisible();
   });
@@ -20,7 +20,7 @@ test.describe('Responsiveness', () => {
   test('should display editor correctly on mobile', async ({ page }) => {
     // Login and create doc
     await page.goto('/pages/login.html');
-    const testUser = `resp_user_${Date.now()}`;
+    const testUser = `resp_user_${test.info().project.name}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await page.click('#showSignup');
     await page.fill('#signupUsername', testUser);
     await page.fill('#signupEmail', `${testUser}@example.com`);
@@ -34,7 +34,7 @@ test.describe('Responsiveness', () => {
     // Check editor container
     const editorContainer = page.locator('.editor-container');
     await expect(editorContainer).toBeVisible();
-    
+
     // Ribbon tabs should be accessible
     const homeTab = page.locator('.ribbon-tab', { hasText: 'Home' });
     await expect(homeTab).toBeVisible();

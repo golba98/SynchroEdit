@@ -9,6 +9,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/synchro.css" />
     <style>
       :root {
         --accent-color: #8b5cf6;
@@ -49,7 +50,9 @@
           0 0 80px var(--accent-glow);
         border: 1px solid #2a2a2a;
         display: flex;
-        width: 1000px; /* Wider to fit both sections */
+        width: 100%;
+        max-width: 1000px; /* Responsive max-width */
+        margin: 20px;
         min-height: 600px;
         position: relative;
         z-index: 10;
@@ -201,8 +204,12 @@
         min-height: 20px;
       }
 
-      .status-message.success { color: #4caf50; }
-      .status-message.error { color: #f44336; }
+      .status-message.success {
+        color: #4caf50;
+      }
+      .status-message.error {
+        color: #f44336;
+      }
 
       .toggle-form {
         text-align: center;
@@ -227,10 +234,24 @@
         text-decoration: underline;
       }
 
-      .form-container { display: none; }
-      .form-container.active { display: block; animation: fadeIn 0.5s ease; }
+      .form-container {
+        display: none;
+      }
+      .form-container.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
 
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: 0;
+        }
+      }
 
       /* Missing UI Styles */
       .floating-label-container {
@@ -273,7 +294,9 @@
 
       .entropy-segment {
         height: 100%;
-        transition: width 0.3s ease, background 0.3s ease;
+        transition:
+          width 0.3s ease,
+          background 0.3s ease;
       }
 
       .requirement-item {
@@ -299,10 +322,102 @@
       }
 
       @keyframes shake {
-        10%, 90% { transform: translate3d(-1px, 0, 0); }
-        20%, 80% { transform: translate3d(2px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-        40%, 60% { transform: translate3d(4px, 0, 0); }
+        10%,
+        90% {
+          transform: translate3d(-1px, 0, 0);
+        }
+        20%,
+        80% {
+          transform: translate3d(2px, 0, 0);
+        }
+        30%,
+        50%,
+        70% {
+          transform: translate3d(-4px, 0, 0);
+        }
+        40%,
+        60% {
+          transform: translate3d(4px, 0, 0);
+        }
+      }
+
+      /* =========================================
+         MOBILE RESPONSIVE ADJUSTMENTS
+         ========================================= */
+      @media (max-width: 768px) {
+        body {
+          align-items: flex-start; /* Allow scrolling if needed, start from top */
+          padding: 20px 0;
+          overflow-y: auto; /* Enable scrolling on mobile */
+          min-height: 100dvh; /* Use dynamic viewport height */
+        }
+
+        .login-container {
+          flex-direction: column-reverse; /* Stack: Bot on Top, Form on Bottom */
+          width: 90% !important;
+          max-width: 400px; /* Limit width on tablets */
+          min-height: auto;
+          border-radius: 24px;
+          margin: 0 auto;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .left-section {
+          padding: 30px 24px;
+          background: #000000;
+          border-radius: 0 0 24px 24px;
+        }
+
+        .right-section {
+          height: 110px; /* Even smaller height */
+          background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+          border-radius: 24px 24px 0 0;
+          border-bottom: 1px solid #1a1a1a;
+        }
+
+        .character-container {
+          width: 100%;
+          height: 100%;
+          transform: scale(0.35); /* Smaller bot */
+          transform-origin: center bottom;
+          margin-bottom: -15px;
+        }
+
+        /* Touch Optimizations */
+        .input-group input {
+          padding: 14px;
+          font-size: 16px; /* Prevent auto-zoom on iOS */
+          min-height: 48px;
+        }
+
+        .login-btn {
+          padding: 16px;
+          min-height: 48px;
+          font-size: 16px;
+        }
+
+        .password-toggle {
+          padding: 12px;
+          right: 8px;
+        }
+
+        .title {
+          font-size: 24px;
+          text-align: center;
+        }
+
+        .subtitle {
+          text-align: center;
+          font-size: 13px;
+          margin-bottom: 20px;
+        }
+      }
+
+      /* Touch-friendly hover states */
+      @media (hover: none) {
+        .login-btn:active {
+          transform: scale(0.98);
+        }
       }
 
       /* =========================================
@@ -329,8 +444,13 @@
 
       /* Float Animation (Idle) */
       @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
       }
 
       .bot-rig {
@@ -341,13 +461,24 @@
 
       /* Boot-up Animation */
       .boot-up .bot-rig {
-        animation: bootUpScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, float 6s ease-in-out infinite 0.8s;
+        animation:
+          bootUpScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+          float 6s ease-in-out infinite 0.8s;
       }
 
       @keyframes bootUpScale {
-        0% { transform: scale(0); opacity: 0; }
-        60% { transform: scale(1.1); opacity: 1; }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
 
       /* Body Chassis */
@@ -357,12 +488,15 @@
         background: linear-gradient(135deg, #2a2a2a 0%, #0a0a0a 100%);
         border-radius: 45px; /* Squircle */
         border: 2px solid var(--accent-color);
-        box-shadow: 
-          inset 0 0 20px rgba(255,255,255,0.05),
+        box-shadow:
+          inset 0 0 20px rgba(255, 255, 255, 0.05),
           0 0 30px var(--accent-glow);
         position: relative;
         z-index: 5;
-        transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s,
+          transform 0.3s;
       }
 
       /* Face Screen */
@@ -375,7 +509,7 @@
         height: 90px;
         background: #000;
         border-radius: 35px;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
         overflow: hidden;
         display: flex;
         justify-content: center;
@@ -406,13 +540,22 @@
         background: var(--accent-color);
         box-shadow: 0 0 15px var(--accent-color);
         z-index: 1;
-        transition: background 0.3s, box-shadow 0.3s;
+        transition:
+          background 0.3s,
+          box-shadow 0.3s;
         animation: pulse 3s infinite;
       }
 
       @keyframes pulse {
-        0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-        50% { opacity: 0.6; transform: translateX(-50%) scale(0.9); }
+        0%,
+        100% {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: translateX(-50%) scale(0.9);
+        }
       }
 
       /* Eyes Container */
@@ -429,7 +572,10 @@
         border-radius: 12px;
         position: relative;
         overflow: hidden;
-        transition: height 0.2s, border-radius 0.2s, background 0.2s;
+        transition:
+          height 0.2s,
+          border-radius 0.2s,
+          background 0.2s;
       }
 
       .pupil {
@@ -442,7 +588,11 @@
         left: 50%;
         transform: translate(-50%, -50%); /* Centered default */
         box-shadow: 0 0 10px var(--accent-color);
-        transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.2s, height 0.2s, border-radius 0.2s;
+        transition:
+          transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+          width 0.2s,
+          height 0.2s,
+          border-radius 0.2s;
       }
 
       /* Eyelids */
@@ -454,8 +604,14 @@
         z-index: 10;
         transition: height 0.2s ease;
       }
-      .eyelid.top { top: 0; height: 0%; }
-      .eyelid.bottom { bottom: 0; height: 0%; }
+      .eyelid.top {
+        top: 0;
+        height: 0%;
+      }
+      .eyelid.bottom {
+        bottom: 0;
+        height: 0%;
+      }
 
       /* Mouth */
       .mouth {
@@ -489,12 +645,20 @@
         border: 2px solid var(--accent-color);
         border-radius: 50%;
         bottom: -20px; /* Default Chin Position */
-        transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s, left 0.4s, right 0.4s; /* Added left/right transition */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        transition:
+          bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+          transform 0.4s,
+          left 0.4s,
+          right 0.4s; /* Added left/right transition */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
       }
 
-      .hand.left { left: -10px; }
-      .hand.right { right: -10px; }
+      .hand.left {
+        left: -10px;
+      }
+      .hand.right {
+        right: -10px;
+      }
 
       /* ==================== STATES ==================== */
 
@@ -504,7 +668,7 @@
       /* 2. Secure Mode (Password Focus) */
       .bot-rig.secure .hand {
         bottom: 80px; /* Adjusted to sit directly on eyes */
-        box-shadow: 0 2px 10px rgba(0,0,0,0.8); /* Stronger shadow to show depth over face */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); /* Stronger shadow to show depth over face */
       }
       .bot-rig.secure .hand.left {
         left: 58px; /* Tighter to center (Overlap) */
@@ -514,85 +678,206 @@
         right: 58px; /* Tighter to center */
         transform: rotate(25deg);
       }
-      .bot-rig.secure .eyelid.top { height: 50%; } /* Close eyes more */
-      .bot-rig.secure .eyelid.bottom { height: 50%; }
+      .bot-rig.secure .eyelid.top {
+        height: 50%;
+      } /* Close eyes more */
+      .bot-rig.secure .eyelid.bottom {
+        height: 50%;
+      }
 
       /* 3. Peek Mode (Show Password) */
       .bot-rig.peeking .hand {
         bottom: 50px; /* Lower slightly */
       }
-      .bot-rig.peeking .hand.left { left: 30px; } /* Stay relatively close */
-      .bot-rig.peeking .hand.right { right: 30px; }
+      .bot-rig.peeking .hand.left {
+        left: 30px;
+      } /* Stay relatively close */
+      .bot-rig.peeking .hand.right {
+        right: 30px;
+      }
 
       /* 3b. Confused (Empty + Visible) */
-      .bot-rig.confused { transform: rotate(5deg); }
-      .bot-rig.confused .eye.right .eyelid.top { height: 40%; } /* Raised eyebrow effect */
-      .bot-rig.confused .mouth { width: 10px; height: 10px; border-radius: 50%; bottom: 20px; }
-      .bot-rig.peeking .eyelid.top { height: 0%; } /* Open Wide */
-      .bot-rig.peeking .eyelid.bottom { height: 0%; }
-      .bot-rig.peeking .pupil { width: 20px; height: 20px; border-radius: 50%; }
-      .bot-rig.peeking .antenna-bulb { background: #ffd700; box-shadow: 0 0 15px #ffd700; }
+      .bot-rig.confused {
+        transform: rotate(5deg);
+      }
+      .bot-rig.confused .eye.right .eyelid.top {
+        height: 40%;
+      } /* Raised eyebrow effect */
+      .bot-rig.confused .mouth {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        bottom: 20px;
+      }
+      .bot-rig.peeking .eyelid.top {
+        height: 0%;
+      } /* Open Wide */
+      .bot-rig.peeking .eyelid.bottom {
+        height: 0%;
+      }
+      .bot-rig.peeking .pupil {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+      .bot-rig.peeking .antenna-bulb {
+        background: #ffd700;
+        box-shadow: 0 0 15px #ffd700;
+      }
 
       /* 4. Processing (Loading) */
-      .bot-rig.processing .eyes-container { opacity: 0; }
-      .bot-rig.processing .mouth { width: 10px; height: 10px; border-radius: 50%; animation: mouthPulse 0.5s infinite alternate; }
+      .bot-rig.processing .eyes-container {
+        opacity: 0;
+      }
+      .bot-rig.processing .mouth {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: mouthPulse 0.5s infinite alternate;
+      }
       .loader {
         position: absolute;
         width: 40px;
         height: 40px;
-        border: 3px solid rgba(255,255,255,0.1);
+        border: 3px solid rgba(255, 255, 255, 0.1);
         border-top-color: var(--accent-color);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         opacity: 0;
         transition: opacity 0.3s;
       }
-      .bot-rig.processing .loader { opacity: 1; }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @keyframes mouthPulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.5); } }
+      .bot-rig.processing .loader {
+        opacity: 1;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes mouthPulse {
+        from {
+          transform: translateX(-50%) scale(1);
+        }
+        to {
+          transform: translateX(-50%) scale(1.5);
+        }
+      }
 
       /* 5. Success */
-      .bot-rig.success { animation: happyJump 0.6s ease infinite; }
-      @keyframes happyJump {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-30px); }
+      .bot-rig.success {
+        animation: happyJump 0.6s ease infinite;
       }
-      .bot-rig.success .antenna-bulb { background: #00ff88; box-shadow: 0 0 20px #00ff88; }
-      .bot-rig.success .eye { background: transparent; } /* Hide socket bg for shape */
+      @keyframes happyJump {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-30px);
+        }
+      }
+      .bot-rig.success .antenna-bulb {
+        background: #00ff88;
+        box-shadow: 0 0 20px #00ff88;
+      }
+      .bot-rig.success .eye {
+        background: transparent;
+      } /* Hide socket bg for shape */
       .bot-rig.success .pupil {
-        width: 32px; height: 32px; background: transparent; box-shadow: none;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        box-shadow: none;
         border-radius: 0;
         /* Star Shape using CSS clip-path or emoji */
-        content: '⭐'; 
-        font-size: 24px; line-height: 32px; text-align: center;
+        content: '⭐';
+        font-size: 24px;
+        line-height: 32px;
+        text-align: center;
         color: #00ff88;
         text-shadow: 0 0 10px #00ff88;
       }
       /* Fallback for pupil content modification */
-      .bot-rig.success .pupil::after { content: '⭐'; position:absolute; left:0; top:0; }
-      .bot-rig.success .hand { transform: translateY(-60px) rotate(20deg); } /* Hands up */
-      .bot-rig.success .mouth { width: 40px; height: 20px; border-radius: 0 0 40px 40px; border: 2px solid #00ff88; background: transparent; }
+      .bot-rig.success .pupil::after {
+        content: '⭐';
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .bot-rig.success .hand {
+        transform: translateY(-60px) rotate(20deg);
+      } /* Hands up */
+      .bot-rig.success .mouth {
+        width: 40px;
+        height: 20px;
+        border-radius: 0 0 40px 40px;
+        border: 2px solid #00ff88;
+        background: transparent;
+      }
 
       /* 6. Error */
-      .bot-rig.error { animation: shakeHead 0.4s ease-in-out; }
-      @keyframes shakeHead {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-15px) rotate(-5deg); }
-        75% { transform: translateX(15px) rotate(5deg); }
+      .bot-rig.error {
+        animation: shakeHead 0.4s ease-in-out;
       }
-      .bot-rig.error .antenna-bulb { background: #ff0044; box-shadow: 0 0 20px #ff0044; }
-      .bot-rig.error .pupil { background: #ff0044; width: 20px; height: 4px; border-radius: 2px; transform: translate(-50%, -50%) rotate(45deg); }
-      .bot-rig.error .pupil::before { content:''; position:absolute; width:20px; height:4px; background:#ff0044; transform:rotate(90deg); }
-      .bot-rig.error .mouth { width: 30px; height: 4px; border-radius: 2px; transform: translateX(-50%) rotate(5deg); background: #ff0044; }
+      @keyframes shakeHead {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-15px) rotate(-5deg);
+        }
+        75% {
+          transform: translateX(15px) rotate(5deg);
+        }
+      }
+      .bot-rig.error .antenna-bulb {
+        background: #ff0044;
+        box-shadow: 0 0 20px #ff0044;
+      }
+      .bot-rig.error .pupil {
+        background: #ff0044;
+        width: 20px;
+        height: 4px;
+        border-radius: 2px;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+      .bot-rig.error .pupil::before {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 4px;
+        background: #ff0044;
+        transform: rotate(90deg);
+      }
+      .bot-rig.error .mouth {
+        width: 30px;
+        height: 4px;
+        border-radius: 2px;
+        transform: translateX(-50%) rotate(5deg);
+        background: #ff0044;
+      }
 
       /* 7. Sleep Mode */
-      .bot-rig.sleeping { animation-duration: 10s; filter: brightness(0.6); }
-      .bot-rig.sleeping .eyelid.top { height: 55%; }
-      .bot-rig.sleeping .eyelid.bottom { height: 50%; }
-      .bot-rig.sleeping .antenna-bulb { opacity: 0.2; animation: none; }
-      
+      .bot-rig.sleeping {
+        animation-duration: 10s;
+        filter: brightness(0.6);
+      }
+      .bot-rig.sleeping .eyelid.top {
+        height: 55%;
+      }
+      .bot-rig.sleeping .eyelid.bottom {
+        height: 50%;
+      }
+      .bot-rig.sleeping .antenna-bulb {
+        opacity: 0.2;
+        animation: none;
+      }
+
       /* 8. Confused Mode (Shown + Empty) */
-      .bot-rig.searching { transform: rotate(10deg); }
+      .bot-rig.searching {
+        transform: rotate(10deg);
+      }
       .bot-rig.searching .hand.left {
         bottom: 90px;
         left: 20px;
@@ -602,16 +887,23 @@
         bottom: -20px;
         right: -10px;
       }
-      .bot-rig.searching .eye.left .eyelid.top { height: 40%; }
-      .bot-rig.searching .eye.right .eyelid.top { height: 0%; }
-      .bot-rig.searching .mouth { 
-        width: 10px; 
-        height: 10px; 
-        border-radius: 50%; 
-        bottom: 15px; 
+      .bot-rig.searching .eye.left .eyelid.top {
+        height: 40%;
+      }
+      .bot-rig.searching .eye.right .eyelid.top {
+        height: 0%;
+      }
+      .bot-rig.searching .mouth {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        bottom: 15px;
         background: #333;
       }
-      .bot-rig.searching .antenna-bulb { background: #ffd700; box-shadow: 0 0 15px #ffd700; }
+      .bot-rig.searching .antenna-bulb {
+        background: #ffd700;
+        box-shadow: 0 0 15px #ffd700;
+      }
 
       .zzz-particle {
         position: absolute;
@@ -622,19 +914,35 @@
         animation: floatZ 3s ease-out forwards;
       }
       @keyframes floatZ {
-        0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
-        20% { opacity: 1; }
-        100% { transform: translate(20px, -60px) scale(1.5); opacity: 0; }
+        0% {
+          transform: translate(0, 0) scale(0.5);
+          opacity: 0;
+        }
+        20% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(20px, -60px) scale(1.5);
+          opacity: 0;
+        }
       }
-
     </style>
   </head>
   <body class="boot-up">
     <div class="login-container">
       <div class="left-section">
-        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-          <div style="font-size: 24px;">📄</div>
-          <div style="font-size: 20px; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">SynchroEdit</div>
+        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px">
+          <div style="font-size: 24px">📄</div>
+          <div
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: var(--accent-color);
+              letter-spacing: 1px;
+            "
+          >
+            SynchroEdit
+          </div>
         </div>
         <!-- Login Form -->
         <div class="form-container active" id="loginForm">
@@ -642,70 +950,177 @@
           <div class="subtitle">Please login to continue to SynchroEdit</div>
 
           <div class="input-group floating-label-container">
-            <input type="text" id="loginUsername" placeholder=" " autocomplete="username" class="glow-on-hover input-glow-focus" />
+            <input
+              type="text"
+              id="loginUsername"
+              placeholder=" "
+              autocomplete="username"
+              inputmode="email"
+              class="glow-on-hover input-glow-focus"
+            />
             <label for="loginUsername" class="floating-label">Username or Email</label>
           </div>
 
           <div class="input-group floating-label-container">
-            <div class="input-wrapper" style="width: 100%;">
-              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" class="glow-on-hover input-glow-focus" />
+            <div class="input-wrapper" style="width: 100%">
+              <input
+                type="password"
+                id="loginPassword"
+                placeholder=" "
+                autocomplete="current-password"
+                class="glow-on-hover input-glow-focus"
+              />
               <label for="loginPassword" class="floating-label">Password</label>
-              <span class="password-toggle" id="loginPasswordToggle"><i class="fas fa-eye"></i></span>
+              <span class="password-toggle" id="loginPasswordToggle"
+                ><i class="fas fa-eye"></i
+              ></span>
             </div>
-            <div style="text-align: right; margin-top: 5px;">
-                <a href="forgot-password.html" style="font-size: 12px; color: var(--accent-color); text-decoration: none;">Forgot Password?</a>
+            <div style="text-align: right; margin-top: 5px">
+              <a
+                href="forgot-password.html"
+                style="font-size: 12px; color: var(--accent-color); text-decoration: none"
+                >Forgot Password?</a
+              >
             </div>
           </div>
 
           <button class="login-btn" id="loginBtn">Login</button>
           <div class="status-message" id="loginStatusMessage"></div>
-          <div class="toggle-form">Don't have an account? <a id="showSignup">Create Account</a></div>
+          <div class="toggle-form">
+            Don't have an account? <a id="showSignup">Create Account</a>
+          </div>
         </div>
 
         <!-- Signup Form -->
         <div class="form-container" id="signupForm">
-          <div style="margin-bottom: 15px;">
-              <button id="signupBackBtn" style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--accent-color); padding: 8px 16px; border-radius: 6px; color: var(--accent-color); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; transition: all 0.3s; font-weight: 600; position: relative; z-index: 100;">
-                  <i class="fas fa-arrow-left"></i> Back to Login
-              </button>
+          <div style="margin-bottom: 15px">
+            <button
+              id="signupBackBtn"
+              style="
+                background: rgba(139, 92, 246, 0.1);
+                border: 1px solid var(--accent-color);
+                padding: 8px 16px;
+                border-radius: 6px;
+                color: var(--accent-color);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                transition: all 0.3s;
+                font-weight: 600;
+                position: relative;
+                z-index: 100;
+              "
+            >
+              <i class="fas fa-arrow-left"></i> Back to Login
+            </button>
           </div>
           <div class="title">Create Account</div>
           <div class="subtitle">Join SynchroEdit today</div>
 
           <div class="input-group floating-label-container">
-            <div class="input-wrapper" style="width: 100%;">
-              <input type="text" id="signupUsername" placeholder=" " autocomplete="off" class="glow-on-hover input-glow-focus" />
+            <div class="input-wrapper" style="width: 100%">
+              <input
+                type="text"
+                id="signupUsername"
+                placeholder=" "
+                autocomplete="off"
+                class="glow-on-hover input-glow-focus"
+              />
               <label for="signupUsername" class="floating-label">Choose a username</label>
-              <div id="usernameStatusIcon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: none;"></div>
+              <div
+                id="usernameStatusIcon"
+                style="
+                  position: absolute;
+                  right: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  display: none;
+                "
+              ></div>
             </div>
-            <div id="usernameSuggestions" style="display: none; margin-top: 5px; font-size: 11px; color: var(--warning-color);"></div>
+            <div
+              id="usernameSuggestions"
+              style="display: none; margin-top: 5px; font-size: 11px; color: var(--warning-color)"
+            ></div>
           </div>
 
           <div class="input-group floating-label-container">
-            <input type="email" id="signupEmail" placeholder=" " autocomplete="email" class="glow-on-hover input-glow-focus" />
+            <input
+              type="email"
+              id="signupEmail"
+              placeholder=" "
+              autocomplete="email"
+              inputmode="email"
+              class="glow-on-hover input-glow-focus"
+            />
             <label for="signupEmail" class="floating-label">Email Address</label>
-            <div id="emailSuggestion" style="display: none; margin-top: 5px; font-size: 11px; color: var(--accent-color-light); cursor: pointer;"></div>
+            <div
+              id="emailSuggestion"
+              style="
+                display: none;
+                margin-top: 5px;
+                font-size: 11px;
+                color: var(--accent-color-light);
+                cursor: pointer;
+              "
+            ></div>
           </div>
 
           <div class="input-group floating-label-container">
-            <div class="input-wrapper" style="width: 100%;">
-              <input type="password" id="signupPassword" placeholder=" " autocomplete="new-password" class="glow-on-hover input-glow-focus" />
+            <div class="input-wrapper" style="width: 100%">
+              <input
+                type="password"
+                id="signupPassword"
+                placeholder=" "
+                autocomplete="new-password"
+                class="glow-on-hover input-glow-focus"
+              />
               <label for="signupPassword" class="floating-label">Create a password</label>
-              <span class="password-toggle" id="signupPasswordToggle"><i class="fas fa-eye"></i></span>
+              <span class="password-toggle" id="signupPasswordToggle"
+                ><i class="fas fa-eye"></i
+              ></span>
             </div>
             <div class="entropy-bar">
-              <div id="entropySegment" class="entropy-segment" style="width: 0%;"></div>
+              <div id="entropySegment" class="entropy-segment" style="width: 0%"></div>
             </div>
-            <ul id="passwordRequirements" style="list-style: none; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-              <li class="requirement-item" data-req="length"><i class="fas fa-circle"></i> 8+ chars</li>
-              <li class="requirement-item" data-req="upper"><i class="fas fa-circle"></i> 1 Uppercase</li>
-              <li class="requirement-item" data-req="number"><i class="fas fa-circle"></i> 1 Number</li>
-              <li class="requirement-item" data-req="symbol"><i class="fas fa-circle"></i> 1 Symbol</li>
+            <ul
+              id="passwordRequirements"
+              style="
+                list-style: none;
+                margin-top: 10px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+              "
+            >
+              <li class="requirement-item" data-req="length">
+                <i class="fas fa-circle"></i> 8+ chars
+              </li>
+              <li class="requirement-item" data-req="upper">
+                <i class="fas fa-circle"></i> 1 Upper
+              </li>
+              <li class="requirement-item" data-req="lower">
+                <i class="fas fa-circle"></i> 1 Lower
+              </li>
+              <li class="requirement-item" data-req="number">
+                <i class="fas fa-circle"></i> 1 Number
+              </li>
+              <li class="requirement-item" data-req="symbol">
+                <i class="fas fa-circle"></i> 1 Symbol
+              </li>
             </ul>
           </div>
 
           <div class="input-group floating-label-container">
-            <input type="password" id="signupPasswordConfirm" placeholder=" " autocomplete="new-password" class="glow-on-hover input-glow-focus" />
+            <input
+              type="password"
+              id="signupPasswordConfirm"
+              placeholder=" "
+              autocomplete="new-password"
+              class="glow-on-hover input-glow-focus"
+            />
             <label for="signupPasswordConfirm" class="floating-label">Confirm Password</label>
           </div>
 
@@ -749,27 +1164,130 @@
     </div>
 
     <!-- Email Verification Modal (Same as before) -->
-    <div id="emailVerificationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10001; align-items: center; justify-content: center;">
-      <div style="background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0d0d0d 100%); padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.4); border: 1px solid #8b5cf6; text-align: center;">
+    <div
+      id="emailVerificationModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10001;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0d0d0d 100%);
+          padding: 40px;
+          border-radius: 12px;
+          width: 100%;
+          max-width: 400px;
+          box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+          border: 1px solid #8b5cf6;
+          text-align: center;
+        "
+      >
         <h2 style="color: #a78bfa; margin-bottom: 16px; font-size: 20px">Verify Your Email</h2>
-        <p style="color: #b0b0b0; margin-bottom: 24px; font-size: 14px">We've sent a verification code to your email. Enter it below:</p>
+        <p style="color: #b0b0b0; margin-bottom: 24px; font-size: 14px">
+          We've sent a verification code to your email. Enter it below:
+        </p>
         <div style="margin-bottom: 24px">
-          <input type="text" id="verificationCode" placeholder="Enter 6-digit code" style="width: 100%; padding: 12px; border: 1px solid #8b5cf6; border-radius: 6px; background: #1a1a1a; color: #e0e0e0; font-size: 16px; text-align: center; letter-spacing: 4px; outline: none;" maxlength="6" />
+          <input
+            type="text"
+            id="verificationCode"
+            placeholder="Enter 6-digit code"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            style="
+              width: 100%;
+              padding: 12px;
+              border: 1px solid #8b5cf6;
+              border-radius: 6px;
+              background: #1a1a1a;
+              color: #e0e0e0;
+              font-size: 16px;
+              text-align: center;
+              letter-spacing: 4px;
+              outline: none;
+            "
+            maxlength="6"
+          />
         </div>
-        <button id="verifyCodeBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px;">Verify Code</button>
-        <button id="resendCodeBtn" style="width: 100%; padding: 12px; background: transparent; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 6px; cursor: pointer; font-weight: 600;">Resend Code</button>
+        <button
+          id="verifyCodeBtn"
+          style="
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 12px;
+          "
+        >
+          Verify Code
+        </button>
+        <button
+          id="resendCodeBtn"
+          style="
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #8b5cf6;
+            border: 1px solid #8b5cf6;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+          "
+        >
+          Resend Code
+        </button>
         <div id="verificationMessage" style="margin-top: 16px; font-size: 13px"></div>
       </div>
     </div>
 
-    <div id="redirectOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020d; z-index: 100000; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease-in-out;">
-       <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-          <div style="font-size: 48px; animation: float 3s ease-in-out infinite;">📄</div>
-          <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0;">Accessing Workspace</h2>
-          <div style="width: 40px; height: 40px; border: 3px solid rgba(139, 92, 246, 0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-       </div>
+    <div
+      id="redirectOverlay"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #05020d;
+        z-index: 100000;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      "
+    >
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 20px">
+        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
+        <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0">
+          Accessing Workspace
+        </h2>
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          "
+        ></div>
+      </div>
     </div>
 
-    <script type="module" src="../js/ui/authController.js"></script>
+    <script type="module" src="../js/features/auth/authController.js"></script>
   </body>
 </html>

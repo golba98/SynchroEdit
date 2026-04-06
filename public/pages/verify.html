@@ -8,54 +8,105 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="stylesheet" href="../css/synchro.css" />
     <style>
+      :root {
+        --accent-color: #8b5cf6;
+        --accent-glow: rgba(139, 92, 246, 0.6);
+        --bg-gradient: linear-gradient(135deg, #1a0033 0%, #0d001a 50%, #000000 100%);
+      }
+
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
+
       html {
         color-scheme: dark;
       }
+
       body {
         font-family: 'Helvetica Neue', Arial, sans-serif;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(167, 139, 250, 0.12), transparent 25%),
-          radial-gradient(circle at 80% 0%, rgba(99, 102, 241, 0.12), transparent 18%),
-          linear-gradient(135deg, #0b021a 0%, #08000f 40%, #05000a 100%);
+        background: var(--bg-gradient);
+        display: flex;
+        justify-content: center;
+        align-items: center;
         min-height: 100vh;
+        overflow: hidden;
+        transition: background 0.5s;
+      }
+
+      body.error-flash {
+        background: linear-gradient(135deg, #330000 0%, #1a0000 50%, #000000 100%);
+      }
+
+      .login-container {
+        background: #0d0d0d;
+        border-radius: 60px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.6),
+          0 0 80px var(--accent-glow);
+        border: 1px solid #2a2a2a;
+        display: flex;
+        width: 100%;
+        max-width: 900px;
+        margin: 20px;
+        min-height: 500px;
+        position: relative;
+        z-index: 10;
+        transition: box-shadow 0.5s;
+        overflow: hidden;
+      }
+
+      .left-section {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #000000;
+        z-index: 2;
+        position: relative;
+      }
+
+      .right-section {
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #e0e0e0;
-        padding: 16px;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
+        position: relative;
+        overflow: hidden;
       }
-      .card {
-        width: 100%;
-        max-width: 480px;
-        background: #0f0f13;
-        border: 1px solid rgba(139, 92, 246, 0.45);
-        border-radius: 16px;
-        box-shadow:
-          0 24px 80px rgba(0, 0, 0, 0.6),
-          0 0 60px rgba(139, 92, 246, 0.25);
-        padding: 32px;
+
+      .character-container {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
+
       .heading {
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 20px;
+        font-size: 28px;
         font-weight: 700;
-        color: #c4b5fd;
+        color: var(--accent-color);
         margin-bottom: 12px;
+        text-shadow: 0 0 20px var(--accent-glow);
       }
+
       .muted {
         color: #9ca3af;
         font-size: 14px;
         line-height: 1.5;
         margin-bottom: 18px;
       }
+
       .email-tag {
         display: inline-flex;
         align-items: center;
@@ -68,12 +119,14 @@
         font-weight: 600;
         margin-bottom: 20px;
       }
+
       .field-label {
         font-size: 13px;
         color: #a1a1aa;
         margin-bottom: 6px;
         display: block;
       }
+
       .code-input {
         width: 100%;
         padding: 14px;
@@ -89,15 +142,18 @@
           border 0.2s,
           box-shadow 0.2s;
       }
+
       .code-input:focus {
         border-color: rgba(139, 92, 246, 0.8);
         box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
       }
+
       .actions {
         display: flex;
         gap: 12px;
         margin-top: 18px;
       }
+
       .btn {
         flex: 1;
         padding: 14px;
@@ -110,30 +166,38 @@
           box-shadow 0.2s ease,
           opacity 0.2s ease;
       }
+
       .btn-primary {
         background: linear-gradient(135deg, #8b5cf6, #6366f1);
         color: #fff;
         box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35);
       }
+
       .btn-secondary {
         background: transparent;
         color: #c4b5fd;
         border: 1px solid rgba(139, 92, 246, 0.5);
       }
+
       .btn:active {
         transform: translateY(1px);
       }
+
       .status {
         margin-top: 14px;
         font-size: 13px;
         min-height: 18px;
+        text-align: center;
       }
+
       .status.error {
         color: #f87171;
       }
+
       .status.success {
         color: #34d399;
       }
+
       .footer {
         margin-top: 22px;
         font-size: 13px;
@@ -142,50 +206,192 @@
         justify-content: space-between;
         align-items: center;
       }
+
       .link {
         color: #c4b5fd;
         text-decoration: none;
         font-weight: 600;
       }
+
       .link:hover {
         text-decoration: underline;
+      }
+
+      /* =========================================
+         MOBILE RESPONSIVE ADJUSTMENTS
+         ========================================= */
+      @media (max-width: 768px) {
+        body {
+          align-items: flex-start;
+          padding: 20px 0;
+          overflow-y: auto;
+          min-height: 100dvh;
+        }
+
+        .login-container {
+          flex-direction: column-reverse;
+          width: 90% !important;
+          max-width: 400px;
+          min-height: auto;
+          border-radius: 24px;
+          margin: 0 auto;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .left-section {
+          padding: 30px 24px;
+          background: #000000;
+          border-radius: 0 0 24px 24px;
+        }
+
+        .right-section {
+          height: 120px;
+          background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+          border-radius: 24px 24px 0 0;
+          border-bottom: 1px solid #1a1a1a;
+        }
+
+        .character-container {
+          width: 100%;
+          height: 100%;
+          transform: scale(0.4);
+          transform-origin: center bottom;
+          margin-bottom: -15px;
+        }
+
+        .heading {
+          font-size: 22px;
+          justify-content: center;
+        }
+
+        .muted {
+          text-align: center;
+          font-size: 13px;
+        }
+
+        .email-tag {
+          justify-content: center;
+          font-size: 14px;
+          width: 100%;
+        }
+
+        /* Touch-friendly inputs */
+        .code-input {
+          padding: 14px;
+          font-size: 18px;
+          min-height: 48px;
+        }
+
+        .btn {
+          padding: 16px;
+          min-height: 48px;
+          font-size: 16px;
+        }
+
+        .actions {
+          flex-direction: column;
+        }
+
+        .footer {
+          flex-direction: column;
+          gap: 12px;
+          text-align: center;
+        }
+      }
+
+      /* Touch-friendly hover states */
+      @media (hover: none) {
+        .btn:active {
+          transform: scale(0.98);
+        }
       }
     </style>
   </head>
   <body>
-    <div class="card">
-      <div class="heading"><i class="fas fa-shield-check"></i>Verify your email</div>
-      <p class="muted" id="introText">
-        We sent a 6-digit code to your email. Enter it below to continue.
-      </p>
-      <div class="email-tag" id="emailTag">
-        <i class="fas fa-envelope"></i><span id="emailValue">example@email.com</span>
+    <div class="login-container">
+      <div class="left-section">
+        <div class="heading"><i class="fas fa-shield-check"></i> Verify your email</div>
+        <p class="muted" id="introText">
+          We sent a 6-digit code to your email. Enter it below to continue.
+        </p>
+        <div class="email-tag" id="emailTag">
+          <i class="fas fa-envelope"></i><span id="emailValue">example@email.com</span>
+        </div>
+
+        <label class="field-label" for="codeInput">Verification code</label>
+        <input
+          id="codeInput"
+          class="code-input"
+          type="text"
+          maxlength="6"
+          autocomplete="one-time-code"
+          placeholder="000000"
+        />
+
+        <div class="actions">
+          <button id="verifyBtn" class="btn btn-primary">Confirm</button>
+          <button id="resendBtn" class="btn btn-secondary">Resend code</button>
+        </div>
+
+        <div class="status" id="statusMessage"></div>
+
+        <div class="footer">
+          <span id="lastMessage"></span>
+          <a class="link" href="login.html">Back to login</a>
+        </div>
       </div>
 
-      <label class="field-label" for="codeInput">Verification code</label>
-      <input
-        id="codeInput"
-        class="code-input"
-        type="text"
-        maxlength="6"
-        autocomplete="one-time-code"
-        placeholder="000000"
-      />
-
-      <div class="actions">
-        <button id="verifyBtn" class="btn btn-primary">Confirm</button>
-        <button id="resendBtn" class="btn btn-secondary">Resend code</button>
-      </div>
-
-      <div class="status" id="statusMessage"></div>
-
-      <div class="footer">
-        <span id="lastMessage"></span>
-        <a class="link" href="login.html">Back to login</a>
+      <div class="right-section">
+        <div class="character-container">
+          <div class="bot-rig" id="botRig">
+            <div class="antenna-stalk"></div>
+            <div class="antenna-bulb"></div>
+            <div class="head">
+              <div class="face-screen">
+                <div class="loader"></div>
+                <div class="eyes-container">
+                  <div class="eye left">
+                    <div class="eyelid top"></div>
+                    <div class="pupil"></div>
+                    <div class="eyelid bottom"></div>
+                  </div>
+                  <div class="eye right">
+                    <div class="eyelid top"></div>
+                    <div class="pupil"></div>
+                    <div class="eyelid bottom"></div>
+                  </div>
+                </div>
+                <div class="mouth"></div>
+              </div>
+            </div>
+            <div class="hands-container">
+              <div class="hand left"></div>
+              <div class="hand right"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { Network } from '../js/app/network.js';
+      import { Auth } from '../js/features/auth/auth.js';
+      import { SynchroBot } from '../js/features/auth/synchro/SynchroBot.js';
+      import { SynchroRenderer } from '../js/features/auth/synchro/SynchroRenderer.js';
+
+      // Initialize SynchroBot with verify flow (expectant state)
+      const container = document.querySelector('.character-container');
+      let synchro = null;
+      let renderer = null;
+
+      if (container) {
+        synchro = new SynchroBot({ authFlow: 'verify' });
+        synchro.init('.character-container');
+
+        renderer = new SynchroRenderer(container);
+        renderer.injectParticleCSS();
+      }
+
       const params = new URLSearchParams(window.location.search);
       const storedEmail = sessionStorage.getItem('verificationEmail');
       const email = storedEmail || params.get('email');
@@ -223,27 +429,66 @@
       function setStatus(text, type = '') {
         statusMessage.textContent = text;
         statusMessage.className = 'status ' + type;
+        if (type === 'error') {
+          synchro?.onError();
+        }
       }
+
+      // Wire up SynchroBot events for code input
+      codeInput?.addEventListener('focus', () => {
+        synchro?.onFieldFocus('code', codeInput.value);
+      });
+
+      codeInput?.addEventListener('input', () => {
+        const isComplete = codeInput.value.length === 6;
+        synchro?.onFieldInput('code', codeInput.value, {
+          formData: {
+            code: codeInput.value,
+            _hasErrors: false,
+          },
+        });
+        // Show ready state when code is complete
+        if (isComplete) {
+          synchro?.transition('hover-ready');
+        }
+      });
+
+      codeInput?.addEventListener('blur', () => {
+        synchro?.onFieldBlur();
+      });
+
+      // Button hover events
+      verifyBtn?.addEventListener('mouseenter', () => {
+        synchro?.onButtonHover(true);
+      });
+
+      verifyBtn?.addEventListener('mouseleave', () => {
+        synchro?.onButtonHover(false);
+      });
+
+      resendBtn?.addEventListener('click', () => {
+        sendCode();
+      });
 
       async function sendCode() {
         setStatus('Sending code...', '');
+        synchro?.onSubmit();
         try {
-          const response = await fetch('/api/auth/resend-code', {
+          await Network.fetchAPI('/api/auth/resend-code', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
           });
-          if (response.ok) {
-            setStatus('Code sent. Check your email.', 'success');
-            codeInput.value = '';
-            codeInput.focus();
-          } else {
-            const data = await response.json();
-            setStatus(data.message || 'Unable to send code. Try again.', 'error');
-          }
+          synchro?.transition('idle');
+          setStatus('Code sent. Check your email.', 'success');
+          codeInput.value = '';
+          codeInput.focus();
         } catch (err) {
           console.error('Resend error:', err);
-          setStatus('Network error. Try again.', 'error');
+          synchro?.onError();
+          setStatus(
+            err.message.replace('API error: ', 'Error ') || 'Unable to send code. Try again.',
+            'error'
+          );
         }
       }
 
@@ -255,36 +500,40 @@
           return;
         }
 
+        synchro?.onSubmit();
         setStatus('Verifying...', '');
         try {
-          const response = await fetch('/api/auth/verify-email', {
+          const data = await Network.fetchAPI('/api/auth/verify-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, verificationCode: code }),
           });
-          const data = await response.json();
-          if (response.ok) {
-            setStatus('Email verified! Redirecting...', 'success');
-            if (data.username || storedUsername) {
-                localStorage.setItem('synchroEditUser', data.username || storedUsername);
-            }
-            sessionStorage.removeItem('verificationEmail');
-            sessionStorage.removeItem('verificationUsername');
-            sessionStorage.removeItem('verificationMessage');
-            const redirectUrl = docId ? `../index.html?doc=${docId}` : '../index.html';
-            sessionStorage.removeItem('postLoginDocId');
-            setTimeout(() => (window.location.href = redirectUrl), 1200);
-          } else {
-            setStatus(data.message || 'Invalid code. Try again.', 'error');
+
+          synchro?.onSuccess();
+          renderer?.burst('star', 5);
+          setStatus('Email verified! Redirecting...', 'success');
+          if (data.token) {
+            Auth.setToken(data.token);
           }
+          if (data.username || storedUsername) {
+            localStorage.setItem('synchroEditUser', data.username || storedUsername);
+          }
+          sessionStorage.removeItem('verificationEmail');
+          sessionStorage.removeItem('verificationUsername');
+          sessionStorage.removeItem('verificationMessage');
+          const redirectUrl = docId ? `../index.html?doc=${docId}` : '../index.html';
+          sessionStorage.removeItem('postLoginDocId');
+          setTimeout(() => (window.location.href = redirectUrl), 1200);
         } catch (err) {
           console.error('Verification error:', err);
-          setStatus('Network error. Try again.', 'error');
+          synchro?.onError();
+          setStatus(
+            err.message.replace('API error: ', 'Error ') || 'Invalid code. Try again.',
+            'error'
+          );
         }
       }
 
       verifyBtn.addEventListener('click', verifyCode);
-      resendBtn.addEventListener('click', sendCode);
       codeInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyCode();
       });

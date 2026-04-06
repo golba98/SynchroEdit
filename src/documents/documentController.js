@@ -224,6 +224,10 @@ exports.transferOwnership = async (req, res, next) => {
     return next(new AppError('New owner username is required', 400));
   }
 
+  if (typeof newOwnerUsername !== 'string') {
+    return next(new AppError('New owner username must be a string', 400));
+  }
+
   const doc = await Document.findById(docId);
   if (!doc) return next(new AppError('Document not found', 404));
 

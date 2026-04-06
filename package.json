@@ -9,7 +9,7 @@
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "cross-env SKIP_DB_SETUP=true jest tests/unit",
     "test:integration": "jest tests/integration",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --config=config/playwright.config.js",
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . -c config/.eslintrc.json --ignore-path config/.eslintignore",
     "format": "prettier --write . --config config/.prettierrc --ignore-path config/.prettierignore"
   },
@@ -27,6 +27,9 @@
       "^y-websocket$": "<rootDir>/tests/mocks/emptyModule.js",
       "^y-quill$": "<rootDir>/tests/mocks/emptyModule.js",
       "^https://unpkg.com/idb-keyval@(.*)$": "idb-keyval"
+    },
+    "transform": {
+      "^.+\\.jsx?$": ["babel-jest", { "configFile": "./config/.babelrc" }]
     }
   },
   "repository": {

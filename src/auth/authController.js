@@ -266,6 +266,9 @@ exports.resendCode = async (req, res, next) => {
 
   const { email } = req.body;
   if (!email) return next(new AppError('Please provide an email address', 400));
+  if (typeof email !== 'string') {
+    return next(new AppError('Invalid email address format', 400));
+  }
 
   const user = await User.findOne({ email });
   if (!user) {

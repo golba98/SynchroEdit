@@ -35,27 +35,42 @@ The UI adaptively generates its color palette based on a user's chosen accent co
 
 The project follows a modular, manager-based architecture for maximum maintainability.
 
-### Frontend (`/public/js`)
+```
+SynchroEdit/
+├── config/              # Configuration files (ESLint, Prettier, Playwright, Babel)
+├── docs/                # Development documentation
+│   ├── AI_CONTEXT.md   # AI assistant context and conventions
+│   ├── AGENTS.md       # AI agent instructions
+│   ├── PERFORMANCE.md  # Performance optimization plans
+│   ├── SECURITY_CHECKLIST.md
+│   └── SETUP.md        # Detailed setup instructions
+├── public/             # Frontend static files
+│   └── js/
+│       ├── app/        # Application initialization
+│       ├── core/       # Core application lifecycle
+│       ├── editor/     # Central Editor class
+│       ├── features/   # Feature modules (auth, theme, etc.)
+│       ├── managers/   # Specialized handlers (pages, library, cursors)
+│       └── ui/         # UI components and controllers
+├── scripts/            # Utility scripts
+│   ├── dev/           # Development utilities
+│   └── test/          # Test utilities
+├── src/               # Backend source code
+│   ├── auth/          # Authentication & JWT logic
+│   ├── documents/     # Document models & WebSocket sync
+│   ├── middleware/    # Express middleware (security, auth, errors)
+│   ├── users/         # User profiles & account management
+│   ├── utils/         # Server utilities & logging
+│   └── server.js      # Application entry point
+├── tests/             # Test suites
+│   ├── e2e/           # End-to-end (Playwright)
+│   ├── frontend/      # Frontend unit tests
+│   ├── integration/   # Backend integration tests
+│   └── unit/          # Backend unit tests
+└── logs/              # Runtime logs (gitignored)
+```
 
-- **`/core`**: Core application lifecycle (`app.js`) and network abstraction.
-- **`/editor`**: The central `Editor` class and its primary integration logic.
-- **`/managers`**: Specialized logic handlers:
-  - `PageManager`: Handles pagination and layout engine logic.
-  - `LibraryManager`: Manages document listing, caching, and creation.
-  - `CursorManager`: Synchronizes remote cursors and awareness state.
-  - `BorderManager`, `ImageManager`, `NavigationManager`, etc.
-- **`/ui`**: Interface components and theme controllers.
-  - `UIManager`: Centralized event handling and modal orchestration.
-  - `ToolbarController`: Logic for the rich-text editing toolbar.
-
-### Backend (`/src`)
-
-- **`/controllers`**: Clean API request handlers.
-- **`/middleware`**: Modular Express middleware (Auth, Error handling, Security).
-- **`/models`**: Mongoose schemas for Users, Documents, Sessions, and History.
-- **`/routes`**: RESTful API route definitions.
-- **`/sockets`**: Real-time WebSocket event orchestration.
-- **`/utils`**: Server utilities including logging and graceful shutdown handlers.
+For detailed architecture and development guidance, see [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## 6. Quick Start
 
@@ -81,18 +96,7 @@ The project follows a modular, manager-based architecture for maximum maintainab
    cp .env.example .env
    ```
 
-   Then edit `.env` and configure:
-   - `MONGODB_URI`: Your MongoDB connection string
-   - `JWT_SECRET`: Generate a secure secret using:
-     ```bash
-     node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-     ```
-   - Generate RSA keys for JWT (optional but recommended):
-     ```bash
-     ssh-keygen -t rsa -b 2048 -m PEM -f jwtRS256.key
-     openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
-     ```
-   - Configure email settings if you want email verification features
+   See [`docs/SETUP.md`](docs/SETUP.md) for detailed configuration instructions.
 
 4. **Start the server**:
    ```bash

@@ -236,8 +236,19 @@ npx jest --watch tests/unit
 
 - ESLint: `config/.eslintrc.json` + `config/.eslintignore`
 - Prettier: `config/.prettierrc` + `config/.prettierignore`
-- Playwright: `playwright.config.js`
+- Playwright: `config/playwright.config.js`
+- Babel: `config/.babelrc`
 - Jest: Inline in `package.json`
+
+### Documentation
+
+- Development Docs: `docs/` (AI_CONTEXT.md, AGENTS.md, SETUP.md, PERFORMANCE.md, SECURITY_CHECKLIST.md)
+- Root: `README.md`, `SECURITY.md`
+
+### Scripts
+
+- Development utilities: `scripts/dev/`
+- Test utilities: `scripts/test/`
 
 ### Entry Points
 

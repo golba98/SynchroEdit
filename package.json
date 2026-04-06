@@ -63,7 +63,7 @@
     "ws": "^8.18.3",
     "y-protocols": "^1.0.7",
     "y-websocket": "^3.0.0",
-    "yjs": "^13.6.28"
+    "yjs": "^13.6.30"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.5",

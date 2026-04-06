@@ -28,12 +28,15 @@ describe('Network Module', () => {
 
       await Network.fetchAPI('/api/test', { method: 'POST', body: '{}' });
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        headers: expect.objectContaining({
-          'Authorization': 'Bearer mock-token',
-          'Content-Type': 'application/json',
-        }),
-      }));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+            'Content-Type': 'application/json',
+          }),
+        })
+      );
     });
 
     it('should throw error on non-ok response', async () => {
@@ -76,27 +79,29 @@ describe('Network Module', () => {
       await new Promise(process.nextTick);
 
       expect(global.WebSocket).toHaveBeenCalled();
-      
+
       // Simulate Open
       mockWebSocket.onopen();
       expect(onStatusChange).toHaveBeenCalledWith('connected');
-      expect(mockWebSocket.send).toHaveBeenCalledWith(JSON.stringify({
-        type: 'join-document',
-        documentId: 'doc1',
-        ticket: 'mock-ticket',
-      }));
+      expect(mockWebSocket.send).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'join-document',
+          documentId: 'doc1',
+          ticket: 'mock-ticket',
+        })
+      );
     });
 
     it('should handle incoming messages', async () => {
       const onMessage = jest.fn();
-      
+
       global.fetch.mockResolvedValue({
         ok: true,
         json: async () => ({ ticket: 'mock-ticket' }),
       });
 
       Network.initWebSocket('doc1', onMessage);
-      
+
       // Wait for async connect()
       await new Promise(process.nextTick);
 
@@ -107,4 +112,3 @@ describe('Network Module', () => {
     });
   });
 });
-

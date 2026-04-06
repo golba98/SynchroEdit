@@ -18,7 +18,7 @@ const strictAuthLimiter = rateLimit({
 // General limiter for other auth routes (Forgot Password, etc.)
 const generalAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isTestOrDev ? 100 : 20, 
+  max: isTestOrDev ? 100 : 20,
   message: { message: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -31,7 +31,7 @@ router.post('/resend-code', generalAuthLimiter, authController.resendCode);
 router.post('/login', strictAuthLimiter, authController.login);
 router.post('/forgot-password', generalAuthLimiter, authController.forgotPassword);
 router.post('/reset-password', generalAuthLimiter, authController.resetPassword);
-router.post('/refresh-token', authController.refreshToken); 
+router.post('/refresh-token', authController.refreshToken);
 router.post('/logout', authController.logout);
 router.get('/ws-ticket', authenticateToken, authController.getWsTicket);
 router.get('/csrf-token', authController.getCsrfToken);

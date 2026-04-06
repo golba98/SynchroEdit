@@ -11,10 +11,10 @@ describe('userController', () => {
   beforeEach(() => {
     req = {
       user: { id: 'user123' },
-      body: {}
+      body: {},
     };
     res = {
-      json: jest.fn()
+      json: jest.fn(),
     };
     next = jest.fn();
     jest.clearAllMocks();
@@ -28,14 +28,14 @@ describe('userController', () => {
         accentColor: '#8b5cf6',
         bio: '',
         showOnlineStatus: true,
-        save: jest.fn().mockResolvedValue(true)
+        save: jest.fn().mockResolvedValue(true),
       };
 
       User.findById.mockResolvedValue(mockUser);
 
       req.body = {
         bio: 'New bio',
-        showOnlineStatus: false
+        showOnlineStatus: false,
       };
 
       await userController.updateProfile(req, res, next);
@@ -44,28 +44,30 @@ describe('userController', () => {
       expect(mockUser.bio).toBe('New bio');
       expect(mockUser.showOnlineStatus).toBe(false);
       expect(mockUser.save).toHaveBeenCalled();
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        showOnlineStatus: false,
-        bio: 'New bio'
-      }));
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          showOnlineStatus: false,
+          bio: 'New bio',
+        })
+      );
     });
 
     it('should update profile picture string', async () => {
-        const mockUser = {
-          _id: 'user123',
-          save: jest.fn().mockResolvedValue(true)
-        };
-        User.findById.mockResolvedValue(mockUser);
-  
-        req.body = {
-          profilePicture: 'data:image/png;base64,mockdata'
-        };
-  
-        await userController.updateProfile(req, res, next);
-  
-        expect(mockUser.profilePicture).toBe('data:image/png;base64,mockdata');
-        expect(mockUser.save).toHaveBeenCalled();
-      });
+      const mockUser = {
+        _id: 'user123',
+        save: jest.fn().mockResolvedValue(true),
+      };
+      User.findById.mockResolvedValue(mockUser);
+
+      req.body = {
+        profilePicture: 'data:image/png;base64,mockdata',
+      };
+
+      await userController.updateProfile(req, res, next);
+
+      expect(mockUser.profilePicture).toBe('data:image/png;base64,mockdata');
+      expect(mockUser.save).toHaveBeenCalled();
+    });
 
     it('should return 404 if user not found', async () => {
       User.findById.mockResolvedValue(null);
@@ -77,4 +79,3 @@ describe('userController', () => {
     });
   });
 });
-

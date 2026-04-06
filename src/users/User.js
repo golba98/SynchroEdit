@@ -24,11 +24,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: [8, 'Password must be at least 8 characters long'],
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         return PASSWORD_REGEX.test(v);
       },
-      message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*)'
-    }
+      message:
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol (!@#$%^&*)',
+    },
   },
   profilePicture: {
     type: String,
@@ -41,7 +42,7 @@ const userSchema = new mongoose.Schema({
   bio: {
     type: String,
     default: '',
-    maxlength: 500
+    maxlength: 500,
   },
   showOnlineStatus: {
     type: Boolean,
@@ -72,31 +73,33 @@ const userSchema = new mongoose.Schema({
   // Password Reset Fields
   passwordResetToken: String,
   passwordResetExpires: Date,
-  
+
   // Account Lockout Fields
   loginAttempts: {
     type: Number,
-    default: 0
+    default: 0,
   },
   lockUntil: {
-    type: Date
+    type: Date,
   },
-  sessions: [{
-    sessionId: String,
-    refreshToken: String,
-    userAgent: String,
-    ipAddress: String,
-    lastActive: {
-      type: Date,
-      default: Date.now
-    }
-  }],
+  sessions: [
+    {
+      sessionId: String,
+      refreshToken: String,
+      userAgent: String,
+      ipAddress: String,
+      lastActive: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   loginHistory: [Date],
   mfaEnabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  mfaSecret: String
+  mfaSecret: String,
 });
 
 // Hash password before saving

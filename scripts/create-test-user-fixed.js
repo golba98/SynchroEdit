@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const User = require('../src/users/User');
 
 // Check both, prefer MONGODB_URI (what server.js uses)
-const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
+const MONGO_URI =
+  process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/syncroedit';
 
 console.log('Targeting DB URI:', MONGO_URI);
 
@@ -17,11 +18,11 @@ async function createTestUser() {
       email: 'tester@example.com',
       password: 'TesterPassword123!',
       isEmailVerified: true,
-      bio: 'Automated Test User'
+      bio: 'Automated Test User',
     };
 
     let user = await User.findOne({ username: 'tester' });
-    
+
     if (user) {
       console.log('Test user already exists. Updating...');
       user.password = testUser.password;
@@ -33,7 +34,6 @@ async function createTestUser() {
       await user.save();
       console.log('Test user created.');
     }
-
   } catch (error) {
     console.error('Error creating test user:', error);
   } finally {
@@ -43,4 +43,3 @@ async function createTestUser() {
 }
 
 createTestUser();
-

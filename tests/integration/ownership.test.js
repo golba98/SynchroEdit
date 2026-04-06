@@ -23,14 +23,13 @@ describe('Document Ownership Transfer', () => {
     user1.isEmailVerified = true;
     user1.verificationCode = null;
     await user1.save();
-    
+
     // Login to get token
     const res1 = await request(app).post('/api/auth/login').send({
-        username: userData1.email,
-        password: userData1.password
+      username: userData1.email,
+      password: userData1.password,
     });
     token1 = res1.body.token;
-
 
     // User 2
     const userData2 = {
@@ -45,16 +44,16 @@ describe('Document Ownership Transfer', () => {
     await user2.save();
 
     const res2 = await request(app).post('/api/auth/login').send({
-        username: userData2.email,
-        password: userData2.password
+      username: userData2.email,
+      password: userData2.password,
     });
     token2 = res2.body.token;
 
     // Create Document owned by User 1
     document = await Document.create({
-        title: 'Transferable Doc',
-        owner: userId1,
-        pages: [{ content: 'Content' }]
+      title: 'Transferable Doc',
+      owner: userId1,
+      pages: [{ content: 'Content' }],
     });
   });
 
@@ -69,9 +68,9 @@ describe('Document Ownership Transfer', () => {
 
     const updatedDoc = await Document.findById(document._id);
     expect(updatedDoc.owner.toString()).toBe(userId2.toString());
-    
+
     // Check if old owner is now in sharedWith
-    const sharedWithString = updatedDoc.sharedWith.map(id => id.toString());
+    const sharedWithString = updatedDoc.sharedWith.map((id) => id.toString());
     expect(sharedWithString).toContain(userId1.toString());
   });
 
@@ -102,4 +101,3 @@ describe('Document Ownership Transfer', () => {
     expect(res.status).toBe(400);
   });
 });
-

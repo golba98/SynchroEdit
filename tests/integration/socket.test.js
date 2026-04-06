@@ -37,16 +37,20 @@ describe('Socket Logic Integration Tests', () => {
   beforeEach(async () => {
     // Setup.js clears DB.
     // Create User and Doc
-    const user = await User.create({ username: 'socketuser', email: 'socket@test.com', password: 'password123' });
+    const user = await User.create({
+      username: 'socketuser',
+      email: 'socket@test.com',
+      password: 'password123',
+    });
     userId = user._id.toString();
-    
+
     const doc = await Document.create({
       title: 'Socket Doc',
       owner: userId,
-      sharedWith: []
+      sharedWith: [],
     });
     docId = doc._id.toString();
-    
+
     // Create REAL ticket
     validTicket = createTicket(userId);
   });
@@ -57,10 +61,10 @@ describe('Socket Logic Integration Tests', () => {
 
   it('should reject connection without ticket', (done) => {
     const ws = createWebSocket(`?documentId=${docId}`);
-    ws.on('error', () => {}); 
+    ws.on('error', () => {});
     ws.on('close', (code) => {
-       // Expecting non-normal closure or error, practically just closed.
-       done();
+      // Expecting non-normal closure or error, practically just closed.
+      done();
     });
   });
 
@@ -68,20 +72,20 @@ describe('Socket Logic Integration Tests', () => {
     const ws = createWebSocket(`?documentId=${docId}&ticket=invalid`);
     ws.on('error', () => {});
     ws.on('close', () => {
-       done();
+      done();
     });
   });
 
   it('should accept connection with valid ticket', (done) => {
     const ws = createWebSocket(`?documentId=${docId}&ticket=${validTicket}`);
-    
+
     ws.on('open', () => {
       ws.close();
       done();
     });
-    
+
     ws.on('error', (err) => {
-        done(err);
+      done(err);
     });
   });
 });

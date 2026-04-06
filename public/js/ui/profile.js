@@ -11,42 +11,44 @@ export class Profile {
     // Password strength listener
     const newPasswordInput = document.getElementById('newPassword');
     if (newPasswordInput) {
-      newPasswordInput.addEventListener('input', () => this.updatePasswordStrength(newPasswordInput.value));
+      newPasswordInput.addEventListener('input', () =>
+        this.updatePasswordStrength(newPasswordInput.value)
+      );
     }
 
     // Tab switching listener (to load sessions when security tab is opened)
     const profileTabs = document.querySelectorAll('.profile-tab');
-    profileTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            if (tab.getAttribute('data-tab') === 'security') {
-                this.loadSessions();
-                this.loadLoginHistory();
-            }
-        });
+    profileTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        if (tab.getAttribute('data-tab') === 'security') {
+          this.loadSessions();
+          this.loadLoginHistory();
+        }
+      });
     });
 
     // Resend verification listener
     const resendBtn = document.getElementById('resendVerificationBtn');
     if (resendBtn) {
-        resendBtn.addEventListener('click', () => this.resendVerification());
+      resendBtn.addEventListener('click', () => this.resendVerification());
     }
 
     // Revoke all others listener
     const revokeOthersBtn = document.getElementById('revokeAllOthersBtn');
     if (revokeOthersBtn) {
-        revokeOthersBtn.addEventListener('click', () => this.revokeAllOtherSessions());
+      revokeOthersBtn.addEventListener('click', () => this.revokeAllOtherSessions());
     }
 
     // Privacy toggle listener
     const privacyToggle = document.getElementById('privacyToggle');
     if (privacyToggle) {
-        privacyToggle.addEventListener('click', () => this.togglePrivacy());
+      privacyToggle.addEventListener('click', () => this.togglePrivacy());
     }
 
     // PFP upload listener with validation
     const pfpInput = document.getElementById('pfpUpload');
     if (pfpInput) {
-        pfpInput.addEventListener('change', (e) => this.handlePfpUpload(e));
+      pfpInput.addEventListener('change', (e) => this.handlePfpUpload(e));
     }
 
     // Collapsible sections
@@ -60,12 +62,16 @@ export class Profile {
     if (!header || !container) return;
 
     header.addEventListener('click', () => {
-        const isHidden = container.style.display === 'none';
-        container.style.display = isHidden ? (containerId === 'sessionListContainer' ? 'flex' : 'block') : 'none';
-        const icon = header.querySelector('i');
-        if (icon) {
-            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden
+        ? containerId === 'sessionListContainer'
+          ? 'flex'
+          : 'block'
+        : 'none';
+      const icon = header.querySelector('i');
+      if (icon) {
+        icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
     });
   }
 
@@ -90,23 +96,23 @@ export class Profile {
   async togglePrivacy() {
     if (!this.user) return;
     const newState = !this.user.showOnlineStatus;
-    
+
     try {
-        const data = await Network.fetchAPI('/api/user/profile', {
-            method: 'PUT',
-            body: JSON.stringify({ showOnlineStatus: newState })
-        });
-        
-        this.user.showOnlineStatus = data.showOnlineStatus;
-        this.updatePrivacyUI();
-        
-        // Notify editor if it exists
-        if (window.editor) {
-            window.editor.updateUser(this.user);
-        }
+      const data = await Network.fetchAPI('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ showOnlineStatus: newState }),
+      });
+
+      this.user.showOnlineStatus = data.showOnlineStatus;
+      this.updatePrivacyUI();
+
+      // Notify editor if it exists
+      if (window.editor) {
+        window.editor.updateUser(this.user);
+      }
     } catch (err) {
-        console.error('Failed to toggle privacy:', err);
-        alert('Failed to update privacy settings');
+      console.error('Failed to toggle privacy:', err);
+      alert('Failed to update privacy settings');
     }
   }
 
@@ -115,11 +121,11 @@ export class Profile {
     if (!toggle) return;
 
     if (this.user.showOnlineStatus) {
-        toggle.className = 'fas fa-toggle-on';
-        toggle.style.color = 'var(--accent-color-light)';
+      toggle.className = 'fas fa-toggle-on';
+      toggle.style.color = 'var(--accent-color-light)';
     } else {
-        toggle.className = 'fas fa-toggle-off';
-        toggle.style.color = '#666';
+      toggle.className = 'fas fa-toggle-off';
+      toggle.style.color = '#666';
     }
   }
 
@@ -155,20 +161,20 @@ export class Profile {
 
   showSkeleton() {
     const fields = ['profileEmailInput', 'profileUsernameInput', 'profileBioInput'];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('skeleton');
+    fields.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('skeleton');
     });
-    
+
     const pfpPlaceholder = document.getElementById('profilePfpPlaceholder');
     if (pfpPlaceholder) pfpPlaceholder.classList.add('skeleton', 'skeleton-circle');
   }
 
   hideSkeleton() {
     const fields = ['profileEmailInput', 'profileUsernameInput', 'profileBioInput'];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('skeleton');
+    fields.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('skeleton');
     });
 
     const pfpPlaceholder = document.getElementById('profilePfpPlaceholder');
@@ -238,109 +244,114 @@ export class Profile {
   }
 
   updateVerificationBadge() {
-      const badge = document.getElementById('emailVerificationBadge');
-      const resendContainer = document.getElementById('resendVerificationContainer');
-      if (!badge) return;
+    const badge = document.getElementById('emailVerificationBadge');
+    const resendContainer = document.getElementById('resendVerificationContainer');
+    if (!badge) return;
 
-      if (this.user.isEmailVerified) {
-          badge.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> <span style="color: #10b981;">Verified</span>';
-          if (resendContainer) resendContainer.style.display = 'none';
-      } else {
-          badge.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #f59e0b;"></i> <span style="color: #f59e0b;">Unverified</span>';
-          if (resendContainer) resendContainer.style.display = 'block';
-      }
+    if (this.user.isEmailVerified) {
+      badge.innerHTML =
+        '<i class="fas fa-check-circle" style="color: #10b981;"></i> <span style="color: #10b981;">Verified</span>';
+      if (resendContainer) resendContainer.style.display = 'none';
+    } else {
+      badge.innerHTML =
+        '<i class="fas fa-exclamation-circle" style="color: #f59e0b;"></i> <span style="color: #f59e0b;">Unverified</span>';
+      if (resendContainer) resendContainer.style.display = 'block';
+    }
   }
 
   async resendVerification() {
-      const resendBtn = document.getElementById('resendVerificationBtn');
-      const timerSpan = document.getElementById('resendTimer');
-      
-      try {
-          resendBtn.disabled = true;
-          await Network.fetchAPI('/api/auth/resend-code', {
-              method: 'POST',
-              body: JSON.stringify({ email: this.user.email })
-          });
-          
-          alert('Verification code sent to your email!');
-          
-          // Rate limit UI
-          let timeLeft = 60;
-          timerSpan.style.display = 'inline';
-          resendBtn.style.opacity = '0.5';
-          resendBtn.style.cursor = 'not-allowed';
-          
-          const interval = setInterval(() => {
-              timeLeft--;
-              timerSpan.textContent = `Retry in ${timeLeft}s`;
-              if (timeLeft <= 0) {
-                  clearInterval(interval);
-                  resendBtn.disabled = false;
-                  resendBtn.style.opacity = '1';
-                  resendBtn.style.cursor = 'pointer';
-                  timerSpan.style.display = 'none';
-              }
-          }, 1000);
+    const resendBtn = document.getElementById('resendVerificationBtn');
+    const timerSpan = document.getElementById('resendTimer');
 
-      } catch (err) {
-          console.error('Resend error:', err);
-          alert('Failed to resend code. Please try again later.');
+    try {
+      resendBtn.disabled = true;
+      await Network.fetchAPI('/api/auth/resend-code', {
+        method: 'POST',
+        body: JSON.stringify({ email: this.user.email }),
+      });
+
+      alert('Verification code sent to your email!');
+
+      // Rate limit UI
+      let timeLeft = 60;
+      timerSpan.style.display = 'inline';
+      resendBtn.style.opacity = '0.5';
+      resendBtn.style.cursor = 'not-allowed';
+
+      const interval = setInterval(() => {
+        timeLeft--;
+        timerSpan.textContent = `Retry in ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
           resendBtn.disabled = false;
-      }
+          resendBtn.style.opacity = '1';
+          resendBtn.style.cursor = 'pointer';
+          timerSpan.style.display = 'none';
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Resend error:', err);
+      alert('Failed to resend code. Please try again later.');
+      resendBtn.disabled = false;
+    }
   }
 
   updatePasswordStrength(password) {
     const bar = document.getElementById('passwordStrengthBar');
     const reqs = {
-        length: password.length >= 8,
-        upper: /[A-Z]/.test(password),
-        number: /[0-9]/.test(password),
-        symbol: /[!@#$%^&*]/.test(password)
+      length: password.length >= 8,
+      upper: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      symbol: /[!@#$%^&*]/.test(password),
     };
 
     let score = 0;
-    Object.keys(reqs).forEach(key => {
-        const el = document.querySelector(`li[data-req="${key}"]`);
-        if (reqs[key]) {
-            score++;
-            el.style.color = '#10b981';
-            el.querySelector('i').className = 'fas fa-check-circle';
-        } else {
-            el.style.color = document.body.classList.contains('light-theme') ? '#4b5563' : '#666';
-            el.querySelector('i').className = 'fas fa-circle';
-        }
+    Object.keys(reqs).forEach((key) => {
+      const el = document.querySelector(`li[data-req="${key}"]`);
+      if (reqs[key]) {
+        score++;
+        el.style.color = '#10b981';
+        el.querySelector('i').className = 'fas fa-check-circle';
+      } else {
+        el.style.color = document.body.classList.contains('light-theme') ? '#4b5563' : '#666';
+        el.querySelector('i').className = 'fas fa-circle';
+      }
     });
 
     const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
     const widths = ['25%', '50%', '75%', '100%'];
-    
+
     if (password.length === 0) {
-        bar.style.width = '0%';
+      bar.style.width = '0%';
     } else {
-        const index = Math.min(score, colors.length) - 1;
-        bar.style.width = widths[index] || '0%';
-        bar.style.background = colors[index] || '#ef4444';
+      const index = Math.min(score, colors.length) - 1;
+      bar.style.width = widths[index] || '0%';
+      bar.style.background = colors[index] || '#ef4444';
     }
   }
 
   async loadSessions() {
-      const container = document.getElementById('sessionListContainer');
-      if (!container) return;
-      
-      try {
-          container.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; padding: 10px;">Loading sessions...</div>';
-          const sessions = await Network.fetchAPI('/api/user/sessions');
-          
-          container.innerHTML = '';
-          sessions.sort((a, b) => (a.isCurrent ? -1 : 1)).forEach(session => {
-              const sessionEl = document.createElement('div');
-              sessionEl.className = 'session-item';
-              sessionEl.style.cssText = 'padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;';
-              
-              const info = this.parseUserAgent(session.userAgent);
-              const lastActive = this.formatLastActive(session.lastActive);
+    const container = document.getElementById('sessionListContainer');
+    if (!container) return;
 
-              sessionEl.innerHTML = `
+    try {
+      container.innerHTML =
+        '<div style="font-size: 11px; color: #666; text-align: center; padding: 10px;">Loading sessions...</div>';
+      const sessions = await Network.fetchAPI('/api/user/sessions');
+
+      container.innerHTML = '';
+      sessions
+        .sort((a, b) => (a.isCurrent ? -1 : 1))
+        .forEach((session) => {
+          const sessionEl = document.createElement('div');
+          sessionEl.className = 'session-item';
+          sessionEl.style.cssText =
+            'padding: 12px; border-radius: 6px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;';
+
+          const info = this.parseUserAgent(session.userAgent);
+          const lastActive = this.formatLastActive(session.lastActive);
+
+          sessionEl.innerHTML = `
                   <div style="flex: 1;">
                       <div style="display: flex; align-items: center; gap: 6px;">
                           <span class="session-info-main" style="font-size: 11px; font-weight: 600;">${info.os} • ${info.browser}</span>
@@ -350,36 +361,38 @@ export class Profile {
                   </div>
                   ${!session.isCurrent ? `<button class="revoke-session-btn" data-id="${session.sessionId}" style="background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer; padding: 4px;"><i class="fas fa-times-circle"></i></button>` : ''}
               `;
-              container.appendChild(sessionEl);
-          });
+          container.appendChild(sessionEl);
+        });
 
-          // Add revocation listeners
-          container.querySelectorAll('.revoke-session-btn').forEach(btn => {
-              btn.addEventListener('click', () => this.revokeSession(btn.getAttribute('data-id')));
-          });
-
-      } catch (err) {
-          console.error('Error loading sessions:', err);
-          container.innerHTML = '<div style="font-size: 11px; color: #ef4444; text-align: center; padding: 10px;">Failed to load sessions</div>';
-      }
+      // Add revocation listeners
+      container.querySelectorAll('.revoke-session-btn').forEach((btn) => {
+        btn.addEventListener('click', () => this.revokeSession(btn.getAttribute('data-id')));
+      });
+    } catch (err) {
+      console.error('Error loading sessions:', err);
+      container.innerHTML =
+        '<div style="font-size: 11px; color: #ef4444; text-align: center; padding: 10px;">Failed to load sessions</div>';
+    }
   }
 
   async loadLoginHistory() {
-      const tbody = document.getElementById('loginHistoryTableBody');
-      if (!tbody || !this.user.loginHistory) return;
+    const tbody = document.getElementById('loginHistoryTableBody');
+    if (!tbody || !this.user.loginHistory) return;
 
-      tbody.innerHTML = '';
-      if (this.user.loginHistory.length === 0) {
-          tbody.innerHTML = '<tr><td style="padding: 12px; color: #666; text-align: center;">No login history available</td></tr>';
-          return;
-      }
+    tbody.innerHTML = '';
+    if (this.user.loginHistory.length === 0) {
+      tbody.innerHTML =
+        '<tr><td style="padding: 12px; color: #666; text-align: center;">No login history available</td></tr>';
+      return;
+    }
 
-      this.user.loginHistory.forEach((timestamp, index) => {
-          const date = new Date(timestamp);
-          const row = document.createElement('tr');
-          row.style.borderBottom = index === this.user.loginHistory.length - 1 ? 'none' : '1px solid rgba(139, 92, 246, 0.1)';
-          
-          row.innerHTML = `
+    this.user.loginHistory.forEach((timestamp, index) => {
+      const date = new Date(timestamp);
+      const row = document.createElement('tr');
+      row.style.borderBottom =
+        index === this.user.loginHistory.length - 1 ? 'none' : '1px solid rgba(139, 92, 246, 0.1)';
+
+      row.innerHTML = `
               <td style="padding: 10px 12px;" class="history-item-cell">
                   <div style="display: flex; align-items: center; gap: 8px;">
                       <i class="fas fa-sign-in-alt" style="color: #666; font-size: 10px;"></i>
@@ -390,104 +403,105 @@ export class Profile {
                   ${index === 0 ? '<span style="color: var(--accent-color-light); font-weight: 600; font-size: 8px; text-transform: uppercase;">Most Recent</span>' : ''}
               </td>
           `;
-          tbody.appendChild(row);
-      });
+      tbody.appendChild(row);
+    });
   }
 
   promptIdentityConfirmation() {
-      return new Promise((resolve) => {
-          const modal = document.getElementById('confirmIdentityModal');
-          const input = document.getElementById('confirmIdentityPassword');
-          const submitBtn = document.getElementById('submitConfirmIdentity');
-          const cancelBtn = document.getElementById('cancelConfirmIdentity');
+    return new Promise((resolve) => {
+      const modal = document.getElementById('confirmIdentityModal');
+      const input = document.getElementById('confirmIdentityPassword');
+      const submitBtn = document.getElementById('submitConfirmIdentity');
+      const cancelBtn = document.getElementById('cancelConfirmIdentity');
 
-          if (!modal || !input || !submitBtn || !cancelBtn) {
-              return resolve(null);
-          }
+      if (!modal || !input || !submitBtn || !cancelBtn) {
+        return resolve(null);
+      }
 
-          modal.style.display = 'flex';
-          input.value = '';
-          input.focus();
+      modal.style.display = 'flex';
+      input.value = '';
+      input.focus();
 
-          const handleConfirm = () => {
-              const password = input.value;
-              if (!password) return;
-              cleanup();
-              resolve(password);
-          };
+      const handleConfirm = () => {
+        const password = input.value;
+        if (!password) return;
+        cleanup();
+        resolve(password);
+      };
 
-          const handleCancel = () => {
-              cleanup();
-              resolve(null);
-          };
+      const handleCancel = () => {
+        cleanup();
+        resolve(null);
+      };
 
-          const handleKeydown = (e) => {
-              if (e.key === 'Enter') handleConfirm();
-              if (e.key === 'Escape') handleCancel();
-          };
+      const handleKeydown = (e) => {
+        if (e.key === 'Enter') handleConfirm();
+        if (e.key === 'Escape') handleCancel();
+      };
 
-          const cleanup = () => {
-              modal.style.display = 'none';
-              submitBtn.removeEventListener('click', handleConfirm);
-              cancelBtn.removeEventListener('click', handleCancel);
-              input.removeEventListener('keydown', handleKeydown);
-          };
+      const cleanup = () => {
+        modal.style.display = 'none';
+        submitBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+        input.removeEventListener('keydown', handleKeydown);
+      };
 
-          submitBtn.addEventListener('click', handleConfirm);
-          cancelBtn.addEventListener('click', handleCancel);
-          input.addEventListener('keydown', handleKeydown);
-      });
+      submitBtn.addEventListener('click', handleConfirm);
+      cancelBtn.addEventListener('click', handleCancel);
+      input.addEventListener('keydown', handleKeydown);
+    });
   }
 
   async revokeSession(sessionId) {
-      if (!confirm('Are you sure you want to revoke this session? The device will be signed out.')) return;
-      try {
-          await Network.fetchAPI(`/api/user/sessions/${sessionId}`, { method: 'DELETE' });
-          this.loadSessions();
-      } catch (err) {
-          alert('Failed to revoke session');
-      }
+    if (!confirm('Are you sure you want to revoke this session? The device will be signed out.'))
+      return;
+    try {
+      await Network.fetchAPI(`/api/user/sessions/${sessionId}`, { method: 'DELETE' });
+      this.loadSessions();
+    } catch (err) {
+      alert('Failed to revoke session');
+    }
   }
 
   async revokeAllOtherSessions() {
-      if (!confirm('Sign out of all other devices?')) return;
-      try {
-          await Network.fetchAPI('/api/user/sessions', { method: 'DELETE' });
-          this.loadSessions();
-      } catch (err) {
-          alert('Failed to revoke sessions');
-      }
+    if (!confirm('Sign out of all other devices?')) return;
+    try {
+      await Network.fetchAPI('/api/user/sessions', { method: 'DELETE' });
+      this.loadSessions();
+    } catch (err) {
+      alert('Failed to revoke sessions');
+    }
   }
 
   parseUserAgent(ua) {
-      let os = 'Unknown OS';
-      let browser = 'Unknown Browser';
+    let os = 'Unknown OS';
+    let browser = 'Unknown Browser';
 
-      if (ua.includes('Win')) os = 'Windows';
-      else if (ua.includes('Mac')) os = 'macOS';
-      else if (ua.includes('Linux')) os = 'Linux';
-      else if (ua.includes('Android')) os = 'Android';
-      else if (ua.includes('like Mac')) os = 'iOS';
+    if (ua.includes('Win')) os = 'Windows';
+    else if (ua.includes('Mac')) os = 'macOS';
+    else if (ua.includes('Linux')) os = 'Linux';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('like Mac')) os = 'iOS';
 
-      if (ua.includes('Firefox')) browser = 'Firefox';
-      else if (ua.includes('Chrome')) browser = 'Chrome';
-      else if (ua.includes('Safari')) browser = 'Safari';
-      else if (ua.includes('Edge')) browser = 'Edge';
+    if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Chrome')) browser = 'Chrome';
+    else if (ua.includes('Safari')) browser = 'Safari';
+    else if (ua.includes('Edge')) browser = 'Edge';
 
-      return { os, browser };
+    return { os, browser };
   }
 
   formatLastActive(date) {
-      const now = new Date();
-      const last = new Date(date);
-      const diffMs = now - last;
-      const diffMins = Math.floor(diffMs / 60000);
+    const now = new Date();
+    const last = new Date(date);
+    const diffMs = now - last;
+    const diffMins = Math.floor(diffMs / 60000);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins}m ago`;
-      const diffHours = Math.floor(diffMins / 60);
-      if (diffHours < 24) return `${diffHours}h ago`;
-      return last.toLocaleDateString();
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return last.toLocaleDateString();
   }
 
   async updateProfilePicture(base64String) {
@@ -537,7 +551,7 @@ export class Profile {
 
   async updateAccentColor(color) {
     if (!this.user) return;
-    
+
     // UI Update is immediate
     this.user.accentColor = color;
     this.updateUI();
@@ -546,15 +560,15 @@ export class Profile {
     // Backend sync is debounced to prevent 429 Rate Limiting
     if (this.colorDebounceTimeout) clearTimeout(this.colorDebounceTimeout);
     this.colorDebounceTimeout = setTimeout(async () => {
-        try {
-          await Network.fetchAPI('/api/user/profile', {
-            method: 'PUT',
-            body: JSON.stringify({ accentColor: color }),
-          });
-          console.log(`[Profile] Accent color synced to backend: ${color}`);
-        } catch (err) {
-          console.error('Error syncing accent color:', err);
-        }
+      try {
+        await Network.fetchAPI('/api/user/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ accentColor: color }),
+        });
+        console.log(`[Profile] Accent color synced to backend: ${color}`);
+      } catch (err) {
+        console.error('Error syncing accent color:', err);
+      }
     }, 1000); // 1-second debounce
   }
 }

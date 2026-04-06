@@ -17,16 +17,16 @@ exports.updateProfile = async (req, res, next) => {
   if (accentColor !== undefined) user.accentColor = accentColor;
   if (bio !== undefined) user.bio = bio;
   if (showOnlineStatus !== undefined) user.showOnlineStatus = showOnlineStatus;
-  
+
   await user.save();
 
   logger.info(`Profile updated for user: ${req.user.id}`);
-  res.json({ 
-      message: 'Profile updated successfully', 
-      profilePicture: user.profilePicture,
-      accentColor: user.accentColor,
-      bio: user.bio,
-      showOnlineStatus: user.showOnlineStatus
+  res.json({
+    message: 'Profile updated successfully',
+    profilePicture: user.profilePicture,
+    accentColor: user.accentColor,
+    bio: user.bio,
+    showOnlineStatus: user.showOnlineStatus,
   });
 };
 
@@ -46,17 +46,17 @@ exports.updatePassword = async (req, res, next) => {
 };
 
 exports.getSessions = async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('sessions');
-    if (!user) return next(new AppError('User not found', 404));
+  const user = await User.findById(req.user.id).select('sessions');
+  if (!user) return next(new AppError('User not found', 404));
 
-    // Return sessions but exclude the refresh token hash for security
-    const sessions = user.sessions.map(s => ({
-        sessionId: s.sessionId,
-        userAgent: s.userAgent,
-        ipAddress: s.ipAddress,
-        lastActive: s.lastActive,
-        isCurrent: s.sessionId === req.user.sessionId
-    }));
+  // Return sessions but exclude the refresh token hash for security
+  const sessions = user.sessions.map((s) => ({
+    sessionId: s.sessionId,
+    userAgent: s.userAgent,
+    ipAddress: s.ipAddress,
+    lastActive: s.lastActive,
+    isCurrent: s.sessionId === req.user.sessionId,
+  }));
 
-    res.json(sessions);
+  res.json(sessions);
 };

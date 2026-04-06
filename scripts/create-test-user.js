@@ -14,11 +14,11 @@ async function createTestUser() {
       email: 'tester@example.com',
       password: 'password123',
       isEmailVerified: true,
-      bio: 'Automated Test User'
+      bio: 'Automated Test User',
     };
 
     let user = await User.findOne({ email: testUser.email });
-    
+
     if (user) {
       console.log('Test user already exists.');
       // Update password to be sure
@@ -39,7 +39,6 @@ async function createTestUser() {
     Password: password123
     --------------------------------------
     `);
-
   } catch (error) {
     console.error('Error creating test user:', error);
   } finally {
@@ -49,4 +48,3 @@ async function createTestUser() {
 }
 
 createTestUser();
-

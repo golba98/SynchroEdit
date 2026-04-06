@@ -6,7 +6,7 @@ export class SelectionManager extends Plugin {
     this.isSelecting = false;
     this.startPoint = null; // { pageIndex, index }
     this.currentPoint = null; // { pageIndex, index }
-    
+
     // Store overlay elements for cleanup
     this.overlays = [];
   }
@@ -19,7 +19,7 @@ export class SelectionManager extends Plugin {
     // Global tracking
     this.addDisposableListener(document, 'mousemove', (e) => this.handleMouseMove(e));
     this.addDisposableListener(document, 'mouseup', (e) => this.handleMouseUp(e));
-    
+
     // Intercept Copy/Cut
     this.addDisposableListener(document, 'copy', (e) => this.handleCopy(e));
     this.addDisposableListener(document, 'cut', (e) => this.handleCut(e));
@@ -44,7 +44,7 @@ export class SelectionManager extends Plugin {
 
     const pageId = editorContainer.dataset.pageId;
     const pages = this.editor.yPages.toArray();
-    const pageIndex = pages.findIndex(p => p.get('id') === pageId);
+    const pageIndex = pages.findIndex((p) => p.get('id') === pageId);
     if (pageIndex === -1) return;
 
     const quill = this.editor.pageQuillInstances.get(pageId);
@@ -54,11 +54,11 @@ export class SelectionManager extends Plugin {
     // Safer: Quill's getSelection might update automatically if we are dragging.
     const range = quill.getSelection();
     if (range) {
-        this.currentPoint = { pageIndex, index: range.index + range.length };
-        this.renderVisuals();
+      this.currentPoint = { pageIndex, index: range.index + range.length };
+      this.renderVisuals();
     } else {
-        // Fallback: Estimate index based on Y coordinate relative to quill?
-        // For now, assume Quill catches the drag if it's active.
+      // Fallback: Estimate index based on Y coordinate relative to quill?
+      // For now, assume Quill catches the drag if it's active.
     }
   }
 
@@ -73,21 +73,24 @@ export class SelectionManager extends Plugin {
   }
 
   clearOverlays() {
-    this.overlays.forEach(el => el.remove());
+    this.overlays.forEach((el) => el.remove());
     this.overlays = [];
   }
 
   renderVisuals() {
     this.clearOverlays();
-    
+
     if (!this.startPoint || !this.currentPoint) return;
-    
+
     let start = this.startPoint;
     let end = this.currentPoint;
 
     // Normalize
-    if (start.pageIndex > end.pageIndex || (start.pageIndex === end.pageIndex && start.index > end.index)) {
-        [start, end] = [end, start];
+    if (
+      start.pageIndex > end.pageIndex ||
+      (start.pageIndex === end.pageIndex && start.index > end.index)
+    ) {
+      [start, end] = [end, start];
     }
 
     if (start.pageIndex === end.pageIndex) return;
@@ -95,93 +98,96 @@ export class SelectionManager extends Plugin {
     const pagesArr = this.editor.yPages.toArray();
 
     for (let i = start.pageIndex; i <= end.pageIndex; i++) {
-        const pageMap = pagesArr[i];
-        if (!pageMap) continue;
-        const pageId = pageMap.get('id');
-        const quill = this.editor.pageQuillInstances.get(pageId);
-        if (!quill) continue;
-        
-        // Don't draw overlay on the page that has the real browser selection
-        if (quill.hasFocus()) continue;
+      const pageMap = pagesArr[i];
+      if (!pageMap) continue;
+      const pageId = pageMap.get('id');
+      const quill = this.editor.pageQuillInstances.get(pageId);
+      if (!quill) continue;
 
-        let pStart = 0;
-        let pEnd = quill.getLength();
+      // Don't draw overlay on the page that has the real browser selection
+      if (quill.hasFocus()) continue;
 
-        if (i === start.pageIndex) pStart = start.index;
-        if (i === end.pageIndex) pEnd = end.index;
+      let pStart = 0;
+      let pEnd = quill.getLength();
 
-        const length = Math.max(0, pEnd - pStart);
-        if (length === 0) continue;
+      if (i === start.pageIndex) pStart = start.index;
+      if (i === end.pageIndex) pEnd = end.index;
 
-        this.createHighlight(pageId, quill, pStart, length);
+      const length = Math.max(0, pEnd - pStart);
+      if (length === 0) continue;
+
+      this.createHighlight(pageId, quill, pStart, length);
     }
   }
 
   createHighlight(pageId, quill, index, length) {
-      const container = document.getElementById(`page-container-${pageId}`);
-      if (!container) return;
-      
-      const bounds = quill.getBounds(index, length);
-      if (!bounds) return;
+    const container = document.getElementById(`page-container-${pageId}`);
+    if (!container) return;
 
-      const overlay = document.createElement('div');
-      overlay.className = 'selection-bridge-overlay';
-      overlay.style.position = 'absolute';
-      overlay.style.left = `${bounds.left}px`;
-      overlay.style.top = `${bounds.top}px`;
-      overlay.style.width = `${bounds.width}px`;
-      overlay.style.height = `${bounds.height}px`;
-      overlay.style.backgroundColor = 'rgba(var(--accent-color-rgb), 0.3)'; 
-      overlay.style.pointerEvents = 'none'; 
-      overlay.style.zIndex = '10'; 
-      
-      const editorDiv = container.querySelector('.page-editor');
-      if (editorDiv) {
-          editorDiv.appendChild(overlay);
-          this.overlays.push(overlay);
-      }
+    const bounds = quill.getBounds(index, length);
+    if (!bounds) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'selection-bridge-overlay';
+    overlay.style.position = 'absolute';
+    overlay.style.left = `${bounds.left}px`;
+    overlay.style.top = `${bounds.top}px`;
+    overlay.style.width = `${bounds.width}px`;
+    overlay.style.height = `${bounds.height}px`;
+    overlay.style.backgroundColor = 'rgba(var(--accent-color-rgb), 0.3)';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.zIndex = '10';
+
+    const editorDiv = container.querySelector('.page-editor');
+    if (editorDiv) {
+      editorDiv.appendChild(overlay);
+      this.overlays.push(overlay);
+    }
   }
 
   handleCopy(e) {
-      if (!this.startPoint || !this.currentPoint) return;
-      
-      let start = this.startPoint;
-      let end = this.currentPoint;
-      if (start.pageIndex > end.pageIndex || (start.pageIndex === end.pageIndex && start.index > end.index)) {
-          [start, end] = [end, start];
-      }
+    if (!this.startPoint || !this.currentPoint) return;
 
-      if (start.pageIndex === end.pageIndex) return; 
+    let start = this.startPoint;
+    let end = this.currentPoint;
+    if (
+      start.pageIndex > end.pageIndex ||
+      (start.pageIndex === end.pageIndex && start.index > end.index)
+    ) {
+      [start, end] = [end, start];
+    }
 
-      e.preventDefault();
-      
-      let fullText = '';
-      const pagesArr = this.editor.yPages.toArray();
-      
-      for (let i = start.pageIndex; i <= end.pageIndex; i++) {
-          const pageMap = pagesArr[i];
-          if (!pageMap) continue;
-          const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
-          if (!quill) continue; 
-          
-          let pStart = 0;
-          let pEnd = quill.getLength();
-          
-          if (i === start.pageIndex) pStart = start.index;
-          if (i === end.pageIndex) pEnd = end.index;
-          
-          const length = Math.max(0, pEnd - pStart);
-          fullText += quill.getText(pStart, length);
-      }
-      
-      if (e.clipboardData) {
-          e.clipboardData.setData('text/plain', fullText);
-      }
+    if (start.pageIndex === end.pageIndex) return;
+
+    e.preventDefault();
+
+    let fullText = '';
+    const pagesArr = this.editor.yPages.toArray();
+
+    for (let i = start.pageIndex; i <= end.pageIndex; i++) {
+      const pageMap = pagesArr[i];
+      if (!pageMap) continue;
+      const quill = this.editor.pageQuillInstances.get(pageMap.get('id'));
+      if (!quill) continue;
+
+      let pStart = 0;
+      let pEnd = quill.getLength();
+
+      if (i === start.pageIndex) pStart = start.index;
+      if (i === end.pageIndex) pEnd = end.index;
+
+      const length = Math.max(0, pEnd - pStart);
+      fullText += quill.getText(pStart, length);
+    }
+
+    if (e.clipboardData) {
+      e.clipboardData.setData('text/plain', fullText);
+    }
   }
-  
+
   handleCut(e) {
-      if (!this.startPoint || !this.currentPoint) return;
-      this.handleCopy(e);
-      // Multi-page delete logic could be added here
+    if (!this.startPoint || !this.currentPoint) return;
+    this.handleCopy(e);
+    // Multi-page delete logic could be added here
   }
 }

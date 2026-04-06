@@ -9,7 +9,7 @@ jest.mock('../../../src/utils/email', () => ({
   sendVerificationEmail: jest.fn(),
   sendPasswordResetEmail: jest.fn(),
   sendPasswordChangedEmail: jest.fn().mockResolvedValue(true),
-  generateVerificationCode: jest.fn().mockReturnValue('123456')
+  generateVerificationCode: jest.fn().mockReturnValue('123456'),
 }));
 jest.mock('../../../src/utils/ticketStore');
 jest.mock('jsonwebtoken');
@@ -28,7 +28,7 @@ jest.mock('mongoose', () => {
     ...doc,
     save: jest.fn().mockResolvedValue(doc),
   }));
-  
+
   // Mock Static Property used in Controller
   MockModel.PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
 
@@ -36,15 +36,15 @@ jest.mock('mongoose', () => {
   MockModel.findById = jest.fn();
   MockModel.deleteOne = jest.fn();
   MockModel.deleteMany = jest.fn();
-  
+
   return {
     connection: {
-      readyState: 1
+      readyState: 1,
     },
     Schema: MockSchema,
     model: jest.fn((name, schema) => {
-        Object.assign(MockModel, schema.statics);
-        return MockModel;
+      Object.assign(MockModel, schema.statics);
+      return MockModel;
     }),
   };
 });
@@ -79,7 +79,7 @@ describe('Auth Controller Unit Tests', () => {
   describe('signup', () => {
     it('should return generic message if user exists (enumeration prevention)', async () => {
       req.body = { username: 'existing', email: 'test@test.com', password: 'TestPassword123!' };
-      
+
       User.findOne.mockReturnValue({
         lean: jest.fn().mockResolvedValue({ _id: '123' }),
       });
@@ -89,321 +89,343 @@ describe('Auth Controller Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-            message: 'If your email is not registered, you will receive a verification code.'
+          message: 'If your email is not registered, you will receive a verification code.',
         })
       );
     });
 
     it('should create new user and send verification email if enabled', async () => {
-        // We assume env var is enabled for this test context or mock it if possible.
-        // Since we can't easily change process.env inside a running module without reloading,
-        // we test the path assuming defaults (which seems to be ENABLED based on code read).
-        
-        req.body = { username: 'new', email: 'new@test.com', password: 'TestPassword123!' };
-        
-        User.findOne.mockReturnValue({
-            lean: jest.fn().mockResolvedValue(null),
-        });
-        
-        const mockSave = jest.fn();
-        User.mockImplementation(() => ({
-            save: mockSave,
-            _id: 'newid',
-            username: 'new',
-            email: 'new@test.com'
-        }));
-        
-        sendVerificationEmail.mockResolvedValue(true);
-        
-        await authController.signup(req, res, next);
-        
-        expect(mockSave).toHaveBeenCalled();
-        expect(sendVerificationEmail).toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(200);
+      // We assume env var is enabled for this test context or mock it if possible.
+      // Since we can't easily change process.env inside a running module without reloading,
+      // we test the path assuming defaults (which seems to be ENABLED based on code read).
+
+      req.body = { username: 'new', email: 'new@test.com', password: 'TestPassword123!' };
+
+      User.findOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null),
+      });
+
+      const mockSave = jest.fn();
+      User.mockImplementation(() => ({
+        save: mockSave,
+        _id: 'newid',
+        username: 'new',
+        email: 'new@test.com',
+      }));
+
+      sendVerificationEmail.mockResolvedValue(true);
+
+      await authController.signup(req, res, next);
+
+      expect(mockSave).toHaveBeenCalled();
+      expect(sendVerificationEmail).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
     });
 
     it('should return tokens directly if email verification is disabled', async () => {
-        process.env.ENABLE_EMAIL_VERIFICATION = 'false';
-        req.body = { username: 'direct', email: 'direct@test.com', password: 'TestPassword123!' };
-        req.headers = { 'user-agent': 'test-agent' };
-        
-        User.findOne.mockReturnValue({
-            lean: jest.fn().mockResolvedValue(null),
-        });
-        
-        const mockUser = {
-            _id: 'directid',
-            username: 'direct',
-            email: 'direct@test.com',
-            sessions: [],
-            save: jest.fn().mockResolvedValue(true)
-        };
-        User.mockImplementation(() => mockUser);
-        jwt.sign.mockReturnValue('mock-refresh');
+      process.env.ENABLE_EMAIL_VERIFICATION = 'false';
+      req.body = { username: 'direct', email: 'direct@test.com', password: 'TestPassword123!' };
+      req.headers = { 'user-agent': 'test-agent' };
 
-        // We need to re-require or mock the logic that uses process.env
-        // But the controller captures it at module load time.
-        // For unit test purposes, we'll assume it works if we can trigger the 'else' block.
-        
-        await authController.signup(req, res, next);
-        
-        // Cleanup env
-        delete process.env.ENABLE_EMAIL_VERIFICATION;
+      User.findOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null),
+      });
+
+      const mockUser = {
+        _id: 'directid',
+        username: 'direct',
+        email: 'direct@test.com',
+        sessions: [],
+        save: jest.fn().mockResolvedValue(true),
+      };
+      User.mockImplementation(() => mockUser);
+      jwt.sign.mockReturnValue('mock-refresh');
+
+      // We need to re-require or mock the logic that uses process.env
+      // But the controller captures it at module load time.
+      // For unit test purposes, we'll assume it works if we can trigger the 'else' block.
+
+      await authController.signup(req, res, next);
+
+      // Cleanup env
+      delete process.env.ENABLE_EMAIL_VERIFICATION;
     });
   });
 
   describe('refreshToken', () => {
-      it('should rotate tokens and return new access token', async () => {
-          req.cookies = { refreshToken: 'old-refresh' };
-          req.ip = '127.0.0.1';
-          
-          const mockUser = {
-              _id: 'user123',
-              username: 'user',
-              sessions: [{
-                  sessionId: 'sess123',
-                  refreshToken: require('crypto').createHash('sha256').update('old-refresh').digest('hex')
-              }],
-              save: jest.fn().mockResolvedValue(true)
-          };
-          
-          User.findById.mockResolvedValue(mockUser);
-          jwt.verify.mockReturnValue({ id: 'user123', sessionId: 'sess123' });
-          jwt.sign.mockReturnValueOnce('new-refresh').mockReturnValueOnce('new-access');
+    it('should rotate tokens and return new access token', async () => {
+      req.cookies = { refreshToken: 'old-refresh' };
+      req.ip = '127.0.0.1';
 
-          await authController.refreshToken(req, res, next);
+      const mockUser = {
+        _id: 'user123',
+        username: 'user',
+        sessions: [
+          {
+            sessionId: 'sess123',
+            refreshToken: require('crypto')
+              .createHash('sha256')
+              .update('old-refresh')
+              .digest('hex'),
+          },
+        ],
+        save: jest.fn().mockResolvedValue(true),
+      };
 
-          expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'new-refresh', expect.any(Object));
-          expect(res.json).toHaveBeenCalledWith({ token: 'new-access' });
-      });
+      User.findById.mockResolvedValue(mockUser);
+      jwt.verify.mockReturnValue({ id: 'user123', sessionId: 'sess123' });
+      jwt.sign.mockReturnValueOnce('new-refresh').mockReturnValueOnce('new-access');
 
-      it('should return 401 if refresh token is missing', async () => {
-          req.cookies = {};
-          await authController.refreshToken(req, res, next);
-          // In actual code it returns res.status(401).json(...)
-          expect(res.status).toHaveBeenCalledWith(401);
-      });
+      await authController.refreshToken(req, res, next);
+
+      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'new-refresh', expect.any(Object));
+      expect(res.json).toHaveBeenCalledWith({ token: 'new-access' });
+    });
+
+    it('should return 401 if refresh token is missing', async () => {
+      req.cookies = {};
+      await authController.refreshToken(req, res, next);
+      // In actual code it returns res.status(401).json(...)
+      expect(res.status).toHaveBeenCalledWith(401);
+    });
   });
 
   describe('login', () => {
-      it('should return tokens and set cookie if login successful', async () => {
-          req.body = { username: 'user', password: 'password' };
-          req.headers = { 'user-agent': 'test-agent' };
-          req.ip = '127.0.0.1';
-          
-          const mockUser = {
-              _id: 'user123',
-              username: 'user',
-              email: 'test@test.com',
-              comparePassword: jest.fn().mockResolvedValue(true),
-              isEmailVerified: true,
-              sessions: [],
-              loginHistory: [],
-              save: jest.fn().mockResolvedValue(true)
-          };
-          
-          User.findOne.mockResolvedValue(mockUser);
-          jwt.sign.mockReturnValueOnce('mock-refresh-token').mockReturnValueOnce('mock-access-token');
-          
-          await authController.login(req, res, next);
-          
-          expect(mockUser.save).toHaveBeenCalled();
-          expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'mock-refresh-token', expect.any(Object));
-          expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ 
-              token: 'mock-access-token',
-              username: 'user'
-          }));
-      });
+    it('should return tokens and set cookie if login successful', async () => {
+      req.body = { username: 'user', password: 'password' };
+      req.headers = { 'user-agent': 'test-agent' };
+      req.ip = '127.0.0.1';
+
+      const mockUser = {
+        _id: 'user123',
+        username: 'user',
+        email: 'test@test.com',
+        comparePassword: jest.fn().mockResolvedValue(true),
+        isEmailVerified: true,
+        sessions: [],
+        loginHistory: [],
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne.mockResolvedValue(mockUser);
+      jwt.sign.mockReturnValueOnce('mock-refresh-token').mockReturnValueOnce('mock-access-token');
+
+      await authController.login(req, res, next);
+
+      expect(mockUser.save).toHaveBeenCalled();
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'mock-refresh-token',
+        expect.any(Object)
+      );
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          token: 'mock-access-token',
+          username: 'user',
+        })
+      );
+    });
   });
 
   describe('checkUsername', () => {
     it('should return available true if username not taken', async () => {
-        req.body = { username: 'available_user' };
-        User.findOne.mockReturnValue({
-            lean: jest.fn().mockResolvedValue(null)
-        });
+      req.body = { username: 'available_user' };
+      User.findOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null),
+      });
 
-        await authController.checkUsername(req, res, next);
+      await authController.checkUsername(req, res, next);
 
-        expect(res.json).toHaveBeenCalledWith({ available: true });
+      expect(res.json).toHaveBeenCalledWith({ available: true });
     });
 
     it('should return available false and suggestions if username taken', async () => {
-        req.body = { username: 'taken_user' };
-        User.findOne.mockReturnValue({
-            lean: jest.fn().mockResolvedValue({ username: 'taken_user' })
-        });
+      req.body = { username: 'taken_user' };
+      User.findOne.mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ username: 'taken_user' }),
+      });
 
-        await authController.checkUsername(req, res, next);
+      await authController.checkUsername(req, res, next);
 
-        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-            available: false,
-            suggestions: expect.any(Array)
-        }));
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          available: false,
+          suggestions: expect.any(Array),
+        })
+      );
     });
   });
 
   describe('logout', () => {
     it('should clear refresh token cookie and return success', async () => {
-        req.cookies = { refreshToken: 'some-token' };
-        jwt.verify.mockReturnValue({ id: 'user123', sessionId: 'sess123' });
-        User.findById.mockResolvedValue({
-            _id: 'user123',
-            sessions: [],
-            save: jest.fn().mockResolvedValue(true)
-        });
+      req.cookies = { refreshToken: 'some-token' };
+      jwt.verify.mockReturnValue({ id: 'user123', sessionId: 'sess123' });
+      User.findById.mockResolvedValue({
+        _id: 'user123',
+        sessions: [],
+        save: jest.fn().mockResolvedValue(true),
+      });
 
-        await authController.logout(req, res);
-        
-        expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Logged out successfully' });
+      await authController.logout(req, res);
+
+      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Logged out successfully' });
     });
   });
 
-    describe('resetPassword', () => {
-      it('should reset password, clear sessions, and return success message without logging in', async () => {
-        req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'testuser' };
-        const mockUser = {
-          username: 'testuser',
-          password: 'oldHash',
-          passwordResetToken: 'hashedToken',
-          passwordResetExpires: Date.now() + 10000,
-          sessions: [{ sessionId: 'old-session' }], // Simulate active sessions
-          save: jest.fn().mockResolvedValue(true)
-        };
-  
-        // Mock crypto.createHash
-        const mockHash = {
-          update: jest.fn().mockReturnThis(),
-          digest: jest.fn().mockReturnValue('hashedToken')
-        };
-        require('crypto').createHash = jest.fn().mockReturnValue(mockHash);
-  
-        User.findOne.mockResolvedValue(mockUser);
-  
-        await authController.resetPassword(req, res, next);
-  
-        expect(User.findOne).toHaveBeenCalled();
-        expect(mockUser.password).toBe('NewPassword123!');
-        expect(mockUser.passwordResetToken).toBeUndefined();
-        expect(mockUser.passwordResetExpires).toBeUndefined();
-        // Verify sessions are revoked
-        expect(mockUser.sessions).toEqual([]);
-        expect(mockUser.save).toHaveBeenCalled();
-        
-        // Crucial check: Should NOT set cookie (no auto-login)
-        expect(res.cookie).not.toHaveBeenCalled();
-        
-        expect(res.status).toHaveBeenCalledWith(200);
-        
-        // Verify Security Alert Email
-        expect(require('../../../src/utils/email').sendPasswordChangedEmail).toHaveBeenCalled();
-      });
-  
-      it('should burn token and return error if username confirmation fails', async () => {
-          req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'wronguser' };
-          
-          const mockUser = {
-              username: 'realuser',
-              passwordResetToken: 'hashedToken',
-              passwordResetExpires: Date.now() + 10000,
-              save: jest.fn().mockResolvedValue(true)
-          };
-    
-          User.findOne.mockResolvedValue(mockUser);
-    
-          await authController.resetPassword(req, res, next);
-    
-          expect(next).toHaveBeenCalledWith(expect.any(Error));
-          expect(next.mock.calls[0][0].message).toMatch(/confirmation failed/i);
-          
-          // Verify token burned
-          expect(mockUser.passwordResetToken).toBeUndefined();
-          expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
-      });
-  
-      it('should return error if token is invalid or expired', async () => {
-        req.body = { token: 'invalid-token', password: 'NewPassword123!', username: 'testuser' };
-        
-        require('crypto').createHash = jest.fn().mockReturnValue({
-          update: jest.fn().mockReturnThis(),
-          digest: jest.fn().mockReturnValue('hashedInvalid')
-        });
-  
-        User.findOne.mockResolvedValue(null);
-  
-        await authController.resetPassword(req, res, next);
-  
-        expect(next).toHaveBeenCalledWith(expect.any(Error));
-      });
-  
-      it('should return 400 if MFA is enabled but code is missing (Token Preserved)', async () => {
-          req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'mfauser' };
-          const mockUser = {
-              username: 'mfauser',
-              mfaEnabled: true,
-              passwordResetToken: 'hashedToken',
-              passwordResetExpires: Date.now() + 10000,
-              save: jest.fn().mockResolvedValue(true)
-          };
-          User.findOne.mockResolvedValue(mockUser);
-          
-          await authController.resetPassword(req, res, next);
-          
-          expect(res.status).toHaveBeenCalledWith(400);
-          expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ mfaRequired: true }));
-          
-          // Verify Token NOT burned
-          expect(mockUser.save).not.toHaveBeenCalled();
+  describe('resetPassword', () => {
+    it('should reset password, clear sessions, and return success message without logging in', async () => {
+      req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'testuser' };
+      const mockUser = {
+        username: 'testuser',
+        password: 'oldHash',
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        sessions: [{ sessionId: 'old-session' }], // Simulate active sessions
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      // Mock crypto.createHash
+      const mockHash = {
+        update: jest.fn().mockReturnThis(),
+        digest: jest.fn().mockReturnValue('hashedToken'),
+      };
+      require('crypto').createHash = jest.fn().mockReturnValue(mockHash);
+
+      User.findOne.mockResolvedValue(mockUser);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(User.findOne).toHaveBeenCalled();
+      expect(mockUser.password).toBe('NewPassword123!');
+      expect(mockUser.passwordResetToken).toBeUndefined();
+      expect(mockUser.passwordResetExpires).toBeUndefined();
+      // Verify sessions are revoked
+      expect(mockUser.sessions).toEqual([]);
+      expect(mockUser.save).toHaveBeenCalled();
+
+      // Crucial check: Should NOT set cookie (no auto-login)
+      expect(res.cookie).not.toHaveBeenCalled();
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      // Verify Security Alert Email
+      expect(require('../../../src/utils/email').sendPasswordChangedEmail).toHaveBeenCalled();
+    });
+
+    it('should burn token and return error if username confirmation fails', async () => {
+      req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'wronguser' };
+
+      const mockUser = {
+        username: 'realuser',
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne.mockResolvedValue(mockUser);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(next.mock.calls[0][0].message).toMatch(/confirmation failed/i);
+
+      // Verify token burned
+      expect(mockUser.passwordResetToken).toBeUndefined();
+      expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
+    });
+
+    it('should return error if token is invalid or expired', async () => {
+      req.body = { token: 'invalid-token', password: 'NewPassword123!', username: 'testuser' };
+
+      require('crypto').createHash = jest.fn().mockReturnValue({
+        update: jest.fn().mockReturnThis(),
+        digest: jest.fn().mockReturnValue('hashedInvalid'),
       });
 
-      it('should burn token and return error if MFA code is invalid', async () => {
-          req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'mfauser', mfaCode: '000000' };
-          const mockUser = {
-              username: 'mfauser',
-              mfaEnabled: true,
-              mfaSecret: 'secret',
-              passwordResetToken: 'hashedToken',
-              passwordResetExpires: Date.now() + 10000,
-              save: jest.fn().mockResolvedValue(true)
-          };
-          User.findOne.mockResolvedValue(mockUser);
+      User.findOne.mockResolvedValue(null);
 
-          const speakeasy = require('speakeasy');
-          jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(false);
+      await authController.resetPassword(req, res, next);
 
-          await authController.resetPassword(req, res, next);
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+    });
 
-          expect(next).toHaveBeenCalledWith(expect.any(Error));
-          expect(next.mock.calls[0][0].message).toMatch(/Invalid two-factor/i);
+    it('should return 400 if MFA is enabled but code is missing (Token Preserved)', async () => {
+      req.body = { token: 'valid-token', password: 'NewPassword123!', username: 'mfauser' };
+      const mockUser = {
+        username: 'mfauser',
+        mfaEnabled: true,
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        save: jest.fn().mockResolvedValue(true),
+      };
+      User.findOne.mockResolvedValue(mockUser);
 
-          // Verify token burned
-          expect(mockUser.passwordResetToken).toBeUndefined();
-          expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
-      });
-  
-      it('should reset password with valid MFA code', async () => {
-        req.body = { token: 'valid-token', password: 'NewPassword123!', mfaCode: '123456', username: 'mfauser' };
-        const mockUser = {
-            username: 'mfauser',
-            mfaEnabled: true,
-            mfaSecret: 'base32secret',
-            passwordResetToken: 'hashedToken',
-            passwordResetExpires: Date.now() + 10000,
-            save: jest.fn().mockResolvedValue(true),
-            sessions: []
-        };
-        User.findOne.mockResolvedValue(mockUser);
-        
-        const speakeasy = require('speakeasy');
-        jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(true);
+      await authController.resetPassword(req, res, next);
 
-        await authController.resetPassword(req, res, next);
-        
-        expect(mockUser.save).toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ mfaRequired: true }));
+
+      // Verify Token NOT burned
+      expect(mockUser.save).not.toHaveBeenCalled();
+    });
+
+    it('should burn token and return error if MFA code is invalid', async () => {
+      req.body = {
+        token: 'valid-token',
+        password: 'NewPassword123!',
+        username: 'mfauser',
+        mfaCode: '000000',
+      };
+      const mockUser = {
+        username: 'mfauser',
+        mfaEnabled: true,
+        mfaSecret: 'secret',
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        save: jest.fn().mockResolvedValue(true),
+      };
+      User.findOne.mockResolvedValue(mockUser);
+
+      const speakeasy = require('speakeasy');
+      jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(false);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(next.mock.calls[0][0].message).toMatch(/Invalid two-factor/i);
+
+      // Verify token burned
+      expect(mockUser.passwordResetToken).toBeUndefined();
+      expect(mockUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
+    });
+
+    it('should reset password with valid MFA code', async () => {
+      req.body = {
+        token: 'valid-token',
+        password: 'NewPassword123!',
+        mfaCode: '123456',
+        username: 'mfauser',
+      };
+      const mockUser = {
+        username: 'mfauser',
+        mfaEnabled: true,
+        mfaSecret: 'base32secret',
+        passwordResetToken: 'hashedToken',
+        passwordResetExpires: Date.now() + 10000,
+        save: jest.fn().mockResolvedValue(true),
+        sessions: [],
+      };
+      User.findOne.mockResolvedValue(mockUser);
+
+      const speakeasy = require('speakeasy');
+      jest.spyOn(speakeasy.totp, 'verify').mockReturnValue(true);
+
+      await authController.resetPassword(req, res, next);
+
+      expect(mockUser.save).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
     });
   });
 });
-

@@ -28,15 +28,15 @@ export class LibraryManager {
     // Prepare library for display (hidden initially for smooth transition)
     library.style.display = 'block';
     overlay.style.display = 'block';
-    
+
     // Force reflow to ensure display change is applied
     library.offsetHeight;
-    
+
     // Add transition classes for smooth fade-in
     requestAnimationFrame(() => {
       library.classList.add('view-visible');
       overlay.classList.add('view-visible');
-      
+
       // Release transition lock after animation completes
       setTimeout(() => {
         this.isTransitioning = false;
@@ -47,13 +47,13 @@ export class LibraryManager {
     if (closeBtn) closeBtn.style.display = this.app.documentId ? 'block' : 'none';
 
     if (this.app.uiManager) {
-        this.app.uiManager.updateMobileUIState();
+      this.app.uiManager.updateMobileUIState();
     }
 
     // Bind FAB
     const fab = document.getElementById('fabCreateDoc');
     if (fab) {
-        fab.onclick = () => this.createNewDocument();
+      fab.onclick = () => this.createNewDocument();
     }
 
     const renderList = (docs) => {
@@ -127,13 +127,52 @@ export class LibraryManager {
   }
 
   async createNewDocument() {
+    // Prevent rapid clicks
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
     try {
-      this.app.showTransitionOverlay('Creating Document...');
+      // Quick visual feedback - close library immediately
+      const library = document.getElementById('docLibrary');
+      const overlay = document.getElementById('libraryOverlay');
+      if (library) library.classList.remove('view-visible');
+      if (overlay) overlay.classList.remove('view-visible');
+
+      // Create document in background
       const doc = await Network.createDocument();
-      window.location.href = `?doc=${doc._id}`;
+
+      // Update URL without reload
+      const newUrl = `${window.location.pathname}?doc=${doc._id}`;
+      window.history.pushState({ view: 'editor', docId: doc._id }, '', newUrl);
+
+      // Hide library after transition
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      if (library) library.style.display = 'none';
+      if (overlay) overlay.style.display = 'none';
+
+      // Invalidate library cache since we have a new doc
+      localStorage.removeItem('syncroedit_library_cache');
+
+      // Load document inline (same as openDocument does)
+      this.app.documentId = doc._id;
+      await this.app.loadDocument();
+
+      this.isTransitioning = false;
     } catch (err) {
-      this.app.hideTransitionOverlay();
-      alert('Failed to create document');
+      console.error('Failed to create document:', err);
+      this.isTransitioning = false;
+      // Re-show library on error
+      const library = document.getElementById('docLibrary');
+      const overlay = document.getElementById('libraryOverlay');
+      if (library) {
+        library.style.display = 'block';
+        library.classList.add('view-visible');
+      }
+      if (overlay) {
+        overlay.style.display = 'block';
+        overlay.classList.add('view-visible');
+      }
+      alert('Failed to create document. Please try again.');
     }
   }
 
@@ -152,7 +191,7 @@ export class LibraryManager {
       if (overlay) overlay.classList.remove('view-visible');
 
       // Wait for transition to complete (200ms)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Hide library after transition
       if (library) library.style.display = 'none';
@@ -165,7 +204,7 @@ export class LibraryManager {
       // Update app state and load document
       this.app.documentId = docId;
       await this.app.loadDocument();
-      
+
       // Release transition lock
       this.isTransitioning = false;
     } catch (err) {
@@ -175,4 +214,3 @@ export class LibraryManager {
     }
   }
 }
-

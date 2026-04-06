@@ -16,8 +16,8 @@ export class CursorManager extends Plugin {
       if (range) {
         this.currentRange = range;
         const pages = this.editor.yPages.toArray();
-        const pageIndex = pages.findIndex(p => p.get('id') === pageId);
-        
+        const pageIndex = pages.findIndex((p) => p.get('id') === pageId);
+
         if (pageIndex !== -1) {
           // Notify SelectionManager
           if (this.editor.selectionManager) {
@@ -39,15 +39,15 @@ export class CursorManager extends Plugin {
     // However, ideally, plugins should hook into "page:mount" events instead of Editor calling them directly.
     // For this refactor step, I will keep the method public so Editor can call it, but in a "Perfect" plugin system,
     // Editor would emit 'page-mounted' and this plugin would listen to it.
-    
+
     // For now, adhering to the plan:
     pageQuill.root.addEventListener('mousedown', (e) => {
-        const pages = this.editor.yPages.toArray();
-        const pageIndex = pages.findIndex(p => p.get('id') === pageId);
-        const range = pageQuill.getSelection();
-        if (range && this.editor.selectionManager) {
-            this.editor.selectionManager.handleMouseDown(pageIndex, range);
-        }
+      const pages = this.editor.yPages.toArray();
+      const pageIndex = pages.findIndex((p) => p.get('id') === pageId);
+      const range = pageQuill.getSelection();
+      if (range && this.editor.selectionManager) {
+        this.editor.selectionManager.handleMouseDown(pageIndex, range);
+      }
     });
   }
 
@@ -77,29 +77,29 @@ export class CursorManager extends Plugin {
     const container = document.getElementById(`page-container-${pageId}`);
     const scrollParent = document.getElementById('pagesContainer');
     const quill = this.editor.pageQuillInstances.get(pageId);
-    
+
     if (container && scrollParent && quill) {
       const parentRect = scrollParent.getBoundingClientRect();
       const pageRect = container.getBoundingClientRect();
-      
+
       let targetY = pageRect.top - parentRect.top + scrollParent.scrollTop;
 
       if (cursorIndex !== null) {
-          const bounds = quill.getBounds(cursorIndex);
-          if (bounds) {
-              const scale = (this.editor.currentZoom || 100) / 100;
-              // Add the relative cursor Y to the page top, adjusted for scale and padding
-              targetY += (bounds.top * scale);
-              
-              // Center the cursor in the viewport for better context
-              const viewportHeight = parentRect.height;
-              targetY -= (viewportHeight / 2);
-          }
+        const bounds = quill.getBounds(cursorIndex);
+        if (bounds) {
+          const scale = (this.editor.currentZoom || 100) / 100;
+          // Add the relative cursor Y to the page top, adjusted for scale and padding
+          targetY += bounds.top * scale;
+
+          // Center the cursor in the viewport for better context
+          const viewportHeight = parentRect.height;
+          targetY -= viewportHeight / 2;
+        }
       }
 
       scrollParent.scrollTo({
-          top: Math.max(0, targetY),
-          behavior: behavior
+        top: Math.max(0, targetY),
+        behavior: behavior,
       });
     }
   }

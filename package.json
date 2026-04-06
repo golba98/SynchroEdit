@@ -54,7 +54,7 @@
     "helmet": "^8.1.0",
     "idb-keyval": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
-    "mongodb": "^7.0.0",
+    "mongodb": "^7.1.1",
     "mongoose": "^9.0.2",
     "nodemailer": "^7.0.12",
     "speakeasy": "^2.0.0",

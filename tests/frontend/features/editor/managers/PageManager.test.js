@@ -76,10 +76,10 @@ describe('PageManager', () => {
       // We use getText to find newline.
       mockQuillPage1.getText.mockReturnValue('Hello\nWorld\n');
       mockQuillPage1.getLength.mockReturnValue(12); // "Hello\nWorld\n".length
-      
+
       // We use getBounds(0) to check first line height
       mockQuillPage1.getBounds.mockReturnValue({ height: 20 });
-      
+
       const mockContent = { ops: [{ insert: 'Hello\n' }] };
       mockQuillPage1.getContents.mockReturnValue(mockContent);
 
@@ -89,35 +89,38 @@ describe('PageManager', () => {
       // 4. Verify
       // Should check bounds on page 0
       expect(mockQuillPage0.getBounds).toHaveBeenCalled();
-      
+
       // Should check text on page 1
       expect(mockQuillPage1.getText).toHaveBeenCalled();
-      
+
       // Should check line height (safety check)
       expect(mockQuillPage1.getBounds).toHaveBeenCalledWith(0);
-      
+
       // Should move content (length of "Hello\n" is 6)
       expect(mockEditor.doc.transact).toHaveBeenCalled();
       expect(mockQuillPage1.getContents).toHaveBeenCalledWith(0, 6);
-      
+
       // Should update page 0
-      expect(mockQuillPage0.updateContents).toHaveBeenCalledWith({
-        ops: [{ insert: 'Hello\n' }]
-      }, 'user');
-      
+      expect(mockQuillPage0.updateContents).toHaveBeenCalledWith(
+        {
+          ops: [{ insert: 'Hello\n' }],
+        },
+        'user'
+      );
+
       // Should delete from page 1
       expect(mockQuillPage1.deleteText).toHaveBeenCalledWith(0, 6, 'user');
-      
+
       // Should NOT delete page 1 (length remains > 1 after delete)
       expect(mockEditor.yPages.delete).not.toHaveBeenCalled();
-      
+
       // Should trigger update check again
       jest.useFakeTimers();
       // Re-run to capture the timeout callback
       pageManager.handlePageUpdate.mockClear();
       pageManager.attemptMergeFromNextPage(0);
       jest.runAllTimers();
-      
+
       expect(pageManager.handlePageUpdate).toHaveBeenCalledWith(0);
       expect(pageManager.handlePageUpdate).toHaveBeenCalledWith(1);
       jest.useRealTimers();
@@ -142,44 +145,44 @@ describe('PageManager', () => {
     });
 
     it('should delete next page if it becomes empty after pull', () => {
-       // 1. Setup Page 0 (Space available)
-       mockQuillPage0.getLength.mockReturnValue(100);
-       mockQuillPage0.getBounds.mockReturnValue({ bottom: 500 });
- 
-       // 2. Setup Page 1 (Almost empty)
-       mockQuillPage1.getText.mockReturnValue('Hello\n');
-       mockQuillPage1.getLength.mockReturnValue(6); // Initial length
-       mockQuillPage1.getBounds.mockReturnValue({ height: 20 });
-       mockQuillPage1.getContents.mockReturnValue({ ops: [{ insert: 'Hello\n' }] });
-       
-       // Crucial: We need to mock getLength returning 1 inside the transaction logic check
-       mockQuillPage1.getLength
-         .mockReturnValueOnce(6) // Initial check
-         .mockReturnValueOnce(1); // Check inside transact
- 
-       // 3. Execute
-       pageManager.attemptMergeFromNextPage(0);
- 
-       // 4. Verify
-       expect(mockEditor.doc.transact).toHaveBeenCalled();
-       expect(mockEditor.yPages.delete).toHaveBeenCalledWith(1, 1);
-       
-       // Verify handlePageUpdate(1) is NOT called because page was deleted
-       jest.useFakeTimers();
-       pageManager.handlePageUpdate.mockClear();
-       pageManager.attemptMergeFromNextPage(0);
-       jest.runAllTimers();
-       expect(pageManager.handlePageUpdate).toHaveBeenCalledWith(0);
-       // handlePageUpdate(1) should NOT be called
-       // Note: Since we re-ran attemptMergeFromNextPage inside the fake timer block,
-       // and we mocked getLength to return 6 then 1.
-       // The second run inside fake timers will use getLength again.
-       // We need to ensure mocks are consistent. 
-       // Simpler verification: Just check that handlePageUpdate(1) wasn't called in the FIRST execution?
-       // But Step 5 (setTimeout) happens asynchronously. 
-       // So we MUST use fake timers for the FIRST execution too if we want to check Step 5.
-       
-       jest.useRealTimers();
+      // 1. Setup Page 0 (Space available)
+      mockQuillPage0.getLength.mockReturnValue(100);
+      mockQuillPage0.getBounds.mockReturnValue({ bottom: 500 });
+
+      // 2. Setup Page 1 (Almost empty)
+      mockQuillPage1.getText.mockReturnValue('Hello\n');
+      mockQuillPage1.getLength.mockReturnValue(6); // Initial length
+      mockQuillPage1.getBounds.mockReturnValue({ height: 20 });
+      mockQuillPage1.getContents.mockReturnValue({ ops: [{ insert: 'Hello\n' }] });
+
+      // Crucial: We need to mock getLength returning 1 inside the transaction logic check
+      mockQuillPage1.getLength
+        .mockReturnValueOnce(6) // Initial check
+        .mockReturnValueOnce(1); // Check inside transact
+
+      // 3. Execute
+      pageManager.attemptMergeFromNextPage(0);
+
+      // 4. Verify
+      expect(mockEditor.doc.transact).toHaveBeenCalled();
+      expect(mockEditor.yPages.delete).toHaveBeenCalledWith(1, 1);
+
+      // Verify handlePageUpdate(1) is NOT called because page was deleted
+      jest.useFakeTimers();
+      pageManager.handlePageUpdate.mockClear();
+      pageManager.attemptMergeFromNextPage(0);
+      jest.runAllTimers();
+      expect(pageManager.handlePageUpdate).toHaveBeenCalledWith(0);
+      // handlePageUpdate(1) should NOT be called
+      // Note: Since we re-ran attemptMergeFromNextPage inside the fake timer block,
+      // and we mocked getLength to return 6 then 1.
+      // The second run inside fake timers will use getLength again.
+      // We need to ensure mocks are consistent.
+      // Simpler verification: Just check that handlePageUpdate(1) wasn't called in the FIRST execution?
+      // But Step 5 (setTimeout) happens asynchronously.
+      // So we MUST use fake timers for the FIRST execution too if we want to check Step 5.
+
+      jest.useRealTimers();
     });
   });
 
@@ -187,31 +190,31 @@ describe('PageManager', () => {
     it('should identify overflow using block-based search', () => {
       // Setup
       mockQuillPage0.getLength.mockReturnValue(100);
-      
+
       // Setup Blocks (Blots)
       // Block 1: 0-50 (Fits)
       // Block 2: 50-100 (Overflows)
-      const mockBlock1 = { 
-        length: () => 50, 
-        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) } 
+      const mockBlock1 = {
+        length: () => 50,
+        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) },
       };
-      const mockBlock2 = { 
-        length: () => 50, 
-        domNode: { getBoundingClientRect: () => ({ top: 500, bottom: 1000 }) } // Overflows MAX (956)
+      const mockBlock2 = {
+        length: () => 50,
+        domNode: { getBoundingClientRect: () => ({ top: 500, bottom: 1000 }) }, // Overflows MAX (956)
       };
-      
+
       mockQuillPage0.getLines.mockReturnValue([mockBlock1, mockBlock2]);
-      
+
       // Helper to return index based on block identity
       mockQuillPage0.getIndex.mockImplementation((block) => {
-          return block === mockBlock1 ? 0 : 50;
+        return block === mockBlock1 ? 0 : 50;
       });
 
       // Mock getBounds for binary search inside Block 2
       // We expect binary search between 50 and 99.
       // Let's say index 96 is the split point (height 960)
       mockQuillPage0.getBounds.mockImplementation((index) => {
-          return { bottom: index * 10 };
+        return { bottom: index * 10 };
       });
 
       // Execute
@@ -227,12 +230,12 @@ describe('PageManager', () => {
     it('should return no overflow if all blocks fit', () => {
       // Setup
       mockQuillPage0.getLength.mockReturnValue(100);
-      const mockBlock1 = { 
-        length: () => 50, 
-        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) } 
+      const mockBlock1 = {
+        length: () => 50,
+        domNode: { getBoundingClientRect: () => ({ top: 100, bottom: 500 }) },
       };
       mockQuillPage0.getLines.mockReturnValue([mockBlock1]);
-      
+
       // Execute
       const result = pageManager.findOverflowPoint(mockQuillPage0);
 

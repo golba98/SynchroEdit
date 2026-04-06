@@ -69,7 +69,7 @@ describe('BorderManager', () => {
     btn.click();
 
     expect(borderManager.currentBorderType).toBe('none');
-    
+
     const element = document.querySelector('.page-border-inner');
     expect(element.style.border).toBe('');
   });
@@ -79,4 +79,3 @@ describe('BorderManager', () => {
     expect(editorMock.onContentChange).not.toHaveBeenCalled();
   });
 });
-

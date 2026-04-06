@@ -3,6 +3,7 @@
 This guide will help you set up SynchroEdit for local development with proper security configurations.
 
 ## Prerequisites
+
 - Node.js 18 or higher
 - MongoDB (local installation or cloud instance)
 - Git
@@ -10,12 +11,14 @@ This guide will help you set up SynchroEdit for local development with proper se
 ## Installation Steps
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/yourusername/synchroedit.git
 cd synchroedit
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
@@ -23,7 +26,9 @@ npm install
 ### 3. Environment Configuration
 
 #### Create Your Environment File
+
 Copy the example environment file:
+
 ```bash
 cp .env.example .env
 ```
@@ -31,12 +36,15 @@ cp .env.example .env
 #### Generate Secure Secrets
 
 **Generate JWT Secret:**
+
 ```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
+
 Copy the output and set it as `JWT_SECRET` in your `.env` file.
 
 **Generate RSA Key Pair (Recommended for Production):**
+
 ```bash
 # Generate private key
 ssh-keygen -t rsa -b 2048 -m PEM -f jwtRS256.key -N ""
@@ -46,6 +54,7 @@ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 ```
 
 Then update your `.env` file:
+
 ```bash
 # Read the private key
 cat jwtRS256.key
@@ -55,6 +64,7 @@ cat jwtRS256.key.pub
 ```
 
 Format them in your `.env` file as:
+
 ```env
 JWT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
 your_private_key_content_here
@@ -64,18 +74,23 @@ JWT_PUBLIC_KEYS={"v1":"-----BEGIN PUBLIC KEY-----\nyour_public_key_content_here\
 ```
 
 #### Configure MongoDB
+
 Set your MongoDB connection string:
+
 ```env
 MONGODB_URI=mongodb://localhost:27017/synchroedit
 ```
 
 Or use MongoDB Atlas:
+
 ```env
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
 ```
 
 #### Email Configuration (Optional)
+
 If you want to enable email verification features:
+
 ```env
 ENABLE_EMAIL_VERIFICATION=true
 EMAIL_SERVICE=gmail
@@ -84,6 +99,7 @@ EMAIL_PASSWORD=your-app-password
 ```
 
 ### 4. Start Development Server
+
 ```bash
 npm start
 ```
@@ -93,7 +109,9 @@ The application will be available at `http://localhost:3000`
 ## Docker Setup
 
 ### For Local Docker Development
+
 1. Copy the Docker environment example:
+
 ```bash
 cp .env.docker.example .env
 ```
@@ -101,11 +119,13 @@ cp .env.docker.example .env
 2. Generate and configure secrets as described above
 
 3. Start the containers:
+
 ```bash
 docker-compose up -d
 ```
 
 4. View logs:
+
 ```bash
 docker-compose logs -f
 ```
@@ -131,12 +151,14 @@ docker-compose logs -f
    - Use strong validation for secret complexity
 
 ### What's Safe to Commit
+
 ✅ `.env.example` - Template with placeholders
 ✅ `.env.docker.example` - Docker template
 ✅ Configuration files without secrets
 ✅ Code and documentation
 
 ### What Should NEVER be Committed
+
 ❌ `.env` - Your actual environment file
 ❌ `.env.local`, `.env.production` - Any environment files
 ❌ `jwtRS256.key`, `jwtRS256.key.pub` - RSA key files
@@ -145,11 +167,13 @@ docker-compose logs -f
 ## Testing
 
 Run the test suite:
+
 ```bash
 npm test
 ```
 
 Run end-to-end tests:
+
 ```bash
 npm run test:e2e
 ```
@@ -157,6 +181,7 @@ npm run test:e2e
 ## Production Deployment
 
 For production deployment:
+
 1. Use environment variables provided by your hosting platform
 2. Enable all security features (HTTPS, secure cookies, CSRF protection)
 3. Set `NODE_ENV=production`
@@ -168,16 +193,19 @@ For production deployment:
 ## Troubleshooting
 
 ### MongoDB Connection Issues
+
 - Verify MongoDB is running: `mongod --version`
 - Check connection string format
 - Ensure network access is allowed (for cloud databases)
 
 ### JWT Token Issues
+
 - Verify `JWT_SECRET` is set and is a strong random string
 - Check that RSA keys are properly formatted in `.env`
 - Ensure `JWT_CURRENT_KID` matches a key in `JWT_PUBLIC_KEYS`
 
 ### Port Already in Use
+
 ```bash
 # Find and kill process on port 3000
 # Windows:
@@ -189,9 +217,11 @@ lsof -ti:3000 | xargs kill -9
 ```
 
 ## Getting Help
+
 - Check existing issues: [GitHub Issues](https://github.com/yourusername/synchroedit/issues)
 - Read the [Security Documentation](./mds/SECURITY.md)
 - Contact: your-email@example.com
 
 ## License
+
 ISC License - See LICENSE file for details

@@ -59,27 +59,35 @@ describe('Profile UI', () => {
       Auth.verifyToken.mockResolvedValue(mockUser);
 
       const promise = profile.loadProfile();
-      
+
       // Check if skeleton classes are added
-      expect(document.getElementById('profileEmailInput').classList.contains('skeleton')).toBe(true);
-      expect(document.getElementById('profilePfpPlaceholder').classList.contains('skeleton')).toBe(true);
+      expect(document.getElementById('profileEmailInput').classList.contains('skeleton')).toBe(
+        true
+      );
+      expect(document.getElementById('profilePfpPlaceholder').classList.contains('skeleton')).toBe(
+        true
+      );
 
       await promise;
 
       // Check if skeleton classes are removed
-      expect(document.getElementById('profileEmailInput').classList.contains('skeleton')).toBe(false);
-      expect(document.getElementById('profilePfpPlaceholder').classList.contains('skeleton')).toBe(false);
+      expect(document.getElementById('profileEmailInput').classList.contains('skeleton')).toBe(
+        false
+      );
+      expect(document.getElementById('profilePfpPlaceholder').classList.contains('skeleton')).toBe(
+        false
+      );
     });
   });
 
   describe('updateUI', () => {
     it('should display initials fallback if no profile picture exists', () => {
-      profile.user = { 
-        username: 'John Doe', 
+      profile.user = {
+        username: 'John Doe',
         email: 'john@example.com',
-        accentColor: '#ff0000'
+        accentColor: '#ff0000',
       };
-      
+
       profile.updateUI();
 
       const initialsEl = document.getElementById('profileInitials');
@@ -92,12 +100,12 @@ describe('Profile UI', () => {
     });
 
     it('should display profile picture if it exists', () => {
-      profile.user = { 
-        username: 'John Doe', 
+      profile.user = {
+        username: 'John Doe',
         email: 'john@example.com',
-        profilePicture: 'data:image/png;base64,abc'
+        profilePicture: 'data:image/png;base64,abc',
       };
-      
+
       profile.updateUI();
 
       const pfpEl = document.getElementById('profilePfp');
@@ -109,4 +117,3 @@ describe('Profile UI', () => {
     });
   });
 });
-

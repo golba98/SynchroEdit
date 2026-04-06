@@ -32,36 +32,36 @@ export class ReadabilityManager extends Plugin {
     // Background Theme
     const bgSelect = document.getElementById('backgroundThemeSelect');
     if (bgSelect) {
-        // Initialize value from localStorage
-        const savedBg = localStorage.getItem('synchroEditBackgroundTheme') || 'dots';
-        bgSelect.value = savedBg;
-        this.addDisposableListener(bgSelect, 'change', (e) => {
-            if (window.app && window.app.background) {
-                window.app.background.setTheme(e.target.value);
-            }
-        });
+      // Initialize value from localStorage
+      const savedBg = localStorage.getItem('synchroEditBackgroundTheme') || 'dots';
+      bgSelect.value = savedBg;
+      this.addDisposableListener(bgSelect, 'change', (e) => {
+        if (window.app && window.app.background) {
+          window.app.background.setTheme(e.target.value);
+        }
+      });
     }
 
     // Page Glow
     const glowToggle = document.getElementById('togglePageGlow');
     if (glowToggle) {
-        glowToggle.checked = this.showPageGlow;
-        this.addDisposableListener(glowToggle, 'change', (e) => {
-            this.showPageGlow = e.target.checked;
-            localStorage.setItem('synchroEditPageGlow', this.showPageGlow);
-            this.applyPageGlow();
-        });
+      glowToggle.checked = this.showPageGlow;
+      this.addDisposableListener(glowToggle, 'change', (e) => {
+        this.showPageGlow = e.target.checked;
+        localStorage.setItem('synchroEditPageGlow', this.showPageGlow);
+        this.applyPageGlow();
+      });
     }
 
     // Page Border
     const borderToggle = document.getElementById('togglePageBorder');
     if (borderToggle) {
-        borderToggle.checked = this.showPageBorder;
-        this.addDisposableListener(borderToggle, 'change', (e) => {
-            this.showPageBorder = e.target.checked;
-            localStorage.setItem('synchroEditPageBorder', this.showPageBorder);
-            this.applyPageBorder();
-        });
+      borderToggle.checked = this.showPageBorder;
+      this.addDisposableListener(borderToggle, 'change', (e) => {
+        this.showPageBorder = e.target.checked;
+        localStorage.setItem('synchroEditPageBorder', this.showPageBorder);
+        this.applyPageBorder();
+      });
     }
 
     // Zoom
@@ -96,9 +96,14 @@ export class ReadabilityManager extends Plugin {
   setCanvasTheme(theme) {
     this.currentCanvasTheme = theme;
     const containers = document.querySelectorAll('.editor-container');
-    containers.forEach(container => {
+    containers.forEach((container) => {
       // Remove all canvas theme classes
-      container.classList.remove('canvas-classic', 'canvas-sepia', 'canvas-midnight', 'canvas-math');
+      container.classList.remove(
+        'canvas-classic',
+        'canvas-sepia',
+        'canvas-midnight',
+        'canvas-math'
+      );
       // Add new one
       container.classList.add(`canvas-${theme}`);
     });
@@ -108,10 +113,10 @@ export class ReadabilityManager extends Plugin {
   toggleInvisibles() {
     this.showInvisibles = !this.showInvisibles;
     const containers = document.querySelectorAll('.editor-container');
-    containers.forEach(container => {
+    containers.forEach((container) => {
       container.classList.toggle('show-invisibles', this.showInvisibles);
     });
-    
+
     const btn = document.getElementById('toggleInvisibles');
     if (btn) btn.classList.toggle('active', this.showInvisibles);
   }
@@ -119,7 +124,7 @@ export class ReadabilityManager extends Plugin {
   toggleLineNumbers() {
     this.showLineNumbers = !this.showLineNumbers;
     this.updateAllGutters();
-    
+
     const btn = document.getElementById('toggleLineNumbers');
     if (btn) btn.classList.toggle('active', this.showLineNumbers);
   }
@@ -140,7 +145,7 @@ export class ReadabilityManager extends Plugin {
     if (!container) return;
 
     let gutter = container.querySelector('.line-numbers-gutter');
-    
+
     if (!this.showLineNumbers) {
       if (gutter) gutter.style.display = 'none';
       return;
@@ -153,7 +158,7 @@ export class ReadabilityManager extends Plugin {
     }
 
     gutter.style.display = 'block';
-    
+
     const quill = this.editor.pageQuillInstances.get(pageId);
     if (!quill) return;
 
@@ -164,25 +169,25 @@ export class ReadabilityManager extends Plugin {
   applyPageGlow() {
     document.body.classList.toggle('glow-enabled', this.showPageGlow);
     const containers = document.querySelectorAll('.editor-container');
-    containers.forEach(container => {
-        container.classList.toggle('glow-effect', this.showPageGlow);
+    containers.forEach((container) => {
+      container.classList.toggle('glow-effect', this.showPageGlow);
     });
   }
 
   applyPageBorder() {
     const containers = document.querySelectorAll('.editor-container');
-    containers.forEach(container => {
-        container.classList.toggle('border-enabled', this.showPageBorder);
+    containers.forEach((container) => {
+      container.classList.toggle('border-enabled', this.showPageBorder);
     });
   }
 
   setFocusMode(active) {
     this.isFocusMode = active;
     document.body.classList.toggle('focus-mode', active);
-    
+
     // Notify app to hide/show other UI if necessary
     if (active) {
-        console.log('Zen Mode Activated');
+      console.log('Zen Mode Activated');
     }
   }
 

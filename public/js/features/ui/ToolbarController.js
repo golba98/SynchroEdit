@@ -86,44 +86,44 @@ export class ToolbarController extends Plugin {
     // Save Button
     const saveBtn = document.getElementById('saveBtn');
     if (saveBtn) {
-        this.addDisposableListener(saveBtn, 'click', async (e) => {
-            e.preventDefault();
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            
-            try {
-                // Force save to IndexedDB
-                const docId = new URLSearchParams(window.location.search).get('doc');
-                if (this.editor) {
-                    await this.editor.saveToCache(docId);
-                    // Also trigger a reflow to ensure visual consistency
-                    if (this.editor.pageManager) {
-                        this.editor.pageManager.performReflowCheck();
-                    }
-                }
-                
-                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
-                setTimeout(() => {
-                    saveBtn.innerHTML = originalText;
-                }, 2000);
-            } catch (err) {
-                console.error('Save failed:', err);
-                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-                setTimeout(() => {
-                    saveBtn.innerHTML = originalText;
-                }, 2000);
+      this.addDisposableListener(saveBtn, 'click', async (e) => {
+        e.preventDefault();
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        try {
+          // Force save to IndexedDB
+          const docId = new URLSearchParams(window.location.search).get('doc');
+          if (this.editor) {
+            await this.editor.saveToCache(docId);
+            // Also trigger a reflow to ensure visual consistency
+            if (this.editor.pageManager) {
+              this.editor.pageManager.performReflowCheck();
             }
-        });
+          }
+
+          saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+          setTimeout(() => {
+            saveBtn.innerHTML = originalText;
+          }, 2000);
+        } catch (err) {
+          console.error('Save failed:', err);
+          saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+          setTimeout(() => {
+            saveBtn.innerHTML = originalText;
+          }, 2000);
+        }
+      });
     }
 
     const imageInput = document.getElementById('imageInput');
     if (imageInput) {
       this.addDisposableListener(imageInput, 'change', (e) => {
         const file = e.target.files[0];
-        
+
         // Fallback: If no active quill (user hasn't clicked yet), use the first page
         if (!this.editor.quill && this.editor.pageQuillInstances.size > 0) {
-            this.editor.quill = this.editor.pageQuillInstances.values().next().value;
+          this.editor.quill = this.editor.pageQuillInstances.values().next().value;
         }
 
         if (file && this.editor.quill) {
@@ -132,12 +132,12 @@ export class ToolbarController extends Plugin {
             // Get selection or default to end
             const range = this.editor.quill.getSelection(true);
             const index = range ? range.index : this.editor.quill.getLength() - 1;
-            
+
             this.editor.quill.insertEmbed(index, 'image', e.target.result);
-            
+
             // Force a reflow check in case image overflows
             if (this.editor.pageManager) {
-                setTimeout(() => this.editor.pageManager.performReflowCheck(), 100);
+              setTimeout(() => this.editor.pageManager.performReflowCheck(), 100);
             }
           };
           reader.readAsDataURL(file);

@@ -7,8 +7,8 @@ const User = require('../src/users/User');
 const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-    console.error('❌ MONGODB_URI is not defined in environment variables.');
-    process.exit(1);
+  console.error('❌ MONGODB_URI is not defined in environment variables.');
+  process.exit(1);
 }
 
 // Mask password for logging
@@ -21,15 +21,15 @@ const usersToCreate = [
     email: 'tester_arc@example.com',
     password: 'TesterPassword123!',
     isEmailVerified: true,
-    bio: 'Arc Browser Test User'
+    bio: 'Arc Browser Test User',
   },
   {
     username: 'tester_edge',
     email: 'tester_edge@example.com',
     password: 'TesterPassword123!',
     isEmailVerified: true,
-    bio: 'Edge Browser Test User'
-  }
+    bio: 'Edge Browser Test User',
+  },
 ];
 
 async function createBrowserTesters() {
@@ -39,7 +39,7 @@ async function createBrowserTesters() {
 
     for (const userInfo of usersToCreate) {
       let user = await User.findOne({ username: userInfo.username });
-      
+
       if (user) {
         console.log(`User ${userInfo.username} already exists. Updating...`);
         user.password = userInfo.password;
@@ -60,8 +60,7 @@ async function createBrowserTesters() {
     console.log('\n--- Verification ---');
     const allUsers = await User.find({}, 'username email');
     console.log(`Total Users in DB: ${allUsers.length}`);
-    allUsers.forEach(u => console.log(`- ${u.username} (${u.email})`));
-
+    allUsers.forEach((u) => console.log(`- ${u.username} (${u.email})`));
   } catch (error) {
     console.error('❌ Error creating browser test users:', error);
   } finally {
@@ -71,4 +70,3 @@ async function createBrowserTesters() {
 }
 
 createBrowserTesters();
-

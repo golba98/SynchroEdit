@@ -75,10 +75,10 @@ export class BorderManager extends Plugin {
 
     // Fix: Check if onContentChange exists (it might not be on Editor yet, or we need to add it)
     // The previous code called `this.editor.onContentChange`. I need to ensure Editor has this method or logic.
-    // Looking at Editor.js again, I don't recall seeing onContentChange. 
+    // Looking at Editor.js again, I don't recall seeing onContentChange.
     // Wait, the truncated read of Editor.js didn't show it.
-    // I should check if it exists. 
-    
+    // I should check if it exists.
+
     if (this.editor.onContentChange && !fromServer) {
       this.editor.onContentChange('update-borders', {
         style: this.currentBorderStyle,

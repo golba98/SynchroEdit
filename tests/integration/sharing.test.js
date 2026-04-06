@@ -29,8 +29,8 @@ describe('Document Sharing Integration Tests', () => {
     const user1 = await User.findOne({ email: ownerUser.email });
     ownerId = user1._id;
     const verifyRes1 = await request(app).post('/api/auth/verify-email').send({
-        email: ownerUser.email,
-        verificationCode: user1.verificationCode
+      email: ownerUser.email,
+      verificationCode: user1.verificationCode,
     });
     ownerToken = verifyRes1.body.token;
 
@@ -39,8 +39,8 @@ describe('Document Sharing Integration Tests', () => {
     const user2 = await User.findOne({ email: otherUser.email });
     otherId = user2._id;
     const verifyRes2 = await request(app).post('/api/auth/verify-email').send({
-        email: otherUser.email,
-        verificationCode: user2.verificationCode
+      email: otherUser.email,
+      verificationCode: user2.verificationCode,
     });
     otherToken = verifyRes2.body.token;
 
@@ -120,9 +120,9 @@ describe('Document Sharing Integration Tests', () => {
 
       expect(res.status).toBe(403);
     });
-    
+
     it('should allow viewing settings if public', async () => {
-         // 1. Make public
+      // 1. Make public
       await Document.findByIdAndUpdate(docId, { isPublic: true });
 
       const res = await request(app)
@@ -135,4 +135,3 @@ describe('Document Sharing Integration Tests', () => {
     });
   });
 });
-

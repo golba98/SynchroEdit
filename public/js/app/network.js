@@ -28,7 +28,7 @@ export const Network = {
 
   async fetchAPI(url, options = {}) {
     if (!_csrfToken && !url.includes('/csrf-token')) {
-        await this.fetchCsrfToken();
+      await this.fetchCsrfToken();
     }
 
     let token = Auth.getToken();
@@ -39,57 +39,62 @@ export const Network = {
     };
 
     if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     // Debug CSRF
     // console.log(`[Network] Fetching ${url} with CSRF: ${_csrfToken ? _csrfToken.substring(0,10)+'...' : 'null'}`);
 
     let response = await fetch(url, { ...options, headers, credentials: 'include' });
-    
+
     // Interceptor: Check for 403 (Forbidden) - could be CSRF failure
     if (response.status === 403 && !url.includes('/csrf-token')) {
-        console.warn('Potential CSRF failure or access denied, retrying with fresh token...');
-        await this.fetchCsrfToken();
-        headers['X-CSRF-Token'] = _csrfToken;
-        response = await fetch(url, { ...options, headers, credentials: 'include' });
+      console.warn('Potential CSRF failure or access denied, retrying with fresh token...');
+      await this.fetchCsrfToken();
+      headers['X-CSRF-Token'] = _csrfToken;
+      response = await fetch(url, { ...options, headers, credentials: 'include' });
     }
 
     // Interceptor: Check for 401 (Unauthorized)
     // Don't try to refresh if we are explicitly trying to login/signup/verify/logout or if we are already refreshing
-    const isAuthRequest = url.includes('/login') || url.includes('/signup') || url.includes('/verify-email') || url.includes('/logout') || url.includes('/refresh-token');
-    
+    const isAuthRequest =
+      url.includes('/login') ||
+      url.includes('/signup') ||
+      url.includes('/verify-email') ||
+      url.includes('/logout') ||
+      url.includes('/refresh-token');
+
     if (response.status === 401 && !isAuthRequest) {
-        // console.log('Token expired, attempting refresh...'); // Reduced noise
-        try {
-            // Call refresh endpoint
-            // Note: browser automatically sends cookies for same-origin requests
-            const refreshResponse = await fetch('/api/auth/refresh-token', { 
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': _csrfToken
-                },
-                credentials: 'include'
-            });
-            
-            if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
-                Auth.setToken(data.token); // Update local token
-                
-                // Retry original request with new token
-                headers.Authorization = `Bearer ${data.token}`;
-                response = await fetch(url, { ...options, headers });
-            } else {
-                // Silent failure - session expired, let the caller handle it (usually by redirecting)
-                await Auth.logout();
-                return;
-            }
-        } catch (e) {
-            // console.error('Token refresh failed', e);
-            await Auth.logout();
-            return;
+      // console.log('Token expired, attempting refresh...'); // Reduced noise
+      try {
+        // Call refresh endpoint
+        // Note: browser automatically sends cookies for same-origin requests
+        const refreshResponse = await fetch('/api/auth/refresh-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': _csrfToken,
+          },
+          credentials: 'include',
+        });
+
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          Auth.setToken(data.token); // Update local token
+
+          // Retry original request with new token
+          headers.Authorization = `Bearer ${data.token}`;
+          response = await fetch(url, { ...options, headers });
+        } else {
+          // Silent failure - session expired, let the caller handle it (usually by redirecting)
+          await Auth.logout();
+          return;
         }
+      } catch (e) {
+        // console.error('Token refresh failed', e);
+        await Auth.logout();
+        return;
+      }
     }
 
     if (!response.ok) throw new Error(`API error: ${response.status}`);
@@ -153,55 +158,55 @@ export const Network = {
       if (isIntentionallyClosed) return;
 
       try {
-          // 1. Get a fresh ticket before every connection attempt
-          // This also verifies the session is still active
-          const { ticket } = await this.fetchAPI('/api/auth/ws-ticket');
-          
-          const wsFullUrl = `${wsUrl}/?documentId=${documentId}&ticket=${ticket}`;
-          ws = new WebSocket(wsFullUrl);
+        // 1. Get a fresh ticket before every connection attempt
+        // This also verifies the session is still active
+        const { ticket } = await this.fetchAPI('/api/auth/ws-ticket');
 
-          ws.onopen = () => {
-            console.log('Connected to server');
-            reconnectAttempts = 0;
-            if (onStatusChange) onStatusChange('connected');
-            // No need to send join-document message as it is handled by URL params in upgrade
-          };
+        const wsFullUrl = `${wsUrl}/?documentId=${documentId}&ticket=${ticket}`;
+        ws = new WebSocket(wsFullUrl);
 
-          ws.onmessage = (event) => {
-            try {
-              const data = JSON.parse(event.data);
-              onMessage(data);
-            } catch (error) {
-              console.error('WebSocket message error:', error);
-            }
-          };
+        ws.onopen = () => {
+          console.log('Connected to server');
+          reconnectAttempts = 0;
+          if (onStatusChange) onStatusChange('connected');
+          // No need to send join-document message as it is handled by URL params in upgrade
+        };
 
-          ws.onclose = () => {
-            if (isIntentionallyClosed) return;
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            onMessage(data);
+          } catch (error) {
+            console.error('WebSocket message error:', error);
+          }
+        };
 
-            console.log('Disconnected from server');
-            if (onStatusChange) onStatusChange('reconnecting');
+        ws.onclose = () => {
+          if (isIntentionallyClosed) return;
 
-            const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
-            reconnectAttempts++;
-
-            setTimeout(connect, delay);
-          };
-
-          ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            // Don't call onStatusChange('offline') yet, let onclose handle reconnection
-            ws.close();
-          };
-      } catch (err) {
-          console.error('Failed to acquire WS ticket or connect:', err);
+          console.log('Disconnected from server');
           if (onStatusChange) onStatusChange('reconnecting');
-          
-          // If the ticket fetch failed (e.g. 401), fetchAPI already tried to refresh the token.
-          // If it still fails, the user is likely logged out.
+
           const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
           reconnectAttempts++;
+
           setTimeout(connect, delay);
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          // Don't call onStatusChange('offline') yet, let onclose handle reconnection
+          ws.close();
+        };
+      } catch (err) {
+        console.error('Failed to acquire WS ticket or connect:', err);
+        if (onStatusChange) onStatusChange('reconnecting');
+
+        // If the ticket fetch failed (e.g. 401), fetchAPI already tried to refresh the token.
+        // If it still fails, the user is likely logged out.
+        const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
+        reconnectAttempts++;
+        setTimeout(connect, delay);
       }
     };
 
@@ -229,4 +234,3 @@ export const Network = {
     }
   },
 };
-

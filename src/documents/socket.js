@@ -63,24 +63,24 @@ async function getOrCreateDoc(documentId, gc = true) {
       const firstPage = pages.get(0);
       // Ensure it's a Y.Map and has 'content' (Y.Text)
       if (firstPage && firstPage.get) {
-         const content = firstPage.get('content');
-         if (content && typeof content.toString === 'function') {
-             previewContent = content.toString();
-         }
+        const content = firstPage.get('content');
+        if (content && typeof content.toString === 'function') {
+          previewContent = content.toString();
+        }
       }
     }
 
     const updateData = {
-        yjsState: stateBase64,
-        lastModified: new Date(),
+      yjsState: stateBase64,
+      lastModified: new Date(),
     };
 
     if (title) updateData.title = title;
-    
+
     // Save preview content to pages[0]
     // This allows the file list to show a snippet or at least search to work
     if (previewContent || previewContent === '') {
-         updateData.pages = [{ content: previewContent.substring(0, 500) }]; // Limit preview size
+      updateData.pages = [{ content: previewContent.substring(0, 500) }]; // Limit preview size
     }
 
     try {
@@ -137,10 +137,10 @@ function init(server) {
     // Support dedicated path /ws/:docId
     // Robust extraction: Handle /ws/docId (direct) or /docId (proxy stripped)
     if (!documentId) {
-        const parts = url.pathname.split('/').filter(p => p.trim().length > 0);
-        if (parts.length > 0) {
-             documentId = parts[parts.length - 1];
-        }
+      const parts = url.pathname.split('/').filter((p) => p.trim().length > 0);
+      if (parts.length > 0) {
+        documentId = parts[parts.length - 1];
+      }
     }
 
     if (!documentId) {
@@ -153,25 +153,25 @@ function init(server) {
 
     // Authentication Strategy: Ticket (Preferred) > Token
     if (ticket) {
-        userId = verifyTicket(ticket);
-        if (!userId) {
-            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-            socket.destroy();
-            return;
-        }
-    } else if (token) {
-        try {
-            const decoded = jwt.verify(token, JWT_SECRET);
-            userId = decoded.id;
-        } catch (err) {
-            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-            socket.destroy();
-            return;
-        }
-    } else {
+      userId = verifyTicket(ticket);
+      if (!userId) {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
         socket.destroy();
         return;
+      }
+    } else if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        userId = decoded.id;
+      } catch (err) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+      }
+    } else {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
     }
 
     // Check Document Access
@@ -184,10 +184,8 @@ function init(server) {
       }
 
       const isOwner = dbDoc.owner.toString() === userId;
-      const isShared =
-        dbDoc.sharedWith && dbDoc.sharedWith.some((id) => id.toString() === userId);
-      const isViewer = 
-        dbDoc.viewers && dbDoc.viewers.some((id) => id.toString() === userId);
+      const isShared = dbDoc.sharedWith && dbDoc.sharedWith.some((id) => id.toString() === userId);
+      const isViewer = dbDoc.viewers && dbDoc.viewers.some((id) => id.toString() === userId);
 
       // Allow if public, but maybe we want to enforce read-only for public?
       // For now, let's assume public means "collaborate" based on the UI text.
@@ -219,20 +217,20 @@ function init(server) {
   wss.on('connection', async (conn, req, { documentId, userId }) => {
     console.log(`Client connected to doc: ${documentId} (User: ${userId})`);
     const doc = await getOrCreateDoc(documentId);
-    
+
     // Setup Awareness (Cursors)
     // We create an awareness instance for this connection
     // Note: In standard y-websocket, awareness is shared via the doc.
     // Here we manually handle the protocol.
-    
+
     conn.binaryType = 'arraybuffer';
-    
+
     // Initialize Sync
     // Optimization: Standard Yjs protocol exchange
     // 1. Server sends SyncStep1 (Server State Vector)
     // 2. Client receives, calculates diff, sends SyncStep2 (Missing updates) AND SyncStep1 (Client State Vector)
     // 3. Server receives, sends SyncStep2 (Missing updates for client)
-    
+
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageSync);
     syncProtocol.writeSyncStep1(encoder, doc);
@@ -249,17 +247,18 @@ function init(server) {
         switch (messageType) {
           case messageSync:
             encoding.writeVarUint(encoder, messageSync);
-            
+
             // Peek at sync message type to enforce Read-Only
             // y-protocols: 0=Step1, 1=Step2, 2=Update
             if (conn.readOnly) {
-                const syncMessageType = decoding.peekVarUint(decoder); 
-                if (syncMessageType === 2) { // Update
-                    // Ignore updates from viewers
-                    return;
-                }
+              const syncMessageType = decoding.peekVarUint(decoder);
+              if (syncMessageType === 2) {
+                // Update
+                // Ignore updates from viewers
+                return;
+              }
             }
-            
+
             syncProtocol.readSyncMessage(decoder, encoder, doc, conn);
             if (encoding.length(encoder) > 1) {
               conn.send(encoding.toUint8Array(encoder));
@@ -270,12 +269,12 @@ function init(server) {
             // Simple relay for now
             const awarenessUpdate = decoding.readVarUint8Array(decoder);
             docs.get(documentId).conns.forEach((_, c) => {
-                if (c !== conn && c.readyState === WebSocket.OPEN) {
-                    const awarenessEncoder = encoding.createEncoder();
-                    encoding.writeVarUint(awarenessEncoder, messageAwareness);
-                    encoding.writeVarUint8Array(awarenessEncoder, awarenessUpdate);
-                    c.send(encoding.toUint8Array(awarenessEncoder));
-                }
+              if (c !== conn && c.readyState === WebSocket.OPEN) {
+                const awarenessEncoder = encoding.createEncoder();
+                encoding.writeVarUint(awarenessEncoder, messageAwareness);
+                encoding.writeVarUint8Array(awarenessEncoder, awarenessUpdate);
+                c.send(encoding.toUint8Array(awarenessEncoder));
+              }
             });
             break;
         }
@@ -288,7 +287,7 @@ function init(server) {
     if (!doc.conns.has(conn)) {
       doc.conns.set(conn, new Set());
     }
-    
+
     conn.on('close', () => {
       doc.conns.delete(conn);
       if (doc.conns.size === 0) {
@@ -296,14 +295,14 @@ function init(server) {
         // If all clients disconnected, schedule doc removal from memory
         // Grace period (e.g. 10s) to handle page refreshes or quick re-entry
         setTimeout(() => {
-            const currentDoc = docs.get(documentId);
-            if (currentDoc && currentDoc.conns.size === 0) {
-                console.log(`[Memory Management] Unloading doc ${documentId} due to inactivity.`);
-                // Force a final save if there's a pending update
-                // The doc.on('update') already has a saveTimeout, but we want to be safe.
-                docs.delete(documentId);
-            }
-        }, 10000); 
+          const currentDoc = docs.get(documentId);
+          if (currentDoc && currentDoc.conns.size === 0) {
+            console.log(`[Memory Management] Unloading doc ${documentId} due to inactivity.`);
+            // Force a final save if there's a pending update
+            // The doc.on('update') already has a saveTimeout, but we want to be safe.
+            docs.delete(documentId);
+          }
+        }, 10000);
       }
     });
   });
@@ -312,11 +311,11 @@ function init(server) {
 }
 
 function notifyDocumentDeleted(documentId) {
-    // ...
+  // ...
 }
 
 function broadcastMaintenance(wss) {
-    // ...
+  // ...
 }
 
 module.exports = { init, notifyDocumentDeleted, broadcastMaintenance };

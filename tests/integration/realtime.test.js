@@ -15,7 +15,7 @@ describe('Real-time Collaboration Tests', () => {
   let ownerId, editorId, viewerId;
   let docId;
   let ownerTicket, editorTicket, viewerTicket;
-  
+
   beforeAll((done) => {
     if (!server.listening) {
       server.listen(0, () => {
@@ -36,9 +36,21 @@ describe('Real-time Collaboration Tests', () => {
 
   beforeEach(async () => {
     // DB cleared by setup.js
-    const owner = await User.create({ username: 'owner', email: 'owner@test.com', password: 'password123' });
-    const editor = await User.create({ username: 'editor', email: 'editor@test.com', password: 'password123' });
-    const viewer = await User.create({ username: 'viewer', email: 'viewer@test.com', password: 'password123' });
+    const owner = await User.create({
+      username: 'owner',
+      email: 'owner@test.com',
+      password: 'password123',
+    });
+    const editor = await User.create({
+      username: 'editor',
+      email: 'editor@test.com',
+      password: 'password123',
+    });
+    const viewer = await User.create({
+      username: 'viewer',
+      email: 'viewer@test.com',
+      password: 'password123',
+    });
 
     ownerId = owner._id.toString();
     editorId = editor._id.toString();
@@ -48,7 +60,7 @@ describe('Real-time Collaboration Tests', () => {
       title: 'Realtime Doc',
       owner: ownerId,
       sharedWith: [editorId],
-      viewers: [viewerId]
+      viewers: [viewerId],
     });
     docId = doc._id.toString();
 
@@ -64,173 +76,176 @@ describe('Real-time Collaboration Tests', () => {
   it('should allow editors to sync updates (Conflict Resolution)', (done) => {
     const client1 = createClient(ownerTicket);
     const client2 = createClient(editorTicket);
-    
+
     let client1Doc = new Y.Doc();
     let client2Doc = new Y.Doc();
-    
+
     let c1Connected = false;
-    
+
     const sendSync = (ws, doc) => {
-        const encoder = encoding.createEncoder();
-        encoding.writeVarUint(encoder, 0); // messageSync
-        syncProtocol.writeSyncStep1(encoder, doc);
-        ws.send(encoding.toUint8Array(encoder));
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, 0); // messageSync
+      syncProtocol.writeSyncStep1(encoder, doc);
+      ws.send(encoding.toUint8Array(encoder));
     };
 
     const handleMessage = (doc, data) => {
-        try {
-            const decoder = decoding.createDecoder(new Uint8Array(data));
-            const messageType = decoding.readVarUint(decoder);
-            if (messageType === 0) { // messageSync
-                const syncMessageType = decoding.peekVarUint(decoder);
-                console.log(`[DEBUG] Received Sync Message Type: ${syncMessageType} (0=Step1, 1=Step2, 2=Update)`);
-                
-                const encoder = encoding.createEncoder();
-                encoding.writeVarUint(encoder, 0);
-                syncProtocol.readSyncMessage(decoder, encoder, doc, null);
-            }
-        } catch (e) {
-            console.error('Error handling message', e);
+      try {
+        const decoder = decoding.createDecoder(new Uint8Array(data));
+        const messageType = decoding.readVarUint(decoder);
+        if (messageType === 0) {
+          // messageSync
+          const syncMessageType = decoding.peekVarUint(decoder);
+          console.log(
+            `[DEBUG] Received Sync Message Type: ${syncMessageType} (0=Step1, 1=Step2, 2=Update)`
+          );
+
+          const encoder = encoding.createEncoder();
+          encoding.writeVarUint(encoder, 0);
+          syncProtocol.readSyncMessage(decoder, encoder, doc, null);
         }
+      } catch (e) {
+        console.error('Error handling message', e);
+      }
     };
 
     client1.on('open', () => {
-        console.log('Client 1 Open');
-        c1Connected = true;
-        sendSync(client1, client1Doc);
+      console.log('Client 1 Open');
+      c1Connected = true;
+      sendSync(client1, client1Doc);
     });
 
     client2.on('open', () => {
-        console.log('Client 2 Open');
-        sendSync(client2, client2Doc);
+      console.log('Client 2 Open');
+      sendSync(client2, client2Doc);
     });
 
     let updatesReceived = 0;
 
     const checkConvergence = () => {
-        const text1 = client1Doc.getText('content').toString();
-        const text2 = client2Doc.getText('content').toString();
-        
-        console.log(`Convergence Check: "${text1}" vs "${text2}"`);
+      const text1 = client1Doc.getText('content').toString();
+      const text2 = client2Doc.getText('content').toString();
 
-        if (text1.length === 2 && text2.length === 2) {
-            // Wait a tick to ensure stable state
-            setTimeout(() => {
-                try {
-                    expect(text1).toEqual(text2);
-                    client1.close();
-                    client2.close();
-                    done();
-                } catch (e) {
-                    done(e);
-                }
-            }, 100);
-        }
+      console.log(`Convergence Check: "${text1}" vs "${text2}"`);
+
+      if (text1.length === 2 && text2.length === 2) {
+        // Wait a tick to ensure stable state
+        setTimeout(() => {
+          try {
+            expect(text1).toEqual(text2);
+            client1.close();
+            client2.close();
+            done();
+          } catch (e) {
+            done(e);
+          }
+        }, 100);
+      }
     };
 
     client1.on('message', (data) => {
-        // console.log('Client 1 Message');
-        handleMessage(client1Doc, data);
-        if (c1Connected) {
-             console.log('Client 1 Inserting "A"');
-             client1Doc.getText('content').insert(0, 'A');
-             const update = Y.encodeStateAsUpdate(client1Doc);
-             
-             const encoder = encoding.createEncoder();
-             encoding.writeVarUint(encoder, 0);
-             syncProtocol.writeUpdate(encoder, update);
-             client1.send(encoding.toUint8Array(encoder));
-             c1Connected = false; 
-        }
-        checkConvergence();
+      // console.log('Client 1 Message');
+      handleMessage(client1Doc, data);
+      if (c1Connected) {
+        console.log('Client 1 Inserting "A"');
+        client1Doc.getText('content').insert(0, 'A');
+        const update = Y.encodeStateAsUpdate(client1Doc);
+
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, 0);
+        syncProtocol.writeUpdate(encoder, update);
+        client1.send(encoding.toUint8Array(encoder));
+        c1Connected = false;
+      }
+      checkConvergence();
     });
 
     client2.on('message', (data) => {
-        // console.log('Client 2 Message');
-        handleMessage(client2Doc, data);
-        if (client2Doc.getText('content').toString() === '' && updatesReceived === 0) {
-             console.log('Client 2 Inserting "B"');
-             client2Doc.getText('content').insert(0, 'B');
-             const update = Y.encodeStateAsUpdate(client2Doc);
-             const encoder = encoding.createEncoder();
-             encoding.writeVarUint(encoder, 0);
-             syncProtocol.writeUpdate(encoder, update);
-             client2.send(encoding.toUint8Array(encoder));
-             updatesReceived++;
-        }
-        checkConvergence();
+      // console.log('Client 2 Message');
+      handleMessage(client2Doc, data);
+      if (client2Doc.getText('content').toString() === '' && updatesReceived === 0) {
+        console.log('Client 2 Inserting "B"');
+        client2Doc.getText('content').insert(0, 'B');
+        const update = Y.encodeStateAsUpdate(client2Doc);
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, 0);
+        syncProtocol.writeUpdate(encoder, update);
+        client2.send(encoding.toUint8Array(encoder));
+        updatesReceived++;
+      }
+      checkConvergence();
     });
   }, 10000); // Increased timeout
 
   it('should prevent viewers from broadcasting changes', (done) => {
     const viewerClient = createClient(viewerTicket);
     const editorClient = createClient(editorTicket);
-    
+
     let editorDoc = new Y.Doc();
-    
+
     viewerClient.on('open', () => {
-        console.log('Viewer Client Open');
-        const encoder = encoding.createEncoder();
-        encoding.writeVarUint(encoder, 0); // messageSync
-        
-        const doc = new Y.Doc();
-        doc.getText('content').insert(0, 'ViewerHack');
-        const update = Y.encodeStateAsUpdate(doc);
-        
-        syncProtocol.writeUpdate(encoder, update);
-        viewerClient.send(encoding.toUint8Array(encoder));
+      console.log('Viewer Client Open');
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, 0); // messageSync
+
+      const doc = new Y.Doc();
+      doc.getText('content').insert(0, 'ViewerHack');
+      const update = Y.encodeStateAsUpdate(doc);
+
+      syncProtocol.writeUpdate(encoder, update);
+      viewerClient.send(encoding.toUint8Array(encoder));
     });
 
     editorClient.on('message', (data) => {
-        const decoder = decoding.createDecoder(new Uint8Array(data));
-        const messageType = decoding.readVarUint(decoder);
-        if (messageType === 0) {
-             const encoder = encoding.createEncoder();
-             encoding.writeVarUint(encoder, 0);
-             syncProtocol.readSyncMessage(decoder, encoder, editorDoc, null);
-             
-             if (editorDoc.getText('content').toString().includes('ViewerHack')) {
-                 viewerClient.close();
-                 editorClient.close();
-                 done(new Error('Viewer update was applied!'));
-             }
+      const decoder = decoding.createDecoder(new Uint8Array(data));
+      const messageType = decoding.readVarUint(decoder);
+      if (messageType === 0) {
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, 0);
+        syncProtocol.readSyncMessage(decoder, encoder, editorDoc, null);
+
+        if (editorDoc.getText('content').toString().includes('ViewerHack')) {
+          viewerClient.close();
+          editorClient.close();
+          done(new Error('Viewer update was applied!'));
         }
+      }
     });
 
     setTimeout(() => {
-        if (!editorDoc.getText('content').toString().includes('ViewerHack')) {
-            viewerClient.close();
-            editorClient.close();
-            done();
-        }
+      if (!editorDoc.getText('content').toString().includes('ViewerHack')) {
+        viewerClient.close();
+        editorClient.close();
+        done();
+      }
     }, 2000); // Wait long enough for potential update to arrive
   });
 
   it('should propagate awareness (Presence)', (done) => {
-      const c1 = createClient(ownerTicket);
-      const c2 = createClient(editorTicket);
-      
-      c1.on('open', () => {
-          const encoder = encoding.createEncoder();
-          encoding.writeVarUint(encoder, 1); // messageAwareness
-          
-          const awareness = new awarenessProtocol.Awareness(new Y.Doc());
-          awareness.setLocalState({ user: { name: 'Owner' } });
-          const update = awarenessProtocol.encodeAwarenessUpdate(awareness, [awareness.clientID]);
-          
-          encoding.writeVarUint8Array(encoder, update);
-          c1.send(encoding.toUint8Array(encoder));
-      });
-      
-      c2.on('message', (data) => {
-          const decoder = decoding.createDecoder(new Uint8Array(data));
-          const messageType = decoding.readVarUint(decoder);
-          if (messageType === 1) { 
-              const update = decoding.readVarUint8Array(decoder);
-              c1.close();
-              c2.close();
-              done();
-          }
-      });
+    const c1 = createClient(ownerTicket);
+    const c2 = createClient(editorTicket);
+
+    c1.on('open', () => {
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, 1); // messageAwareness
+
+      const awareness = new awarenessProtocol.Awareness(new Y.Doc());
+      awareness.setLocalState({ user: { name: 'Owner' } });
+      const update = awarenessProtocol.encodeAwarenessUpdate(awareness, [awareness.clientID]);
+
+      encoding.writeVarUint8Array(encoder, update);
+      c1.send(encoding.toUint8Array(encoder));
+    });
+
+    c2.on('message', (data) => {
+      const decoder = decoding.createDecoder(new Uint8Array(data));
+      const messageType = decoding.readVarUint(decoder);
+      if (messageType === 1) {
+        const update = decoding.readVarUint8Array(decoder);
+        c1.close();
+        c2.close();
+        done();
+      }
+    });
   });
 });

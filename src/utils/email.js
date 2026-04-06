@@ -183,7 +183,7 @@ async function sendPasswordResetEmail(email, resetUrl) {
     return true;
   } catch (err) {
     logger.error(`SMTP Reset Password Failed: ${err.message}`);
-    return true; 
+    return true;
   }
 }
 
@@ -201,26 +201,26 @@ async function sendPasswordChangedEmail(email) {
   `;
 
   if (RESEND_API_KEY) {
-      return await sendViaResend(email, html, 'Security Alert: Password Changed');
+    return await sendViaResend(email, html, 'Security Alert: Password Changed');
   }
 
   if (!SMTP_USER || !SMTP_PASS) {
-      logger.info('DEV MODE: Password change alert simulated.');
-      return true;
+    logger.info('DEV MODE: Password change alert simulated.');
+    return true;
   }
 
   try {
-      await transporter.sendMail({
-          from: `"SynchroEdit Security" <${SMTP_FROM}>`,
-          to: email,
-          subject: 'Security Alert: Password Changed',
-          html
-      });
-      return true;
+    await transporter.sendMail({
+      from: `"SynchroEdit Security" <${SMTP_FROM}>`,
+      to: email,
+      subject: 'Security Alert: Password Changed',
+      html,
+    });
+    return true;
   } catch (err) {
-      logger.error(`Failed to send password change alert: ${err.message}`);
-      // Don't block the flow if alert fails, but log it critical
-      return false;
+    logger.error(`Failed to send password change alert: ${err.message}`);
+    // Don't block the flow if alert fails, but log it critical
+    return false;
   }
 }
 

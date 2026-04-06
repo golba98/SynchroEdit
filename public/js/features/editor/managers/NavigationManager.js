@@ -30,7 +30,7 @@ export class NavigationManager extends Plugin {
     // Ideally, we'd wrap this or manually clean it up in destroy().
     // For now, we'll keep it as is, but mark it for future improvement.
     this.editor.doc.getArray('pages').observeDeep(() => {
-        this.debounceUpdate();
+      this.debounceUpdate();
     });
 
     // Intelligent Selection
@@ -49,7 +49,7 @@ export class NavigationManager extends Plugin {
     this.isOutlineVisible = !this.isOutlineVisible;
     const sidebar = document.getElementById('outlineSidebar');
     if (sidebar) {
-        sidebar.style.display = this.isOutlineVisible ? 'flex' : 'none';
+      sidebar.style.display = this.isOutlineVisible ? 'flex' : 'none';
     }
     const btn = document.getElementById('toggleOutline');
     if (btn) btn.classList.toggle('active', this.isOutlineVisible);
@@ -59,7 +59,7 @@ export class NavigationManager extends Plugin {
     this.isMinimapVisible = !this.isMinimapVisible;
     const sidebar = document.getElementById('minimapSidebar');
     if (sidebar) {
-        sidebar.style.display = this.isMinimapVisible ? 'flex' : 'none';
+      sidebar.style.display = this.isMinimapVisible ? 'flex' : 'none';
     }
     const btn = document.getElementById('toggleMinimap');
     if (btn) btn.classList.toggle('active', this.isMinimapVisible);
@@ -70,17 +70,17 @@ export class NavigationManager extends Plugin {
 
     const headings = [];
     const pagesArr = this.editor.yPages.toArray();
-    
+
     pagesArr.forEach((pageMap, pageIndex) => {
       const yText = pageMap.get('content');
       if (!yText) return;
-      
+
       const delta = yText.toDelta();
       let currentLineText = '';
       let currentLineStart = 0;
       let pos = 0;
 
-      delta.forEach(op => {
+      delta.forEach((op) => {
         if (op.insert) {
           if (typeof op.insert === 'string') {
             for (let i = 0; i < op.insert.length; i++) {
@@ -95,7 +95,7 @@ export class NavigationManager extends Plugin {
                       level: op.attributes.header,
                       text: text,
                       pageIndex: pageIndex,
-                      index: currentLineStart // Start position of the heading line
+                      index: currentLineStart, // Start position of the heading line
                     });
                   }
                 }
@@ -115,52 +115,58 @@ export class NavigationManager extends Plugin {
     });
 
     if (headings.length === 0) {
-      this.outlineContainer.innerHTML = '<div style="padding: 20px; color: #666; font-size: 12px;">No headings found</div>';
+      this.outlineContainer.innerHTML =
+        '<div style="padding: 20px; color: #666; font-size: 12px;">No headings found</div>';
       return;
     }
 
     // Sidebar Tree Folding Logic
     let hideBelowLevel = Infinity;
-    
-    this.outlineContainer.innerHTML = headings.map((h, i) => {
-      // Check if we should stop hiding
-      if (h.level <= hideBelowLevel) {
-        hideBelowLevel = Infinity;
-      }
 
-      // If we are currently hiding, return empty string (don't render this item)
-      if (hideBelowLevel !== Infinity) {
-        return '';
-      }
+    this.outlineContainer.innerHTML = headings
+      .map((h, i) => {
+        // Check if we should stop hiding
+        if (h.level <= hideBelowLevel) {
+          hideBelowLevel = Infinity;
+        }
 
-      // Check if this item is collapsed
-      const isCollapsed = this.collapsedSections.has(i);
-      if (isCollapsed) {
-        hideBelowLevel = h.level;
-      }
+        // If we are currently hiding, return empty string (don't render this item)
+        if (hideBelowLevel !== Infinity) {
+          return '';
+        }
 
-      return `
+        // Check if this item is collapsed
+        const isCollapsed = this.collapsedSections.has(i);
+        if (isCollapsed) {
+          hideBelowLevel = h.level;
+        }
+
+        return `
       <div class="outline-item outline-h${h.level} ${isCollapsed ? 'collapsed' : ''}" data-index="${i}">
         <i class="fas ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} fold-toggle" style="margin-right: 8px; width: 12px; cursor: pointer;"></i>
         ${this.escapeHTML(h.text || 'Untitled Section')}
       </div>
-    `}).join('');
+    `;
+      })
+      .join('');
 
     this.outlineContainer.querySelectorAll('.outline-item').forEach((el) => {
       const index = parseInt(el.dataset.index);
       const toggle = el.querySelector('.fold-toggle');
-      
+
       toggle.onclick = (e) => {
-          e.stopPropagation();
-          this.toggleSection(index);
+        e.stopPropagation();
+        this.toggleSection(index);
       };
 
       el.onclick = () => {
         const h = headings[index];
         this.editor.switchToPage(parseInt(h.pageIndex), h.index);
-        
+
         // Highlight active
-        this.outlineContainer.querySelectorAll('.outline-item').forEach(item => item.classList.remove('active'));
+        this.outlineContainer
+          .querySelectorAll('.outline-item')
+          .forEach((item) => item.classList.remove('active'));
         el.classList.add('active');
       };
     });
@@ -204,12 +210,12 @@ export class NavigationManager extends Plugin {
     clone.style.background = 'transparent';
 
     // Remove heavy elements from clone
-    clone.querySelectorAll('.page-border-inner').forEach(el => el.remove());
-    
+    clone.querySelectorAll('.page-border-inner').forEach((el) => el.remove());
+
     const wrapper = document.createElement('div');
     wrapper.style.position = 'relative';
     wrapper.style.width = '120px';
-    const totalHeight = (pagesContainer.scrollHeight * 0.12);
+    const totalHeight = pagesContainer.scrollHeight * 0.12;
     wrapper.style.height = `${totalHeight}px`;
     wrapper.appendChild(clone);
 
@@ -217,10 +223,10 @@ export class NavigationManager extends Plugin {
 
     // Sync scroll
     this.minimapContainer.onclick = (e) => {
-        const rect = wrapper.getBoundingClientRect();
-        const y = e.clientY - rect.top;
-        const scrollTarget = (y / 0.12);
-        pagesContainer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+      const rect = wrapper.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const scrollTarget = y / 0.12;
+      pagesContainer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
     };
   }
 

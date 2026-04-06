@@ -23,11 +23,11 @@ export class UIManager {
       if (this.app.documentId) {
         const docLibrary = document.getElementById('docLibrary');
         const libraryOverlay = document.getElementById('libraryOverlay');
-        
+
         // Smooth transition out
         if (docLibrary) docLibrary.classList.remove('view-visible');
         if (libraryOverlay) libraryOverlay.classList.remove('view-visible');
-        
+
         setTimeout(() => {
           if (docLibrary) docLibrary.style.display = 'none';
           if (libraryOverlay) libraryOverlay.style.display = 'none';
@@ -141,74 +141,74 @@ export class UIManager {
       const input = document.getElementById('shareLink');
       const toggle = document.getElementById('linkSharingToggle');
       const shareLinkContainer = document.getElementById('shareLinkContainer');
-      
+
       if (modal && input) {
         input.value = window.location.href;
-        
+
         // Load current settings
         if (toggle && this.app.documentId) {
-            toggle.disabled = true;
-            toggle.parentElement.style.opacity = '0.5';
-            
-            try {
-                const settings = await Network.getDocumentSettings(this.app.documentId);
-                toggle.checked = settings.isPublic;
+          toggle.disabled = true;
+          toggle.parentElement.style.opacity = '0.5';
 
-                // Update link visual state
-                if (shareLinkContainer) {
-                    shareLinkContainer.style.opacity = settings.isPublic ? '1' : '0.5';
-                    shareLinkContainer.style.pointerEvents = settings.isPublic ? 'all' : 'none';
-                }
-                
-                // Only owner can change settings
-                if (!settings.isOwner) {
-                     toggle.disabled = true;
-                     toggle.title = "Only the document owner can change sharing settings.";
-                } else {
-                     toggle.disabled = false;
-                     toggle.parentElement.style.opacity = '1';
-                }
-            } catch (err) {
-                console.error("Failed to load settings", err);
+          try {
+            const settings = await Network.getDocumentSettings(this.app.documentId);
+            toggle.checked = settings.isPublic;
+
+            // Update link visual state
+            if (shareLinkContainer) {
+              shareLinkContainer.style.opacity = settings.isPublic ? '1' : '0.5';
+              shareLinkContainer.style.pointerEvents = settings.isPublic ? 'all' : 'none';
             }
+
+            // Only owner can change settings
+            if (!settings.isOwner) {
+              toggle.disabled = true;
+              toggle.title = 'Only the document owner can change sharing settings.';
+            } else {
+              toggle.disabled = false;
+              toggle.parentElement.style.opacity = '1';
+            }
+          } catch (err) {
+            console.error('Failed to load settings', err);
+          }
         }
-        
+
         modal.style.display = 'flex';
       }
     });
 
     addEvent('linkSharingToggle', 'change', async (e) => {
-        const enabled = e.target.checked;
-        const status = document.getElementById('linkSharingStatus');
-        const shareLinkContainer = document.getElementById('shareLinkContainer');
-        
-        if (status) {
-            status.style.display = 'block';
-            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-        }
-        
-        try {
-            await Network.updateDocumentSettings(this.app.documentId, { isPublic: enabled });
-            
-            // Update link visual state
-            if (shareLinkContainer) {
-                shareLinkContainer.style.opacity = enabled ? '1' : '0.5';
-                shareLinkContainer.style.pointerEvents = enabled ? 'all' : 'none';
-            }
+      const enabled = e.target.checked;
+      const status = document.getElementById('linkSharingStatus');
+      const shareLinkContainer = document.getElementById('shareLinkContainer');
 
-            if (status) {
-                status.innerHTML = '<i class="fas fa-check"></i> Updated successfully';
-                status.style.color = '#10b981';
-                setTimeout(() => status.style.display = 'none', 2000);
-            }
-        } catch (err) {
-            console.error("Failed to update settings", err);
-            e.target.checked = !enabled; // Revert
-            if (status) {
-                status.innerHTML = '<i class="fas fa-times"></i> Failed to update';
-                status.style.color = '#ef4444';
-            }
+      if (status) {
+        status.style.display = 'block';
+        status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      }
+
+      try {
+        await Network.updateDocumentSettings(this.app.documentId, { isPublic: enabled });
+
+        // Update link visual state
+        if (shareLinkContainer) {
+          shareLinkContainer.style.opacity = enabled ? '1' : '0.5';
+          shareLinkContainer.style.pointerEvents = enabled ? 'all' : 'none';
         }
+
+        if (status) {
+          status.innerHTML = '<i class="fas fa-check"></i> Updated successfully';
+          status.style.color = '#10b981';
+          setTimeout(() => (status.style.display = 'none'), 2000);
+        }
+      } catch (err) {
+        console.error('Failed to update settings', err);
+        e.target.checked = !enabled; // Revert
+        if (status) {
+          status.innerHTML = '<i class="fas fa-times"></i> Failed to update';
+          status.style.color = '#ef4444';
+        }
+      }
     });
 
     addEvent('closeShareModal', 'click', () => {
@@ -236,54 +236,54 @@ export class UIManager {
 
   setupMobileEvents() {
     const isMobile = window.innerWidth <= 768;
-    
+
     // FAB Logic
     const fabCreate = document.getElementById('fabCreateDoc');
     const fabEdit = document.getElementById('fabEditDoc');
     const mobileToolbar = document.getElementById('mobileContextualToolbar');
 
     if (fabCreate) {
-        fabCreate.addEventListener('click', () => {
-            this.app.libraryManager.createNewDocument();
-        });
+      fabCreate.addEventListener('click', () => {
+        this.app.libraryManager.createNewDocument();
+      });
     }
 
     if (fabEdit) {
-        fabEdit.addEventListener('click', () => {
-            if (this.app.editor && this.app.editor.quill) {
-                this.app.editor.quill.focus();
-                this.setMobileEditMode(true);
-            }
-        });
+      fabEdit.addEventListener('click', () => {
+        if (this.app.editor && this.app.editor.quill) {
+          this.app.editor.quill.focus();
+          this.setMobileEditMode(true);
+        }
+      });
     }
 
     // Bottom Nav
     const navItems = document.querySelectorAll('.bottom-nav-item');
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            navItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
+    navItems.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        navItems.forEach((i) => i.classList.remove('active'));
+        item.classList.add('active');
 
-            if (item.id === 'navHome') {
-                this.app.libraryManager.showLibrary();
-            } else if (item.id === 'navProfile') {
-                const modal = document.getElementById('profileModal');
-                if (modal) modal.style.display = 'flex';
-            }
-            // navShared is placeholder for now
-        });
+        if (item.id === 'navHome') {
+          this.app.libraryManager.showLibrary();
+        } else if (item.id === 'navProfile') {
+          const modal = document.getElementById('profileModal');
+          if (modal) modal.style.display = 'flex';
+        }
+        // navShared is placeholder for now
+      });
     });
 
     // Mobile Toolbar Close Keyboard
     const closeKbd = document.getElementById('mobileCloseKeyboard');
     if (closeKbd) {
-        closeKbd.addEventListener('click', () => {
-            if (this.app.editor && this.app.editor.quill) {
-                this.app.editor.quill.blur();
-                this.setMobileEditMode(false);
-            }
-        });
+      closeKbd.addEventListener('click', () => {
+        if (this.app.editor && this.app.editor.quill) {
+          this.app.editor.quill.blur();
+          this.setMobileEditMode(false);
+        }
+      });
     }
 
     // Initial state
@@ -291,9 +291,9 @@ export class UIManager {
 
     // Listen for editor focus/blur to toggle toolbar
     document.addEventListener('focusin', (e) => {
-        if (isMobile && e.target.closest('.ql-editor')) {
-            this.setMobileEditMode(true);
-        }
+      if (isMobile && e.target.closest('.ql-editor')) {
+        this.setMobileEditMode(true);
+      }
     });
 
     // We don't blur immediately on focusout because clicking a toolbar button might trigger focusout
@@ -313,13 +313,13 @@ export class UIManager {
     const hasDocument = !!this.app.documentId;
 
     if (isLibraryVisible) {
-        if (fabCreate) fabCreate.style.display = 'flex';
-        if (fabEdit) fabEdit.style.display = 'none';
-        if (bottomNav) bottomNav.style.display = 'flex';
+      if (fabCreate) fabCreate.style.display = 'flex';
+      if (fabEdit) fabEdit.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'flex';
     } else if (hasDocument) {
-        if (fabCreate) fabCreate.style.display = 'none';
-        if (fabEdit) fabEdit.style.display = 'flex';
-        if (bottomNav) bottomNav.style.display = 'none';
+      if (fabCreate) fabCreate.style.display = 'none';
+      if (fabEdit) fabEdit.style.display = 'flex';
+      if (bottomNav) bottomNav.style.display = 'none';
     }
   }
 
@@ -329,16 +329,15 @@ export class UIManager {
     const header = document.querySelector('.header');
 
     if (active) {
-        if (toolbar) toolbar.style.display = 'block';
-        if (fabEdit) fabEdit.style.display = 'none';
-        if (header) header.style.height = '50px'; // Slimmer header in edit mode
+      if (toolbar) toolbar.style.display = 'block';
+      if (fabEdit) fabEdit.style.display = 'none';
+      if (header) header.style.height = '50px'; // Slimmer header in edit mode
     } else {
-        if (toolbar) toolbar.style.display = 'none';
-        if (fabEdit) fabEdit.style.display = 'flex';
-        if (header) header.style.height = '60px';
+      if (toolbar) toolbar.style.display = 'none';
+      if (fabEdit) fabEdit.style.display = 'flex';
+      if (header) header.style.height = '60px';
     }
   }
-
 
   setupRibbonTabs() {
     const tabs = document.querySelectorAll('.ribbon-tab');
@@ -435,4 +434,3 @@ export class UIManager {
     }
   }
 }
-

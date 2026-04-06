@@ -17,8 +17,8 @@ jest.mock('/js/features/theme/theme.js');
 jest.mock('/js/features/profile/profile.js');
 jest.mock('/js/features/theme/background.js');
 jest.mock('/js/app/utils.js', () => ({
-    ...jest.requireActual('/js/app/utils.js'),
-    navigateTo: jest.fn(),
+  ...jest.requireActual('/js/app/utils.js'),
+  navigateTo: jest.fn(),
 }));
 
 describe('App Core Initialization', () => {
@@ -52,31 +52,33 @@ describe('App Core Initialization', () => {
         <button id="saveGeneralBtn"></button>
       </div>
     `;
-    
+
     // Default Profile load success
-    Profile.prototype.loadProfile = jest.fn().mockResolvedValue({ _id: 'user1', username: 'TestUser' });
-    
+    Profile.prototype.loadProfile = jest
+      .fn()
+      .mockResolvedValue({ _id: 'user1', username: 'TestUser' });
+
     // Default Network mocks
     Network.getDocuments.mockResolvedValue({ documents: [] });
     Network.addToRecent.mockResolvedValue({});
 
     // Mock URLSearchParams globally
     global.URLSearchParams = jest.fn(() => ({
-        get: jest.fn().mockReturnValue(null) // Default no doc param
+      get: jest.fn().mockReturnValue(null), // Default no doc param
     }));
   });
 
   afterAll(() => {
-      global.URLSearchParams = originalURLSearchParams;
+    global.URLSearchParams = originalURLSearchParams;
   });
 
   it('should show library if no document ID in URL', async () => {
     global.URLSearchParams = jest.fn(() => ({
-        get: jest.fn().mockReturnValue(null)
+      get: jest.fn().mockReturnValue(null),
     }));
 
     const app = new App();
-    
+
     // Wait for async init
     await new Promise(process.nextTick);
 
@@ -90,14 +92,14 @@ describe('App Core Initialization', () => {
 
   it('should load document if document ID is present', async () => {
     global.URLSearchParams = jest.fn(() => ({
-        get: jest.fn().mockReturnValue('123')
+      get: jest.fn().mockReturnValue('123'),
     }));
 
     const app = new App();
-    
+
     // Wait for async init
     await new Promise(process.nextTick);
-    await new Promise(process.nextTick); 
+    await new Promise(process.nextTick);
 
     expect(Profile.prototype.loadProfile).toHaveBeenCalledWith({ silent: true });
     expect(document.getElementById('authGuard').style.display).toBe('none');
@@ -119,7 +121,7 @@ describe('App Core Initialization', () => {
 
   it('should preserve doc param when redirecting after failed session check', async () => {
     global.URLSearchParams = jest.fn(() => ({
-      get: jest.fn().mockReturnValue('doc-42')
+      get: jest.fn().mockReturnValue('doc-42'),
     }));
     Profile.prototype.loadProfile = jest.fn().mockResolvedValue(null);
 
@@ -132,13 +134,13 @@ describe('App Core Initialization', () => {
   it('should not show connection overlay if page is hidden', async () => {
     jest.useFakeTimers();
     global.URLSearchParams = jest.fn(() => ({
-      get: jest.fn().mockReturnValue('123')
+      get: jest.fn().mockReturnValue('123'),
     }));
 
     // Mock hidden state
     Object.defineProperty(document, 'visibilityState', {
       value: 'hidden',
-      configurable: true
+      configurable: true,
     });
 
     const app = new App();
@@ -148,20 +150,20 @@ describe('App Core Initialization', () => {
     const overlay = document.getElementById('serverOfflineOverlay');
     overlay.style.display = 'none';
     app.handleWSStatusChange('connecting');
-    
+
     expect(overlay.style.display).toBe('none');
 
     // Change to visible
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
-      configurable: true
+      configurable: true,
     });
 
     app.handleWSStatusChange('connecting');
-    
+
     // Fast-forward 5 seconds
     jest.advanceTimersByTime(5000);
-    
+
     expect(overlay.style.display).toBe('flex');
     jest.useRealTimers();
   });
@@ -174,7 +176,7 @@ describe('App Core Initialization', () => {
 
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
-      configurable: true
+      configurable: true,
     });
 
     document.dispatchEvent(new Event('visibilitychange'));
@@ -183,4 +185,3 @@ describe('App Core Initialization', () => {
     expect(Profile.prototype.loadProfile).toHaveBeenCalledWith({ silent: true });
   });
 });
-

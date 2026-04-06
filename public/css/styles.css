@@ -49,8 +49,9 @@ body {
   background: rgba(5, 2, 13, 0.8) !important;
   opacity: 0;
   transform: translateY(-20px);
-  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #docLibrary.view-visible {
@@ -59,7 +60,7 @@ body {
 }
 
 /* Apply will-change only when transitioning */
-#docLibrary[style*="display: block"] {
+#docLibrary[style*='display: block'] {
   will-change: opacity, transform;
 }
 
@@ -72,7 +73,7 @@ body {
   opacity: 1;
 }
 
-#libraryOverlay[style*="display: block"] {
+#libraryOverlay[style*='display: block'] {
   will-change: opacity;
 }
 
@@ -2545,4 +2546,95 @@ body.light-theme .skeleton {
 
 .document-row:hover .doc-title-cell {
   color: var(--accent-color-light);
+}
+
+/* Skeleton Loading States */
+.skeleton-page {
+  background: linear-gradient(
+    90deg,
+    rgba(40, 40, 40, 0.3) 25%,
+    rgba(60, 60, 60, 0.3) 50%,
+    rgba(40, 40, 40, 0.3) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.editor-skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.editor-skeleton.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skeleton-toolbar {
+  width: 100%;
+  max-width: 800px;
+  height: 44px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 20px;
+}
+
+.skeleton-toolbar-item {
+  width: 32px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.skeleton-paper {
+  width: 100%;
+  max-width: 816px;
+  height: 1056px;
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 4px;
+  padding: 72px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.skeleton-line {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 3px;
+}
+
+.skeleton-line:nth-child(1) {
+  width: 60%;
+}
+.skeleton-line:nth-child(2) {
+  width: 80%;
+}
+.skeleton-line:nth-child(3) {
+  width: 70%;
+}
+.skeleton-line:nth-child(4) {
+  width: 85%;
+}
+.skeleton-line:nth-child(5) {
+  width: 40%;
 }

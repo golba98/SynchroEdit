@@ -88,8 +88,10 @@ describe('CursorManager', () => {
       cursorManager.scrollToCursor(2);
 
       expect(document.getElementById).toHaveBeenCalledWith('page-container-2');
-      expect(mockElement.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'nearest' });
+      expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     });
   });
 });
-

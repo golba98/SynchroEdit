@@ -1,12 +1,12 @@
 // node_modules/y-websocket/src/y-websocket.js
-import * as Y4 from "yjs";
+import * as Y4 from 'yjs';
 
 // node_modules/lib0/map.js
 var create = () => /* @__PURE__ */ new Map();
 var setIfUndefined = (map2, key, createT) => {
   let set = map2.get(key);
   if (set === void 0) {
-    map2.set(key, set = createT());
+    map2.set(key, (set = createT()));
   }
   return set;
 };
@@ -23,32 +23,34 @@ var fromCodePoint = String.fromCodePoint;
 var MAX_UTF16_CHARACTER = fromCharCode(65535);
 var toLowerCase = (s) => s.toLowerCase();
 var trimLeftRegex = /^\s*/g;
-var trimLeft = (s) => s.replace(trimLeftRegex, "");
+var trimLeft = (s) => s.replace(trimLeftRegex, '');
 var fromCamelCaseRegex = /([A-Z])/g;
-var fromCamelCase = (s, separator) => trimLeft(s.replace(fromCamelCaseRegex, (match) => `${separator}${toLowerCase(match)}`));
+var fromCamelCase = (s, separator) =>
+  trimLeft(s.replace(fromCamelCaseRegex, (match) => `${separator}${toLowerCase(match)}`));
 var _encodeUtf8Polyfill = (str) => {
   const encodedString = unescape(encodeURIComponent(str));
   const len = encodedString.length;
   const buf = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    buf[i] = /** @type {number} */
-    encodedString.codePointAt(i);
+    buf[i] = /** @type {number} */ encodedString.codePointAt(i);
   }
   return buf;
 };
-var utf8TextEncoder = (
+var utf8TextEncoder =
   /** @type {TextEncoder} */
-  typeof TextEncoder !== "undefined" ? new TextEncoder() : null
-);
+  typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
 var _encodeUtf8Native = (str) => utf8TextEncoder.encode(str);
 var encodeUtf8 = utf8TextEncoder ? _encodeUtf8Native : _encodeUtf8Polyfill;
-var utf8TextDecoder = typeof TextDecoder === "undefined" ? null : new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
+var utf8TextDecoder =
+  typeof TextDecoder === 'undefined'
+    ? null
+    : new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 if (utf8TextDecoder && utf8TextDecoder.decode(new Uint8Array()).length === 1) {
   utf8TextDecoder = null;
 }
 
 // node_modules/lib0/conditions.js
-var undefinedToNull = (v) => v === void 0 ? null : v;
+var undefinedToNull = (v) => (v === void 0 ? null : v);
 
 // node_modules/lib0/storage.js
 var VarStoragePolyfill = class {
@@ -72,26 +74,29 @@ var VarStoragePolyfill = class {
 var _localStorage = new VarStoragePolyfill();
 var usePolyfill = true;
 try {
-  if (typeof localStorage !== "undefined" && localStorage) {
+  if (typeof localStorage !== 'undefined' && localStorage) {
     _localStorage = localStorage;
     usePolyfill = false;
   }
-} catch (e) {
-}
+} catch (e) {}
 var varStorage = _localStorage;
-var onChange = (eventHandler) => usePolyfill || addEventListener(
-  "storage",
-  /** @type {any} */
-  eventHandler
-);
-var offChange = (eventHandler) => usePolyfill || removeEventListener(
-  "storage",
-  /** @type {any} */
-  eventHandler
-);
+var onChange = (eventHandler) =>
+  usePolyfill ||
+  addEventListener(
+    'storage',
+    /** @type {any} */
+    eventHandler
+  );
+var offChange = (eventHandler) =>
+  usePolyfill ||
+  removeEventListener(
+    'storage',
+    /** @type {any} */
+    eventHandler
+  );
 
 // node_modules/lib0/trait/equality.js
-var EqualityTraitSymbol = /* @__PURE__ */ Symbol("Equality");
+var EqualityTraitSymbol = /* @__PURE__ */ Symbol('Equality');
 
 // node_modules/lib0/object.js
 var keys = Object.keys;
@@ -110,7 +115,11 @@ var equalityDeep = (a, b) => {
   if (a === b) {
     return true;
   }
-  if (a == null || b == null || a.constructor !== b.constructor && (a.constructor || Object) !== (b.constructor || Object)) {
+  if (
+    a == null ||
+    b == null ||
+    (a.constructor !== b.constructor && (a.constructor || Object) !== (b.constructor || Object))
+  ) {
     return false;
   }
   if (a[EqualityTraitSymbol] != null) {
@@ -183,9 +192,14 @@ var equalityDeep = (a, b) => {
 var isOneOf = (value, options) => options.includes(value);
 
 // node_modules/lib0/environment.js
-var isNode = typeof process !== "undefined" && process.release && /node|io\.js/.test(process.release.name) && Object.prototype.toString.call(typeof process !== "undefined" ? process : 0) === "[object process]";
-var isBrowser = typeof window !== "undefined" && typeof document !== "undefined" && !isNode;
-var isMac = typeof navigator !== "undefined" ? /Mac/.test(navigator.platform) : false;
+var isNode =
+  typeof process !== 'undefined' &&
+  process.release &&
+  /node|io\.js/.test(process.release.name) &&
+  Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) ===
+    '[object process]';
+var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && !isNode;
+var isMac = typeof navigator !== 'undefined' ? /Mac/.test(navigator.platform) : false;
 var params;
 var args = [];
 var computeParams = () => {
@@ -196,9 +210,9 @@ var computeParams = () => {
       let currParamName = null;
       for (let i = 0; i < pargs.length; i++) {
         const parg = pargs[i];
-        if (parg[0] === "-") {
+        if (parg[0] === '-') {
           if (currParamName !== null) {
-            params.set(currParamName, "");
+            params.set(currParamName, '');
           }
           currParamName = parg;
         } else {
@@ -211,17 +225,20 @@ var computeParams = () => {
         }
       }
       if (currParamName !== null) {
-        params.set(currParamName, "");
+        params.set(currParamName, '');
       }
-    } else if (typeof location === "object") {
+    } else if (typeof location === 'object') {
       params = create();
-      (location.search || "?").slice(1).split("&").forEach((kv) => {
-        if (kv.length !== 0) {
-          const [key, value] = kv.split("=");
-          params.set(`--${fromCamelCase(key, "-")}`, value);
-          params.set(`-${fromCamelCase(key, "-")}`, value);
-        }
-      });
+      (location.search || '?')
+        .slice(1)
+        .split('&')
+        .forEach((kv) => {
+          if (kv.length !== 0) {
+            const [key, value] = kv.split('=');
+            params.set(`--${fromCamelCase(key, '-')}`, value);
+            params.set(`-${fromCamelCase(key, '-')}`, value);
+          }
+        });
     } else {
       params = create();
     }
@@ -229,17 +246,27 @@ var computeParams = () => {
   return params;
 };
 var hasParam = (name) => computeParams().has(name);
-var getVariable = (name) => isNode ? undefinedToNull(process.env[name.toUpperCase().replaceAll("-", "_")]) : undefinedToNull(varStorage.getItem(name));
-var hasConf = (name) => hasParam("--" + name) || getVariable(name) !== null;
-var production = hasConf("production");
-var forceColor = isNode && isOneOf(process.env.FORCE_COLOR, ["true", "1", "2"]);
-var supportsColor = forceColor || !hasParam("--no-colors") && // @todo deprecate --no-colors
-!hasConf("no-color") && (!isNode || process.stdout.isTTY) && (!isNode || hasParam("--color") || getVariable("COLORTERM") !== null || (getVariable("TERM") || "").includes("color"));
+var getVariable = (name) =>
+  isNode
+    ? undefinedToNull(process.env[name.toUpperCase().replaceAll('-', '_')])
+    : undefinedToNull(varStorage.getItem(name));
+var hasConf = (name) => hasParam('--' + name) || getVariable(name) !== null;
+var production = hasConf('production');
+var forceColor = isNode && isOneOf(process.env.FORCE_COLOR, ['true', '1', '2']);
+var supportsColor =
+  forceColor ||
+  (!hasParam('--no-colors') && // @todo deprecate --no-colors
+    !hasConf('no-color') &&
+    (!isNode || process.stdout.isTTY) &&
+    (!isNode ||
+      hasParam('--color') ||
+      getVariable('COLORTERM') !== null ||
+      (getVariable('TERM') || '').includes('color')));
 
 // node_modules/lib0/math.js
 var floor = Math.floor;
-var min = (a, b) => a < b ? a : b;
-var max = (a, b) => a > b ? a : b;
+var min = (a, b) => (a < b ? a : b);
+var max = (a, b) => (a > b ? a : b);
 var isNaN = Number.isNaN;
 var pow = Math.pow;
 
@@ -280,7 +307,8 @@ var BITS30 = BIT31 - 1;
 var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 var MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER;
 var LOWEST_INT32 = 1 << 31;
-var isInteger = Number.isInteger || ((num) => typeof num === "number" && isFinite(num) && floor(num) === num);
+var isInteger =
+  Number.isInteger || ((num) => typeof num === 'number' && isFinite(num) && floor(num) === num);
 var isNaN2 = Number.isNaN;
 var parseInt = Number.parseInt;
 
@@ -322,7 +350,7 @@ var write = (encoder, num) => {
 };
 var writeVarUint = (encoder, num) => {
   while (num > BITS7) {
-    write(encoder, BIT8 | BITS7 & num);
+    write(encoder, BIT8 | (BITS7 & num));
     num = floor(num / 128);
   }
   write(encoder, BITS7 & num);
@@ -352,8 +380,10 @@ var _writeVarStringPolyfill = (encoder, str) => {
     );
   }
 };
-var writeVarString = utf8TextEncoder && /** @type {any} */
-utf8TextEncoder.encodeInto ? _writeVarStringNative : _writeVarStringPolyfill;
+var writeVarString =
+  utf8TextEncoder && /** @type {any} */ utf8TextEncoder.encodeInto
+    ? _writeVarStringNative
+    : _writeVarStringPolyfill;
 var writeUint8Array = (encoder, uint8Array) => {
   const bufferLen = encoder.cbuf.length;
   const cpos = encoder.cpos;
@@ -378,8 +408,8 @@ var floatTestBed = new DataView(new ArrayBuffer(4));
 var create3 = (s) => new Error(s);
 
 // node_modules/lib0/decoding.js
-var errorUnexpectedEndOfArray = create3("Unexpected end of array");
-var errorIntegerOutOfRange = create3("Integer out of Range");
+var errorUnexpectedEndOfArray = create3('Unexpected end of array');
+var errorIntegerOutOfRange = create3('Integer out of Range');
 var Decoder = class {
   /**
    * @param {Uint8Array<Buf>} uint8Array Binary data to decode
@@ -417,7 +447,7 @@ var readVarUint = (decoder) => {
 var _readVarStringPolyfill = (decoder) => {
   let remainingLen = readVarUint(decoder);
   if (remainingLen === 0) {
-    return "";
+    return '';
   } else {
     let encodedString = String.fromCodePoint(readUint8(decoder));
     if (--remainingLen < 100) {
@@ -440,24 +470,25 @@ var _readVarStringPolyfill = (decoder) => {
     return decodeURIComponent(escape(encodedString));
   }
 };
-var _readVarStringNative = (decoder) => (
+var _readVarStringNative = (decoder) =>
   /** @type any */
-  utf8TextDecoder.decode(readVarUint8Array(decoder))
-);
+  utf8TextDecoder.decode(readVarUint8Array(decoder));
 var readVarString = utf8TextDecoder ? _readVarStringNative : _readVarStringPolyfill;
 
 // node_modules/lib0/buffer.js
 var createUint8ArrayFromLen = (len) => new Uint8Array(len);
-var createUint8ArrayViewFromArrayBuffer = (buffer, byteOffset, length2) => new Uint8Array(buffer, byteOffset, length2);
+var createUint8ArrayViewFromArrayBuffer = (buffer, byteOffset, length2) =>
+  new Uint8Array(buffer, byteOffset, length2);
 var createUint8ArrayFromArrayBuffer = (buffer) => new Uint8Array(buffer);
 var toBase64Browser = (bytes) => {
-  let s = "";
+  let s = '';
   for (let i = 0; i < bytes.byteLength; i++) {
     s += fromCharCode(bytes[i]);
   }
   return btoa(s);
 };
-var toBase64Node = (bytes) => Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("base64");
+var toBase64Node = (bytes) =>
+  Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString('base64');
 var fromBase64Browser = (s) => {
   const a = atob(s);
   const bytes = createUint8ArrayFromLen(a.length);
@@ -467,7 +498,7 @@ var fromBase64Browser = (s) => {
   return bytes;
 };
 var fromBase64Node = (s) => {
-  const buf = Buffer.from(s, "base64");
+  const buf = Buffer.from(s, 'base64');
   return createUint8ArrayViewFromArrayBuffer(buf.buffer, buf.byteOffset, buf.byteLength);
 };
 var toBase64 = isBrowser ? toBase64Browser : toBase64Node;
@@ -482,7 +513,10 @@ var LocalStoragePolyfill = class {
   constructor(room) {
     this.room = room;
     this.onmessage = null;
-    this._onChange = (e) => e.key === room && this.onmessage !== null && this.onmessage({ data: fromBase64(e.newValue || "") });
+    this._onChange = (e) =>
+      e.key === room &&
+      this.onmessage !== null &&
+      this.onmessage({ data: fromBase64(e.newValue || '') });
     onChange(this._onChange);
   }
   /**
@@ -495,16 +529,17 @@ var LocalStoragePolyfill = class {
     offChange(this._onChange);
   }
 };
-var BC = typeof BroadcastChannel === "undefined" ? LocalStoragePolyfill : BroadcastChannel;
-var getChannel = (room) => setIfUndefined(channels, room, () => {
-  const subs = create2();
-  const bc = new BC(room);
-  bc.onmessage = (e) => subs.forEach((sub) => sub(e.data, "broadcastchannel"));
-  return {
-    bc,
-    subs
-  };
-});
+var BC = typeof BroadcastChannel === 'undefined' ? LocalStoragePolyfill : BroadcastChannel;
+var getChannel = (room) =>
+  setIfUndefined(channels, room, () => {
+    const subs = create2();
+    const bc = new BC(room);
+    bc.onmessage = (e) => subs.forEach((sub) => sub(e.data, 'broadcastchannel'));
+    return {
+      bc,
+      subs,
+    };
+  });
 var subscribe = (room, f) => {
   getChannel(room).subs.add(f);
   return f;
@@ -528,7 +563,7 @@ var publish = (room, data, origin = null) => {
 var getUnixTime = Date.now;
 
 // node_modules/y-protocols/sync.js
-import * as Y from "yjs";
+import * as Y from 'yjs';
 var messageYjsSyncStep1 = 0;
 var messageYjsSyncStep2 = 1;
 var messageYjsUpdate = 2;
@@ -541,16 +576,18 @@ var writeSyncStep2 = (encoder, doc, encodedStateVector) => {
   writeVarUint(encoder, messageYjsSyncStep2);
   writeVarUint8Array(encoder, Y.encodeStateAsUpdate(doc, encodedStateVector));
 };
-var readSyncStep1 = (decoder, encoder, doc) => writeSyncStep2(encoder, doc, readVarUint8Array(decoder));
+var readSyncStep1 = (decoder, encoder, doc) =>
+  writeSyncStep2(encoder, doc, readVarUint8Array(decoder));
 var readSyncStep2 = (decoder, doc, transactionOrigin, errorHandler) => {
   try {
     Y.applyUpdate(doc, readVarUint8Array(decoder), transactionOrigin);
   } catch (error) {
-    if (errorHandler != null) errorHandler(
-      /** @type {Error} */
-      error
-    );
-    console.error("Caught error while handling a Yjs update", error);
+    if (errorHandler != null)
+      errorHandler(
+        /** @type {Error} */
+        error
+      );
+    console.error('Caught error while handling a Yjs update', error);
   }
 };
 var writeUpdate = (encoder, update) => {
@@ -571,13 +608,13 @@ var readSyncMessage = (decoder, encoder, doc, transactionOrigin, errorHandler) =
       readUpdate(decoder, doc, transactionOrigin, errorHandler);
       break;
     default:
-      throw new Error("Unknown message type");
+      throw new Error('Unknown message type');
   }
   return messageType;
 };
 
 // node_modules/y-protocols/auth.js
-import * as Y2 from "yjs";
+import * as Y2 from 'yjs';
 var messagePermissionDenied = 0;
 var readAuthMessage = (decoder, y, permissionDeniedHandler2) => {
   switch (readVarUint(decoder)) {
@@ -709,7 +746,7 @@ var Observable = class {
 };
 
 // node_modules/y-protocols/awareness.js
-import * as Y3 from "yjs";
+import * as Y3 from 'yjs';
 var outdatedTimeout = 3e4;
 var Awareness = class extends Observable {
   /**
@@ -721,30 +758,41 @@ var Awareness = class extends Observable {
     this.clientID = doc.clientID;
     this.states = /* @__PURE__ */ new Map();
     this.meta = /* @__PURE__ */ new Map();
-    this._checkInterval = /** @type {any} */
-    setInterval(() => {
-      const now = getUnixTime();
-      if (this.getLocalState() !== null && outdatedTimeout / 2 <= now - /** @type {{lastUpdated:number}} */
-      this.meta.get(this.clientID).lastUpdated) {
-        this.setLocalState(this.getLocalState());
-      }
-      const remove = [];
-      this.meta.forEach((meta, clientid) => {
-        if (clientid !== this.clientID && outdatedTimeout <= now - meta.lastUpdated && this.states.has(clientid)) {
-          remove.push(clientid);
-        }
-      });
-      if (remove.length > 0) {
-        removeAwarenessStates(this, remove, "timeout");
-      }
-    }, floor(outdatedTimeout / 10));
-    doc.on("destroy", () => {
+    this._checkInterval =
+      /** @type {any} */
+      setInterval(
+        () => {
+          const now = getUnixTime();
+          if (
+            this.getLocalState() !== null &&
+            outdatedTimeout / 2 <=
+              now - /** @type {{lastUpdated:number}} */ this.meta.get(this.clientID).lastUpdated
+          ) {
+            this.setLocalState(this.getLocalState());
+          }
+          const remove = [];
+          this.meta.forEach((meta, clientid) => {
+            if (
+              clientid !== this.clientID &&
+              outdatedTimeout <= now - meta.lastUpdated &&
+              this.states.has(clientid)
+            ) {
+              remove.push(clientid);
+            }
+          });
+          if (remove.length > 0) {
+            removeAwarenessStates(this, remove, 'timeout');
+          }
+        },
+        floor(outdatedTimeout / 10)
+      );
+    doc.on('destroy', () => {
       this.destroy();
     });
     this.setLocalState({});
   }
   destroy() {
-    this.emit("destroy", [this]);
+    this.emit('destroy', [this]);
     this.setLocalState(null);
     super.destroy();
     clearInterval(this._checkInterval);
@@ -770,7 +818,7 @@ var Awareness = class extends Observable {
     }
     this.meta.set(clientID, {
       clock,
-      lastUpdated: getUnixTime()
+      lastUpdated: getUnixTime(),
     });
     const added = [];
     const updated = [];
@@ -789,9 +837,9 @@ var Awareness = class extends Observable {
       }
     }
     if (added.length > 0 || filteredUpdated.length > 0 || removed.length > 0) {
-      this.emit("change", [{ added, updated: filteredUpdated, removed }, "local"]);
+      this.emit('change', [{ added, updated: filteredUpdated, removed }, 'local']);
     }
-    this.emit("update", [{ added, updated, removed }, "local"]);
+    this.emit('update', [{ added, updated, removed }, 'local']);
   }
   /**
    * @param {string} field
@@ -802,7 +850,7 @@ var Awareness = class extends Observable {
     if (state !== null) {
       this.setLocalState({
         ...state,
-        [field]: value
+        [field]: value,
       });
     }
   }
@@ -820,21 +868,20 @@ var removeAwarenessStates = (awareness, clients, origin) => {
     if (awareness.states.has(clientID)) {
       awareness.states.delete(clientID);
       if (clientID === awareness.clientID) {
-        const curMeta = (
+        const curMeta =
           /** @type {MetaClientState} */
-          awareness.meta.get(clientID)
-        );
+          awareness.meta.get(clientID);
         awareness.meta.set(clientID, {
           clock: curMeta.clock + 1,
-          lastUpdated: getUnixTime()
+          lastUpdated: getUnixTime(),
         });
       }
       removed.push(clientID);
     }
   }
   if (removed.length > 0) {
-    awareness.emit("change", [{ added: [], updated: [], removed }, origin]);
-    awareness.emit("update", [{ added: [], updated: [], removed }, origin]);
+    awareness.emit('change', [{ added: [], updated: [], removed }, origin]);
+    awareness.emit('update', [{ added: [], updated: [], removed }, origin]);
   }
 };
 var encodeAwarenessUpdate = (awareness, clients, states = awareness.states) => {
@@ -844,10 +891,9 @@ var encodeAwarenessUpdate = (awareness, clients, states = awareness.states) => {
   for (let i = 0; i < len; i++) {
     const clientID = clients[i];
     const state = states.get(clientID) || null;
-    const clock = (
+    const clock =
       /** @type {MetaClientState} */
-      awareness.meta.get(clientID).clock
-    );
+      awareness.meta.get(clientID).clock;
     writeVarUint(encoder, clientID);
     writeVarUint(encoder, clock);
     writeVarString(encoder, JSON.stringify(state));
@@ -869,7 +915,10 @@ var applyAwarenessUpdate = (awareness, update, origin) => {
     const clientMeta = awareness.meta.get(clientID);
     const prevState = awareness.states.get(clientID);
     const currClock = clientMeta === void 0 ? 0 : clientMeta.clock;
-    if (currClock < clock || currClock === clock && state === null && awareness.states.has(clientID)) {
+    if (
+      currClock < clock ||
+      (currClock === clock && state === null && awareness.states.has(clientID))
+    ) {
       if (state === null) {
         if (clientID === awareness.clientID && awareness.getLocalState() != null) {
           clock++;
@@ -881,7 +930,7 @@ var applyAwarenessUpdate = (awareness, update, origin) => {
       }
       awareness.meta.set(clientID, {
         clock,
-        lastUpdated: timestamp
+        lastUpdated: timestamp,
       });
       if (clientMeta === void 0 && state !== null) {
         added.push(clientID);
@@ -896,23 +945,30 @@ var applyAwarenessUpdate = (awareness, update, origin) => {
     }
   }
   if (added.length > 0 || filteredUpdated.length > 0 || removed.length > 0) {
-    awareness.emit("change", [{
-      added,
-      updated: filteredUpdated,
-      removed
-    }, origin]);
+    awareness.emit('change', [
+      {
+        added,
+        updated: filteredUpdated,
+        removed,
+      },
+      origin,
+    ]);
   }
   if (added.length > 0 || updated.length > 0 || removed.length > 0) {
-    awareness.emit("update", [{
-      added,
-      updated,
-      removed
-    }, origin]);
+    awareness.emit('update', [
+      {
+        added,
+        updated,
+        removed,
+      },
+      origin,
+    ]);
   }
 };
 
 // node_modules/lib0/url.js
-var encodeQueryParams = (params2) => map(params2, (val, key) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join("&");
+var encodeQueryParams = (params2) =>
+  map(params2, (val, key) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&');
 
 // node_modules/y-websocket/src/y-websocket.js
 var messageSync = 0;
@@ -922,42 +978,35 @@ var messageAuth = 2;
 var messageHandlers = [];
 messageHandlers[messageSync] = (encoder, decoder, provider, emitSynced, _messageType) => {
   writeVarUint(encoder, messageSync);
-  const syncMessageType = readSyncMessage(
-    decoder,
-    encoder,
-    provider.doc,
-    provider
-  );
+  const syncMessageType = readSyncMessage(decoder, encoder, provider.doc, provider);
   if (emitSynced && syncMessageType === messageYjsSyncStep2 && !provider.synced) {
     provider.synced = true;
   }
 };
-messageHandlers[messageQueryAwareness] = (encoder, _decoder, provider, _emitSynced, _messageType) => {
+messageHandlers[messageQueryAwareness] = (
+  encoder,
+  _decoder,
+  provider,
+  _emitSynced,
+  _messageType
+) => {
   writeVarUint(encoder, messageAwareness);
   writeVarUint8Array(
     encoder,
-    encodeAwarenessUpdate(
-      provider.awareness,
-      Array.from(provider.awareness.getStates().keys())
-    )
+    encodeAwarenessUpdate(provider.awareness, Array.from(provider.awareness.getStates().keys()))
   );
 };
 messageHandlers[messageAwareness] = (_encoder, decoder, provider, _emitSynced, _messageType) => {
-  applyAwarenessUpdate(
-    provider.awareness,
-    readVarUint8Array(decoder),
-    provider
-  );
+  applyAwarenessUpdate(provider.awareness, readVarUint8Array(decoder), provider);
 };
 messageHandlers[messageAuth] = (_encoder, decoder, provider, _emitSynced, _messageType) => {
-  readAuthMessage(
-    decoder,
-    provider.doc,
-    (_ydoc, reason) => permissionDeniedHandler(provider, reason)
+  readAuthMessage(decoder, provider.doc, (_ydoc, reason) =>
+    permissionDeniedHandler(provider, reason)
   );
 };
 var messageReconnectTimeout = 3e4;
-var permissionDeniedHandler = (provider, reason) => console.warn(`Permission denied to access ${provider.url}.
+var permissionDeniedHandler = (provider, reason) =>
+  console.warn(`Permission denied to access ${provider.url}.
 ${reason}`);
 var readMessage = (provider, buf, emitSynced) => {
   const decoder = createDecoder(buf);
@@ -970,13 +1019,13 @@ var readMessage = (provider, buf, emitSynced) => {
   ) {
     messageHandler(encoder, decoder, provider, emitSynced, messageType);
   } else {
-    console.error("Unable to compute message");
+    console.error('Unable to compute message');
   }
   return encoder;
 };
 var closeWebsocketConnection = (provider, ws, event) => {
   if (ws === provider.ws) {
-    provider.emit("connection-close", [event, provider]);
+    provider.emit('connection-close', [event, provider]);
     provider.ws = null;
     ws.close();
     provider.wsconnecting = false;
@@ -990,18 +1039,17 @@ var closeWebsocketConnection = (provider, ws, event) => {
         ),
         provider
       );
-      provider.emit("status", [{
-        status: "disconnected"
-      }]);
+      provider.emit('status', [
+        {
+          status: 'disconnected',
+        },
+      ]);
     } else {
       provider.wsUnsuccessfulReconnects++;
     }
     setTimeout(
       setupWS,
-      min(
-        pow(2, provider.wsUnsuccessfulReconnects) * 100,
-        provider.maxBackoffTime
-      ),
+      min(pow(2, provider.wsUnsuccessfulReconnects) * 100, provider.maxBackoffTime),
       provider
     );
   }
@@ -1009,7 +1057,7 @@ var closeWebsocketConnection = (provider, ws, event) => {
 var setupWS = (provider) => {
   if (provider.shouldConnect && provider.ws === null) {
     const websocket = new provider._WS(provider.url, provider.protocols);
-    websocket.binaryType = "arraybuffer";
+    websocket.binaryType = 'arraybuffer';
     provider.ws = websocket;
     provider.wsconnecting = true;
     provider.wsconnected = false;
@@ -1022,7 +1070,7 @@ var setupWS = (provider) => {
       }
     };
     websocket.onerror = (event) => {
-      provider.emit("connection-error", [event, provider]);
+      provider.emit('connection-error', [event, provider]);
     };
     websocket.onclose = (event) => {
       closeWebsocketConnection(provider, websocket, event);
@@ -1032,9 +1080,11 @@ var setupWS = (provider) => {
       provider.wsconnecting = false;
       provider.wsconnected = true;
       provider.wsUnsuccessfulReconnects = 0;
-      provider.emit("status", [{
-        status: "connected"
-      }]);
+      provider.emit('status', [
+        {
+          status: 'connected',
+        },
+      ]);
       const encoder = createEncoder();
       writeVarUint(encoder, messageSync);
       writeSyncStep1(encoder, provider.doc);
@@ -1044,16 +1094,16 @@ var setupWS = (provider) => {
         writeVarUint(encoderAwarenessState, messageAwareness);
         writeVarUint8Array(
           encoderAwarenessState,
-          encodeAwarenessUpdate(provider.awareness, [
-            provider.doc.clientID
-          ])
+          encodeAwarenessUpdate(provider.awareness, [provider.doc.clientID])
         );
         websocket.send(toUint8Array(encoderAwarenessState));
       }
     };
-    provider.emit("status", [{
-      status: "connecting"
-    }]);
+    provider.emit('status', [
+      {
+        status: 'connecting',
+      },
+    ]);
   }
 };
 var broadcastMessage = (provider, buf) => {
@@ -1080,22 +1130,27 @@ var WebsocketProvider = class extends ObservableV2 {
    * @param {number} [opts.maxBackoffTime] Maximum amount of time to wait before trying to reconnect (we try to reconnect using exponential backoff)
    * @param {boolean} [opts.disableBc] Disable cross-tab BroadcastChannel communication
    */
-  constructor(serverUrl, roomname, doc, {
-    connect = true,
-    awareness = new Awareness(doc),
-    params: params2 = {},
-    protocols = [],
-    WebSocketPolyfill = WebSocket,
-    resyncInterval = -1,
-    maxBackoffTime = 2500,
-    disableBc = false
-  } = {}) {
+  constructor(
+    serverUrl,
+    roomname,
+    doc,
+    {
+      connect = true,
+      awareness = new Awareness(doc),
+      params: params2 = {},
+      protocols = [],
+      WebSocketPolyfill = WebSocket,
+      resyncInterval = -1,
+      maxBackoffTime = 2500,
+      disableBc = false,
+    } = {}
+  ) {
     super();
-    while (serverUrl[serverUrl.length - 1] === "/") {
+    while (serverUrl[serverUrl.length - 1] === '/') {
       serverUrl = serverUrl.slice(0, serverUrl.length - 1);
     }
     this.serverUrl = serverUrl;
-    this.bcChannel = serverUrl + "/" + roomname;
+    this.bcChannel = serverUrl + '/' + roomname;
     this.maxBackoffTime = maxBackoffTime;
     this.params = params2;
     this.protocols = protocols;
@@ -1115,15 +1170,16 @@ var WebsocketProvider = class extends ObservableV2 {
     this.shouldConnect = connect;
     this._resyncInterval = 0;
     if (resyncInterval > 0) {
-      this._resyncInterval = /** @type {any} */
-      setInterval(() => {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-          const encoder = createEncoder();
-          writeVarUint(encoder, messageSync);
-          writeSyncStep1(encoder, doc);
-          this.ws.send(toUint8Array(encoder));
-        }
-      }, resyncInterval);
+      this._resyncInterval =
+        /** @type {any} */
+        setInterval(() => {
+          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            const encoder = createEncoder();
+            writeVarUint(encoder, messageSync);
+            writeSyncStep1(encoder, doc);
+            this.ws.send(toUint8Array(encoder));
+          }
+        }, resyncInterval);
     }
     this._bcSubscriber = (data, origin) => {
       if (origin !== this) {
@@ -1141,46 +1197,45 @@ var WebsocketProvider = class extends ObservableV2 {
         broadcastMessage(this, toUint8Array(encoder));
       }
     };
-    this.doc.on("update", this._updateHandler);
+    this.doc.on('update', this._updateHandler);
     this._awarenessUpdateHandler = ({ added, updated, removed }, _origin) => {
       const changedClients = added.concat(updated).concat(removed);
       const encoder = createEncoder();
       writeVarUint(encoder, messageAwareness);
-      writeVarUint8Array(
-        encoder,
-        encodeAwarenessUpdate(awareness, changedClients)
-      );
+      writeVarUint8Array(encoder, encodeAwarenessUpdate(awareness, changedClients));
       broadcastMessage(this, toUint8Array(encoder));
     };
     this._exitHandler = () => {
-      removeAwarenessStates(
-        this.awareness,
-        [doc.clientID],
-        "app closed"
-      );
+      removeAwarenessStates(this.awareness, [doc.clientID], 'app closed');
     };
-    if (isNode && typeof process !== "undefined") {
-      process.on("exit", this._exitHandler);
+    if (isNode && typeof process !== 'undefined') {
+      process.on('exit', this._exitHandler);
     }
-    awareness.on("update", this._awarenessUpdateHandler);
-    this._checkInterval = /** @type {any} */
-    setInterval(() => {
-      if (this.wsconnected && messageReconnectTimeout < getUnixTime() - this.wsLastMessageReceived) {
-        closeWebsocketConnection(
-          this,
-          /** @type {WebSocket} */
-          this.ws,
-          null
-        );
-      }
-    }, messageReconnectTimeout / 10);
+    awareness.on('update', this._awarenessUpdateHandler);
+    this._checkInterval =
+      /** @type {any} */
+      setInterval(() => {
+        if (
+          this.wsconnected &&
+          messageReconnectTimeout < getUnixTime() - this.wsLastMessageReceived
+        ) {
+          closeWebsocketConnection(
+            this,
+            /** @type {WebSocket} */
+            this.ws,
+            null
+          );
+        }
+      }, messageReconnectTimeout / 10);
     if (connect) {
       this.connect();
     }
   }
   get url() {
     const encodedParams = encodeQueryParams(this.params);
-    return this.serverUrl + "/" + this.roomname + (encodedParams.length === 0 ? "" : "?" + encodedParams);
+    return (
+      this.serverUrl + '/' + this.roomname + (encodedParams.length === 0 ? '' : '?' + encodedParams)
+    );
   }
   /**
    * @type {boolean}
@@ -1191,8 +1246,8 @@ var WebsocketProvider = class extends ObservableV2 {
   set synced(state) {
     if (this._synced !== state) {
       this._synced = state;
-      this.emit("synced", [state]);
-      this.emit("sync", [state]);
+      this.emit('synced', [state]);
+      this.emit('sync', [state]);
     }
   }
   destroy() {
@@ -1201,11 +1256,11 @@ var WebsocketProvider = class extends ObservableV2 {
     }
     clearInterval(this._checkInterval);
     this.disconnect();
-    if (isNode && typeof process !== "undefined") {
-      process.off("exit", this._exitHandler);
+    if (isNode && typeof process !== 'undefined') {
+      process.off('exit', this._exitHandler);
     }
-    this.awareness.off("update", this._awarenessUpdateHandler);
-    this.doc.off("update", this._updateHandler);
+    this.awareness.off('update', this._awarenessUpdateHandler);
+    this.doc.off('update', this._updateHandler);
     super.destroy();
   }
   connectBc() {
@@ -1226,33 +1281,21 @@ var WebsocketProvider = class extends ObservableV2 {
     publish(this.bcChannel, toUint8Array(encoderState), this);
     const encoderAwarenessQuery = createEncoder();
     writeVarUint(encoderAwarenessQuery, messageQueryAwareness);
-    publish(
-      this.bcChannel,
-      toUint8Array(encoderAwarenessQuery),
-      this
-    );
+    publish(this.bcChannel, toUint8Array(encoderAwarenessQuery), this);
     const encoderAwarenessState = createEncoder();
     writeVarUint(encoderAwarenessState, messageAwareness);
     writeVarUint8Array(
       encoderAwarenessState,
-      encodeAwarenessUpdate(this.awareness, [
-        this.doc.clientID
-      ])
+      encodeAwarenessUpdate(this.awareness, [this.doc.clientID])
     );
-    publish(
-      this.bcChannel,
-      toUint8Array(encoderAwarenessState),
-      this
-    );
+    publish(this.bcChannel, toUint8Array(encoderAwarenessState), this);
   }
   disconnectBc() {
     const encoder = createEncoder();
     writeVarUint(encoder, messageAwareness);
     writeVarUint8Array(
       encoder,
-      encodeAwarenessUpdate(this.awareness, [
-        this.doc.clientID
-      ], /* @__PURE__ */ new Map())
+      encodeAwarenessUpdate(this.awareness, [this.doc.clientID], /* @__PURE__ */ new Map())
     );
     broadcastMessage(this, toUint8Array(encoder));
     if (this.bcconnected) {
@@ -1275,10 +1318,4 @@ var WebsocketProvider = class extends ObservableV2 {
     }
   }
 };
-export {
-  WebsocketProvider,
-  messageAuth,
-  messageAwareness,
-  messageQueryAwareness,
-  messageSync
-};
+export { WebsocketProvider, messageAuth, messageAwareness, messageQueryAwareness, messageSync };

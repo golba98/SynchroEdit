@@ -80,14 +80,31 @@ self.addEventListener('message', (event) => {
 
 // Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
-  // Ignore API requests, WebSocket upgrades, and non-http/https schemes
-  if (
-    event.request.url.includes('/api/') ||
-    event.request.url.includes('/ws/') ||
-    event.request.url.includes('socket.io') ||
-    !event.request.url.startsWith('http')
-  ) {
+  const urlString = event.request.url;
+
+  // Ignore non-http/https schemes early
+  if (!urlString.startsWith('http')) {
     return;
+  }
+
+  let requestUrl;
+  try {
+    requestUrl = new URL(urlString);
+  } catch (e) {
+    // If the URL cannot be parsed for some reason, do not handle it
+    return;
+  }
+
+  // Ignore API requests, WebSocket upgrades, and socket.io paths for same-origin requests
+  if (requestUrl.origin === self.location.origin) {
+    const pathname = requestUrl.pathname || '';
+    if (
+      pathname.startsWith('/api/') ||
+      pathname.startsWith('/ws/') ||
+      pathname.startsWith('/socket.io')
+    ) {
+      return;
+    }
   }
 
   // Ignore non-GET requests

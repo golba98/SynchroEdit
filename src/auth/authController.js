@@ -535,11 +535,7 @@ exports.forgotPassword = async (req, res, next) => {
   let baseUrl = process.env.FRONTEND_URL;
 
   if (!baseUrl) {
-    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-      baseUrl = `${req.protocol}://${req.get('host')}`;
-    } else {
-      return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
-    }
+    return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
   }
 
   const resetUrl = `${baseUrl}/pages/reset-password.html?token=${resetToken}`;

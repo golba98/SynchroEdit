@@ -112,22 +112,30 @@ class AuthController {
     // Form toggle (login <-> signup)
     const showSignup = document.getElementById('showSignup');
     const showLogin = document.getElementById('showLogin');
-    
+    const signupBackBtn = document.getElementById('signupBackBtn');
+
     if (showSignup) {
       showSignup.addEventListener('click', (e) => {
         e.preventDefault();
         this.toggleForm('signup');
       });
     }
-    
+
     if (showLogin) {
       showLogin.addEventListener('click', (e) => {
         e.preventDefault();
         this.toggleForm('login');
       });
     }
+
+    if (signupBackBtn) {
+      signupBackBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleForm('login');
+      });
+    }
   }
-  
+
   getFieldName(input) {
     // Try to get a meaningful field name for synchro tracking
     if (input.id) {
@@ -187,19 +195,59 @@ class AuthController {
     this.currentForm = formType;
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
-    
+
     if (formType === 'signup') {
       loginForm?.classList.remove('active');
       signupForm?.classList.add('active');
+      this._clearFormInputs(loginForm);
     } else {
       signupForm?.classList.remove('active');
       loginForm?.classList.add('active');
+      this._clearFormInputs(signupForm);
     }
-    
+
+    this._clearAuthMessages();
+    this._resetPasswordStrengthUI();
+    this._resetPasswordVisibility();
+
     this.synchro.formCompleteness = 'empty';
     this.synchro.applyState('idle');
   }
-  
+
+  _clearAuthMessages() {
+    const statusMessages = document.querySelectorAll('.status-message');
+    statusMessages.forEach((msg) => {
+      msg.textContent = '';
+      msg.className = 'status-message';
+    });
+  }
+
+  _resetPasswordStrengthUI() {
+    this._updatePasswordStrength('');
+  }
+
+  _resetPasswordVisibility() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+    inputs.forEach((input) => {
+      if (input.id?.toLowerCase().includes('password')) {
+        input.type = 'password';
+      }
+    });
+
+    const toggleIcons = document.querySelectorAll('.password-toggle i, .toggle-password i');
+    toggleIcons.forEach((icon) => {
+      icon.className = 'fas fa-eye';
+    });
+  }
+
+  _clearFormInputs(form) {
+    if (!form) return;
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach((input) => {
+      input.value = '';
+    });
+  }
+
   async handleSubmit(form) {
     this.synchro.onSubmit();
     if (form.id === 'signupForm') {

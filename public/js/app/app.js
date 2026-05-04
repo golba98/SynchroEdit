@@ -171,6 +171,7 @@ export class App {
   }
 
   async loadDocument() {
+    console.log('[App] loadDocument docId=', this.documentId);
     // Show skeleton immediately for instant perceived response
     const skeleton = document.getElementById('editorSkeleton');
     if (skeleton) skeleton.classList.remove('hidden');
@@ -180,7 +181,12 @@ export class App {
         console.warn('Recent list update failed:', err)
       );
 
-      // Create editor only if it doesn't exist or if switching to a different document
+      // Destroy and recreate editor when switching to a different document
+      if (this.editor && this.editor.currentDocId !== this.documentId) {
+        this.editor.destroy();
+        this.editor = null;
+      }
+
       if (!this.editor) {
         this.editor = new Editor('pagesContainer', {
           user: this.user,
@@ -209,24 +215,26 @@ export class App {
             );
           },
         });
-      } else if (this.editor.currentDocId !== this.documentId) {
-        // Switch to a different document
-        await this.editor.loadDocument(this.documentId);
+        console.log('[App] Editor created for docId=', this.documentId);
       }
 
-      document.getElementById('docLibrary').style.display = 'none';
-      document.getElementById('libraryOverlay').style.display = 'none';
+      const docLibrary = document.getElementById('docLibrary');
+      const libraryOverlay = document.getElementById('libraryOverlay');
+      if (docLibrary) docLibrary.style.display = 'none';
+      if (libraryOverlay) libraryOverlay.style.display = 'none';
 
       if (this.uiManager) {
         this.uiManager.updateMobileUIState();
       }
 
-      // Hide skeleton after editor is ready
-      if (skeleton) {
-        setTimeout(() => skeleton.classList.add('hidden'), 100);
+      // Wait for editor to signal ready (pages rendered), with built-in 10s fallback
+      if (this.editor.ready) {
+        await this.editor.ready;
       }
+      console.log('[App] Editor ready, hiding skeleton for docId=', this.documentId);
+      if (skeleton) skeleton.classList.add('hidden');
     } catch (err) {
-      console.error('Failed to load document:', err);
+      console.error('[App] Failed to load document:', err);
       // Hide skeleton on error
       if (skeleton) skeleton.classList.add('hidden');
       this.libraryManager.showLibrary();

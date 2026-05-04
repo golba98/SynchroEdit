@@ -3,6 +3,8 @@
  * Manages login/signup forms and integrates with SynchroBot
  */
 import { SynchroBot } from './synchro/SynchroBot.js';
+import { Auth } from '/js/features/auth/auth.js';
+import { Network } from '/js/app/network.js';
 
 class AuthController {
   constructor() {
@@ -56,6 +58,9 @@ class AuthController {
         const validation = this.validateField(e.target);
         this.synchro.onFieldInput(fieldName, e.target.value, validation);
         this.updateFormCompleteness();
+        if (e.target.id === 'signupPassword') {
+          this._updatePasswordStrength(e.target.value);
+        }
       });
     });
     
@@ -94,8 +99,9 @@ class AuthController {
       });
       
       button.addEventListener('click', (e) => {
-        // Check if form is valid before submitting
-        const form = e.target.closest('form') || e.target.closest('.form-section');
+        const form = e.target.closest('form')
+          || e.target.closest('.form-section')
+          || e.target.closest('.form-container');
         if (form) {
           e.preventDefault();
           this.handleSubmit(form);
@@ -106,22 +112,30 @@ class AuthController {
     // Form toggle (login <-> signup)
     const showSignup = document.getElementById('showSignup');
     const showLogin = document.getElementById('showLogin');
-    
+    const signupBackBtn = document.getElementById('signupBackBtn');
+
     if (showSignup) {
       showSignup.addEventListener('click', (e) => {
         e.preventDefault();
         this.toggleForm('signup');
       });
     }
-    
+
     if (showLogin) {
       showLogin.addEventListener('click', (e) => {
         e.preventDefault();
         this.toggleForm('login');
       });
     }
+
+    if (signupBackBtn) {
+      signupBackBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleForm('login');
+      });
+    }
   }
-  
+
   getFieldName(input) {
     // Try to get a meaningful field name for synchro tracking
     if (input.id) {
@@ -181,37 +195,159 @@ class AuthController {
     this.currentForm = formType;
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
-    
+
     if (formType === 'signup') {
       loginForm?.classList.remove('active');
       signupForm?.classList.add('active');
+      this._clearFormInputs(loginForm);
     } else {
       signupForm?.classList.remove('active');
       loginForm?.classList.add('active');
+      this._clearFormInputs(signupForm);
     }
-    
+
+    this._clearAuthMessages();
+    this._resetPasswordStrengthUI();
+    this._resetPasswordVisibility();
+
     this.synchro.formCompleteness = 'empty';
     this.synchro.applyState('idle');
   }
-  
+
+  _clearAuthMessages() {
+    const statusMessages = document.querySelectorAll('.status-message');
+    statusMessages.forEach((msg) => {
+      msg.textContent = '';
+      msg.className = 'status-message';
+    });
+  }
+
+  _resetPasswordStrengthUI() {
+    this._updatePasswordStrength('');
+  }
+
+  _resetPasswordVisibility() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+    inputs.forEach((input) => {
+      if (input.id?.toLowerCase().includes('password')) {
+        input.type = 'password';
+      }
+    });
+
+    const toggleIcons = document.querySelectorAll('.password-toggle i, .toggle-password i');
+    toggleIcons.forEach((icon) => {
+      icon.className = 'fas fa-eye';
+    });
+  }
+
+  _clearFormInputs(form) {
+    if (!form) return;
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach((input) => {
+      input.value = '';
+    });
+  }
+
   async handleSubmit(form) {
     this.synchro.onSubmit();
-    
-    // Here you would normally make an API call
-    // For now, just simulate it
-    setTimeout(() => {
-      // Simulate success/failure
-      const success = Math.random() > 0.3; // 70% success rate for demo
-      
-      if (success) {
-        this.synchro.onSuccess();
+    if (form.id === 'signupForm') {
+      await this._handleSignup(form);
+    } else {
+      await this._handleLogin(form);
+    }
+  }
+
+  async _handleLogin(form) {
+    const username = form.querySelector('#loginUsername')?.value?.trim();
+    const password = form.querySelector('#loginPassword')?.value;
+    const statusEl = document.getElementById('loginStatusMessage');
+
+    if (statusEl) statusEl.textContent = '';
+
+    try {
+      const data = await Network.fetchAPI('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
+      Auth.setToken(data.token);
+      this.synchro.onSuccess();
+      this._redirect();
+    } catch (e) {
+      const msg = e.message?.includes('401')
+        ? 'Invalid username or password'
+        : (e.message?.replace('API error: ', '') || 'Login failed');
+      if (statusEl) statusEl.textContent = msg;
+      this.synchro.onError();
+      setTimeout(() => this.synchro.applyState('idle'), 2000);
+    }
+  }
+
+  async _handleSignup(form) {
+    // Signup is out of scope for this fix; show a neutral state
+    this.synchro.applyState('idle');
+  }
+
+  _updatePasswordStrength(password) {
+    const segment = document.getElementById('entropySegment');
+    const label = document.getElementById('strengthLabel');
+    if (!segment) return;
+
+    const reqs = {
+      length: password.length >= 8,
+      upper:  /[A-Z]/.test(password),
+      lower:  /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      symbol: /[!@#$%^&*]/.test(password),
+    };
+
+    let score = 0;
+    for (const key of Object.keys(reqs)) {
+      const el = document.querySelector(`.requirement-item[data-req="${key}"]`);
+      if (!el) continue;
+      if (reqs[key]) {
+        score++;
+        el.classList.add('met');
+        el.querySelector('i').className = 'fas fa-check-circle';
       } else {
-        this.synchro.onError();
-        setTimeout(() => {
-          this.synchro.applyState('idle');
-        }, 2000);
+        el.classList.remove('met');
+        el.querySelector('i').className = 'fas fa-circle';
       }
-    }, 2000);
+    }
+
+    if (password.length === 0) {
+      segment.style.width = '0%';
+      segment.className = 'entropy-segment';
+      if (label) { label.textContent = ''; label.className = 'strength-label'; }
+      return;
+    }
+
+    const levels = [
+      { minScore: 1, maxScore: 2, cls: 'entropy-weak',   width: '30%',  text: 'Weak' },
+      { minScore: 3, maxScore: 3, cls: 'entropy-fair',   width: '60%',  text: 'Fair' },
+      { minScore: 4, maxScore: 4, cls: 'entropy-strong', width: '80%',  text: 'Strong' },
+      { minScore: 5, maxScore: 5, cls: 'entropy-elite',  width: '100%', text: 'Very Strong' },
+    ];
+    const level = levels.find(l => score >= l.minScore && score <= l.maxScore) || levels[0];
+
+    segment.style.width = level.width;
+    segment.className = `entropy-segment ${level.cls}`;
+
+    if (label) {
+      label.textContent = level.text;
+      label.className = `strength-label strength-label--${level.cls.replace('entropy-', '')}`;
+    }
+  }
+
+  _redirect() {
+    const overlay = document.getElementById('redirectOverlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      setTimeout(() => (overlay.style.opacity = '1'), 10);
+    }
+    const docId = new URLSearchParams(window.location.search).get('doc');
+    setTimeout(() => {
+      window.location.href = docId ? `/?doc=${docId}` : '/';
+    }, 1500);
   }
 }
 

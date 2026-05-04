@@ -266,6 +266,9 @@ exports.resendCode = async (req, res, next) => {
 
   const { email } = req.body;
   if (!email) return next(new AppError('Please provide an email address', 400));
+  if (typeof email !== 'string') {
+    return next(new AppError('Invalid email address format', 400));
+  }
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -535,11 +538,7 @@ exports.forgotPassword = async (req, res, next) => {
   let baseUrl = process.env.FRONTEND_URL;
 
   if (!baseUrl) {
-    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-      baseUrl = `${req.protocol}://${req.get('host')}`;
-    } else {
-      return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
-    }
+    return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
   }
 
   const resetUrl = `${baseUrl}/pages/reset-password.html?token=${resetToken}`;

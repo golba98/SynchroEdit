@@ -3,6 +3,8 @@
  * Manages login/signup forms and integrates with SynchroBot
  */
 import { SynchroBot } from './synchro/SynchroBot.js';
+import { Auth } from '/js/features/auth/auth.js';
+import { Network } from '/js/app/network.js';
 
 class AuthController {
   constructor() {
@@ -94,8 +96,9 @@ class AuthController {
       });
       
       button.addEventListener('click', (e) => {
-        // Check if form is valid before submitting
-        const form = e.target.closest('form') || e.target.closest('.form-section');
+        const form = e.target.closest('form')
+          || e.target.closest('.form-section')
+          || e.target.closest('.form-container');
         if (form) {
           e.preventDefault();
           this.handleSubmit(form);
@@ -196,22 +199,53 @@ class AuthController {
   
   async handleSubmit(form) {
     this.synchro.onSubmit();
-    
-    // Here you would normally make an API call
-    // For now, just simulate it
+    if (form.id === 'signupForm') {
+      await this._handleSignup(form);
+    } else {
+      await this._handleLogin(form);
+    }
+  }
+
+  async _handleLogin(form) {
+    const username = form.querySelector('#loginUsername')?.value?.trim();
+    const password = form.querySelector('#loginPassword')?.value;
+    const statusEl = document.getElementById('loginStatusMessage');
+
+    if (statusEl) statusEl.textContent = '';
+
+    try {
+      const data = await Network.fetchAPI('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
+      Auth.setToken(data.token);
+      this.synchro.onSuccess();
+      this._redirect();
+    } catch (e) {
+      const msg = e.message?.includes('401')
+        ? 'Invalid username or password'
+        : (e.message?.replace('API error: ', '') || 'Login failed');
+      if (statusEl) statusEl.textContent = msg;
+      this.synchro.onError();
+      setTimeout(() => this.synchro.applyState('idle'), 2000);
+    }
+  }
+
+  async _handleSignup(form) {
+    // Signup is out of scope for this fix; show a neutral state
+    this.synchro.applyState('idle');
+  }
+
+  _redirect() {
+    const overlay = document.getElementById('redirectOverlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      setTimeout(() => (overlay.style.opacity = '1'), 10);
+    }
+    const docId = new URLSearchParams(window.location.search).get('doc');
     setTimeout(() => {
-      // Simulate success/failure
-      const success = Math.random() > 0.3; // 70% success rate for demo
-      
-      if (success) {
-        this.synchro.onSuccess();
-      } else {
-        this.synchro.onError();
-        setTimeout(() => {
-          this.synchro.applyState('idle');
-        }, 2000);
-      }
-    }, 2000);
+      window.location.href = docId ? `/?doc=${docId}` : '/';
+    }, 1500);
   }
 }
 

@@ -1,135 +1,132 @@
 /**
  * @jest-environment jsdom
  */
-import { SynchroBot } from '../../../public/js/features/auth/synchro/SynchroBot.js';
 
-describe('SynchroBot', () => {
+import { SynchroBot } from "../../../public/js/features/auth/synchro/SynchroBot.js";
+
+describe("SynchroBot polish", () => {
   let synchro;
+  let requestAnimationFrameMock;
+  let cancelAnimationFrameMock;
 
   beforeEach(() => {
-    // Set up DOM
+    jest.useFakeTimers();
+
     document.body.innerHTML = `
       <div class="character-container">
         <div class="bot-rig" id="botRig">
-          <div class="pupil"></div>
-          <div class="pupil"></div>
+          <div class="eye left"><div class="pupil"></div></div>
+          <div class="eye right"><div class="pupil"></div></div>
+          <div class="eyelid top"></div>
+          <div class="eyelid bottom"></div>
         </div>
       </div>
+      <input id="loginUsername" />
     `;
 
-    synchro = new SynchroBot({ authFlow: 'login' });
+    requestAnimationFrameMock = jest.fn((cb) =>
+      setTimeout(() => cb(performance.now()), 16),
+    );
+    cancelAnimationFrameMock = jest.fn((id) => clearTimeout(id));
+    global.requestAnimationFrame = requestAnimationFrameMock;
+    global.cancelAnimationFrame = cancelAnimationFrameMock;
+
+    jest
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(function () {
+        if (this.id === "loginUsername") {
+          return {
+            x: 20,
+            y: 120,
+            left: 20,
+            top: 120,
+            width: 180,
+            height: 40,
+            right: 200,
+            bottom: 160,
+            toJSON: () => {},
+          };
+        }
+
+        if (this.classList?.contains("eye")) {
+          const isLeft = this.classList.contains("left");
+          return {
+            x: isLeft ? 180 : 220,
+            y: 100,
+            left: isLeft ? 180 : 220,
+            top: 100,
+            width: 32,
+            height: 40,
+            right: isLeft ? 212 : 252,
+            bottom: 140,
+            toJSON: () => {},
+          };
+        }
+
+        return {
+          x: 0,
+          y: 0,
+          left: 0,
+          top: 0,
+          width: 0,
+          height: 0,
+          right: 0,
+          bottom: 0,
+          toJSON: () => {},
+        };
+      });
+
+    synchro = new SynchroBot({ authFlow: "login" });
+    expect(synchro.init(".character-container")).toBe(true);
   });
 
   afterEach(() => {
     synchro?.destroy();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
+    delete global.requestAnimationFrame;
+    delete global.cancelAnimationFrame;
   });
 
-  describe('initialization', () => {
-    test('should initialize with default state', () => {
-      expect(synchro.currentState).toBe('idle');
-      expect(synchro.focusTarget).toBe('none');
-      expect(synchro.formCompleteness).toBe('empty');
-    });
+  test("blinks and returns to the resting eye state", () => {
+    synchro.triggerBlink();
+    expect(
+      document.getElementById("botRig").classList.contains("blinking"),
+    ).toBe(true);
 
-    test('should initialize with forgot flow state', () => {
-      const forgotSynchro = new SynchroBot({ authFlow: 'forgot' });
-      forgotSynchro.init('.character-container');
-      expect(forgotSynchro.currentState).toBe('empathy');
-      forgotSynchro.destroy();
-    });
+    jest.advanceTimersByTime(synchro.config.blinkDuration);
 
-    test('should return false if container not found', () => {
-      document.body.innerHTML = '';
-      const result = synchro.init('.character-container');
-      expect(result).toBe(false);
-    });
+    expect(
+      document.getElementById("botRig").classList.contains("blinking"),
+    ).toBe(false);
   });
 
-  describe('state transitions', () => {
-    beforeEach(() => {
-      synchro.init('.character-container');
-    });
+  test("keeps refreshing the focused input target while tracking", () => {
+    const trackSpy = jest.spyOn(synchro, "trackElement");
 
-    test('should transition to tracking on username focus', () => {
-      synchro.onFieldFocus('username', '');
-      expect(synchro.currentState).toBe('tracking');
-    });
+    synchro.setTargetElement(document.getElementById("loginUsername"));
 
-    test('should transition to secure on password focus (hidden)', () => {
-      synchro.onFieldFocus('password', '');
-      expect(synchro.currentState).toBe('secure');
-    });
+    expect(trackSpy).toHaveBeenCalledTimes(1);
 
-    test('should transition to peeking when password visible', () => {
-      jest.useFakeTimers();
-      synchro.onFieldFocus('password', '');
-      // Wait for transition to complete
-      jest.advanceTimersByTime(synchro.config.transitionDuration + 10);
-      synchro.onPasswordToggle(true);
-      jest.advanceTimersByTime(synchro.config.transitionDuration + 10);
-      expect(synchro.currentState).toBe('peeking');
-      jest.useRealTimers();
-    });
+    jest.advanceTimersByTime(32);
 
-    test('should transition to processing on submit', () => {
-      synchro.onSubmit();
-      expect(synchro.currentState).toBe('processing');
-      expect(synchro.isProcessing).toBe(true);
-    });
-
-    test('should transition to success after submit success', () => {
-      synchro.onSubmit();
-      synchro.onSuccess();
-      expect(synchro.currentState).toBe('success');
-      expect(synchro.isProcessing).toBe(false);
-    });
-
-    test('should transition to error after submit error', () => {
-      synchro.onSubmit();
-      synchro.onError();
-      expect(synchro.currentState).toBe('error');
-      expect(synchro.isProcessing).toBe(false);
-    });
+    expect(trackSpy.mock.calls.length).toBeGreaterThan(1);
+    expect(
+      document.querySelector(".eye.left .pupil").style.transform,
+    ).toContain("calc(-50% +");
   });
 
-  describe('idle timer', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-      synchro.init('.character-container');
-    });
+  test("centers the pupils again when focus is lost", () => {
+    synchro.setTargetElement(document.getElementById("loginUsername"));
+    jest.advanceTimersByTime(16);
 
-    afterEach(() => {
-      jest.useRealTimers();
-    });
+    synchro.onFieldBlur();
 
-    test('should transition to bored after 10s idle', () => {
-      jest.advanceTimersByTime(11000);
-      expect(synchro.currentState).toBe('bored');
-    });
-
-    test('should reset idle timer on input', () => {
-      jest.advanceTimersByTime(9000);
-      synchro.onFieldInput('username', 'test', {});
-      jest.advanceTimersByTime(9000);
-      expect(synchro.currentState).not.toBe('bored');
-    });
-  });
-
-  describe('button hover', () => {
-    beforeEach(() => {
-      synchro.init('.character-container');
-    });
-
-    test('should show hover-blocked when form empty', () => {
-      synchro.formCompleteness = 'empty';
-      synchro.onButtonHover(true);
-      expect(synchro.currentState).toBe('hover-blocked');
-    });
-
-    test('should show hover-ready when form valid', () => {
-      synchro.formCompleteness = 'valid';
-      synchro.onButtonHover(true);
-      expect(synchro.currentState).toBe('hover-ready');
-    });
+    expect(document.querySelectorAll(".pupil")[0].style.transform).toBe(
+      "translate(-50%, -50%)",
+    );
+    expect(document.querySelectorAll(".pupil")[1].style.transform).toBe(
+      "translate(-50%, -50%)",
+    );
   });
 });

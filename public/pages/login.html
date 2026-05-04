@@ -14,7 +14,12 @@
       :root {
         --accent-color: #8b5cf6;
         --accent-glow: rgba(139, 92, 246, 0.6);
-        --bg-gradient: linear-gradient(135deg, #1a0033 0%, #0d001a 50%, #000000 100%);
+        --bg-gradient: linear-gradient(
+          135deg,
+          #1a0033 0%,
+          #0d001a 50%,
+          #000000 100%
+        );
       }
 
       * {
@@ -28,7 +33,7 @@
       }
 
       body {
-        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-family: "Helvetica Neue", Arial, sans-serif;
         background: var(--bg-gradient);
         display: flex;
         justify-content: center;
@@ -39,7 +44,12 @@
       }
 
       body.error-flash {
-        background: linear-gradient(135deg, #330000 0%, #1a0000 50%, #000000 100%);
+        background: linear-gradient(
+          135deg,
+          #330000 0%,
+          #1a0000 50%,
+          #000000 100%
+        );
       }
 
       .login-container {
@@ -134,8 +144,8 @@
         color: #e0e0e0 !important;
       }
 
-      .input-group input[type='password'],
-      .input-group input[type='text'] {
+      .input-group input[type="password"],
+      .input-group input[type="text"] {
         color: #e0e0e0 !important;
         -webkit-text-fill-color: #e0e0e0;
       }
@@ -274,7 +284,9 @@
       }
 
       .floating-label-container input:focus + .floating-label,
-      .floating-label-container input:not(:placeholder-shown) + .floating-label {
+      .floating-label-container
+        input:not(:placeholder-shown)
+        + .floating-label {
         top: 0;
         font-size: 11px;
         color: var(--accent-color);
@@ -370,7 +382,11 @@
 
         .right-section {
           height: 110px; /* Even smaller height */
-          background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+          background: radial-gradient(
+            circle at center,
+            #1a1a1a 0%,
+            #000000 80%
+          );
           border-radius: 24px 24px 0 0;
           border-bottom: 1px solid #1a1a1a;
         }
@@ -588,8 +604,9 @@
         left: 50%;
         transform: translate(-50%, -50%); /* Centered default */
         box-shadow: 0 0 10px var(--accent-color);
+        will-change: transform;
         transition:
-          transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+          transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1),
           width 0.2s,
           height 0.2s,
           border-radius 0.2s;
@@ -790,7 +807,7 @@
         box-shadow: none;
         border-radius: 0;
         /* Star Shape using CSS clip-path or emoji */
-        content: '⭐';
+        content: "⭐";
         font-size: 24px;
         line-height: 32px;
         text-align: center;
@@ -799,7 +816,7 @@
       }
       /* Fallback for pupil content modification */
       .bot-rig.success .pupil::after {
-        content: '⭐';
+        content: "⭐";
         position: absolute;
         left: 0;
         top: 0;
@@ -843,7 +860,7 @@
         transform: translate(-50%, -50%) rotate(45deg);
       }
       .bot-rig.error .pupil::before {
-        content: '';
+        content: "";
         position: absolute;
         width: 20px;
         height: 4px;
@@ -905,6 +922,11 @@
         box-shadow: 0 0 15px #ffd700;
       }
 
+      .bot-rig.blinking .eyelid.top,
+      .bot-rig.blinking .eyelid.bottom {
+        height: 58%;
+      }
+
       .zzz-particle {
         position: absolute;
         color: #b0b0b0;
@@ -931,7 +953,14 @@
   <body class="boot-up">
     <div class="login-container">
       <div class="left-section">
-        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px">
+        <div
+          style="
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          "
+        >
           <div style="font-size: 24px">📄</div>
           <div
             style="
@@ -958,7 +987,9 @@
               inputmode="email"
               class="glow-on-hover input-glow-focus"
             />
-            <label for="loginUsername" class="floating-label">Username or Email</label>
+            <label for="loginUsername" class="floating-label"
+              >Username or Email</label
+            >
           </div>
 
           <div class="input-group floating-label-container">
@@ -978,7 +1009,11 @@
             <div style="text-align: right; margin-top: 5px">
               <a
                 href="forgot-password.html"
-                style="font-size: 12px; color: var(--accent-color); text-decoration: none"
+                style="
+                  font-size: 12px;
+                  color: var(--accent-color);
+                  text-decoration: none;
+                "
                 >Forgot Password?</a
               >
             </div>
@@ -1028,7 +1063,9 @@
                 autocomplete="off"
                 class="glow-on-hover input-glow-focus"
               />
-              <label for="signupUsername" class="floating-label">Choose a username</label>
+              <label for="signupUsername" class="floating-label"
+                >Choose a username</label
+              >
               <div
                 id="usernameStatusIcon"
                 style="
@@ -1042,7 +1079,12 @@
             </div>
             <div
               id="usernameSuggestions"
-              style="display: none; margin-top: 5px; font-size: 11px; color: var(--warning-color)"
+              style="
+                display: none;
+                margin-top: 5px;
+                font-size: 11px;
+                color: var(--warning-color);
+              "
             ></div>
           </div>
 
@@ -1055,7 +1097,9 @@
               inputmode="email"
               class="glow-on-hover input-glow-focus"
             />
-            <label for="signupEmail" class="floating-label">Email Address</label>
+            <label for="signupEmail" class="floating-label"
+              >Email Address</label
+            >
             <div
               id="emailSuggestion"
               style="
@@ -1077,13 +1121,19 @@
                 autocomplete="new-password"
                 class="glow-on-hover input-glow-focus"
               />
-              <label for="signupPassword" class="floating-label">Create a password</label>
+              <label for="signupPassword" class="floating-label"
+                >Create a password</label
+              >
               <span class="password-toggle" id="signupPasswordToggle"
                 ><i class="fas fa-eye"></i
               ></span>
             </div>
             <div class="entropy-bar">
-              <div id="entropySegment" class="entropy-segment" style="width: 0%"></div>
+              <div
+                id="entropySegment"
+                class="entropy-segment"
+                style="width: 0%"
+              ></div>
             </div>
             <ul
               id="passwordRequirements"
@@ -1121,12 +1171,16 @@
               autocomplete="new-password"
               class="glow-on-hover input-glow-focus"
             />
-            <label for="signupPasswordConfirm" class="floating-label">Confirm Password</label>
+            <label for="signupPasswordConfirm" class="floating-label"
+              >Confirm Password</label
+            >
           </div>
 
           <button class="login-btn" id="signupBtn">Create Account</button>
           <div class="status-message" id="signupStatusMessage"></div>
-          <div class="toggle-form">Already have an account? <a id="showLogin">Login</a></div>
+          <div class="toggle-form">
+            Already have an account? <a id="showLogin">Login</a>
+          </div>
         </div>
       </div>
 
@@ -1181,7 +1235,12 @@
     >
       <div
         style="
-          background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0d0d0d 100%);
+          background: linear-gradient(
+            135deg,
+            #0a0a0a 0%,
+            #1a0f2e 50%,
+            #0d0d0d 100%
+          );
           padding: 40px;
           border-radius: 12px;
           width: 100%;
@@ -1191,7 +1250,9 @@
           text-align: center;
         "
       >
-        <h2 style="color: #a78bfa; margin-bottom: 16px; font-size: 20px">Verify Your Email</h2>
+        <h2 style="color: #a78bfa; margin-bottom: 16px; font-size: 20px">
+          Verify Your Email
+        </h2>
         <p style="color: #b0b0b0; margin-bottom: 24px; font-size: 14px">
           We've sent a verification code to your email. Enter it below:
         </p>
@@ -1248,7 +1309,10 @@
         >
           Resend Code
         </button>
-        <div id="verificationMessage" style="margin-top: 16px; font-size: 13px"></div>
+        <div
+          id="verificationMessage"
+          style="margin-top: 16px; font-size: 13px"
+        ></div>
       </div>
     </div>
 
@@ -1270,9 +1334,25 @@
         transition: opacity 0.5s ease-in-out;
       "
     >
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 20px">
-        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
-        <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+        "
+      >
+        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">
+          📄
+        </div>
+        <h2
+          style="
+            color: var(--accent-color);
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin: 0;
+          "
+        >
           Accessing Workspace
         </h2>
         <div

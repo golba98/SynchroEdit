@@ -61,6 +61,24 @@ const setupMiddleware = (app) => {
   app.use(cookieParser());
 
   const { doubleCsrfProtection } = require('../utils/csrf');
+
+  // Global CSRF protection for non-API, state-changing requests
+  app.use((req, res, next) => {
+    // Skip CSRF for safe methods
+    const method = req.method && req.method.toUpperCase();
+    if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
+      return next();
+    }
+
+    // Let the dedicated API CSRF middleware handle /api routes
+    if (req.path && req.path.startsWith('/api/')) {
+      return next();
+    }
+
+    // Apply CSRF protection to other state-changing routes
+    return doubleCsrfProtection(req, res, next);
+  });
+
   // Apply CSRF protection to all API routes
   app.use('/api/', doubleCsrfProtection);
 

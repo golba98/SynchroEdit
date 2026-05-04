@@ -29,9 +29,8 @@ const ASSETS_TO_CACHE = [
   '/pages/reset-password.html',
   '/pages/verify.html',
   // External CDNs - Cache them for performance/offline
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://cdn.quilljs.com/1.3.6/quill.snow.css',
-  'https://cdn.quilljs.com/1.3.6/quill.js',
+  '/vendor/fontawesome/css/all.min.css',
+  'https://cdn.quilljs.com/1.3.6/quill.snow.css',  'https://cdn.quilljs.com/1.3.6/quill.js',
   'https://unpkg.com/idb-keyval@6.2.1/dist/index.js',
   'https://esm.sh/yjs@13.6.28',
   'https://esm.sh/y-quill@1.0.0?deps=yjs@13.6.28',

@@ -77,20 +77,33 @@ describe('Auth Controller Unit Tests', () => {
   });
 
   describe('signup', () => {
-    it('should return generic message if user exists (enumeration prevention)', async () => {
+    it('should return 409 with specific message when username is already taken', async () => {
       req.body = { username: 'existing', email: 'test@test.com', password: 'TestPassword123!' };
 
+      // First findOne (username check) returns an existing user
       User.findOne.mockReturnValue({
         lean: jest.fn().mockResolvedValue({ _id: '123' }),
       });
 
       await authController.signup(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'If your email is not registered, you will receive a verification code.',
-        })
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Username is already taken.', statusCode: 409 })
+      );
+    });
+
+    it('should return 409 with specific message when email is already registered', async () => {
+      req.body = { username: 'newuser', email: 'taken@test.com', password: 'TestPassword123!' };
+
+      // First findOne (username) returns null, second (email) returns existing user
+      User.findOne
+        .mockReturnValueOnce({ lean: jest.fn().mockResolvedValue(null) })
+        .mockReturnValueOnce({ lean: jest.fn().mockResolvedValue({ _id: '456' }) });
+
+      await authController.signup(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Email is already registered.', statusCode: 409 })
       );
     });
 

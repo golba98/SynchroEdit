@@ -5,6 +5,7 @@
 import { SynchroBot } from './synchro/SynchroBot.js';
 import { Auth } from '/js/features/auth/auth.js';
 import { Network } from '/js/app/network.js';
+import { PASSWORD_REGEX } from '/js/app/utils.js';
 
 class AuthController {
   constructor() {
@@ -212,6 +213,12 @@ class AuthController {
 
     this.synchro.formCompleteness = 'empty';
     this.synchro.applyState('idle');
+
+    // Clear stale status messages on both forms
+    const loginStatus = document.getElementById('loginStatusMessage');
+    const signupStatus = document.getElementById('signupStatusMessage');
+    if (loginStatus) { loginStatus.textContent = ''; loginStatus.className = 'status-message'; }
+    if (signupStatus) { signupStatus.textContent = ''; signupStatus.className = 'status-message'; }
   }
 
   _clearAuthMessages() {
@@ -283,8 +290,122 @@ class AuthController {
   }
 
   async _handleSignup(form) {
-    // Signup is out of scope for this fix; show a neutral state
-    this.synchro.applyState('idle');
+    const username = form.querySelector('#signupUsername')?.value?.trim();
+    const email = form.querySelector('#signupEmail')?.value?.trim();
+    const password = form.querySelector('#signupPassword')?.value;
+    const confirmPassword = form.querySelector('#signupPasswordConfirm')?.value;
+    const statusEl = document.getElementById('signupStatusMessage');
+    const btn = document.getElementById('signupBtn');
+
+    const showError = (msg) => {
+      if (statusEl) { statusEl.textContent = '✗ ' + msg; statusEl.className = 'status-message error'; }
+      this.synchro.onError();
+      setTimeout(() => this.synchro.applyState('idle'), 2000);
+    };
+
+    if (statusEl) { statusEl.textContent = ''; statusEl.className = 'status-message'; }
+
+    // Client-side validation
+    if (!username || !email || !password || !confirmPassword) {
+      return showError('Please fill in all fields.');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return showError('Please enter a valid email address.');
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      return showError('Password must be 8+ chars with uppercase, lowercase, number, and symbol.');
+    }
+
+    if (password !== confirmPassword) {
+      return showError('Passwords do not match.');
+    }
+
+    // Loading state
+    if (btn) { btn.disabled = true; btn.textContent = 'Creating account...'; }
+
+    try {
+      const data = await Network.fetchAPI('/api/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (data.token) {
+        // Email verification disabled — log the user in directly
+        Auth.setToken(data.token);
+        this.synchro.onSuccess();
+        if (statusEl) { statusEl.textContent = '✓ Account created! Redirecting...'; statusEl.className = 'status-message success'; }
+        setTimeout(() => this._redirect(), 1500);
+      } else {
+        // Email verification enabled — show the verification modal
+        this.synchro.onSuccess();
+        if (statusEl) {
+          statusEl.textContent = '✓ ' + (data.message || 'Check your email for a verification code.');
+          statusEl.className = 'status-message success';
+        }
+        this._showVerificationModal(email);
+      }
+    } catch (e) {
+      showError(e.message || 'Signup failed. Please try again.');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Create Account'; }
+    }
+  }
+
+  _showVerificationModal(email) {
+    const modal = document.getElementById('emailVerificationModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+
+    const verifyBtn = document.getElementById('verifyCodeBtn');
+    const resendBtn = document.getElementById('resendCodeBtn');
+    const verificationMsg = document.getElementById('verificationMessage');
+    const codeInput = document.getElementById('verificationCode');
+
+    if (verifyBtn) {
+      verifyBtn.onclick = async () => {
+        const code = codeInput?.value?.trim();
+        if (!code) {
+          if (verificationMsg) { verificationMsg.textContent = 'Please enter the code.'; verificationMsg.style.color = '#f44336'; }
+          return;
+        }
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
+        try {
+          const data = await Network.fetchAPI('/api/auth/verify-email', {
+            method: 'POST',
+            body: JSON.stringify({ email, verificationCode: code }),
+          });
+          Auth.setToken(data.token);
+          if (verificationMsg) { verificationMsg.textContent = '✓ Email verified! Redirecting...'; verificationMsg.style.color = '#4caf50'; }
+          this.synchro.onSuccess();
+          setTimeout(() => this._redirect(), 1200);
+        } catch (err) {
+          if (verificationMsg) { verificationMsg.textContent = '✗ ' + (err.message || 'Invalid code.'); verificationMsg.style.color = '#f44336'; }
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'Verify Code';
+        }
+      };
+    }
+
+    if (resendBtn) {
+      resendBtn.onclick = async () => {
+        resendBtn.disabled = true;
+        try {
+          await Network.fetchAPI('/api/auth/resend-code', {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+          });
+          if (verificationMsg) { verificationMsg.textContent = 'New code sent to your email.'; verificationMsg.style.color = '#4caf50'; }
+        } catch (err) {
+          if (verificationMsg) { verificationMsg.textContent = '✗ ' + (err.message || 'Failed to resend.'); verificationMsg.style.color = '#f44336'; }
+        } finally {
+          resendBtn.disabled = false;
+        }
+      };
+    }
   }
 
   _updatePasswordStrength(password) {

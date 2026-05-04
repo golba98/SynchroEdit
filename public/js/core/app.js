@@ -153,6 +153,12 @@ export class App {
   }
 
   async loadDocument() {
+    // Destroy any existing editor before creating a new one
+    if (this.editor) {
+      this.editor.destroy();
+      this.editor = null;
+    }
+
     // Show skeleton immediately for instant perceived response
     const skeleton = document.getElementById('editorSkeleton');
     if (skeleton) skeleton.classList.remove('hidden');

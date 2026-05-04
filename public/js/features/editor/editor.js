@@ -313,15 +313,19 @@ export class Editor {
     this.provider.on('sync', (isSynced) => {
       console.log('[Editor] sync isSynced=', isSynced, 'docId=', docId);
       clearTimeout(syncTimeout);
-      if (isSynced && this.yPages.length === 0) {
-        const newPage = new Y.Map();
-        newPage.set('id', Math.random().toString(36).substr(2, 9));
-        const content = new Y.Text();
-        newPage.set('content', content);
-        this.yPages.push([newPage]);
-      }
       if (isSynced) {
+        const isNewDoc = this.yPages.length === 0;
+        if (isNewDoc) {
+          const newPage = new Y.Map();
+          newPage.set('id', Math.random().toString(36).substr(2, 9));
+          const content = new Y.Text();
+          newPage.set('content', content);
+          this.yPages.push([newPage]);
+        }
         this.renderAllPages();
+        if (isNewDoc) {
+          this.switchToPage(0, 'start');
+        }
         this.saveToCache(docId);
       }
     });

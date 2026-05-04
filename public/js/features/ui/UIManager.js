@@ -232,6 +232,15 @@ export class UIManager {
         this.app.editor.setPageSize(e.target.value);
       }
     });
+
+    // New Page
+    addEvent('newPageBtn', 'click', () => {
+      if (this.app.editor) {
+        const newIndex = this.app.editor.yPages.length;
+        this.app.editor.addNewPage();
+        setTimeout(() => this.app.editor.switchToPage(newIndex, 'start'), 50);
+      }
+    });
   }
 
   setupMobileEvents() {

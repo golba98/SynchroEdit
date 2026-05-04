@@ -120,6 +120,21 @@ export class App {
     } else {
       await this.libraryManager.showLibrary();
     }
+
+    this.removeSplash();
+  }
+
+  removeSplash() {
+    const splash = document.getElementById('cold-splash');
+    if (splash) {
+      // Anti-flicker delay (300ms)
+      setTimeout(() => {
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
+        // Remove from DOM after fade out (400ms transition)
+        setTimeout(() => splash.remove(), 400);
+      }, 300);
+    }
   }
 
   setupVisibilityListener() {

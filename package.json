@@ -29,7 +29,12 @@
       "^https://unpkg.com/idb-keyval@(.*)$": "idb-keyval"
     },
     "transform": {
-      "^.+\\.jsx?$": ["babel-jest", { "configFile": "./config/.babelrc" }]
+      "^.+\\.jsx?$": [
+        "babel-jest",
+        {
+          "configFile": "./config/.babelrc"
+        }
+      ]
     }
   },
   "repository": {
@@ -71,7 +76,7 @@
     "@playwright/test": "^1.59.1",
     "babel-jest": "^30.2.0",
     "cross-env": "^10.1.0",
-    "eslint": "^10.2.0",
+    "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",

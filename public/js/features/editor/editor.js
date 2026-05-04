@@ -39,7 +39,18 @@ export class Editor {
     const token = Auth.getToken();
     const user = options.user || { username: 'Anonymous', accentColor: '#ff0000' };
     this.user = user;
+    this.currentDocId = docId;
     this.yPages = this.doc.getArray('pages');
+
+    // Ready promise — resolves when pages first render, or after 10s safety fallback
+    this._isReady = false;
+    this._readyResolve = null;
+    this.ready = new Promise((resolve) => {
+      this._readyResolve = resolve;
+    });
+    setTimeout(() => { if (this._readyResolve) this._readyResolve(); }, 10000);
+
+    console.log('[Editor] init docId=', docId);
 
     this.plugins = new Map();
 
@@ -163,10 +174,11 @@ export class Editor {
 
   async loadFromCache(docId) {
     if (!docId) return;
+    console.log('[Editor] loadFromCache docId=', docId);
     try {
       const cachedUpdate = await get(`doc-store-${docId}`);
       if (cachedUpdate) {
-        console.log('Loaded document from IndexedDB cache');
+        console.log('[Editor] cache hit for docId=', docId);
         Y.applyUpdate(this.doc, cachedUpdate);
         this.renderAllPages();
 
@@ -196,9 +208,11 @@ export class Editor {
             }
           }, 100);
         }
+      } else {
+        console.log('[Editor] cache miss for docId=', docId);
       }
     } catch (err) {
-      console.warn('Failed to load from IndexedDB:', err);
+      console.warn('[Editor] Failed to load from IndexedDB:', err);
     }
   }
 
@@ -246,14 +260,16 @@ export class Editor {
   }
 
   async connectWebSocket(docId, user) {
+    console.log('[Editor] connectWebSocket docId=', docId);
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
     let ticket;
     try {
       const data = await Network.fetchAPI('/api/auth/ws-ticket');
       ticket = data.ticket;
+      console.log('[Editor] WS ticket received');
     } catch (err) {
-      console.error('Failed to get WS ticket:', err);
+      console.error('[Editor] Failed to get WS ticket:', err);
       setTimeout(() => this.connectWebSocket(docId, user), 1000);
       return;
     }
@@ -268,6 +284,17 @@ export class Editor {
       this.doc,
       { params: { ticket: ticket } }
     );
+
+    console.log('[Editor] WebsocketProvider created for docId=', docId);
+
+    // Timeout: if sync never fires within 15s, show a visible error
+    const syncTimeout = setTimeout(() => {
+      if (!this.provider?.synced) {
+        console.error('[Editor] Sync timeout — document server unreachable for docId:', docId);
+        this._showSyncError();
+        if (this._readyResolve) this._readyResolve();
+      }
+    }, 15000);
 
     this.provider.on('status', async ({ status }) => {
       this.onStatusChange(status);
@@ -284,6 +311,8 @@ export class Editor {
     });
 
     this.provider.on('sync', (isSynced) => {
+      console.log('[Editor] sync isSynced=', isSynced, 'docId=', docId);
+      clearTimeout(syncTimeout);
       if (isSynced && this.yPages.length === 0) {
         const newPage = new Y.Map();
         newPage.set('id', Math.random().toString(36).substr(2, 9));
@@ -298,10 +327,42 @@ export class Editor {
     });
   }
 
+  _showSyncError() {
+    const placeholder = this.container?.querySelector('.loading-placeholder');
+    if (placeholder) {
+      placeholder.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:16px;color:#888;font-size:14px;">
+          <div style="font-size:32px;color:#e57373;">&#9888;</div>
+          <div>Could not connect to the document server.</div>
+          <button onclick="window.location.reload()" style="padding:8px 20px;background:#333;color:#e0e0e0;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px;">Retry</button>
+        </div>`;
+      placeholder.style.opacity = '1';
+    }
+  }
+
   async reconnect(user = null) {
     if (user) this.user = user;
     const docId = new URLSearchParams(window.location.search).get('doc');
     await this.connectWebSocket(docId, this.user);
+  }
+
+  destroy() {
+    console.log('[Editor] destroy docId=', this.currentDocId);
+    if (this.provider) {
+      this.provider.destroy();
+      this.provider = null;
+    }
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+    this.plugins.forEach((plugin) => {
+      if (typeof plugin.destroy === 'function') plugin.destroy();
+    });
+    this.plugins.clear();
+    this.pageQuillInstances.clear();
+    this.pageBindings.clear();
+    if (this.container) this.container.innerHTML = '';
   }
 
   updateUser(user) {
@@ -494,6 +555,8 @@ export class Editor {
       placeholders.forEach((p) => p.remove());
     }
 
+    console.log('[Editor] renderAllPages pages=', this.yPages.length, 'event=', !!event);
+
     const pages = this.yPages.toArray();
 
     // Late Binding: Ensure existing pages get bound when provider becomes available
@@ -567,6 +630,12 @@ export class Editor {
     const currentPageMap = this.yPages.get(this.currentPageIndex);
     if (currentPageMap) {
       this.quill = this.pageQuillInstances.get(currentPageMap.get('id')) || null;
+    }
+
+    // Signal ready on first successful render with pages present
+    if (!this._isReady && this.yPages.length > 0) {
+      this._isReady = true;
+      if (this._readyResolve) this._readyResolve();
     }
   }
 

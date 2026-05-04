@@ -178,15 +178,16 @@ exports.signup = async (req, res, next) => {
   username = username.trim();
   email = email.trim().toLowerCase();
 
-  const existingUser = await User.findOne({ $or: [{ username }, { email }] }).lean();
-  if (existingUser) {
-    // Prevent enumeration: If user exists, we pretend success or return a generic message.
-    // Simulate delay to match the time of user creation + email sending
-    await ensureMinimumDelay(startTime, 800);
+  const existingByUsername = await User.findOne({ username }).lean();
+  if (existingByUsername) {
+    await ensureMinimumDelay(startTime, 300);
+    return next(new AppError('Username is already taken.', 409));
+  }
 
-    return res.status(200).json({
-      message: 'If your email is not registered, you will receive a verification code.',
-    });
+  const existingByEmail = await User.findOne({ email }).lean();
+  if (existingByEmail) {
+    await ensureMinimumDelay(startTime, 300);
+    return next(new AppError('Email is already registered.', 409));
   }
 
   const verificationCode = emailUtils.generateVerificationCode();
@@ -534,13 +535,8 @@ exports.forgotPassword = async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  // Create Reset URL
-  let baseUrl = process.env.FRONTEND_URL;
-
-  if (!baseUrl) {
-    return next(new AppError('Server configuration error: FRONTEND_URL is missing.', 500));
-  }
-
+  // Create Reset URL — fall back to request host in dev if FRONTEND_URL is not configured
+  const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
   const resetUrl = `${baseUrl}/pages/reset-password.html?token=${resetToken}`;
 
   try {

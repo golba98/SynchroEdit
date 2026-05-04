@@ -97,7 +97,14 @@ export const Network = {
       }
     }
 
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    if (!response.ok) {
+      let message = `API error: ${response.status}`;
+      try {
+        const errData = await response.json();
+        if (errData && errData.message) message = errData.message;
+      } catch (_) {}
+      throw new Error(message);
+    }
     return response.json();
   },
 

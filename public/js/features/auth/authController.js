@@ -58,6 +58,9 @@ class AuthController {
         const validation = this.validateField(e.target);
         this.synchro.onFieldInput(fieldName, e.target.value, validation);
         this.updateFormCompleteness();
+        if (e.target.id === 'signupPassword') {
+          this._updatePasswordStrength(e.target.value);
+        }
       });
     });
     
@@ -234,6 +237,57 @@ class AuthController {
   async _handleSignup(form) {
     // Signup is out of scope for this fix; show a neutral state
     this.synchro.applyState('idle');
+  }
+
+  _updatePasswordStrength(password) {
+    const segment = document.getElementById('entropySegment');
+    const label = document.getElementById('strengthLabel');
+    if (!segment) return;
+
+    const reqs = {
+      length: password.length >= 8,
+      upper:  /[A-Z]/.test(password),
+      lower:  /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      symbol: /[!@#$%^&*]/.test(password),
+    };
+
+    let score = 0;
+    for (const key of Object.keys(reqs)) {
+      const el = document.querySelector(`.requirement-item[data-req="${key}"]`);
+      if (!el) continue;
+      if (reqs[key]) {
+        score++;
+        el.classList.add('met');
+        el.querySelector('i').className = 'fas fa-check-circle';
+      } else {
+        el.classList.remove('met');
+        el.querySelector('i').className = 'fas fa-circle';
+      }
+    }
+
+    if (password.length === 0) {
+      segment.style.width = '0%';
+      segment.className = 'entropy-segment';
+      if (label) { label.textContent = ''; label.className = 'strength-label'; }
+      return;
+    }
+
+    const levels = [
+      { minScore: 1, maxScore: 2, cls: 'entropy-weak',   width: '30%',  text: 'Weak' },
+      { minScore: 3, maxScore: 3, cls: 'entropy-fair',   width: '60%',  text: 'Fair' },
+      { minScore: 4, maxScore: 4, cls: 'entropy-strong', width: '80%',  text: 'Strong' },
+      { minScore: 5, maxScore: 5, cls: 'entropy-elite',  width: '100%', text: 'Very Strong' },
+    ];
+    const level = levels.find(l => score >= l.minScore && score <= l.maxScore) || levels[0];
+
+    segment.style.width = level.width;
+    segment.className = `entropy-segment ${level.cls}`;
+
+    if (label) {
+      label.textContent = level.text;
+      label.className = `strength-label strength-label--${level.cls.replace('entropy-', '')}`;
+    }
   }
 
   _redirect() {

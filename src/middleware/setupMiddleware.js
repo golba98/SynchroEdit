@@ -18,6 +18,7 @@ const setupMiddleware = (app) => {
             'cdn.quilljs.com',
             'unpkg.com',
             'esm.sh',
+            'cdn.jsdelivr.net',
           ],
           scriptSrcAttr: ["'unsafe-inline'"],
           styleSrc: [

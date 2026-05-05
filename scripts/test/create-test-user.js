@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const User = require('../src/users/User');
+const User = require('../../src/users/User');
 
 // Check both, prefer MONGODB_URI (what server.js uses)
 const MONGO_URI =

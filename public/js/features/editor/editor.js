@@ -50,8 +50,6 @@ export class Editor {
     });
     setTimeout(() => { if (this._readyResolve) this._readyResolve(); }, 10000);
 
-    console.log('[Editor] init docId=', docId);
-
     this.plugins = new Map();
 
     // Register Core Plugins (Managers)
@@ -750,8 +748,15 @@ export class Editor {
   unmountPage(pageId) {
     if (!this.pageQuillInstances.has(pageId)) return;
 
+    // PROTECTION: Never unmount the currently active page.
+    // IntersectionObserver might fire before initial layout or focus is ready.
+    const currentPageMap = this.yPages.get(this.currentPageIndex);
+    if (currentPageMap && currentPageMap.get('id') === pageId) {
+      return;
+    }
+
+    // Protection for focused editor
     if (
-      this.quill === this.pageQuillInstances.get(pageId) &&
       document.activeElement &&
       document.activeElement.closest(`#editor-${pageId}`)
     ) {

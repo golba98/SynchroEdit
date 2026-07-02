@@ -11,7 +11,7 @@ SyncroEdit is deployed completely on Cloudflare's serverless edge architecture:
 ```mermaid
 graph TD
     Client[Browser Client] -->|HTTP / API| Worker[Cloudflare Worker / Hono]
-    Client -->|WebSocket| DO[Durable Object: DocumentSyncObject]
+    Client -->|WebSocket| DO[Durable Object: SynchroDocumentObject]
     Worker -->|D1 Binding| D1[(D1 SQLite Database)]
     DO -->|Sync State & Pages| D1
     Worker -->|Assets| CF_Assets[Static Assets /public]
@@ -19,7 +19,7 @@ graph TD
 
 - **Cloudflare Worker (Hono):** Handles all HTTP routing, user authentication, profile details, and document CRUD API endpoints.
 - **Cloudflare D1:** Acts as the primary SQL relational database to store users, sessions, documents, and permissions.
-- **Durable Objects (`DocumentSyncObject`):** Represents individual document collaboration rooms. Manages WebSocket connections, state vectors, Yjs sync steps, cursor awareness propagation, and debounces state flushes back to D1.
+- **Durable Objects:** `SynchroDocumentObject` represents individual document collaboration rooms, and `SynchroRateLimitObject` tracks authentication abuse counters. The document object manages WebSocket connections, state vectors, Yjs sync steps, cursor awareness propagation, and debounced state flushes back to D1.
 - **Static Assets:** Served directly from the `./public` directory via Wrangler's assets binding.
 
 ---
@@ -39,14 +39,15 @@ To run SyncroEdit in production, configure the following bindings in your Cloudf
 ### Bindings
 
 1. **D1 Database:** Bind a D1 database to `DB`.
-2. **Durable Objects:** Bind the class `DocumentSyncObject` to `DOCUMENT_SYNC_OBJECT`.
+2. **Document Durable Object:** Bind `SynchroDocumentObject` to `DOCUMENT_SYNC_OBJECT`.
+3. **Rate-limit Durable Object:** Bind `SynchroRateLimitObject` to `RATE_LIMIT_OBJECT`.
 
 ### Secrets
 
 Set the following secret using wrangler CLI:
 
 ```bash
-wrangler secret put JWT_SECRET
+npx wrangler secret put JWT_SECRET
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put EMAIL_CODE_PEPPER
 ```
@@ -74,7 +75,7 @@ npm install
 
 ### 2. Apply Database Migrations (Local)
 
-Create the local SQLite database and apply the schema:
+Create the local SQLite database and apply the schema. The local scripts use the `local` Wrangler environment so production Durable Object migration history is not replayed during development.
 
 ```bash
 npm run db:migrate:local
@@ -99,13 +100,22 @@ Open `http://localhost:8787` in your browser.
 
 | Command                     | Description                                                                             |
 | --------------------------- | --------------------------------------------------------------------------------------- |
-| `npm run dev`               | Runs the wrangler dev emulator on `http://localhost:8787`                               |
-| `npm run deploy`            | Deploys the Worker and static assets using `npx wrangler deploy --config wrangler.toml` |
-| `npm run db:migrate:local`  | Applies migrations to the local development D1 database                                 |
+| `npm run dev`               | Runs the Wrangler dev emulator with `--env local` on `http://localhost:8787`            |
+| `npm run deploy`            | Deploys the top-level production Worker and static assets with `--env=""`              |
+| `npm run db:migrate:local`  | Applies migrations to the local development D1 database with `--env local`             |
 | `npm run db:migrate:remote` | Applies migrations to the production remote D1 database                                 |
 | `npm test`                  | Runs the Jest test suite (unit, integration, and frontend)                              |
 | `npm run lint`              | Runs the ESLint checker                                                                 |
 | `npm run format`            | Standardizes codebase formatting via Prettier                                           |
+
+For staging deploys and migrations, target the Wrangler environment explicitly:
+
+```bash
+npx wrangler deploy --env staging
+npx wrangler d1 migrations apply DB --remote --env staging
+```
+
+The `local` Wrangler environment is for local development only and uses a placeholder D1 database ID. Do not deploy it.
 
 ---
 

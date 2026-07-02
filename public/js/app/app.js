@@ -616,6 +616,6 @@ export class App {
   }
 }
 
-if (typeof window !== 'undefined' && !window.testEnv) {
+if (typeof window !== 'undefined' && !window.testEnv && !window.__SYNCROEDIT_USE_MAIN_ENTRY__) {
   new App();
 }

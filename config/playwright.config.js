@@ -27,7 +27,8 @@ module.exports = defineConfig({
   ],
   webServer: {
     command:
-      'rm -rf .wrangler/state/v3/d1 && npx wrangler d1 migrations apply DB --local && npx wrangler dev --port 8787 --var NODE_ENV:test --var EMAIL_CODE_PEPPER:test-email-code-pepper-123 --var RESEND_API_KEY:test-resend-api-key --var "EMAIL_FROM:SyncroEdit <verify@example.com>" --var APP_NAME:SyncroEdit',
+      'rm -rf .wrangler/state/v3 && npx wrangler d1 migrations apply DB --local --env local && npx wrangler dev --env local --port 8787 --var NODE_ENV:test --var EMAIL_CODE_PEPPER:test-email-code-pepper-123 --var RESEND_API_KEY:test-resend-api-key --var "EMAIL_FROM:SyncroEdit <verify@example.com>" --var APP_NAME:SyncroEdit',
+    cwd: '..',
     url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8787',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

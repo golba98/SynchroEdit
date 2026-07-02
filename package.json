@@ -1,13 +1,13 @@
 {
-  "name": "1-synchroedit",
+  "name": "syncroedit",
   "version": "1.0.0",
-  "description": "",
+  "description": "Cloudflare Workers and Durable Objects collaborative editor.",
   "main": "src-worker/index.js",
   "scripts": {
-    "start": "wrangler dev",
-    "dev": "wrangler dev",
+    "start": "wrangler dev --env local",
+    "dev": "wrangler dev --env local",
     "deploy": "wrangler deploy --env=\"\"",
-    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local --env local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "test": "npm run test:unit && npm run test:integration && npm run test:frontend",
     "test:unit": "cross-env SKIP_DB_SETUP=true jest tests/unit",
@@ -43,15 +43,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/golba98-dev/SynchroEdit.git"
+    "url": "git+https://github.com/golba98/SyncroEdit.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/golba98-dev/SynchroEdit/issues"
+    "url": "https://github.com/golba98/SyncroEdit/issues"
   },
-  "homepage": "https://github.com/golba98-dev/SynchroEdit#readme",
+  "homepage": "https://github.com/golba98/SyncroEdit#readme",
   "dependencies": {
     "dompurify": "3.4.11",
     "hono": "^4.12.27",

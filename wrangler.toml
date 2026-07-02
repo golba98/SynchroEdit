@@ -39,6 +39,37 @@ EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"
 APP_NAME = "SyncroEdit"
 APP_URL = "https://syncroedit.online"
 
+[env.local]
+name = "syncroedit-local"
+workers_dev = true
+
+[[env.local.d1_databases]]
+binding = "DB"
+database_name = "syncroedit-local-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[env.local.durable_objects.bindings]]
+name = "DOCUMENT_SYNC_OBJECT"
+class_name = "SynchroDocumentObject"
+
+[[env.local.durable_objects.bindings]]
+name = "RATE_LIMIT_OBJECT"
+class_name = "SynchroRateLimitObject"
+
+[[env.local.migrations]]
+tag = "v1"
+new_sqlite_classes = ["SynchroDocumentObject"]
+
+[[env.local.migrations]]
+tag = "v2"
+new_sqlite_classes = ["SynchroRateLimitObject"]
+
+[env.local.vars]
+EMAIL_FROM = "SyncroEdit <verify@example.com>"
+APP_NAME = "SyncroEdit"
+APP_URL = "http://localhost:8787"
+
 [env.staging]
 name = "syncroedit-dev"
 workers_dev = true

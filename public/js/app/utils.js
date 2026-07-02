@@ -1,4 +1,5 @@
-export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
+export { PASSWORD_REGEX, isStrongPassword, isValidEmail } from '/scripts/utils/validation.js';
+export { debounce } from '/scripts/utils/debounce.js';
 
 export function escapeHTML(str) {
   if (!str) return '';
@@ -9,18 +10,6 @@ export function escapeHTML(str) {
 
 export function ptToPx(pt) {
   return parseFloat(pt) * 1.333;
-}
-
-export function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 }
 
 export function navigateTo(url) {

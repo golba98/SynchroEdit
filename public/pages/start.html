@@ -93,7 +93,7 @@
     </style>
     <script src="/config.js"></script>
   </head>
-  <body>
+  <body data-page="start">
     <div class="container">
       <div class="logo">📄</div>
       <h1>SynchroEdit</h1>
@@ -101,15 +101,6 @@
       <div class="loading"></div>
     </div>
 
-    <script>
-      // Redirect to login page after brief delay
-      setTimeout(() => {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          window.location.href = 'login.html?autologin=true';
-        } else {
-          window.location.href = 'login.html';
-        }
-      }, 2000);
-    </script>
+    <script type="module" src="/scripts/main.js"></script>
   </body>
 </html>

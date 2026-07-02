@@ -1,5 +1,16 @@
 const { test, expect } = require('@playwright/test');
 
+async function getVisibleBox(locator) {
+  await expect(locator).toBeVisible();
+  await expect
+    .poll(async () => {
+      const box = await locator.boundingBox();
+      return Boolean(box && box.width > 0 && box.height > 0);
+    })
+    .toBe(true);
+  return locator.boundingBox();
+}
+
 test.describe('Login Page Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/pages/login.html');
@@ -183,8 +194,8 @@ test.describe('Bot Alignment & Rig Tests', () => {
     // Resize window
     await page.setViewportSize({ width: 1200, height: 800 });
 
-    const containerBox = await container.boundingBox();
-    const headBox = await head.boundingBox();
+    const containerBox = await getVisibleBox(container);
+    const headBox = await getVisibleBox(head);
 
     // Head should be inside container
     expect(headBox.x).toBeGreaterThanOrEqual(containerBox.x);
@@ -206,17 +217,17 @@ test.describe('Bot Alignment & Rig Tests', () => {
     const handLeft = page.locator('.hand.left');
     const handRight = page.locator('.hand.right');
 
-    const headBox = await head.boundingBox();
-    const leftBox = await handLeft.boundingBox();
-    const rightBox = await handRight.boundingBox();
+    const headBox = await getVisibleBox(head);
+    const leftBox = await getVisibleBox(handLeft);
+    const rightBox = await getVisibleBox(handRight);
 
     // Hands should be roughly within the head's vertical range (covering eyes)
     // Eyes are in the middle-ish of the head.
     // Assert hands overlap with head significantly
     expect(leftBox.y).toBeGreaterThan(headBox.y);
-    expect(leftBox.y + leftBox.height).toBeLessThan(headBox.y + headBox.height + 20); // allow slight overflow
+    expect(leftBox.y + leftBox.height).toBeLessThan(headBox.y + headBox.height + 21); // allow slight overflow and rounding
     expect(rightBox.y).toBeGreaterThan(headBox.y);
-    expect(rightBox.y + rightBox.height).toBeLessThan(headBox.y + headBox.height + 20);
+    expect(rightBox.y + rightBox.height).toBeLessThan(headBox.y + headBox.height + 21);
   });
 
   test('Face Screen Clipping', async ({ page }) => {
@@ -226,8 +237,8 @@ test.describe('Bot Alignment & Rig Tests', () => {
     const faceScreen = page.locator('.face-screen');
     const pupil = page.locator('.eye.left .pupil');
 
-    const faceBox = await faceScreen.boundingBox();
-    const pupilBox = await pupil.boundingBox();
+    const faceBox = await getVisibleBox(faceScreen);
+    const pupilBox = await getVisibleBox(pupil);
 
     // Pupil should be contained within face screen (or mostly, depending on design)
     // With overflow:hidden on face-screen, checking the box might return the clipped box or full box depending on browser.
@@ -275,7 +286,7 @@ test.describe('Responsiveness & Scaling', () => {
 
   test('Aspect Ratio (Squircle)', async ({ page }) => {
     const head = page.locator('.head');
-    const box = await head.boundingBox();
+    const box = await getVisibleBox(head);
     // Width should be roughly close to height (160x140 in CSS)
     // It's not a perfect square, but it shouldn't be flattened excessively.
     const ratio = box.width / box.height;

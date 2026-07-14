@@ -13,7 +13,7 @@ import {
   setAuthHooks,
   transferOwnership,
   updateDocumentSettings,
-} from '/scripts/api.js';
+} from '/js/core/api.js';
 import { Auth } from '/js/features/auth/auth.js';
 
 setAuthHooks({

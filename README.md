@@ -6,6 +6,11 @@ SyncroEdit is a high-performance, real-time collaborative document editor rebuil
 
 ## Architecture Overview
 
+See [the technical documentation](docs/DOCUMENTATION.md) for the standardized project overview.
+The detailed references are [architecture](docs/ARCHITECTURE.md),
+[project structure](docs/PROJECT_STRUCTURE.md), and the
+[per-file reference](docs/FILE_REFERENCE.md).
+
 SyncroEdit is deployed completely on Cloudflare's serverless edge architecture:
 
 ```mermaid
@@ -17,7 +22,7 @@ graph TD
     Worker -->|Assets| CF_Assets[Static Assets /public]
 ```
 
-- **Cloudflare Worker (Hono):** Handles all HTTP routing, user authentication, profile details, and document CRUD API endpoints.
+- **Cloudflare Worker (Hono):** Composes domain route modules for authentication, profiles, documents, and realtime upgrades.
 - **Cloudflare D1:** Acts as the primary SQL relational database to store users, sessions, documents, and permissions.
 - **Durable Objects:** `SynchroDocumentObject` represents individual document collaboration rooms, and `SynchroRateLimitObject` tracks authentication abuse counters. The document object manages WebSocket connections, state vectors, Yjs sync steps, cursor awareness propagation, and debounced state flushes back to D1.
 - **Static Assets:** Served directly from the `./public` directory via Wrangler's assets binding.
@@ -98,15 +103,15 @@ Open `http://localhost:8787` in your browser.
 > [!NOTE]
 > There is no `npm run build` script in this repository. Static assets are served directly from the `public/` directory by Cloudflare.
 
-| Command                     | Description                                                                             |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| `npm run dev`               | Runs the Wrangler dev emulator with `--env local` on `http://localhost:8787`            |
-| `npm run deploy`            | Deploys the top-level production Worker and static assets with `--env=""`              |
-| `npm run db:migrate:local`  | Applies migrations to the local development D1 database with `--env local`             |
-| `npm run db:migrate:remote` | Applies migrations to the production remote D1 database                                 |
-| `npm test`                  | Runs the Jest test suite (unit, integration, and frontend)                              |
-| `npm run lint`              | Runs the ESLint checker                                                                 |
-| `npm run format`            | Standardizes codebase formatting via Prettier                                           |
+| Command                     | Description                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `npm run dev`               | Runs the Wrangler dev emulator with `--env local` on `http://localhost:8787` |
+| `npm run deploy`            | Deploys the top-level production Worker and static assets with `--env=""`    |
+| `npm run db:migrate:local`  | Applies migrations to the local development D1 database with `--env local`   |
+| `npm run db:migrate:remote` | Applies migrations to the production remote D1 database                      |
+| `npm test`                  | Runs the Jest test suite (unit, integration, and frontend)                   |
+| `npm run lint`              | Runs the ESLint checker                                                      |
+| `npm run format`            | Standardizes codebase formatting via Prettier                                |
 
 For staging deploys and migrations, target the Wrangler environment explicitly:
 
@@ -137,11 +142,11 @@ SyncroEdit's production backend is the Cloudflare Worker in `src-worker/`. API r
 
 ### Live URLs
 
-| URL                                                | Purpose                       |
-| -------------------------------------------------- | ----------------------------- |
-| **<https://syncroedit.online>**                    | Production (custom domain)    |
-| **<https://www.syncroedit.online>**                | Production www redirect       |
-| `https://syncroedit.jordanvorster404.workers.dev`  | Worker fallback (workers.dev) |
+| URL                                               | Purpose                       |
+| ------------------------------------------------- | ----------------------------- |
+| **<https://syncroedit.online>**                   | Production (custom domain)    |
+| **<https://www.syncroedit.online>**               | Production www redirect       |
+| `https://syncroedit.jordanvorster404.workers.dev` | Worker fallback (workers.dev) |
 
 ### Production DNS and Security Controls
 

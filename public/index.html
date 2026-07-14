@@ -16,11 +16,10 @@
     <script src="/vendor/highlight.js/highlight.min.js"></script>
     <!-- Fonts -->
     <link href="/vendor/fonts/google/fonts.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/vendor/fonts/cm-web-fonts/fonts.css" />
     <style id="critical-boot-styles">
       /* Initial critical styles to prevent FOUC (Flash of Unstyled Content).
          NOTE: dashboard state is included here so editor chrome is hidden even
-         before styles.css finishes loading (e.g. on a slow connection or after
+         before the application styles finish loading (e.g. on a slow connection or after
          a stale service-worker cache miss). */
       body[data-view-state='booting'] .header,
       body[data-view-state='booting'] .ribbon-tabs,
@@ -107,12 +106,10 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <!-- File Extraction Libraries -->
-    <!-- External Libraries (Deferred for speed) -->
-    <script src="/vendor/mammoth/mammoth.browser.min.js" defer></script>
-    <script src="/vendor/pdfjs/pdf.min.js" defer></script>
-    <script src="/vendor/html2pdf/html2pdf.bundle.min.js" defer></script>
+    <link rel="stylesheet" href="/css/app/core.css" />
+    <link rel="stylesheet" href="/css/app/editor.css" />
+    <link rel="stylesheet" href="/css/app/effects.css" />
+    <link rel="stylesheet" href="/css/app/settings.css" />
     <script type="importmap">
       {
         "imports": {
@@ -2232,37 +2229,6 @@
           >
         </div>
       </div>
-
-      <style>
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-15px);
-          }
-        }
-        @keyframes pulse {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.5;
-            transform: scale(1.2);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      </style>
     </div>
 
     <!-- Search Dialog -->
@@ -2545,6 +2511,6 @@
     </div>
 
     <script src="/config.js"></script>
-    <script type="module" src="/scripts/main.js"></script>
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>

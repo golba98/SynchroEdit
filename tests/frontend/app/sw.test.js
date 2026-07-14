@@ -43,7 +43,7 @@ describe('Service Worker', () => {
     expect(global.self.addEventListener).toHaveBeenCalledWith('fetch', expect.any(Function));
   });
 
-  it('cache name is syncroedit-v10 (ensures stale asset caches are always busted)', () => {
+  it('cache name is syncroedit-v12 (ensures stale asset caches are always busted)', () => {
     require('../../../public/sw.js');
     // The CACHE_NAME constant is not exported, but the activate handler only
     // keeps the current version.  We verify indirectly: when activate runs with
@@ -63,7 +63,7 @@ describe('Service Worker', () => {
       'syncroedit-v7',
       'syncroedit-v8',
       'syncroedit-v9',
-      'syncroedit-v10',
+      'syncroedit-v12',
       'some-other-cache',
     ];
     global.caches.keys.mockResolvedValue(mockCacheKeys);
@@ -76,7 +76,7 @@ describe('Service Worker', () => {
     activateCallback(mockEvent);
     await new Promise(process.nextTick);
 
-    // Should delete all caches except syncroedit-v10
+    // Should delete all caches except syncroedit-v12
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v4');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v5');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v6');
@@ -84,7 +84,7 @@ describe('Service Worker', () => {
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v8');
     expect(global.caches.delete).toHaveBeenCalledWith('some-other-cache');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v9');
-    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v10');
+    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v12');
   });
 
   describe('fetch handler', () => {
@@ -153,7 +153,7 @@ describe('Service Worker', () => {
 
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v10');
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v12');
       expect(mockCache.put).toHaveBeenCalledWith(mockRequest, 'cloned-response');
     });
 
@@ -245,7 +245,7 @@ describe('Service Worker', () => {
       expect(global.caches.match).toHaveBeenCalledWith(mockRequest);
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v10');
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v12');
       expect(mockCache.put).toHaveBeenCalledWith(mockRequest, 'cloned-css');
     });
   });

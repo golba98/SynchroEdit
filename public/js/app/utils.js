@@ -1,5 +1,5 @@
-export { PASSWORD_REGEX, isStrongPassword, isValidEmail } from '/scripts/utils/validation.js';
-export { debounce } from '/scripts/utils/debounce.js';
+export { PASSWORD_REGEX, isStrongPassword, isValidEmail } from '/js/core/validation.js';
+export { debounce } from '/js/core/debounce.js';
 
 export function escapeHTML(str) {
   if (!str) return '';

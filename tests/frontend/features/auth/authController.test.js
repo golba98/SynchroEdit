@@ -62,7 +62,7 @@ describe('AuthController DOM rendering', () => {
     `;
 
     ({ Network } = require('/js/app/network.js'));
-    AuthController = require('/js/features/auth/authController.js').default;
+    AuthController = require('/js/features/auth/pages/login.js').default;
   });
 
   afterEach(() => {

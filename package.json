@@ -27,7 +27,6 @@
     "testEnvironment": "node",
     "maxWorkers": 1,
     "moduleNameMapper": {
-      "^/scripts/(.*)$": "<rootDir>/public/scripts/$1",
       "^/js/(.*)$": "<rootDir>/public/js/$1",
       "^y-websocket$": "<rootDir>/tests/mocks/emptyModule.js",
       "^y-quill$": "<rootDir>/tests/mocks/emptyModule.js",

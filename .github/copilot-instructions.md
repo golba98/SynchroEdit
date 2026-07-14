@@ -15,13 +15,19 @@
 
 SyncroEdit is Cloudflare-native:
 
-- `src-worker/index.js`: Hono Worker routes for API, auth, profile, document, and WebSocket routing.
+- `src-worker/index.js`: stable Worker and Durable Object export entrypoint.
+- `src-worker/app.js`: Hono composition, middleware, route dependencies, health, and public config.
+- `src-worker/routes/`: auth, profile, document, and WebSocket route registration by domain.
 - `src-worker/auth.js`: Web Crypto password hashing and D1-backed session/token helpers.
 - `src-worker/security.js`: validation, binding checks, CORS, and security headers.
 - `src-worker/syncObject.js`: Durable Object realtime rooms backed by D1.
 - `src-worker/rateLimitObject.js`: Durable Object auth abuse counters.
 - `public/`: static browser app and assets served by Wrangler.
 - `migrations/`: D1 schema migrations.
+
+Read `docs/DOCUMENTATION.md` for the overview, `docs/ARCHITECTURE.md` for system behavior,
+`docs/PROJECT_STRUCTURE.md` for file relationships, and `docs/FILE_REFERENCE.md` for the purpose
+and ownership of every retained first-party file.
 
 ## Security Notes
 

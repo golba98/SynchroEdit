@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-const mockSynchroMethods = {
+const mockSyncroMethods = {
   init: jest.fn(),
   onFieldFocus: jest.fn(),
   onFieldBlur: jest.fn(),
@@ -15,8 +15,8 @@ const mockSynchroMethods = {
   onError: jest.fn(),
 };
 
-jest.mock('/js/features/auth/synchro/SynchroBot.js', () => ({
-  SynchroBot: jest.fn().mockImplementation(() => mockSynchroMethods),
+jest.mock('/js/features/auth/syncro/SyncroBot.js', () => ({
+  SyncroBot: jest.fn().mockImplementation(() => mockSyncroMethods),
 }));
 
 jest.mock('/js/app/network.js', () => ({
@@ -40,7 +40,7 @@ describe('AuthController DOM rendering', () => {
   beforeEach(() => {
     jest.resetModules();
     jest.useFakeTimers();
-    document.title = 'SynchroEdit - Login';
+    document.title = 'SyncroEdit - Login';
     document.body.innerHTML = `
       <div class="character-container"></div>
       <span id="usernameStatusIcon"></span>

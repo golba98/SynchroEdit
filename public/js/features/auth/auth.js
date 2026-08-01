@@ -25,6 +25,8 @@ export function storeSession(session = {}) {
 
 export function clearSession() {
   accessToken = null;
+  // Legacy key, kept with the historical "synchro" spelling: tokens now live in memory only, and
+  // this clears the stale value still sitting in existing users' browsers.
   localStorage.removeItem('synchroEditToken');
 }
 

@@ -1,7 +1,7 @@
 import { Network } from '/js/app/network.js';
 import { Auth } from '/js/features/auth/auth.js';
-import { SynchroBot } from '/js/features/auth/synchro/SynchroBot.js';
-import { SynchroRenderer } from '/js/features/auth/synchro/SynchroRenderer.js';
+import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
+import { SyncroRenderer } from '/js/features/auth/syncro/SyncroRenderer.js';
 import {
   getEmailConfigurationErrorMessage,
   isEmailConfigurationError,
@@ -10,14 +10,14 @@ import {
 
 export function initVerifyPage() {
   const container = document.querySelector('.character-container');
-  let synchro = null;
+  let syncro = null;
   let renderer = null;
 
   if (container) {
-    synchro = new SynchroBot({ authFlow: 'verify' });
-    synchro.init('.character-container');
+    syncro = new SyncroBot({ authFlow: 'verify' });
+    syncro.init('.character-container');
 
-    renderer = new SynchroRenderer(container);
+    renderer = new SyncroRenderer(container);
     renderer.injectParticleCSS();
   }
 
@@ -40,7 +40,7 @@ export function initVerifyPage() {
     statusMessage.textContent = text;
     statusMessage.className = 'status ' + type;
     if (type === 'error') {
-      synchro?.onError();
+      syncro?.onError();
     }
   };
 
@@ -99,37 +99,37 @@ export function initVerifyPage() {
   }
 
   codeInput?.addEventListener('focus', () => {
-    synchro?.onFieldFocus('code', codeInput.value);
+    syncro?.onFieldFocus('code', codeInput.value);
   });
 
   codeInput?.addEventListener('input', () => {
     const isComplete = codeInput.value.length === 6;
-    synchro?.onFieldInput('code', codeInput.value, {
+    syncro?.onFieldInput('code', codeInput.value, {
       formData: {
         code: codeInput.value,
         _hasErrors: false,
       },
     });
     if (isComplete) {
-      synchro?.applyState('hover-ready');
+      syncro?.applyState('hover-ready');
     }
   });
 
   codeInput?.addEventListener('blur', () => {
-    synchro?.onFieldBlur();
+    syncro?.onFieldBlur();
   });
 
   verifyBtn?.addEventListener('mouseenter', () => {
-    synchro?.onButtonHover(true);
+    syncro?.onButtonHover(true);
   });
 
   verifyBtn?.addEventListener('mouseleave', () => {
-    synchro?.onButtonHover(false);
+    syncro?.onButtonHover(false);
   });
 
   const sendCode = async () => {
     setStatus('Sending code...', '');
-    synchro?.onSubmit();
+    syncro?.onSubmit();
     resendBtn.disabled = true;
     const isResend = resendBtn.textContent === 'Resend code';
     resendBtn.textContent = isResend ? 'Resending...' : 'Sending...';
@@ -139,7 +139,7 @@ export function initVerifyPage() {
         method: 'POST',
         body: JSON.stringify({ email, purpose: 'signup' }),
       });
-      synchro?.applyState('idle');
+      syncro?.applyState('idle');
       setStatus('Code sent. Check your email.', 'success');
       introTextEl.textContent = `We sent a 6-digit verification code to ${email}.`;
       resendBtn.textContent = 'Resend code';
@@ -148,7 +148,7 @@ export function initVerifyPage() {
       startResendCooldown();
     } catch (error) {
       console.error('Resend error:', error);
-      synchro?.onError();
+      syncro?.onError();
       resendBtn.textContent = isResend ? 'Resend code' : 'Send code';
 
       const code = error.data?.code;
@@ -169,7 +169,7 @@ export function initVerifyPage() {
       return;
     }
 
-    synchro?.onSubmit();
+    syncro?.onSubmit();
     setStatus('Verifying...', '');
     verifyBtn.disabled = true;
     verifyBtn.textContent = 'Verifying...';
@@ -180,7 +180,7 @@ export function initVerifyPage() {
         body: JSON.stringify({ email, code, purpose: 'signup' }),
       });
 
-      synchro?.onSuccess();
+      syncro?.onSuccess();
       renderer?.burst('star', 5);
       setStatus(data.message || 'Email verified. Please sign in.', 'success');
       Auth.removeToken();
@@ -194,7 +194,7 @@ export function initVerifyPage() {
       setTimeout(() => (window.location.href = redirectUrl), 1200);
     } catch (error) {
       console.error('Verification error:', error);
-      synchro?.onError();
+      syncro?.onError();
       verifyBtn.disabled = false;
       verifyBtn.textContent = 'Verify code';
 

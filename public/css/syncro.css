@@ -1,16 +1,16 @@
 /**
- * Synchro Mascot CSS - Animation States & Visual Effects
- * For SynchroEdit Authentication Screens
+ * Syncro Mascot CSS - Animation States & Visual Effects
+ * For SyncroEdit Authentication Screens
  */
 
 /* ==================== CSS VARIABLES ==================== */
 :root {
-  --synchro-accent: #3b82f6;
-  --synchro-accent-glow: rgba(59, 130, 246, 0.15);
-  --synchro-success: #22c55e;
-  --synchro-warning: #eab308;
-  --synchro-error: #ef4444;
-  --synchro-blue: #2563eb;
+  --syncro-accent: #3b82f6;
+  --syncro-accent-glow: rgba(59, 130, 246, 0.15);
+  --syncro-success: #22c55e;
+  --syncro-warning: #eab308;
+  --syncro-error: #ef4444;
+  --syncro-blue: #2563eb;
 }
 
 /* ==================== GLOBAL TRANSITION SMOOTHING ==================== */
@@ -102,10 +102,10 @@
   height: 140px;
   background: linear-gradient(135deg, #2a2a2a 0%, #0a0a0a 100%);
   border-radius: 45px;
-  border: 2px solid var(--synchro-accent);
+  border: 2px solid var(--syncro-accent);
   box-shadow:
     inset 0 0 20px rgba(255, 255, 255, 0.05),
-    0 0 30px var(--synchro-accent-glow);
+    0 0 30px var(--syncro-accent-glow);
   position: relative;
   z-index: 5;
   transition:
@@ -151,8 +151,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--synchro-accent);
-  box-shadow: 0 0 15px var(--synchro-accent);
+  background: var(--syncro-accent);
+  box-shadow: 0 0 15px var(--syncro-accent);
   z-index: 1;
   transition:
     background 0.3s,
@@ -183,13 +183,13 @@
 .pupil {
   width: 16px;
   height: 16px;
-  background: var(--synchro-accent);
+  background: var(--syncro-accent);
   border-radius: 4px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--synchro-accent);
+  box-shadow: 0 0 10px var(--syncro-accent);
   transition:
     transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1),
     width 0.2s,
@@ -244,7 +244,7 @@
   width: 36px;
   height: 36px;
   background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border: 2px solid var(--synchro-accent);
+  border: 2px solid var(--syncro-accent);
   border-radius: 50%;
   bottom: -20px;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -263,7 +263,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--synchro-accent);
+  border-top-color: var(--syncro-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   opacity: 0;
@@ -438,8 +438,8 @@
 
 /* Tracking (watching cursor) */
 .bot-rig.tracking .antenna-bulb {
-  background: var(--synchro-blue);
-  box-shadow: 0 0 15px var(--synchro-blue);
+  background: var(--syncro-blue);
+  box-shadow: 0 0 15px var(--syncro-blue);
 }
 .bot-rig.tracking .pupil {
   transition: transform 0.05s linear;
@@ -502,8 +502,8 @@
   border-radius: 50%;
 }
 .bot-rig.peeking .antenna-bulb {
-  background: var(--synchro-warning);
-  box-shadow: 0 0 15px var(--synchro-warning);
+  background: var(--syncro-warning);
+  box-shadow: 0 0 15px var(--syncro-warning);
 }
 .bot-rig.peeking .head {
   transform: translateX(5px);
@@ -548,8 +548,8 @@
   border-radius: 50%;
 }
 .bot-rig.searching .antenna-bulb {
-  background: var(--synchro-warning);
-  box-shadow: 0 0 15px var(--synchro-warning);
+  background: var(--syncro-warning);
+  box-shadow: 0 0 15px var(--syncro-warning);
 }
 
 /* ==================== VALIDATION STATES ==================== */
@@ -564,8 +564,8 @@
 
 /* Warning (thumbs down, yellow antenna) */
 .bot-rig.warning .antenna-bulb {
-  background: var(--synchro-warning);
-  box-shadow: 0 0 15px var(--synchro-warning);
+  background: var(--syncro-warning);
+  box-shadow: 0 0 15px var(--syncro-warning);
 }
 .bot-rig.warning .eyelid.top {
   height: 30%;
@@ -592,8 +592,8 @@
   height: 30%;
 }
 .bot-rig.success-partial .antenna-bulb {
-  background: var(--synchro-warning);
-  box-shadow: 0 0 15px var(--synchro-warning);
+  background: var(--syncro-warning);
+  box-shadow: 0 0 15px var(--syncro-warning);
   animation: antennaPulse 0.8s infinite;
 }
 
@@ -609,8 +609,8 @@
 
 /* Success Full (happy, 3/3 rules or match) */
 .bot-rig.success-full .antenna-bulb {
-  background: var(--synchro-success);
-  box-shadow: 0 0 20px var(--synchro-success);
+  background: var(--syncro-success);
+  box-shadow: 0 0 20px var(--syncro-success);
 }
 .bot-rig.success-full .eye {
   height: 20px;
@@ -627,7 +627,7 @@
   height: 15px;
   border-radius: 0 0 30px 30px;
   background: transparent;
-  border: 2px solid var(--synchro-success);
+  border: 2px solid var(--syncro-success);
   border-top: none;
 }
 
@@ -668,8 +668,8 @@
 
 /* Hover Ready (confident, both fields filled) */
 .bot-rig.hover-ready .antenna-bulb {
-  background: var(--synchro-success);
-  box-shadow: 0 0 20px var(--synchro-success);
+  background: var(--syncro-success);
+  box-shadow: 0 0 20px var(--syncro-success);
 }
 .bot-rig.hover-ready .hand.left {
   bottom: 40px;
@@ -758,8 +758,8 @@
     enterSuccess 0.4s ease-out;
 }
 .bot-rig.success .antenna-bulb {
-  background: var(--synchro-success);
-  box-shadow: 0 0 25px var(--synchro-success);
+  background: var(--syncro-success);
+  box-shadow: 0 0 25px var(--syncro-success);
 }
 .bot-rig.success .eye {
   background: transparent;
@@ -778,8 +778,8 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  color: var(--synchro-success);
-  text-shadow: 0 0 10px var(--synchro-success);
+  color: var(--syncro-success);
+  text-shadow: 0 0 10px var(--syncro-success);
 }
 .bot-rig.success .hand {
   transform: translateY(-60px) rotate(20deg);
@@ -788,7 +788,7 @@
   width: 40px;
   height: 20px;
   border-radius: 0 0 40px 40px;
-  border: 2px solid var(--synchro-success);
+  border: 2px solid var(--syncro-success);
   background: transparent;
 }
 
@@ -809,11 +809,11 @@
     flashRed 0.4s ease-out;
 }
 .bot-rig.error .antenna-bulb {
-  background: var(--synchro-error);
-  box-shadow: 0 0 20px var(--synchro-error);
+  background: var(--syncro-error);
+  box-shadow: 0 0 20px var(--syncro-error);
 }
 .bot-rig.error .pupil {
-  background: var(--synchro-error);
+  background: var(--syncro-error);
   width: 20px;
   height: 4px;
   border-radius: 2px;
@@ -824,7 +824,7 @@
   position: absolute;
   width: 20px;
   height: 4px;
-  background: var(--synchro-error);
+  background: var(--syncro-error);
   transform: rotate(90deg);
 }
 .bot-rig.error .mouth {
@@ -832,7 +832,7 @@
   height: 4px;
   border-radius: 2px;
   transform: translateX(-50%) rotate(5deg);
-  background: var(--synchro-error);
+  background: var(--syncro-error);
 }
 .bot-rig.error .hand.right {
   bottom: 100px;
@@ -994,8 +994,8 @@
   transform: rotate(-45deg);
 }
 .bot-rig.salute .antenna-bulb {
-  background: var(--synchro-success);
-  box-shadow: 0 0 15px var(--synchro-success);
+  background: var(--syncro-success);
+  box-shadow: 0 0 15px var(--syncro-success);
 }
 .bot-rig.salute .head {
   transform: rotate(5deg);
@@ -1160,7 +1160,7 @@
 
   /* Disable complex particles on mobile */
   .zzz-particle,
-  .synchro-particle {
+  .syncro-particle {
     display: none !important;
   }
 

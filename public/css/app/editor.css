@@ -822,5 +822,3 @@ body.light-theme #docSearch:focus {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1) !important;
 }
-
-

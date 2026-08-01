@@ -1,15 +1,15 @@
 /**
  * Authentication Controller
- * Manages login/signup forms and integrates with SynchroBot
+ * Manages login/signup forms and integrates with SyncroBot
  */
-import { SynchroBot } from '/js/features/auth/synchro/SynchroBot.js';
+import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
 import { Auth } from '/js/features/auth/auth.js';
 import { Network } from '/js/app/network.js';
 import { PASSWORD_REGEX } from '/js/core/validation.js';
 
 export class AuthController {
   constructor() {
-    this.synchro = null;
+    this.syncro = null;
     this.currentForm = 'login';
     this.usernameDebounceTimeout = null;
     this.init();
@@ -30,9 +30,9 @@ export class AuthController {
       authFlow = 'start';
     }
 
-    // Initialize SynchroBot
-    this.synchro = new SynchroBot({ authFlow });
-    this.synchro.init('.character-container');
+    // Initialize SyncroBot
+    this.syncro = new SyncroBot({ authFlow });
+    this.syncro.init('.character-container');
 
     // Setup form event listeners
     this.setupFormListeners();
@@ -48,19 +48,19 @@ export class AuthController {
       // Focus events
       input.addEventListener('focus', (e) => {
         const fieldName = this.getFieldName(e.target);
-        this.synchro.onFieldFocus(fieldName, e.target.value);
+        this.syncro.onFieldFocus(fieldName, e.target.value);
       });
 
       // Blur events
       input.addEventListener('blur', () => {
-        this.synchro.onFieldBlur();
+        this.syncro.onFieldBlur();
       });
 
       // Input events
       input.addEventListener('input', (e) => {
         const fieldName = this.getFieldName(e.target);
         const validation = this.validateField(e.target);
-        this.synchro.onFieldInput(fieldName, e.target.value, validation);
+        this.syncro.onFieldInput(fieldName, e.target.value, validation);
         this.updateFormCompleteness();
         if (e.target.id === 'signupPassword') {
           this._updatePasswordStrength(e.target.value);
@@ -106,7 +106,7 @@ export class AuthController {
             icon.className = isCurrentlyPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
           }
 
-          this.synchro.onPasswordToggle(isCurrentlyPassword);
+          this.syncro.onPasswordToggle(isCurrentlyPassword);
         }
       });
     });
@@ -117,11 +117,11 @@ export class AuthController {
     );
     submitButtons.forEach((button) => {
       button.addEventListener('mouseenter', () => {
-        this.synchro.onButtonHover(true);
+        this.syncro.onButtonHover(true);
       });
 
       button.addEventListener('mouseleave', () => {
-        this.synchro.onButtonHover(false);
+        this.syncro.onButtonHover(false);
       });
 
       button.addEventListener('click', (e) => {
@@ -164,7 +164,7 @@ export class AuthController {
   }
 
   getFieldName(input) {
-    // Try to get a meaningful field name for synchro tracking
+    // Try to get a meaningful field name for syncro tracking
     if (input.id) {
       const id = input.id.toLowerCase();
       if (id.includes('password')) return 'password';
@@ -213,13 +213,13 @@ export class AuthController {
     });
 
     if (allFilled && allValid) {
-      this.synchro.formCompleteness = 'valid';
+      this.syncro.formCompleteness = 'valid';
     } else if (allFilled) {
-      this.synchro.formCompleteness = 'partial';
+      this.syncro.formCompleteness = 'partial';
     } else if (requiredInputs.some((input) => input.value.length > 0)) {
-      this.synchro.formCompleteness = 'partial';
+      this.syncro.formCompleteness = 'partial';
     } else {
-      this.synchro.formCompleteness = 'empty';
+      this.syncro.formCompleteness = 'empty';
     }
   }
 
@@ -255,8 +255,8 @@ export class AuthController {
       confirmInput.style.boxShadow = '';
     }
 
-    this.synchro.formCompleteness = 'empty';
-    this.synchro.applyState('idle');
+    this.syncro.formCompleteness = 'empty';
+    this.syncro.applyState('idle');
 
     // Clear stale status messages on both forms
     const loginStatus = document.getElementById('loginStatusMessage');
@@ -306,7 +306,7 @@ export class AuthController {
   }
 
   async handleSubmit(form) {
-    this.synchro.onSubmit();
+    this.syncro.onSubmit();
     if (form.id === 'signupForm') {
       await this._handleSignup(form);
     } else {
@@ -327,7 +327,7 @@ export class AuthController {
         body: JSON.stringify({ username, password }),
       });
       Auth.setToken(data.token);
-      this.synchro.onSuccess();
+      this.syncro.onSuccess();
       this._redirect();
     } catch (e) {
       if (e.message === 'Email verification required') {
@@ -337,10 +337,10 @@ export class AuthController {
       }
       const msg = this._getAuthErrorMessage(e, 'Invalid username or password', 'Login failed');
       if (statusEl) statusEl.textContent = msg;
-      this.synchro.onError();
+      this.syncro.onError();
       form.classList.add('shake-animation');
       setTimeout(() => form.classList.remove('shake-animation'), 1000);
-      setTimeout(() => this.synchro.applyState('idle'), 2000);
+      setTimeout(() => this.syncro.applyState('idle'), 2000);
     }
   }
 
@@ -357,10 +357,10 @@ export class AuthController {
         statusEl.textContent = '✗ ' + msg;
         statusEl.className = 'status-message error';
       }
-      this.synchro.onError();
+      this.syncro.onError();
       form.classList.add('shake-animation');
       setTimeout(() => form.classList.remove('shake-animation'), 1000);
-      setTimeout(() => this.synchro.applyState('idle'), 2000);
+      setTimeout(() => this.syncro.applyState('idle'), 2000);
     };
 
     if (statusEl) {
@@ -398,7 +398,7 @@ export class AuthController {
         body: JSON.stringify({ username, email, password }),
       });
 
-      this.synchro.onSuccess();
+      this.syncro.onSuccess();
       if (statusEl) {
         statusEl.textContent = '✓ ' + (data.message || 'Check your email for a verification code.');
         statusEl.className = 'status-message success';
@@ -468,7 +468,7 @@ export class AuthController {
             verificationMsg.textContent = '✓ Email verified! Please sign in.';
             verificationMsg.style.color = '#4caf50';
           }
-          this.synchro.onSuccess();
+          this.syncro.onSuccess();
           setTimeout(() => (window.location.href = '/pages/login.html?verified=1'), 1200);
         } catch (err) {
           if (verificationMsg) {

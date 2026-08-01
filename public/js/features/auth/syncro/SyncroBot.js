@@ -1,7 +1,7 @@
 /**
- * SynchroBot - Animated mascot with eye tracking and state-based animations
+ * SyncroBot - Animated mascot with eye tracking and state-based animations
  */
-export class SynchroBot {
+export class SyncroBot {
   constructor(options = {}) {
     this.authFlow = options.authFlow || 'login';
     this.container = null;
@@ -37,7 +37,7 @@ export class SynchroBot {
   init(containerSelector) {
     this.container = document.querySelector(containerSelector);
     if (!this.container) {
-      console.warn('SynchroBot: Container not found');
+      console.warn('SyncroBot: Container not found');
       return false;
     }
 
@@ -46,7 +46,7 @@ export class SynchroBot {
     this.mouseMoveHandler = this.handleMouseMove.bind(this);
 
     if (!this.botRig || this.pupils.length === 0) {
-      console.warn('SynchroBot: Bot elements not found');
+      console.warn('SyncroBot: Bot elements not found');
       return false;
     }
 
@@ -138,7 +138,7 @@ export class SynchroBot {
 
     // Validate that we got valid coordinates
     if (isNaN(targetX) || isNaN(targetY) || !isFinite(targetX) || !isFinite(targetY)) {
-      console.warn('SynchroBot: Invalid element coordinates, resetting to center');
+      console.warn('SyncroBot: Invalid element coordinates, resetting to center');
       // Reset to center if coordinates are invalid
       this.resetEyePosition();
       return;

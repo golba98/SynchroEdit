@@ -93,7 +93,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/css/app/editor.css`            | Defines document canvas, page, editor, toolbar, responsive editor, and collaboration presentation.  |
 | `public/css/app/effects.css`           | Defines themes, loading states, skeletons, animations, notifications, and transient visual effects. |
 | `public/css/app/settings.css`          | Defines profile, settings, sharing, history, and modal-specific presentation.                       |
-| `public/css/synchro.css`               | Defines the reusable SynchroBot rig, body parts, state classes, particles, and animations.          |
+| `public/css/syncro.css`                | Defines the reusable SyncroBot rig, body parts, state classes, particles, and animations.           |
 | `public/css/pages/login.css`           | Defines login/signup layout, validation feedback, verification modal, and auth-page responsiveness. |
 | `public/css/pages/forgot-password.css` | Defines the forgot-password page layout and status presentation.                                    |
 | `public/css/pages/reset-password.css`  | Defines reset-password form, requirements, MFA group, and status presentation.                      |
@@ -117,15 +117,15 @@ Application styles load in the order shown below; changing that order can change
 
 ## Browser Authentication
 
-| File                                                 | Purpose and ownership                                                                                     |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `public/js/features/auth/auth.js`                    | Owns in-memory access-token state, refresh, logout, current-user lookup, and verified-user normalization. |
-| `public/js/features/auth/pages/login.js`             | Implements login/signup forms, validation, email verification, typo suggestions, and bot interactions.    |
-| `public/js/features/auth/pages/forgotPassword.js`    | Implements forgot-password submission and its SynchroBot states.                                          |
-| `public/js/features/auth/pages/resetPassword.js`     | Implements reset-token/password validation and submission.                                                |
-| `public/js/features/auth/pages/verify.js`            | Implements standalone code verification, resend behavior, and post-verification navigation.               |
-| `public/js/features/auth/synchro/SynchroBot.js`      | Owns mascot state, eye tracking, idle behavior, focus tracking, and DOM state classes.                    |
-| `public/js/features/auth/synchro/SynchroRenderer.js` | Creates and cleans up mascot particles and state-specific visual effects.                                 |
+| File                                               | Purpose and ownership                                                                                     |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `public/js/features/auth/auth.js`                  | Owns in-memory access-token state, refresh, logout, current-user lookup, and verified-user normalization. |
+| `public/js/features/auth/pages/login.js`           | Implements login/signup forms, validation, email verification, typo suggestions, and bot interactions.    |
+| `public/js/features/auth/pages/forgotPassword.js`  | Implements forgot-password submission and its SyncroBot states.                                           |
+| `public/js/features/auth/pages/resetPassword.js`   | Implements reset-token/password validation and submission.                                                |
+| `public/js/features/auth/pages/verify.js`          | Implements standalone code verification, resend behavior, and post-verification navigation.               |
+| `public/js/features/auth/syncro/SyncroBot.js`      | Owns mascot state, eye tracking, idle behavior, focus tracking, and DOM state classes.                    |
+| `public/js/features/auth/syncro/SyncroRenderer.js` | Creates and cleans up mascot particles and state-specific visual effects.                                 |
 
 ## Browser Editor and Feature Modules
 

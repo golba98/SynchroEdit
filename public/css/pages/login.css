@@ -485,7 +485,7 @@ select:-webkit-autofill:focus {
 }
 
 /* =========================================
-   SYNCHROBOT 2.0 - VISUAL RIG
+   SYNCROBOT 2.0 - VISUAL RIG
    ========================================= */
 .right-section {
   flex: 1;
@@ -996,4 +996,3 @@ select:-webkit-autofill:focus {
     opacity: 0;
   }
 }
-

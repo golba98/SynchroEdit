@@ -1,4 +1,4 @@
-// Preferences were stored under "synchroEdit*" before the product dropped the "h". Read the old key
+// Preferences were stored under "syncroEdit*" before the product dropped the "h". Read the old key
 // when the new one is absent so existing users keep their settings; the next write migrates them.
 export function readStoredPreference(key, legacyKey) {
   return localStorage.getItem(key) ?? localStorage.getItem(legacyKey);
@@ -6,9 +6,9 @@ export function readStoredPreference(key, legacyKey) {
 
 export class Theme {
   constructor() {
-    this.currentTheme = readStoredPreference('syncroEditTheme', 'synchroEditTheme') || 'dark';
+    this.currentTheme = readStoredPreference('syncroEditTheme', 'syncroEditTheme') || 'dark';
     this.currentAccentColor =
-      readStoredPreference('syncroEditAccentColor', 'synchroEditAccentColor') || '#3b82f6';
+      readStoredPreference('syncroEditAccentColor', 'syncroEditAccentColor') || '#3b82f6';
     this.init();
   }
 

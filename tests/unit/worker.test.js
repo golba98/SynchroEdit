@@ -4,7 +4,7 @@ const syncProtocol = require('y-protocols/sync');
 const encoding = require('lib0/encoding');
 const decoding = require('lib0/decoding');
 const app = require('../../src-worker/index.js').default;
-const { SynchroDocumentObject } = require('../../src-worker/index.js');
+const { SyncroDocumentObject } = require('../../src-worker/index.js');
 const { getDocumentAccess } = require('../../src-worker/security.js');
 const { MockD1 } = require('../mockD1.js');
 
@@ -1102,7 +1102,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
       env.JWT_SECRET
     );
 
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const res = await object.fetch(
       new Request(`https://example.com/ws/${doc.data.id}?ticket=${ticket}`)
     );
@@ -1112,7 +1112,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
   it('rejects malformed realtime messages cleanly', async () => {
     const alice = await signupVerified(env, 'alice', 'alice@example.com');
     const doc = await createDocument(env, alice.data.token, 'Realtime Doc');
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const socket = new FakeSocket();
 
     await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', false);
@@ -1153,7 +1153,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
     const doc = await createDocument(env, alice.data.token, 'Two Way Doc');
     env.DB.documents.find((d) => d.id === doc.data.id).isPublic = 1;
 
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const aliceSocket = new FakeSocket();
     const bobSocket = new FakeSocket();
 
@@ -1190,7 +1190,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
     const alice = await signupVerified(env, 'alice', 'alice@example.com');
     const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
 
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const socket = new FakeSocket();
     await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
 
@@ -1206,7 +1206,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
     const alice = await signupVerified(env, 'alice', 'alice@example.com');
     const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
 
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const socket = new FakeSocket();
     await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
 
@@ -1230,7 +1230,7 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
     const alice = await signupVerified(env, 'alice', 'alice@example.com');
     const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
 
-    const object = new SynchroDocumentObject({}, env);
+    const object = new SyncroDocumentObject({}, env);
     const socket = new FakeSocket();
     await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
 

@@ -64,7 +64,7 @@ Production secrets are `JWT_SECRET`, `RESEND_API_KEY`, and `EMAIL_CODE_PEPPER`. 
 with Wrangler and must never appear in source or `wrangler.toml`. `EMAIL_FROM`, `APP_NAME`, and
 `APP_URL` are non-secret variables.
 
-The historical class names `SynchroDocumentObject` and `SynchroRateLimitObject` are part of
+The historical class names `SyncroDocumentObject` and `SyncroRateLimitObject` are part of
 Cloudflare's Durable Object migration contract. Do not rename them or rewrite their migration tags.
 
 ## 4. Request Pipeline

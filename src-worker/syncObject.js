@@ -77,7 +77,7 @@ async function normalizeWebSocketMessage(data) {
   return null;
 }
 
-export class SynchroDocumentObject {
+export class SyncroDocumentObject {
   constructor(state, env) {
     this.state = state;
     this.env = env;

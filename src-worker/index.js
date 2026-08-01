@@ -1,11 +1,11 @@
 export { default } from './app.js';
 
 // These names are part of the deployed Durable Object migration contract.
-// Keep the historical "Synchro" spelling here even though the product is SyncroEdit:
-// renaming these classes would orphan the live Durable Objects.
+// They were historically spelled "Synchro"; the `v4` `renamed_classes` migration in wrangler.toml
+// carries the live Durable Objects over to these names without orphaning them.
 export {
-  SynchroDocumentObject,
+  SyncroDocumentObject,
   DocumentSyncObject,
-  SynchroRateLimitObject,
+  SyncroRateLimitObject,
   RateLimitObject,
 } from './app.js';

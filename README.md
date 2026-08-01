@@ -16,7 +16,7 @@ SyncroEdit is deployed completely on Cloudflare's serverless edge architecture:
 ```mermaid
 graph TD
     Client[Browser Client] -->|HTTP / API| Worker[Cloudflare Worker / Hono]
-    Client -->|WebSocket| DO[Durable Object: SynchroDocumentObject]
+    Client -->|WebSocket| DO[Durable Object: SyncroDocumentObject]
     Worker -->|D1 Binding| D1[(D1 SQLite Database)]
     DO -->|Sync State & Pages| D1
     Worker -->|Assets| CF_Assets[Static Assets /public]
@@ -24,7 +24,7 @@ graph TD
 
 - **Cloudflare Worker (Hono):** Composes domain route modules for authentication, profiles, documents, and realtime upgrades.
 - **Cloudflare D1:** Acts as the primary SQL relational database to store users, sessions, documents, and permissions.
-- **Durable Objects:** `SynchroDocumentObject` represents individual document collaboration rooms, and `SynchroRateLimitObject` tracks authentication abuse counters. The document object manages WebSocket connections, state vectors, Yjs sync steps, cursor awareness propagation, and debounced state flushes back to D1.
+- **Durable Objects:** `SyncroDocumentObject` represents individual document collaboration rooms, and `SyncroRateLimitObject` tracks authentication abuse counters. The document object manages WebSocket connections, state vectors, Yjs sync steps, cursor awareness propagation, and debounced state flushes back to D1.
 - **Static Assets:** Served directly from the `./public` directory via Wrangler's assets binding.
 
 ---
@@ -44,8 +44,8 @@ To run SyncroEdit in production, configure the following bindings in your Cloudf
 ### Bindings
 
 1. **D1 Database:** Bind a D1 database to `DB`.
-2. **Document Durable Object:** Bind `SynchroDocumentObject` to `DOCUMENT_SYNC_OBJECT`.
-3. **Rate-limit Durable Object:** Bind `SynchroRateLimitObject` to `RATE_LIMIT_OBJECT`.
+2. **Document Durable Object:** Bind `SyncroDocumentObject` to `DOCUMENT_SYNC_OBJECT`.
+3. **Rate-limit Durable Object:** Bind `SyncroRateLimitObject` to `RATE_LIMIT_OBJECT`.
 
 ### Secrets
 

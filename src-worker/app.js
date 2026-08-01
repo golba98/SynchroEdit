@@ -49,17 +49,14 @@ import { registerDocumentsRoutes } from './routes/documents.js';
 import { registerRealtimeRoutes } from './routes/realtime.js';
 
 // Export Durable Object classes so Cloudflare can bind them.
-// These keep the historical "Synchro" spelling because they match the production class names
-// already registered in Cloudflare's namespace (wrangler.toml bindings use these names).
-// Renaming them requires a `renamed_classes` migration, not a find-and-replace.
-export {
-  SynchroDocumentObject,
-  SynchroDocumentObject as DocumentSyncObject,
-} from './syncObject.js';
+// These were historically spelled "Synchro" to match the class names already registered in
+// Cloudflare's namespace. The `v4` migration in wrangler.toml renames them via `renamed_classes`,
+// so the live Durable Objects carry over to these names rather than being reprovisioned.
+export { SyncroDocumentObject, SyncroDocumentObject as DocumentSyncObject } from './syncObject.js';
 
 export {
-  SynchroRateLimitObject,
-  SynchroRateLimitObject as RateLimitObject,
+  SyncroRateLimitObject,
+  SyncroRateLimitObject as RateLimitObject,
 } from './rateLimitObject.js';
 
 const app = new Hono();

@@ -6,12 +6,11 @@ export class ReadabilityManager extends Plugin {
     super(editor, options);
     this.showLineNumbers = false;
     this.showInvisibles = false;
-    this.showPageGlow =
-      readStoredPreference('syncroEditPageGlow', 'synchroEditPageGlow') === 'true';
+    this.showPageGlow = readStoredPreference('syncroEditPageGlow', 'syncroEditPageGlow') === 'true';
     this.showPageBorder =
-      readStoredPreference('syncroEditPageBorder', 'synchroEditPageBorder') === 'true';
+      readStoredPreference('syncroEditPageBorder', 'syncroEditPageBorder') === 'true';
     this.currentCanvasTheme =
-      readStoredPreference('syncroEditCanvasTheme', 'synchroEditCanvasTheme') || 'classic';
+      readStoredPreference('syncroEditCanvasTheme', 'syncroEditCanvasTheme') || 'classic';
     this.isFocusMode = false;
   }
 

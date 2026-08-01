@@ -1318,4 +1318,11 @@ var WebsocketProvider = class extends ObservableV2 {
     }
   }
 };
-export { WebsocketProvider, messageAuth, messageAwareness, messageQueryAwareness, messageSync };
+export {
+  WebsocketProvider,
+  messageAuth,
+  messageAwareness,
+  messageQueryAwareness,
+  messageSync,
+  readAuthMessage,
+};

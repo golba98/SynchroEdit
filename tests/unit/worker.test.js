@@ -1,9 +1,16 @@
 const { sign } = require('hono/jwt');
+const Y = require('yjs');
+const syncProtocol = require('y-protocols/sync');
+const encoding = require('lib0/encoding');
+const decoding = require('lib0/decoding');
 const app = require('../../src-worker/index.js').default;
 const { SynchroDocumentObject } = require('../../src-worker/index.js');
+const { getDocumentAccess } = require('../../src-worker/security.js');
 const { MockD1 } = require('../mockD1.js');
 
 const PASSWORD = 'Password123!';
+const MESSAGE_SYNC = 0;
+const MESSAGE_AUTH = 2;
 
 function rateLimitBinding() {
   return {
@@ -132,6 +139,43 @@ class FakeSocket {
   addEventListener(type, handler) {
     this.listeners[type] = handler;
   }
+}
+
+// Builds the wire message a client sends after typing: messageSync + a Yjs update.
+function buildSyncUpdateMessage(text, key = 'probe') {
+  const clientDoc = new Y.Doc();
+  const before = Y.encodeStateVector(clientDoc);
+  clientDoc.getText(key).insert(0, text);
+  const update = Y.encodeStateAsUpdate(clientDoc, before);
+
+  const encoder = encoding.createEncoder();
+  encoding.writeVarUint(encoder, MESSAGE_SYNC);
+  syncProtocol.writeUpdate(encoder, update);
+  return encoding.toUint8Array(encoder);
+}
+
+// Applies a messageSync frame the server broadcast onto a doc, returning that doc.
+function applyBroadcastToDoc(bytes, doc = new Y.Doc()) {
+  const decoder = decoding.createDecoder(bytes);
+  expect(decoding.readVarUint(decoder)).toBe(MESSAGE_SYNC);
+  syncProtocol.readSyncMessage(decoder, encoding.createEncoder(), doc, 'test');
+  return doc;
+}
+
+// Returns the decoded permission-denied payload, or null if this is not one.
+function decodePermissionDenied(bytes) {
+  const decoder = decoding.createDecoder(bytes);
+  if (decoding.readVarUint(decoder) !== MESSAGE_AUTH) return null;
+  if (decoding.readVarUint(decoder) !== 0) return null;
+  try {
+    return JSON.parse(decoding.readVarString(decoder));
+  } catch {
+    return null;
+  }
+}
+
+function findPermissionDenied(socket) {
+  return socket.sent.map(decodePermissionDenied).filter(Boolean);
 }
 
 describe('SyncroEdit Cloudflare Worker API security', () => {
@@ -1078,6 +1122,124 @@ describe('SyncroEdit Cloudflare Worker API security', () => {
       code: 1003,
       reason: 'Unsupported message type',
     });
+  });
+
+  // -------------------------------------------------------
+  // Collaborative editing permissions
+  // -------------------------------------------------------
+
+  it('grants edit rights to public-link participants and keeps private docs closed', async () => {
+    const alice = await signupVerified(env, 'alice', 'alice@example.com');
+    const bob = await signupVerified(env, 'bob', 'bob@example.com');
+    const doc = await createDocument(env, alice.data.token, 'Access Matrix');
+
+    const privateAccess = await getDocumentAccess(env.DB, doc.data.id, bob.user.id);
+    expect(privateAccess.canRead).toBe(false);
+    expect(privateAccess.canEdit).toBe(false);
+
+    env.DB.documents.find((d) => d.id === doc.data.id).isPublic = 1;
+
+    const publicAccess = await getDocumentAccess(env.DB, doc.data.id, bob.user.id);
+    expect(publicAccess.canRead).toBe(true);
+    expect(publicAccess.canEdit).toBe(true);
+
+    const ownerAccess = await getDocumentAccess(env.DB, doc.data.id, alice.user.id);
+    expect(ownerAccess.canEdit).toBe(true);
+  });
+
+  it('propagates edits from a collaborator back to the document owner', async () => {
+    const alice = await signupVerified(env, 'alice', 'alice@example.com');
+    const bob = await signupVerified(env, 'bob', 'bob@example.com');
+    const doc = await createDocument(env, alice.data.token, 'Two Way Doc');
+    env.DB.documents.find((d) => d.id === doc.data.id).isPublic = 1;
+
+    const object = new SynchroDocumentObject({}, env);
+    const aliceSocket = new FakeSocket();
+    const bobSocket = new FakeSocket();
+
+    const aliceAccess = await getDocumentAccess(env.DB, doc.data.id, alice.user.id);
+    const bobAccess = await getDocumentAccess(env.DB, doc.data.id, bob.user.id);
+
+    await object.handleConnection(
+      aliceSocket,
+      doc.data.id,
+      alice.user.id,
+      'alice',
+      !aliceAccess.canEdit
+    );
+    await object.handleConnection(bobSocket, doc.data.id, bob.user.id, 'bob', !bobAccess.canEdit);
+
+    const aliceMessagesBefore = aliceSocket.sent.length;
+    await bobSocket.listeners.message({ data: buildSyncUpdateMessage('paragraph from B').buffer });
+
+    // The Durable Object must have accepted the update...
+    expect(object.doc.getText('probe').toString()).toBe('paragraph from B');
+
+    // ...and broadcast it to the owner rather than dropping it.
+    const broadcasts = aliceSocket.sent.slice(aliceMessagesBefore);
+    expect(broadcasts.length).toBeGreaterThan(0);
+    const ownerView = new Y.Doc();
+    broadcasts.forEach((message) => applyBroadcastToDoc(message, ownerView));
+    expect(ownerView.getText('probe').toString()).toBe('paragraph from B');
+
+    expect(findPermissionDenied(bobSocket)).toHaveLength(0);
+    clearTimeout(object.saveTimeout);
+  });
+
+  it('tells a read-only client it cannot edit as soon as it connects', async () => {
+    const alice = await signupVerified(env, 'alice', 'alice@example.com');
+    const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
+
+    const object = new SynchroDocumentObject({}, env);
+    const socket = new FakeSocket();
+    await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
+
+    const notices = findPermissionDenied(socket);
+    expect(notices).toHaveLength(1);
+    expect(notices[0].code).toBe('read_only');
+    expect(typeof notices[0].reason).toBe('string');
+    expect(notices[0].documentId).toBe(doc.data.id);
+    expect(typeof notices[0].stateVector).toBe('string');
+  });
+
+  it('rejects read-only edits explicitly instead of discarding them silently', async () => {
+    const alice = await signupVerified(env, 'alice', 'alice@example.com');
+    const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
+
+    const object = new SynchroDocumentObject({}, env);
+    const socket = new FakeSocket();
+    await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
+
+    const noticesBefore = findPermissionDenied(socket).length;
+    await socket.listeners.message({ data: buildSyncUpdateMessage('unauthorized edit').buffer });
+
+    // The DO stays authoritative: the update is not applied.
+    expect(object.doc.getText('probe').toString()).toBe('');
+    expect(socket.closed).toBeNull();
+
+    // But the client is told, with a reason and the authoritative revision.
+    const notices = findPermissionDenied(socket);
+    expect(notices.length).toBe(noticesBefore + 1);
+    const rejection = notices[notices.length - 1];
+    expect(rejection.code).toBe('edit_rejected');
+    expect(rejection.reason).toEqual(expect.any(String));
+    expect(rejection.stateVector).toEqual(expect.any(String));
+  });
+
+  it('throttles repeated rejection notices to one per burst', async () => {
+    const alice = await signupVerified(env, 'alice', 'alice@example.com');
+    const doc = await createDocument(env, alice.data.token, 'Viewer Doc');
+
+    const object = new SynchroDocumentObject({}, env);
+    const socket = new FakeSocket();
+    await object.handleConnection(socket, doc.data.id, alice.user.id, 'alice', true);
+
+    const noticesBefore = findPermissionDenied(socket).length;
+    for (let i = 0; i < 5; i++) {
+      await socket.listeners.message({ data: buildSyncUpdateMessage(`edit ${i}`).buffer });
+    }
+
+    expect(findPermissionDenied(socket).length).toBe(noticesBefore + 1);
   });
 
   // -------------------------------------------------------

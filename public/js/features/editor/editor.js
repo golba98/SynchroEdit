@@ -1,6 +1,6 @@
 import { get, set } from '/vendor/idb-keyval/index.js';
 import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
+import { WebsocketProvider, messageAuth, readAuthMessage } from 'y-websocket';
 import { QuillBinding } from 'y-quill';
 import { PageManager } from '/js/features/editor/managers/PageManager.js';
 import { BorderManager } from '/js/features/editor/managers/BorderManager.js';
@@ -61,7 +61,14 @@ export class Editor {
     this.onSaveStatusChange = options.onSaveStatusChange || (() => {});
     this.onStatsChange = options.onStatsChange || (() => {});
     this.onSelectionStatsChange = options.onSelectionStatsChange || (() => {});
+    this.onPermissionChange = options.onPermissionChange || (() => {});
     this.isNewDocument = Boolean(options.isNewDocument);
+
+    // Edit permission. The server is authoritative and tells us over the socket; until it answers
+    // we stay editable, since the overwhelmingly common case is the owner opening their own
+    // document and locking the editor first would make every open feel broken.
+    this.canEdit = true;
+    this.permissionReason = null;
 
     this.initQuill();
 
@@ -569,6 +576,7 @@ export class Editor {
       maxBackoffTime: 30000,
     });
     this.providerDocId = docId;
+    this._installPermissionHandler(this.provider);
     this.updateUser(this.user);
 
     this._log('[Editor] WebsocketProvider created for docId=', docId);
@@ -649,6 +657,21 @@ export class Editor {
     return this.provider;
   }
 
+  /**
+   * Routes the server's permission-denied frames to our own handler. The provider copies the
+   * handler table per instance, so this does not mutate shared vendor state.
+   */
+  _installPermissionHandler(provider) {
+    if (!provider || !Array.isArray(provider.messageHandlers)) return;
+    if (typeof messageAuth !== 'number' || typeof readAuthMessage !== 'function') return;
+
+    provider.messageHandlers[messageAuth] = (_encoder, decoder, targetProvider) => {
+      readAuthMessage(decoder, targetProvider.doc, (_doc, reason) =>
+        this._handlePermissionDenied(reason)
+      );
+    };
+  }
+
   _showSyncError() {
     const placeholder = this.container?.querySelector('.loading-placeholder');
     if (placeholder) {
@@ -716,6 +739,10 @@ export class Editor {
       this.observer.disconnect();
       this.observer = null;
     }
+
+    // Don't leave a view-only banner behind when switching to another document.
+    const host = this.container?.parentElement || this.container;
+    host?.querySelector('.editor-permission-banner')?.remove();
 
     if (this._selectionChangeListener) {
       document.removeEventListener('selectionchange', this._selectionChangeListener);
@@ -1063,6 +1090,108 @@ export class Editor {
     this.onSaveStatusChange(status);
   }
 
+  /**
+   * Applies the current edit permission to every mounted page. Quill's `enable(false)` blocks user
+   * input but leaves programmatic `source: 'api'` changes working, so a viewer still receives live
+   * edits from collaborators.
+   */
+  _applyEditPermission() {
+    this.pageQuillInstances.forEach((quill) => {
+      if (quill && typeof quill.enable === 'function') {
+        quill.enable(this.canEdit);
+      }
+    });
+    if (this.container) {
+      this.container.classList.toggle('is-view-only', !this.canEdit);
+    }
+  }
+
+  setEditPermission(canEdit, reason = null) {
+    const next = Boolean(canEdit);
+    const changed = this.canEdit !== next;
+    this.canEdit = next;
+    this.permissionReason = reason;
+    this._applyEditPermission();
+    this._renderPermissionBanner();
+    if (changed) {
+      this.onPermissionChange({ canEdit: next, reason });
+    }
+    return changed;
+  }
+
+  _renderPermissionBanner(extraMessage = null) {
+    const host = this.container?.parentElement || this.container;
+    if (!host) return;
+
+    let banner = host.querySelector('.editor-permission-banner');
+    if (this.canEdit && !extraMessage) {
+      banner?.remove();
+      return;
+    }
+
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.className = 'editor-permission-banner';
+      banner.setAttribute('role', 'status');
+      host.prepend(banner);
+    }
+
+    const message =
+      extraMessage || this.permissionReason || 'You have view-only access to this document.';
+    banner.replaceChildren();
+
+    const label = document.createElement('span');
+    label.textContent = message;
+    banner.appendChild(label);
+
+    if (extraMessage) {
+      banner.classList.add('is-error');
+      const reload = document.createElement('button');
+      reload.type = 'button';
+      reload.className = 'editor-permission-banner__action';
+      reload.textContent = 'Reload document';
+      reload.addEventListener('click', () => window.location.reload());
+      banner.appendChild(reload);
+    }
+  }
+
+  /**
+   * The server refused something. It never discards an edit silently, so this is the client half of
+   * that contract: lock the editor and make the reason visible instead of letting the user keep
+   * typing content that will never persist.
+   */
+  _handlePermissionDenied(rawReason) {
+    let payload = {};
+    try {
+      payload = JSON.parse(rawReason);
+    } catch {
+      payload = { code: 'permission_denied', reason: String(rawReason || '') };
+    }
+
+    const reason = payload.reason || 'You do not have permission to edit this document.';
+    console.warn('[Editor] Server refused edit', payload);
+
+    this.setEditPermission(false, reason);
+
+    if (payload.code === 'edit_rejected') {
+      // The client applied this edit locally but the server did not. Yjs only ever sends deltas, so
+      // it will not be retransmitted and the two sides stay diverged until we resync from scratch.
+      this._handleRejectedEditDivergence(payload, reason);
+    }
+  }
+
+  _handleRejectedEditDivergence(payload, reason) {
+    if (this._divergenceNotified) return;
+    this._divergenceNotified = true;
+    this._renderPermissionBanner(`${reason} Reload to return to the saved version.`);
+    this.onPermissionChange({
+      canEdit: false,
+      reason,
+      diverged: true,
+      stateVector: payload.stateVector || null,
+    });
+  }
+
   hasLoadedDocumentContent() {
     return this._hasLoadedDocumentContent || this.yPages.length > 0;
   }
@@ -1222,6 +1351,7 @@ export class Editor {
     });
 
     this.pageQuillInstances.set(pageId, pageQuill);
+    if (!this.canEdit) pageQuill.enable(false);
     this.installSanitizedPasteHandler(pageId, pageQuill);
 
     pageQuill.on('text-change', (delta, oldDelta, source) => {

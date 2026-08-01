@@ -1,5 +1,6 @@
 import * as Y from 'yjs';
 import * as syncProtocol from 'y-protocols/sync';
+import * as authProtocol from 'y-protocols/auth';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import { verify } from 'hono/jwt';
@@ -17,8 +18,15 @@ import {
 
 const messageSync = 0;
 const messageAwareness = 1;
+const messageAuth = 2;
 const messageQueryAwareness = 3;
 const WS_OPEN = 1;
+
+// y-protocols sync message subtypes.
+const syncMessageUpdate = 2;
+
+// A rejected client sends one update per keystroke batch; only notify it this often.
+const REJECT_NOTICE_INTERVAL_MS = 2000;
 
 function textResponse(message, status) {
   return new Response(message, {
@@ -231,6 +239,45 @@ export class SynchroDocumentObject {
     }
   }
 
+  /**
+   * Tell a client its edit was refused. The Durable Object stays authoritative — the update is
+   * never applied — but it must never drop an edit in silence, which looks to the user like sync is
+   * broken and lets them keep typing content that will never persist.
+   *
+   * The payload rides inside the standard y-protocols auth message, so a client without our custom
+   * handler still decodes it and degrades to a console warning.
+   */
+  sendPermissionDenied(ws, docId, meta, code, reason) {
+    const encoder = encoding.createEncoder();
+    encoding.writeVarUint(encoder, messageAuth);
+    authProtocol.writePermissionDenied(
+      encoder,
+      JSON.stringify({
+        code,
+        reason,
+        documentId: docId,
+        // The authoritative revision, so the client can detect that it has diverged.
+        stateVector: this.doc ? uint8ArrayToBase64(Y.encodeStateVector(this.doc)) : null,
+      })
+    );
+    return this.safeSend(
+      ws,
+      encoding.toUint8Array(encoder),
+      docId,
+      meta,
+      `permission-denied:${code}`
+    );
+  }
+
+  sendThrottledRejection(ws, docId, meta, code, reason) {
+    const now = Date.now();
+    if (meta.lastRejectNoticeAt && now - meta.lastRejectNoticeAt < REJECT_NOTICE_INTERVAL_MS) {
+      return false;
+    }
+    meta.lastRejectNoticeAt = now;
+    return this.sendPermissionDenied(ws, docId, meta, code, reason);
+  }
+
   safeClose(ws, code, reason) {
     try {
       if (ws.readyState === WS_OPEN || ws.readyState === 0) {
@@ -313,6 +360,17 @@ export class SynchroDocumentObject {
       readyState: ws.readyState,
     });
 
+    // Tell viewers up front, so the client can lock the editor before they type rather than after.
+    if (readOnly) {
+      this.sendPermissionDenied(
+        ws,
+        docId,
+        meta,
+        'read_only',
+        'You have view-only access to this document.'
+      );
+    }
+
     // Handle messages
     ws.addEventListener('message', async (event) => {
       try {
@@ -354,8 +412,15 @@ export class SynchroDocumentObject {
 
             if (readOnly) {
               const syncMessageType = decoding.peekVarUint(decoder);
-              if (syncMessageType === 2) {
-                // Ignore updates from viewers
+              if (syncMessageType === syncMessageUpdate) {
+                // Refuse the update, but say so — never discard it silently.
+                this.sendThrottledRejection(
+                  ws,
+                  docId,
+                  meta,
+                  'edit_rejected',
+                  'Your changes were not saved because you have view-only access to this document.'
+                );
                 return;
               }
             }

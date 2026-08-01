@@ -35,7 +35,7 @@ test.describe('Login Page Tests', () => {
     await expect(loginBtn).toBeEnabled();
   });
 
-  test('SynchroBot Animations', async ({ page }) => {
+  test('SyncroBot Animations', async ({ page }) => {
     const botRig = page.locator('#botRig');
     const pupil = page.locator('.pupil').first();
 

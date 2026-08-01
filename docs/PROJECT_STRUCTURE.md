@@ -171,14 +171,14 @@ public/js/features/auth/
 │   ├── forgotPassword.js              Forgot-password page behavior
 │   ├── resetPassword.js               Reset-password validation and submission
 │   └── verify.js                      Standalone verification and resend behavior
-└── synchro/
-    ├── SynchroBot.js                  Mascot state, eye/focus tracking, timers, CSS state classes
-    └── SynchroRenderer.js             Mascot particle creation and cleanup
+└── syncro/
+    ├── SyncroBot.js                  Mascot state, eye/focus tracking, timers, CSS state classes
+    └── SyncroRenderer.js             Mascot particle creation and cleanup
 ```
 
 `auth.js` owns session state and is shared by the editor and auth pages. Page files own only their
-DOM and flow. `SynchroBot.js` changes semantic visual state; `SynchroRenderer.js` creates temporary
-visual elements. Both rely on `public/css/synchro.css` for presentation.
+DOM and flow. `SyncroBot.js` changes semantic visual state; `SyncroRenderer.js` creates temporary
+visual elements. Both rely on `public/css/syncro.css` for presentation.
 
 ### Editor and feature modules
 
@@ -253,7 +253,7 @@ public/css/
 │   ├── forgot-password.css             Forgot-password-only presentation
 │   ├── reset-password.css              Reset-password/MFA presentation
 │   └── verify.css                      Standalone verification presentation
-└── synchro.css                         Shared mascot rig, states, particles, and animations
+└── syncro.css                         Shared mascot rig, states, particles, and animations
 ```
 
 The application CSS files load in the displayed order. Their separation describes ownership but

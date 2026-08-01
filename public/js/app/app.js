@@ -274,6 +274,36 @@ export class App {
     this.uiManager.preventBlackEditorLoadingState();
   }
 
+  /**
+   * Seeds the edit permission before the socket answers, so a viewer never gets a brief window in
+   * which the editor looks writable. Best-effort only: the Durable Object is authoritative and will
+   * say so over the socket, so a failure here must never block opening the document.
+   */
+  seedEditPermission(docId) {
+    try {
+      Promise.resolve(Network.getDocumentSettings(docId))
+        .then((settings) => {
+          if (settings && settings.canEdit === false && this.editor) {
+            this.editor.setEditPermission(false, 'You have view-only access to this document.');
+          }
+        })
+        .catch((err) => console.warn('Permission check failed:', err));
+    } catch (err) {
+      console.warn('Permission check failed:', err);
+    }
+  }
+
+  handleEditorPermissionChange({ canEdit, reason, diverged } = {}) {
+    this.canEditDocument = Boolean(canEdit);
+    document.body.dataset.documentPermission = canEdit ? 'editable' : 'view-only';
+    this.logLifecycle('editor-permission', { canEdit, reason, diverged: Boolean(diverged) });
+
+    if (!canEdit) {
+      // Never leave a "Saving…"/"Saved" indicator up when the server is refusing our edits.
+      this.setSaveState(diverged ? 'failed' : 'saved');
+    }
+  }
+
   setSaveState(status) {
     const normalized = status === 'offline-saved' ? 'offline' : status;
     const knownStates = new Set(['saved', 'saving', 'unsaved', 'offline', 'failed']);
@@ -402,6 +432,7 @@ export class App {
             }
           },
           onStatusChange: (status) => this.handleEditorStatusChange(status, docId),
+          onPermissionChange: (permission) => this.handleEditorPermissionChange(permission),
           onCollaboratorsChange: (users) => {
             UI.updateCollaboratorsUI(
               document.getElementById('activeCollaborators'),
@@ -419,6 +450,10 @@ export class App {
       this.editor.onSaveStatusChange = (status) => this.setSaveState(status);
       this.editor.onStatsChange = (stats) => this.uiManager.updateStats(stats);
       this.editor.onSelectionStatsChange = (stats) => this.uiManager.updateSelectionStats(stats);
+      this.editor.onPermissionChange = (permission) =>
+        this.handleEditorPermissionChange(permission);
+
+      this.seedEditPermission(docId);
 
       if (this.uiManager) {
         this.uiManager.updateMobileUIState();

@@ -257,7 +257,10 @@ export async function getDocumentAccess(db, docId, userId) {
   const isOwner = doc.owner === userId;
   const role = isOwner ? 'owner' : permission ? validateRole(permission.role) : null;
   const canRead = isOwner || role === 'editor' || role === 'viewer' || doc.isPublic === 1;
-  const canEdit = isOwner || role === 'editor';
+  // A public link is the only way a second user can reach a document today, and SyncroEdit is a
+  // real-time collaborative editor, so public participants get edit rights. Private documents stay
+  // limited to the owner and explicitly authorised users.
+  const canEdit = isOwner || role === 'editor' || doc.isPublic === 1;
 
   return {
     doc,

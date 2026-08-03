@@ -1,7 +1,14 @@
+// Preferences were stored under "synchroEdit*" before the product dropped the "h". Read the old key
+// when the new one is absent so existing users keep their settings; the next write migrates them.
+export function readStoredPreference(key, legacyKey) {
+  return localStorage.getItem(key) ?? localStorage.getItem(legacyKey);
+}
+
 export class Theme {
   constructor() {
-    this.currentTheme = localStorage.getItem('synchroEditTheme') || 'dark';
-    this.currentAccentColor = localStorage.getItem('synchroEditAccentColor') || '#3b82f6';
+    this.currentTheme = readStoredPreference('syncroEditTheme', 'synchroEditTheme') || 'dark';
+    this.currentAccentColor =
+      readStoredPreference('syncroEditAccentColor', 'synchroEditAccentColor') || '#3b82f6';
     this.init();
   }
 
@@ -13,7 +20,7 @@ export class Theme {
   applyTheme(theme) {
     this.showThemeToast(theme === 'light' ? 'Applying Light Mode...' : 'Applying Dark Mode...');
     this.currentTheme = theme;
-    localStorage.setItem('synchroEditTheme', theme);
+    localStorage.setItem('syncroEditTheme', theme);
     if (theme === 'light') {
       document.body.classList.add('light-theme');
     } else {
@@ -71,7 +78,7 @@ export class Theme {
 
     this.showThemeToast('Applying Accent Color...');
     this.currentAccentColor = color;
-    localStorage.setItem('synchroEditAccentColor', color);
+    localStorage.setItem('syncroEditAccentColor', color);
 
     let rgbString, lightColor, lighterColor, hexColor;
 

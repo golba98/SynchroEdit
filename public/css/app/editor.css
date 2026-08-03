@@ -181,6 +181,40 @@ body.glow-enabled .pages-container::before {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
 }
 
+.editor-permission-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--font-md);
+  text-align: center;
+}
+
+.editor-permission-banner.is-error {
+  color: var(--text);
+  border-bottom-color: var(--error-color);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.editor-permission-banner__action {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-sm);
+  cursor: pointer;
+}
+
+.editor-permission-banner__action:hover {
+  background: var(--surface-hover);
+}
+
 .page-scaler:focus-within {
   border-color: rgba(var(--accent-color-rgb), 0.45) !important;
 }
@@ -788,5 +822,3 @@ body.light-theme #docSearch:focus {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1) !important;
 }
-
-

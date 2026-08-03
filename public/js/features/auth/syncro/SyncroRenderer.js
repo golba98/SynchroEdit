@@ -1,7 +1,7 @@
 /**
- * SynchroRenderer - Handles visual rendering, particles, and DOM manipulation
+ * SyncroRenderer - Handles visual rendering, particles, and DOM manipulation
  */
-export class SynchroRenderer {
+export class SyncroRenderer {
   constructor(container) {
     this.container = container;
     this.botRig = container.querySelector('.bot-rig') || container.querySelector('#botRig');
@@ -14,7 +14,7 @@ export class SynchroRenderer {
    */
   createParticle(type) {
     const particle = document.createElement('div');
-    particle.className = `synchro-particle particle-${type}`;
+    particle.className = `syncro-particle particle-${type}`;
 
     switch (type) {
       case 'zzz':
@@ -207,10 +207,10 @@ export class SynchroRenderer {
    * Inject required particle animation CSS if not present
    */
   injectParticleCSS() {
-    if (document.getElementById('synchro-particle-styles')) return;
+    if (document.getElementById('syncro-particle-styles')) return;
 
     const style = document.createElement('style');
-    style.id = 'synchro-particle-styles';
+    style.id = 'syncro-particle-styles';
     style.textContent = `
       @keyframes floatZ {
         0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
@@ -257,4 +257,4 @@ export class SynchroRenderer {
   }
 }
 
-export default SynchroRenderer;
+export default SyncroRenderer;

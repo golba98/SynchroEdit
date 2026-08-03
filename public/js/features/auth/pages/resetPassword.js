@@ -1,19 +1,19 @@
 import { Network } from '/js/app/network.js';
-import { SynchroBot } from '/js/features/auth/synchro/SynchroBot.js';
-import { SynchroRenderer } from '/js/features/auth/synchro/SynchroRenderer.js';
+import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
+import { SyncroRenderer } from '/js/features/auth/syncro/SyncroRenderer.js';
 import { PASSWORD_REGEX } from '/js/core/validation.js';
 import { stripApiErrorPrefix } from '/js/core/errors.js';
 
 export function initResetPasswordPage() {
   const container = document.querySelector('.character-container');
-  let synchro = null;
+  let syncro = null;
   let renderer = null;
 
   if (container) {
-    synchro = new SynchroBot({ authFlow: 'reset' });
-    synchro.init('.character-container');
+    syncro = new SyncroBot({ authFlow: 'reset' });
+    syncro.init('.character-container');
 
-    renderer = new SynchroRenderer(container);
+    renderer = new SyncroRenderer(container);
     renderer.injectParticleCSS();
   }
 
@@ -31,15 +31,15 @@ export function initResetPasswordPage() {
     statusMessage.className = 'status-message error';
     resetBtn.disabled = true;
     document.querySelector('.subtitle').textContent = 'Please request a new link.';
-    synchro?.onError();
+    syncro?.onError();
   }
 
   usernameInput?.addEventListener('focus', () => {
-    synchro?.onFieldFocus('username', usernameInput.value);
+    syncro?.onFieldFocus('username', usernameInput.value);
   });
 
   usernameInput?.addEventListener('input', () => {
-    synchro?.onFieldInput('username', usernameInput.value, {
+    syncro?.onFieldInput('username', usernameInput.value, {
       formData: {
         username: usernameInput.value,
         password: passwordInput.value,
@@ -49,16 +49,16 @@ export function initResetPasswordPage() {
   });
 
   usernameInput?.addEventListener('blur', () => {
-    synchro?.onFieldBlur();
+    syncro?.onFieldBlur();
   });
 
   passwordInput?.addEventListener('focus', () => {
-    synchro?.onFieldFocus('password', passwordInput.value);
+    syncro?.onFieldFocus('password', passwordInput.value);
   });
 
   passwordInput?.addEventListener('input', () => {
     const isStrong = PASSWORD_REGEX.test(passwordInput.value);
-    synchro?.onFieldInput('password', passwordInput.value, {
+    syncro?.onFieldInput('password', passwordInput.value, {
       formData: {
         username: usernameInput.value,
         password: passwordInput.value,
@@ -69,16 +69,16 @@ export function initResetPasswordPage() {
   });
 
   passwordInput?.addEventListener('blur', () => {
-    synchro?.onFieldBlur();
+    syncro?.onFieldBlur();
   });
 
   confirmInput?.addEventListener('focus', () => {
-    synchro?.onFieldFocus('confirmPassword', confirmInput.value);
+    syncro?.onFieldFocus('confirmPassword', confirmInput.value);
   });
 
   confirmInput?.addEventListener('input', () => {
     const passwordsMatch = passwordInput.value === confirmInput.value;
-    synchro?.onFieldInput('confirmPassword', confirmInput.value, {
+    syncro?.onFieldInput('confirmPassword', confirmInput.value, {
       formData: {
         username: usernameInput.value,
         password: passwordInput.value,
@@ -89,15 +89,15 @@ export function initResetPasswordPage() {
   });
 
   confirmInput?.addEventListener('blur', () => {
-    synchro?.onFieldBlur();
+    syncro?.onFieldBlur();
   });
 
   resetBtn?.addEventListener('mouseenter', () => {
-    synchro?.onButtonHover(true);
+    syncro?.onButtonHover(true);
   });
 
   resetBtn?.addEventListener('mouseleave', () => {
-    synchro?.onButtonHover(false);
+    syncro?.onButtonHover(false);
   });
 
   const handleReset = async () => {
@@ -109,14 +109,14 @@ export function initResetPasswordPage() {
     if (!username || !password || !confirm) {
       statusMessage.textContent = 'Please fill in all fields.';
       statusMessage.className = 'status-message error';
-      synchro?.onError();
+      syncro?.onError();
       return;
     }
 
     if (password !== confirm) {
       statusMessage.textContent = '✗ Passwords do not match.';
       statusMessage.className = 'status-message error';
-      synchro?.onError();
+      syncro?.onError();
       return;
     }
 
@@ -124,11 +124,11 @@ export function initResetPasswordPage() {
       statusMessage.textContent =
         '✗ Password too weak (Min 8 chars, Upper, Lower, Number, Symbol).';
       statusMessage.className = 'status-message error';
-      synchro?.onError();
+      syncro?.onError();
       return;
     }
 
-    synchro?.onSubmit();
+    syncro?.onSubmit();
     resetBtn.disabled = true;
     resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     statusMessage.textContent = '';
@@ -139,7 +139,7 @@ export function initResetPasswordPage() {
         body: JSON.stringify({ token, password, username, mfaCode }),
       });
 
-      synchro?.onSuccess();
+      syncro?.onSuccess();
       renderer?.burst('star', 5);
       statusMessage.textContent = '✓ Password reset! Redirecting to login...';
       statusMessage.className = 'status-message success';
@@ -148,7 +148,7 @@ export function initResetPasswordPage() {
         window.location.href = 'login.html';
       }, 2000);
     } catch (error) {
-      synchro?.onError();
+      syncro?.onError();
       if (error.data?.mfaRequired) {
         mfaGroup.style.display = 'block';
         statusMessage.textContent = '✗ 2FA code required for this account.';

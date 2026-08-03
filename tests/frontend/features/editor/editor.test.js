@@ -58,6 +58,7 @@ const mockQuillInstance = {
     }),
   },
   getSelection: jest.fn(),
+  enable: jest.fn(),
   getLength: jest.fn().mockReturnValue(1),
   setSelection: jest.fn(),
   focus: jest.fn(),
@@ -394,5 +395,91 @@ describe('Editor Lifecycle & Resilience', () => {
     expect(document.getElementById('page-container-typing-page')).toBe(pageContainer);
     expect(global.Quill).toHaveBeenCalledTimes(1);
     editor.destroy();
+  });
+
+  describe('edit permissions', () => {
+    it('locks the editor and shows why when the server says the document is view-only', () => {
+      const onPermissionChange = jest.fn();
+      const editor = new Editor('editor-container', { onPermissionChange });
+      editor.pageQuillInstances.set('page-1', mockQuillInstance);
+      mockQuillInstance.enable.mockClear();
+
+      expect(editor.canEdit).toBe(true);
+
+      editor._handlePermissionDenied(
+        JSON.stringify({
+          code: 'read_only',
+          reason: 'You have view-only access to this document.',
+          documentId: 'test-doc',
+          stateVector: 'AAA=',
+        })
+      );
+
+      expect(editor.canEdit).toBe(false);
+      expect(mockQuillInstance.enable).toHaveBeenCalledWith(false);
+      expect(onPermissionChange).toHaveBeenCalledWith(
+        expect.objectContaining({ canEdit: false, reason: expect.any(String) })
+      );
+
+      const banner = document.querySelector('.editor-permission-banner');
+      expect(banner).not.toBeNull();
+      expect(banner.textContent).toContain('view-only');
+
+      editor.destroy();
+    });
+
+    it('surfaces a recovery path when an edit was rejected after being applied locally', () => {
+      const onPermissionChange = jest.fn();
+      const editor = new Editor('editor-container', { onPermissionChange });
+      editor.pageQuillInstances.set('page-1', mockQuillInstance);
+
+      editor._handlePermissionDenied(
+        JSON.stringify({
+          code: 'edit_rejected',
+          reason: 'Your changes were not saved.',
+          documentId: 'test-doc',
+          stateVector: 'AAA=',
+        })
+      );
+
+      expect(editor.canEdit).toBe(false);
+      expect(onPermissionChange).toHaveBeenCalledWith(
+        expect.objectContaining({ diverged: true, stateVector: 'AAA=' })
+      );
+
+      const banner = document.querySelector('.editor-permission-banner');
+      expect(banner.classList.contains('is-error')).toBe(true);
+      expect(banner.querySelector('.editor-permission-banner__action')).not.toBeNull();
+
+      editor.destroy();
+    });
+
+    it('falls back to a generic reason when the payload is not JSON', () => {
+      const editor = new Editor('editor-container');
+      editor._handlePermissionDenied('unstructured failure text');
+
+      expect(editor.canEdit).toBe(false);
+      expect(document.querySelector('.editor-permission-banner')).not.toBeNull();
+
+      editor.destroy();
+    });
+
+    it('disables newly mounted pages while the document is view-only', () => {
+      const editor = new Editor('editor-container');
+      editor.provider = null;
+      editor.setEditPermission(false, 'view only');
+
+      const pageMap = new Y.Map();
+      pageMap.set('id', 'locked-page');
+      pageMap.set('content', new Y.Text(''));
+      editor.yPages.push([pageMap]);
+      editor.createPageContainer('locked-page', 0);
+      mockQuillInstance.enable.mockClear();
+
+      editor.mountPage('locked-page');
+
+      expect(mockQuillInstance.enable).toHaveBeenCalledWith(false);
+      editor.destroy();
+    });
   });
 });

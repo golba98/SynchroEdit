@@ -1,13 +1,17 @@
 import { Plugin } from '/js/app/Plugin.js';
+import { readStoredPreference } from '/js/features/theme/theme.js';
 
 export class ReadabilityManager extends Plugin {
   constructor(editor, options) {
     super(editor, options);
     this.showLineNumbers = false;
     this.showInvisibles = false;
-    this.showPageGlow = localStorage.getItem('synchroEditPageGlow') === 'true';
-    this.showPageBorder = localStorage.getItem('synchroEditPageBorder') === 'true';
-    this.currentCanvasTheme = localStorage.getItem('synchroEditCanvasTheme') || 'classic';
+    this.showPageGlow =
+      readStoredPreference('syncroEditPageGlow', 'synchroEditPageGlow') === 'true';
+    this.showPageBorder =
+      readStoredPreference('syncroEditPageBorder', 'synchroEditPageBorder') === 'true';
+    this.currentCanvasTheme =
+      readStoredPreference('syncroEditCanvasTheme', 'synchroEditCanvasTheme') || 'classic';
     this.isFocusMode = false;
   }
 
@@ -37,7 +41,7 @@ export class ReadabilityManager extends Plugin {
       glowToggle.checked = this.showPageGlow;
       this.addDisposableListener(glowToggle, 'change', (e) => {
         this.showPageGlow = e.target.checked;
-        localStorage.setItem('synchroEditPageGlow', this.showPageGlow);
+        localStorage.setItem('syncroEditPageGlow', this.showPageGlow);
         this.applyPageGlow();
       });
     }
@@ -48,7 +52,7 @@ export class ReadabilityManager extends Plugin {
       borderToggle.checked = this.showPageBorder;
       this.addDisposableListener(borderToggle, 'change', (e) => {
         this.showPageBorder = e.target.checked;
-        localStorage.setItem('synchroEditPageBorder', this.showPageBorder);
+        localStorage.setItem('syncroEditPageBorder', this.showPageBorder);
         this.applyPageBorder();
       });
     }
@@ -98,7 +102,7 @@ export class ReadabilityManager extends Plugin {
       // Add new one
       container.classList.add(`canvas-${theme}`);
     });
-    localStorage.setItem('synchroEditCanvasTheme', theme);
+    localStorage.setItem('syncroEditCanvasTheme', theme);
   }
 
   toggleInvisibles() {

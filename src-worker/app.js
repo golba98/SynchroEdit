@@ -49,8 +49,9 @@ import { registerDocumentsRoutes } from './routes/documents.js';
 import { registerRealtimeRoutes } from './routes/realtime.js';
 
 // Export Durable Object classes so Cloudflare can bind them.
-// The Synchro* aliases match the production class names already registered
-// in Cloudflare's namespace (wrangler.toml bindings use these names).
+// These keep the historical "Synchro" spelling because they match the production class names
+// already registered in Cloudflare's namespace (wrangler.toml bindings use these names).
+// Renaming them requires a `renamed_classes` migration, not a find-and-replace.
 export {
   SynchroDocumentObject,
   SynchroDocumentObject as DocumentSyncObject,

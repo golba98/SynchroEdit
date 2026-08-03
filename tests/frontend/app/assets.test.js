@@ -11,7 +11,7 @@ const retiredPublicPaths = [
   'css/pages/start.css',
   'js/features/auth/pages/signup.js',
   'js/features/auth/pages/start.js',
-  'js/features/auth/synchro/SynchroStates.js',
+  'js/features/auth/syncro/SyncroStates.js',
   'pages/start.html',
 ];
 

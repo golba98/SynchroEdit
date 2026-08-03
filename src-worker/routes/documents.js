@@ -228,6 +228,7 @@ export function registerDocumentsRoutes(app, dependencies) {
       isPublic: access.isPublic,
       isOwner: access.isOwner,
       isShared: access.role === 'editor',
+      canEdit: access.canEdit,
     });
   });
 
@@ -377,6 +378,7 @@ export function registerDocumentsRoutes(app, dependencies) {
       title: access.doc.title,
       isOwner: access.isOwner,
       isShared: access.role === 'editor',
+      canEdit: access.canEdit,
     });
   });
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syncroedit-v12';
+const CACHE_NAME = 'syncroedit-v13';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -28,8 +28,8 @@ const ASSETS_TO_CACHE = [
   '/js/features/auth/pages/login.js',
   '/js/features/auth/pages/resetPassword.js',
   '/js/features/auth/pages/verify.js',
-  '/js/features/auth/synchro/SynchroBot.js',
-  '/js/features/auth/synchro/SynchroRenderer.js',
+  '/js/features/auth/syncro/SyncroBot.js',
+  '/js/features/auth/syncro/SyncroRenderer.js',
   '/js/features/theme/theme.js',
   '/js/features/profile/profile.js',
   '/js/features/theme/background.js',

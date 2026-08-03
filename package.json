@@ -6,7 +6,7 @@
   "scripts": {
     "start": "wrangler dev --env local",
     "dev": "wrangler dev --env local",
-    "deploy": "wrangler deploy --env=\"\"",
+    "deploy": "wrangler deploy --env staging",
     "db:migrate:local": "wrangler d1 migrations apply DB --local --env local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "test": "npm run test:unit && npm run test:integration && npm run test:frontend",

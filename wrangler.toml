@@ -22,12 +22,13 @@ class_name = "SynchroDocumentObject"
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
-[[migrations]]
-tag = "v5"
-renamed_classes = [
-  { from = "SyncroDocumentObject", to = "SynchroDocumentObject" },
-  { from = "SyncroRateLimitObject", to = "SynchroRateLimitObject" },
-]
+[exports.SynchroDocumentObject]
+type = "durable-object"
+storage = "sqlite"
+
+[exports.SynchroRateLimitObject]
+type = "durable-object"
+storage = "sqlite"
 
 [vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"

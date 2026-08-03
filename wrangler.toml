@@ -1,4 +1,4 @@
-name = "syncroedit"
+name = "syncroedit-dev"
 main = "src-worker/index.js"
 compatibility_date = "2026-06-10"
 
@@ -10,8 +10,8 @@ run_worker_first = ["/api/*", "/ws/*"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "synchroedit-db"
-database_id = "22d0142f-5997-4622-bd2d-33eab48beeea"
+database_name = "synchroedit-dev-db"
+database_id = "11ebe7c6-b238-43bd-906a-6a1fc651156f"
 migrations_dir = "migrations"
 
 [[durable_objects.bindings]]
@@ -23,21 +23,16 @@ name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
 [[migrations]]
-tag = "v1"
-new_sqlite_classes = ["SynchroDocumentObject"]
-
-[[migrations]]
-tag = "v2"
-new_sqlite_classes = ["SynchroRateLimitObject"]
-
-[[migrations]]
-tag = "v3"
-new_sqlite_classes = ["SynchroDocumentObject", "SynchroRateLimitObject"]
+tag = "v5"
+renamed_classes = [
+  { from = "SyncroDocumentObject", to = "SynchroDocumentObject" },
+  { from = "SyncroRateLimitObject", to = "SynchroRateLimitObject" },
+]
 
 [vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"
 APP_NAME = "SyncroEdit"
-APP_URL = "https://syncroedit.online"
+APP_URL = "https://syncroedit-dev.jordanvorster404.workers.dev"
 
 [env.local]
 name = "syncroedit-local"

@@ -58,7 +58,7 @@
     "idb-keyval": "^6.3.0",
     "quill": "2.0.2",
     "y-protocols": "^1.0.7",
-    "y-websocket": "^3.0.0",
+    "y-websocket": "^3.1.0",
     "yjs": "^13.6.31"
   },
   "devDependencies": {

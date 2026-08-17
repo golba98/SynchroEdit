@@ -106,6 +106,7 @@
         }
       }
     </style>
+    <script src="/js/dev-cache-reset.js"></script>
     <link rel="stylesheet" href="/css/app/core.css" />
     <link rel="stylesheet" href="/css/app/editor.css" />
     <link rel="stylesheet" href="/css/app/effects.css" />
@@ -124,7 +125,7 @@
   <body data-page="editor" data-view-state="booting" style="margin: 0; padding: 0">
     <!-- Boot Loader -->
     <div id="bootLoader">
-      <div
+      <div class="boot-loader-card"
         style="
           display: flex;
           flex-direction: column;
@@ -140,7 +141,7 @@
           width: calc(100% - 32px);
         "
       >
-        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
+        <img class="boot-loader-mark" src="/logo.svg" alt="" />
         <div>
           <h1
             style="
@@ -163,10 +164,10 @@
               letter-spacing: 0.5px;
             "
           >
-            Loading workspace...
+            Preparing your workspace
           </p>
         </div>
-        <div
+        <div class="boot-loader-progress"
           style="
             width: 36px;
             height: 36px;
@@ -182,7 +183,9 @@
     <!-- Document Opening Loader (Instant reveal on click) -->
     <div id="documentOpeningLoader" class="document-opening-loader" hidden>
       <div class="document-opening-card">
-        <div class="document-opening-icon">✦</div>
+        <div class="document-opening-icon">
+          <img src="/logo.svg" alt="" />
+        </div>
         <div id="documentOpeningTitle" class="document-opening-title">Opening document...</div>
         <div id="documentOpeningSubtitle" class="document-opening-subtitle">
           Preparing your workspace
@@ -442,8 +445,8 @@
             margin-bottom: 32px;
           "
         >
-          <div style="display: flex; align-items: center; gap: 12px">
-            <div style="font-size: 24px">📄</div>
+          <div class="library-brand-lockup" style="display: flex; align-items: center; gap: 12px">
+            <img class="library-brand-mark" src="/logo.svg" alt="" />
             <h1 style="margin: 0; color: var(--text); font-size: 16px; font-weight: 600">
               SyncroEdit
             </h1>
@@ -503,8 +506,14 @@
           </div>
         </div>
 
+        <div class="library-page-intro">
+          <div class="library-eyebrow">Workspace</div>
+          <h2>Your documents</h2>
+          <p>Open a recent file or start something new.</p>
+        </div>
+
         <!-- New Document Section -->
-        <div style="margin-bottom: 40px">
+        <div class="library-new-section" style="margin-bottom: 40px">
           <h2
             style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
             class="section-title"
@@ -512,6 +521,7 @@
             New
           </h2>
           <div
+            class="library-create-grid"
             style="
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -521,97 +531,44 @@
             <div
               id="createNewDoc"
               class="create-doc-card"
-              style="
-                width: 168px;
-                min-height: 176px;
-                background: var(--surface-elevated);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                padding: 16px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all var(--transition-speed);
-                text-align: center;
-              "
+              role="button"
+              tabindex="0"
+              aria-label="Create a blank document"
             >
-              <div
-                style="
-                  width: 80px;
-                  height: 100px;
-                  background: var(--surface);
-                  border: 1px solid var(--border);
-                  border-radius: 4px;
-                  margin-bottom: 12px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 24px;
-                  color: var(--text-soft);
-                  transition: all var(--transition-speed);
-                "
-                class="doc-thumbnail"
-              >
-                <i class="far fa-file-alt"></i>
+              <div class="doc-thumbnail">
+                <i class="far fa-file-alt" aria-hidden="true"></i>
               </div>
-              <div
-                style="color: var(--text); font-size: 13px; font-weight: 600; margin-bottom: 2px"
-              >
-                Blank document
+              <div class="create-doc-copy">
+                <div class="create-doc-title">Blank document</div>
+                <div class="create-doc-description">Start from scratch</div>
               </div>
-              <div style="color: var(--text-soft); font-size: 11px">Start from scratch</div>
+              <div class="create-doc-action" aria-hidden="true">
+                <i class="fas fa-arrow-right"></i>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Search and Filter -->
-        <div style="margin-bottom: 24px; display: flex; justify-content: flex-end">
-          <div style="position: relative; width: min(420px, 100%)">
-            <i
-              class="fas fa-search"
-              style="
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--text-soft);
-                font-size: 13px;
-              "
-            ></i>
-            <input
-              type="text"
-              id="docSearch"
-              placeholder="Search documents..."
-              class="document-search"
-              style="
-                width: 100%;
-                height: 40px;
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                color: var(--text);
-                padding-left: 36px;
-                padding-right: 12px;
-                font-size: var(--font-md);
-                outline: none;
-                transition:
-                  border-color var(--transition-speed),
-                  box-shadow var(--transition-speed);
-              "
-            />
-          </div>
-        </div>
-
         <!-- Recent Documents -->
-        <div>
-          <h2
-            style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
-            class="section-title"
-          >
-            Recent
-          </h2>
+        <div class="library-recent-section">
+          <div class="library-recent-toolbar">
+            <h2
+              style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
+              class="section-title"
+            >
+              Recent
+            </h2>
+            <label class="library-search-row" for="docSearch">
+              <i class="fas fa-search" aria-hidden="true"></i>
+              <input
+                type="search"
+                id="docSearch"
+                placeholder="Search documents"
+                class="document-search"
+                autocomplete="off"
+              />
+            </label>
+          </div>
           <div
             class="recent-documents-table-wrapper"
             style="
@@ -1046,13 +1003,17 @@
                   >Theme
                 </h3>
                 <div class="theme-choice-group">
-                  <button id="darkThemeBtn" class="theme-choice active">🌙 Dark</button>
-                  <button id="lightThemeBtn" class="theme-choice">☀️ Light</button>
+                <button id="darkThemeBtn" class="theme-choice active">
+                  <i class="fas fa-moon" aria-hidden="true"></i> Dark
+                </button>
+                  <button id="lightThemeBtn" class="theme-choice">
+                    <i class="fas fa-sun" aria-hidden="true"></i> Light
+                  </button>
                 </div>
               </div>
 
               <!-- Accent Color Selection -->
-              <div class="settings-card">
+              <div class="settings-card accent-color-settings">
                 <h3 class="settings-card-title">
                   <i
                     class="fas fa-palette"
@@ -1942,7 +1903,7 @@
       <!-- Editor Workspace Loader (shows centered card above the workspace area when document is opening) -->
       <div id="editorWorkspaceLoader" class="editor-workspace-loader" hidden>
         <div class="editor-workspace-loader-card">
-          <div class="loader-document-icon">⌁</div>
+          <div class="loader-document-icon"><img src="/logo.svg" alt="" /></div>
           <div class="loader-title">Opening document...</div>
           <div class="loader-subtitle">Preparing your workspace</div>
           <div class="loader-progress"><span></span></div>

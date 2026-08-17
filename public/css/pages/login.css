@@ -477,10 +477,380 @@ select:-webkit-autofill:focus {
   }
 }
 
+/* Final monochrome pass: graphite, white, and neutral gray only. */
+:root {
+  --accent-color: #f5f5f5;
+  --accent-glow: rgba(255, 255, 255, 0.18);
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --accent-border: rgba(255, 255, 255, 0.24);
+  --accent-color-light: #ffffff;
+  --accent-color-lighter: #ffffff;
+  --accent-color-rgb: 255, 255, 255;
+}
+
+body[data-page='login']::before,
+body[data-page='login']::after {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.eyebrow,
+.bot-status,
+.bot-status i,
+.bot-intro h2 em,
+.toggle-form a,
+.floating-label-container input:focus + .floating-label,
+.floating-label-container input:not(:placeholder-shown) + .floating-label,
+.password-toggle:hover {
+  color: #ffffff;
+}
+
+.eyebrow span {
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.input-group input:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.login-btn {
+  background: #f5f5f5;
+  color: #080808;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
+}
+
+.login-btn:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.right-section::before {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+.bot-rig .head {
+  border-color: #ffffff;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.04), 0 0 30px rgba(255, 255, 255, 0.12);
+}
+
+.bot-rig .antenna-bulb,
+.bot-rig .pupil,
+.bot-rig .hand {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.38);
+}
+
+.bot-rig .pupil {
+  background: #050505;
+}
+
+.redirect-mark {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.42);
+}
+
 /* Touch-friendly hover states */
 @media (hover: none) {
   .login-btn:active {
     transform: scale(0.98);
+  }
+}
+
+/* =========================================
+   POLISHED AUTH EXPERIENCE
+   ========================================= */
+body[data-page='login'] {
+  background: #080b12;
+  color: #f8fafc;
+  position: relative;
+}
+
+body[data-page='login']::before,
+body[data-page='login']::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+body[data-page='login']::before {
+  width: 520px;
+  height: 520px;
+  top: -240px;
+  right: -120px;
+  background: rgba(99, 102, 241, 0.14);
+}
+
+body[data-page='login']::after {
+  width: 360px;
+  height: 360px;
+  bottom: -220px;
+  left: -120px;
+  background: rgba(14, 165, 233, 0.09);
+}
+
+.login-container {
+  max-width: 1080px;
+  min-height: 650px;
+  margin: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 28px;
+  background: rgba(15, 20, 31, 0.9);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(18px);
+}
+
+.left-section {
+  flex: 1.08;
+  padding: 64px 72px;
+  background: rgba(12, 16, 25, 0.94);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 76px;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  box-shadow: 0 8px 22px rgba(99, 102, 241, 0.28);
+}
+
+.brand-name {
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.brand-kicker {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #818cf8;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eyebrow span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
+}
+
+.title {
+  margin-bottom: 12px;
+  color: #f8fafc;
+  font-size: clamp(34px, 4vw, 46px);
+  font-weight: 760;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.subtitle {
+  max-width: 350px;
+  margin-bottom: 38px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.input-group {
+  margin-bottom: 18px;
+}
+
+.input-group input {
+  min-height: 52px;
+  padding: 16px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.44);
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  border-color: #818cf8;
+  background: rgba(30, 41, 59, 0.66);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.13);
+}
+
+.floating-label {
+  left: 13px;
+  color: #64748b;
+}
+
+.floating-label-container input:focus + .floating-label,
+.floating-label-container input:not(:placeholder-shown) + .floating-label {
+  color: #a5b4fc;
+  background: #0c1019;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  margin-top: 26px;
+  padding: 0 18px 0 20px;
+  border-radius: 12px;
+  background: #6366f1;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.login-btn i {
+  font-size: 12px;
+  transition: transform 180ms ease;
+}
+
+.login-btn:hover i {
+  transform: translateX(3px);
+}
+
+.right-section {
+  flex: 0.92;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 54px;
+  background: #111827;
+  isolation: isolate;
+}
+
+.right-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.55;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.bot-intro {
+  position: absolute;
+  top: 54px;
+  left: 54px;
+  right: 54px;
+  z-index: 2;
+}
+
+.bot-status {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bot-status i {
+  color: #34d399;
+  margin-right: 6px;
+  font-size: 7px;
+  vertical-align: 1px;
+}
+
+.bot-intro h2 {
+  margin: 18px 0 10px;
+  color: #f8fafc;
+  font-size: 30px;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.bot-intro h2 em {
+  color: #a5b4fc;
+  font-style: normal;
+}
+
+.bot-intro p {
+  max-width: 230px;
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.character-container {
+  margin-top: 150px;
+  transform: scale(0.82);
+}
+
+.redirect-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.redirect-mark {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
+}
+
+.redirect-description {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    margin: 16px;
+    border-radius: 22px;
+  }
+
+  .left-section {
+    padding: 34px 24px 30px;
+  }
+
+  .brand-lockup {
+    margin-bottom: 48px;
+  }
+
+  .right-section {
+    padding: 24px;
+  }
+
+  .bot-intro {
+    top: 24px;
+    left: 24px;
+  }
+
+  .bot-intro h2 {
+    margin-top: 10px;
+    font-size: 22px;
+  }
+
+  .bot-intro p {
+    display: none;
+  }
+
+  .character-container {
+    margin-top: 94px;
   }
 }
 
@@ -995,4 +1365,338 @@ select:-webkit-autofill:focus {
     transform: translate(20px, -60px) scale(1.5);
     opacity: 0;
   }
+}
+
+/* Monochrome overrides must remain last because the legacy mascot rules above
+   intentionally contain the original accent palette. */
+body[data-page='login']::before,
+body[data-page='login']::after {
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+body[data-page='login'] .login-btn,
+body[data-page='login'] #signupBtn {
+  background: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+  color: #080808 !important;
+}
+
+body[data-page='login'] .login-btn:hover,
+body[data-page='login'] #signupBtn:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body[data-page='login'] .bot-intro h2 em,
+body[data-page='login'] .eyebrow,
+body[data-page='login'] .bot-status,
+body[data-page='login'] .toggle-form a {
+  color: #ffffff !important;
+}
+
+body[data-page='login'] .eyebrow span {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body[data-page='login'] .brand-mark {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42) !important;
+}
+
+body[data-page='login'].error-flash {
+  background: #080808 !important;
+}
+
+body[data-page='login'] .status-message.success,
+body[data-page='login'] .status-message.error,
+body[data-page='login'] .strength-label--weak,
+body[data-page='login'] .strength-label--fair,
+body[data-page='login'] .strength-label--strong,
+body[data-page='login'] .strength-label--elite,
+body[data-page='login'] .requirement-item.met,
+body[data-page='login'] .requirement-item.met i {
+  color: #ffffff !important;
+}
+
+body[data-page='login'] .entropy-segment.entropy-weak,
+body[data-page='login'] .entropy-segment.entropy-fair,
+body[data-page='login'] .entropy-segment.entropy-strong,
+body[data-page='login'] .entropy-segment.entropy-elite {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body[data-page='login'] .bot-rig.success .pupil::after {
+  content: none !important;
+}
+
+body[data-page='login'] .bot-rig.success .mouth,
+body[data-page='login'] .bot-rig.error .mouth,
+body[data-page='login'] .bot-rig.searching .mouth {
+  border-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+body[data-page='login'] .bot-rig .head {
+  border-color: #ffffff !important;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.04), 0 0 30px rgba(255, 255, 255, 0.12) !important;
+}
+
+body[data-page='login'] .bot-rig .antenna-bulb,
+body[data-page='login'] .bot-rig .hand {
+  background: #b8b8b8 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 8px rgba(255, 255, 255, 0.18) !important;
+}
+
+body[data-page='login'] .bot-rig .pupil {
+  background: #555555 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Natural eye proportions and a softer gaze. */
+body[data-page='login'] .bot-rig .eye {
+  width: 34px;
+  height: 38px;
+  border: 1px solid #d4d4d4;
+  border-radius: 50%;
+  background: #f2f2f2;
+  box-shadow: inset 0 -3px 7px rgba(0, 0, 0, 0.12);
+}
+
+body[data-page='login'] .bot-rig .pupil {
+  width: 11px;
+  height: 17px;
+  border-radius: 50%;
+  transition: width 180ms ease, height 180ms ease;
+}
+
+body[data-page='login'] .bot-rig .eyelid {
+  background: #050505;
+}
+
+/* Hands settle into position with a weighted, controlled motion. */
+body[data-page='login'] .bot-rig .hand {
+  transition:
+    bottom 680ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 680ms cubic-bezier(0.22, 1, 0.36, 1),
+    right 680ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: bottom, left, right, transform;
+}
+
+body[data-page='login'] .bot-rig.secure .hand {
+  bottom: 74px;
+}
+
+body[data-page='login'] .bot-rig.secure .hand.left {
+  left: 56px;
+}
+
+body[data-page='login'] .bot-rig.secure .hand.right {
+  right: 56px;
+}
+
+body[data-page='login'] .bot-rig[role='button'] {
+  cursor: pointer;
+  user-select: none;
+}
+
+body[data-page='login'] .bot-rig[role='button']:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 12px;
+  border-radius: 24px;
+}
+
+body[data-page='login'] .bot-rig.annoyed {
+  animation: annoyed-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+body[data-page='login'] .bot-rig.annoyed .eye {
+  border-color: #ffffff;
+}
+
+body[data-page='login'] .bot-rig.annoyed .eyelid.top {
+  height: 30%;
+  transform: rotate(8deg);
+  transform-origin: right top;
+}
+
+body[data-page='login'] .bot-rig.annoyed .eye.right .eyelid.top {
+  transform: rotate(-8deg);
+  transform-origin: left top;
+}
+
+body[data-page='login'] .bot-rig.annoyed .pupil {
+  width: 8px;
+  height: 13px;
+  background: #202020 !important;
+}
+
+body[data-page='login'] .bot-rig.annoyed .mouth {
+  width: 26px;
+  height: 5px;
+  border-radius: 5px;
+  background: #ffffff;
+  transform: translateX(-50%) rotate(-5deg);
+}
+
+body[data-page='login'] .bot-rig.annoyed .hand.left {
+  transform: rotate(-24deg) translate(-4px, -5px);
+}
+
+body[data-page='login'] .bot-rig.annoyed .hand.right {
+  transform: rotate(24deg) translate(4px, -5px);
+}
+
+body[data-page='login'] .bot-rig.idle .head,
+body[data-page='login'] .bot-rig.bored .head {
+  animation: bot-idle-breathe 4.6s ease-in-out infinite;
+}
+
+body[data-page='login'] .bot-rig.idle .antenna,
+body[data-page='login'] .bot-rig.bored .antenna {
+  transform-origin: 50% 100%;
+  animation: bot-antenna-sway 5.2s ease-in-out infinite;
+}
+
+body[data-page='login'] .bot-rig.gesture-wave-left .hand.left {
+  animation: bot-wave-left 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body[data-page='login'] .bot-rig.gesture-wave-right .hand.right {
+  animation: bot-wave-right 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body[data-page='login'] .bot-rig.gesture-lean {
+  animation: bot-curious-lean 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body[data-page='login'] .bot-rig.startled {
+  animation: bot-startled 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body[data-page='login'] .bot-rig.startled .eye {
+  transform: scale(1.08);
+}
+
+body[data-page='login'] .bot-rig.startled .pupil {
+  width: 8px;
+  height: 12px;
+}
+
+body[data-page='login'] .bot-rig.startled .hand.left {
+  transform: translate(-7px, -10px) rotate(-18deg);
+}
+
+body[data-page='login'] .bot-rig.startled .hand.right {
+  transform: translate(7px, -10px) rotate(18deg);
+}
+
+@keyframes bot-idle-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.012);
+  }
+}
+
+@keyframes bot-antenna-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes bot-wave-left {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  35% {
+    transform: translate(5px, -38px) rotate(34deg);
+  }
+  65% {
+    transform: translate(2px, -31px) rotate(-18deg);
+  }
+}
+
+@keyframes bot-wave-right {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  35% {
+    transform: translate(-5px, -38px) rotate(-34deg);
+  }
+  65% {
+    transform: translate(-2px, -31px) rotate(18deg);
+  }
+}
+
+@keyframes bot-curious-lean {
+  0%,
+  100% {
+    transform: rotate(0) translateY(0);
+  }
+  45% {
+    transform: rotate(-4deg) translateY(-3px);
+  }
+}
+
+@keyframes bot-startled {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-13px) scale(1.04);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes annoyed-shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  20% {
+    transform: translateX(-8px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(8px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-5px) rotate(-1deg);
+  }
+  80% {
+    transform: translateX(4px) rotate(1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-page='login'] .bot-rig.idle .head,
+  body[data-page='login'] .bot-rig.bored .head,
+  body[data-page='login'] .bot-rig.idle .antenna,
+  body[data-page='login'] .bot-rig.bored .antenna,
+  body[data-page='login'] .bot-rig.gesture-wave-left .hand.left,
+  body[data-page='login'] .bot-rig.gesture-wave-right .hand.right,
+  body[data-page='login'] .bot-rig.gesture-lean,
+  body[data-page='login'] .bot-rig.startled {
+    animation: none !important;
+  }
+}
+
+body[data-page='login'] .bot-rig.error .antenna-bulb,
+body[data-page='login'] .bot-rig.error .pupil,
+body[data-page='login'] .bot-rig.searching .antenna-bulb {
+  background: #ffffff !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.38) !important;
 }

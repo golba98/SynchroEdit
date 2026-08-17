@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syncroedit-v13';
+const CACHE_NAME = 'syncroedit-v14';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   '/css/pages/reset-password.css',
   '/css/pages/verify.css',
   '/js/main.js',
+  '/js/dev-cache-reset.js',
   '/js/core/api.js',
   '/js/core/config.js',
   '/js/core/debounce.js',
@@ -167,27 +168,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets: Cache-First
+  // Static assets: Network-First. This prevents long-lived browser profiles
+  // from pinning an old UI while retaining an offline fallback.
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return networkResponse;
-        })
-        .catch((err) => {
-          console.warn('[SW] Fetch failed:', event.request.url, err);
-          throw err;
-        });
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

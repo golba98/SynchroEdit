@@ -104,6 +104,7 @@ Application styles load in the order shown below; changing that order can change
 | File                           | Purpose and ownership                                                                                           |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `public/js/main.js`            | Detects the declared page and lazily loads its single initializer.                                              |
+| `public/js/dev-cache-reset.js` | Removes stale SyncroEdit service-worker caches on localhost before page initialization.                         |
 | `public/js/app/bootstrap.js`   | Boots the editor page after checking whether the current session may open the application.                      |
 | `public/js/app/app.js`         | Owns top-level application lifecycle, feature composition, view state, and document opening.                    |
 | `public/js/app/network.js`     | Exposes the feature-oriented API façade used by existing controllers and managers.                              |

@@ -75,7 +75,7 @@ export const UI = {
                     <td style="padding: 16px 24px;">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <div class="doc-icon-container">
-                                <i class="fas fa-file-alt"></i>
+                                <i class="far fa-file-alt" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
@@ -89,7 +89,7 @@ export const UI = {
                     <td class="doc-meta-text" style="padding: 16px 24px; font-size: 14px;">${dateStr}</td>
                     <td style="padding: 16px 24px; text-align: center;">
                         <button class="delete-doc-btn" data-doc-id="${doc._id}" title="Delete">
-                            <i class="fas fa-trash"></i>
+                            <i class="far fa-trash-alt" aria-hidden="true"></i>
                         </button>
                     </td>
                 </tr>

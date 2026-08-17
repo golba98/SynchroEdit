@@ -43,7 +43,7 @@ describe('Service Worker', () => {
     expect(global.self.addEventListener).toHaveBeenCalledWith('fetch', expect.any(Function));
   });
 
-  it('cache name is syncroedit-v13 (ensures stale asset caches are always busted)', () => {
+  it('cache name is syncroedit-v14 (ensures stale asset caches are always busted)', () => {
     require('../../../public/sw.js');
     // The CACHE_NAME constant is not exported, but the activate handler only
     // keeps the current version.  We verify indirectly: when activate runs with
@@ -65,6 +65,7 @@ describe('Service Worker', () => {
       'syncroedit-v9',
       'syncroedit-v12',
       'syncroedit-v13',
+      'syncroedit-v14',
       'some-other-cache',
     ];
     global.caches.keys.mockResolvedValue(mockCacheKeys);
@@ -77,7 +78,7 @@ describe('Service Worker', () => {
     activateCallback(mockEvent);
     await new Promise(process.nextTick);
 
-    // Should delete all caches except syncroedit-v13
+    // Should delete all caches except syncroedit-v14
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v4');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v5');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v6');
@@ -86,7 +87,8 @@ describe('Service Worker', () => {
     expect(global.caches.delete).toHaveBeenCalledWith('some-other-cache');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v9');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v12');
-    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v13');
+    expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v13');
+    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v14');
   });
 
   describe('fetch handler', () => {
@@ -155,7 +157,7 @@ describe('Service Worker', () => {
 
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v13');
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v14');
       expect(mockCache.put).toHaveBeenCalledWith(mockRequest, 'cloned-response');
     });
 
@@ -186,7 +188,7 @@ describe('Service Worker', () => {
       expect(result).toBe('cached-response');
     });
 
-    it('should use cache-first strategy for static assets', async () => {
+    it('should use network-first strategy for static assets', async () => {
       const mockRequest = {
         url: 'https://syncroedit.example.com/css/styles.css',
         method: 'GET',
@@ -196,34 +198,6 @@ describe('Service Worker', () => {
         },
       };
 
-      global.caches.match.mockResolvedValue('cached-css');
-
-      const mockEvent = {
-        request: mockRequest,
-        respondWith: jest.fn(),
-      };
-
-      fetchCallback(mockEvent);
-
-      const responsePromise = mockEvent.respondWith.mock.calls[0][0];
-      const result = await responsePromise;
-
-      expect(global.caches.match).toHaveBeenCalledWith(mockRequest);
-      expect(result).toBe('cached-css');
-      expect(global.fetch).not.toHaveBeenCalled();
-    });
-
-    it('should fetch and cache static assets if cache miss', async () => {
-      const mockRequest = {
-        url: 'https://syncroedit.example.com/css/styles.css',
-        method: 'GET',
-        mode: 'no-cors',
-        headers: {
-          get: jest.fn().mockReturnValue('text/css'),
-        },
-      };
-
-      global.caches.match.mockResolvedValue(null);
       const mockResponse = {
         status: 200,
         clone: jest.fn(() => 'cloned-css'),
@@ -244,11 +218,38 @@ describe('Service Worker', () => {
       const responsePromise = mockEvent.respondWith.mock.calls[0][0];
       const result = await responsePromise;
 
-      expect(global.caches.match).toHaveBeenCalledWith(mockRequest);
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v13');
-      expect(mockCache.put).toHaveBeenCalledWith(mockRequest, 'cloned-css');
+      expect(global.caches.match).not.toHaveBeenCalled();
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v14');
+    });
+
+    it('should fall back to cached static assets if the network fails', async () => {
+      const mockRequest = {
+        url: 'https://syncroedit.example.com/css/styles.css',
+        method: 'GET',
+        mode: 'no-cors',
+        headers: {
+          get: jest.fn().mockReturnValue('text/css'),
+        },
+      };
+
+      global.fetch.mockRejectedValue(new Error('Network error'));
+      global.caches.match.mockResolvedValue('cached-css');
+
+      const mockEvent = {
+        request: mockRequest,
+        respondWith: jest.fn(),
+      };
+
+      fetchCallback(mockEvent);
+
+      const responsePromise = mockEvent.respondWith.mock.calls[0][0];
+      const result = await responsePromise;
+
+      expect(global.caches.match).toHaveBeenCalledWith(mockRequest);
+      expect(global.fetch).toHaveBeenCalledWith(mockRequest);
+      expect(result).toBe('cached-css');
     });
   });
 });

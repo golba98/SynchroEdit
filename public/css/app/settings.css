@@ -459,6 +459,357 @@ body.light-theme .switch input:checked + .slider {
   color: var(--text) !important;
 }
 
+/* Apple-like monochrome settings surface. */
+#profileModal .profile-modal {
+  width: min(900px, 96vw) !important;
+  max-width: none !important;
+  height: min(760px, 88vh) !important;
+  background: #111113 !important;
+  border: 1px solid #2a2a2e !important;
+  border-radius: 18px !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.58) !important;
+}
+
+#profileModal .profile-modal-header,
+#profileModal .profile-tabs-container,
+#profileModal .profile-modal-footer {
+  background: #0d0d0f !important;
+  border-color: #28282c !important;
+}
+
+#profileModal .profile-modal-header {
+  padding: 28px 32px 24px !important;
+}
+
+#profileModal .profile-modal-header h2 {
+  color: #f5f5f5 !important;
+  font-size: 24px !important;
+  letter-spacing: -0.04em !important;
+}
+
+#profileModal .profile-modal-subtitle {
+  color: #858589 !important;
+}
+
+#profileModal .profile-tabs-container {
+  width: 180px !important;
+  padding: 22px 12px !important;
+}
+
+#profileModal .profile-tab {
+  min-height: 42px;
+  color: #858589 !important;
+  border-radius: 10px !important;
+}
+
+#profileModal .profile-tab:hover,
+#profileModal .profile-tab.active {
+  background: #202023 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#profileModal .profile-tab.active {
+  box-shadow: inset 3px 0 0 #ffffff !important;
+}
+
+#profileModal .profile-tab i,
+#profileModal .settings-card-title i,
+#profileModal .accordion-icon {
+  color: #ffffff !important;
+}
+
+#profileModal .profile-modal-body {
+  background: #111113 !important;
+  padding: 28px 32px !important;
+}
+
+#profileModal .profile-avatar-card,
+#profileModal .settings-card,
+#profileModal .profile-collapsible {
+  background: #171719 !important;
+  border-color: #2a2a2e !important;
+  border-radius: 14px !important;
+}
+
+#profileModal .profile-avatar-card {
+  padding: 22px 16px !important;
+}
+
+#profileModal .profile-avatar,
+#profileModal #profilePfp,
+#profileModal #profileInitials,
+#profileModal #profilePfpPlaceholder {
+  background: #e9e9e9 !important;
+  border-color: #515155 !important;
+  color: #181818 !important;
+}
+
+#profileModal .profile-label,
+#profileModal .profile-section-title,
+#profileModal .preference-title,
+#profileModal .accordion-title {
+  color: #f0f0f0 !important;
+}
+
+#profileModal .profile-helper-text,
+#profileModal .preference-description,
+#profileModal .accordion-summary {
+  color: #858589 !important;
+}
+
+#profileModal .profile-input,
+#profileModal .profile-textarea {
+  background: #0f0f11 !important;
+  border-color: #303034 !important;
+  color: #f5f5f5 !important;
+  border-radius: 10px !important;
+}
+
+#profileModal .profile-input:focus,
+#profileModal .profile-textarea:focus {
+  border-color: #8a8a8a !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08) !important;
+}
+
+#profileModal .profile-btn-primary {
+  background: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+  color: #0a0a0a !important;
+  border-radius: 10px !important;
+}
+
+#profileModal .profile-btn-primary:hover {
+  background: #ffffff !important;
+}
+
+#profileModal .profile-btn-secondary,
+#profileModal .avatar-upload-btn {
+  background: transparent !important;
+  border-color: #454549 !important;
+  color: #f0f0f0 !important;
+  border-radius: 10px !important;
+}
+
+#profileModal .profile-btn-danger,
+#profileModal .profile-btn-danger-sm,
+#profileModal .profile-danger-text-action {
+  background: transparent !important;
+  border-color: #5c3434 !important;
+  color: #e0a0a0 !important;
+}
+
+#profileModal .profile-verification-panel,
+#profileModal .profile-verification-panel.is-verified {
+  border-color: #3a3a3e !important;
+  background: #202023 !important;
+}
+
+#profileModal .profile-verification-status.is-success,
+#profileModal .status-pill-verified,
+#profileModal .status-pill-unverified {
+  color: #f0f0f0 !important;
+  background: #2a2a2e !important;
+  border-color: #4a4a4e !important;
+}
+
+/* Settings follows the active workspace theme. */
+body.light-theme #profileModal .profile-modal {
+  background: #ffffff !important;
+  border-color: #d8d8dc !important;
+  color: #171717 !important;
+}
+
+body.light-theme #profileModal .profile-modal-header,
+body.light-theme #profileModal .profile-tabs-container,
+body.light-theme #profileModal .profile-modal-body,
+body.light-theme #profileModal .profile-modal-footer {
+  background: #ffffff !important;
+  border-color: #e1e1e5 !important;
+}
+
+body.light-theme #profileModal .profile-modal-header h2,
+body.light-theme #profileModal .profile-label,
+body.light-theme #profileModal .profile-section-title,
+body.light-theme #profileModal .preference-title,
+body.light-theme #profileModal .accordion-title {
+  color: #171717 !important;
+}
+
+body.light-theme #profileModal .profile-modal-subtitle,
+body.light-theme #profileModal .profile-helper-text,
+body.light-theme #profileModal .preference-description,
+body.light-theme #profileModal .accordion-summary {
+  color: #6b6b72 !important;
+}
+
+body.light-theme #profileModal .profile-tab {
+  color: #6b6b72 !important;
+}
+
+body.light-theme #profileModal .profile-tab:hover,
+body.light-theme #profileModal .profile-tab.active {
+  background: #f0f0f2 !important;
+  color: #111111 !important;
+  box-shadow: inset 3px 0 0 #111111 !important;
+}
+
+body.light-theme #profileModal .profile-avatar-card,
+body.light-theme #profileModal .settings-card,
+body.light-theme #profileModal .profile-collapsible {
+  background: #f7f7f8 !important;
+  border-color: #dedee3 !important;
+}
+
+body.light-theme #profileModal .profile-input,
+body.light-theme #profileModal .profile-textarea {
+  background: #ffffff !important;
+  border-color: #d8d8dc !important;
+  color: #171717 !important;
+}
+
+body.light-theme #profileModal .profile-btn-primary {
+  background: #111111 !important;
+  border-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+body.light-theme #profileModal .profile-btn-secondary,
+body.light-theme #profileModal .avatar-upload-btn {
+  border-color: #c9c9ce !important;
+  color: #171717 !important;
+}
+
+body.light-theme #profileModal .theme-choice {
+  background: #ffffff !important;
+  border-color: #d8d8dc !important;
+  color: #6b6b72 !important;
+}
+
+body.light-theme #profileModal .theme-choice.active,
+body.light-theme #profileModal .theme-choice:hover {
+  background: #f0f0f2 !important;
+  border-color: #171717 !important;
+  color: #111111 !important;
+}
+
+body.light-theme #profileModal .profile-verification-panel,
+body.light-theme #profileModal .profile-verification-panel.is-verified {
+  background: #f0f0f2 !important;
+  border-color: #d2d2d7 !important;
+}
+
+body.light-theme #profileModal .settings-card-title,
+body.light-theme #profileModal .profile-verification-title {
+  color: #171717 !important;
+}
+
+body.light-theme #profileModal .profile-verification-message {
+  color: #6b6b72 !important;
+}
+
+body.light-theme #profileModal .profile-text-action,
+body.light-theme #profileModal .profile-btn-danger,
+body.light-theme #profileModal .profile-btn-danger-sm {
+  color: #171717 !important;
+  border-color: #c9c9ce !important;
+  background: #ffffff !important;
+}
+
+body.light-theme #profileModal .profile-btn-danger:hover,
+body.light-theme #profileModal .profile-btn-danger-sm:hover,
+body.light-theme #profileModal .profile-text-action:hover {
+  background: #f0f0f2 !important;
+  color: #111111 !important;
+}
+
+#profileModal .settings-card-title,
+#profileModal .profile-verification-title,
+#profileModal .profile-verification-message,
+#profileModal .profile-text-action,
+#profileModal .profile-btn-danger,
+#profileModal .profile-btn-danger-sm {
+  text-shadow: none !important;
+}
+
+#profileModal .profile-text-action,
+#profileModal .profile-btn-danger,
+#profileModal .profile-btn-danger-sm {
+  color: #f0f0f0 !important;
+}
+
+body.light-theme #profileModal .profile-text-action,
+body.light-theme #profileModal .profile-btn-danger,
+body.light-theme #profileModal .profile-btn-danger-sm {
+  color: #171717 !important;
+}
+
+#profileModal .theme-choice {
+  background: #101012 !important;
+  border-color: #303034 !important;
+  color: #a5a5a8 !important;
+  border-radius: 12px !important;
+}
+
+#profileModal .theme-choice.active,
+#profileModal .theme-choice:hover {
+  background: #242427 !important;
+  border-color: #8a8a8a !important;
+  color: #ffffff !important;
+}
+
+#profileModal .accent-color-settings {
+  display: none !important;
+}
+
+#profileModal .slider {
+  background: #303034 !important;
+  border-color: #4a4a4e !important;
+}
+
+#profileModal .switch input:checked + .slider {
+  background: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+}
+
+#profileModal .switch input:checked + .slider:before {
+  background: #101012 !important;
+}
+
+#profileModal .profile-modal-footer {
+  padding: 16px 32px !important;
+}
+
+@media (max-width: 680px) {
+  #profileModal .profile-modal {
+    height: 92vh !important;
+  }
+
+  #profileModal .profile-settings-layout {
+    flex-direction: column;
+  }
+
+  #profileModal .profile-tabs-container {
+    width: 100% !important;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px !important;
+  }
+
+  #profileModal .profile-tab {
+    white-space: nowrap;
+  }
+
+  #profileModal .profile-modal-body {
+    padding: 20px 16px !important;
+  }
+
+  #profileModal .profile-general-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 body.light-theme .session-item {
   background: #f9fafb !important;
   border-color: #e5e7eb !important;

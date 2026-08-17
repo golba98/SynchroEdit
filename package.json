@@ -4,8 +4,8 @@
   "description": "Cloudflare Workers and Durable Objects collaborative editor.",
   "main": "src-worker/index.js",
   "scripts": {
-    "start": "wrangler dev --env local",
-    "dev": "wrangler dev --env local",
+    "start": "wrangler dev --env local --port 8787 --live-reload",
+    "dev": "wrangler dev --env local --port 8787 --live-reload",
     "deploy": "wrangler deploy --env=\"\"",
     "db:migrate:local": "wrangler d1 migrations apply DB --local --env local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",

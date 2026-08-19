@@ -336,7 +336,10 @@ export class AuthController {
         return;
       }
       const msg = this._getAuthErrorMessage(e, 'Invalid username or password', 'Login failed');
-      if (statusEl) statusEl.textContent = msg;
+      if (statusEl) {
+        statusEl.textContent = msg;
+        statusEl.className = 'status-message error';
+      }
       this.syncro.onError();
       form.classList.add('shake-animation');
       setTimeout(() => form.classList.remove('shake-animation'), 1000);
@@ -506,7 +509,7 @@ export class AuthController {
   }
 
   _getAuthErrorMessage(error, unauthorizedMessage, fallbackMessage) {
-    if (error?.status === 401) {
+    if (error?.status === 401 || error?.data?.status === 401) {
       return unauthorizedMessage;
     }
 

@@ -7,9 +7,6 @@ export class SyncroBot {
     this.container = null;
     this.botRig = null;
     this.pupils = [];
-    this.eyeTargets = new Map();
-    this.eyePositions = new Map();
-    this.eyeAnimationFrame = null;
     this.mouseMoveHandler = null;
     this.targetElement = null;
     this.currentState = 'idle';
@@ -19,16 +16,12 @@ export class SyncroBot {
     this.idleTimer = null;
     this.blinkTimer = null;
     this.passwordToggleTimer = null;
+    this.typingTimer = null;
     this.blinking = false;
     this.passwordVisible = false;
-    this.playCount = 0;
-    this.annoyedTimer = null;
-    this.idleGestureTimer = null;
-    this.gestureResetTimer = null;
 
     this.config = {
       eyeMaxMove: 8, // Maximum pupil movement from center (pixels)
-      eyeSmoothing: 0.16,
       transitionDuration: 300, // ms
       idleTimeout: 10000, // 10 seconds
       blinkMinDelay: 3500,
@@ -51,10 +44,6 @@ export class SyncroBot {
 
     this.botRig = document.getElementById('botRig');
     this.pupils = Array.from(document.querySelectorAll('.pupil'));
-    this.pupils.forEach((pupil) => {
-      this.eyeTargets.set(pupil, { x: 0, y: 0 });
-      this.eyePositions.set(pupil, { x: 0, y: 0 });
-    });
     this.mouseMoveHandler = this.handleMouseMove.bind(this);
 
     if (!this.botRig || this.pupils.length === 0) {
@@ -72,94 +61,18 @@ export class SyncroBot {
   setupEventListeners() {
     // Mouse tracking for cursor following
     document.addEventListener('mousemove', this.mouseMoveHandler);
-
-    const play = (event) => {
-      if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      this.playWithBot();
+    this.nearbyEnterHandler = () => {
+      if (this.currentState === 'idle' && !this.isProcessing) this.applyState('nearby');
     };
-
-    this.botRig.addEventListener('click', play);
-    this.botRig.addEventListener('keydown', play);
-    this.botPlayHandler = play;
+    this.nearbyLeaveHandler = () => {
+      if (this.currentState === 'nearby' && !this.isProcessing) this.applyState('idle');
+    };
+    this.container.addEventListener('pointerenter', this.nearbyEnterHandler);
+    this.container.addEventListener('pointerleave', this.nearbyLeaveHandler);
 
     // Requestanimationframe for smooth updates
     this.rafId = null;
     this.pendingUpdate = null;
-  }
-
-  playWithBot() {
-    if (!this.botRig || this.isProcessing) return;
-
-    this.playCount += 1;
-    this.botRig.dataset.playCount = String(this.playCount);
-    this.botRig.setAttribute(
-      'aria-label',
-      this.playCount > 1 ? 'SyncroBot is annoyed. Tap again to tease it.' : 'SyncroBot is reacting'
-    );
-    this.clearAnnoyedTimer();
-    this.clearIdleGestureTimers();
-    this.applyState(this.playCount === 1 ? 'startled' : 'annoyed');
-
-    this.annoyedTimer = setTimeout(
-      () => {
-        this.annoyedTimer = null;
-        if (this.focusTarget === 'password' && !this.passwordVisible) {
-          this.applyState('secure');
-        } else if (this.focusTarget !== 'none') {
-          this.applyState('tracking');
-        } else {
-          this.applyState('idle');
-        }
-        this.botRig?.setAttribute('aria-label', 'Play with SyncroBot');
-      },
-      Math.min(2200, 900 + this.playCount * 180)
-    );
-  }
-
-  clearAnnoyedTimer() {
-    if (this.annoyedTimer) {
-      clearTimeout(this.annoyedTimer);
-      this.annoyedTimer = null;
-    }
-  }
-
-  scheduleIdleGesture() {
-    this.clearIdleGestureTimers();
-    if (!this.botRig || window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return;
-    if (!['idle', 'bored'].includes(this.currentState)) return;
-
-    const delay = 2200 + Math.floor(Math.random() * 2800);
-    this.idleGestureTimer = setTimeout(() => {
-      if (!this.botRig || !['idle', 'bored'].includes(this.currentState) || this.targetElement) {
-        this.scheduleIdleGesture();
-        return;
-      }
-
-      const gestures = ['gesture-wave-left', 'gesture-wave-right', 'gesture-lean'];
-      const gesture = gestures[Math.floor(Math.random() * gestures.length)];
-      this.botRig.classList.add(gesture);
-
-      const rect = this.botRig.getBoundingClientRect();
-      this.updateEyePosition({
-        x: rect.left + rect.width / 2 + (Math.random() - 0.5) * 90,
-        y: rect.top + rect.height / 2 + (Math.random() - 0.5) * 48,
-      });
-
-      this.gestureResetTimer = setTimeout(() => {
-        this.botRig?.classList.remove(...gestures);
-        this.resetEyePosition();
-        this.scheduleIdleGesture();
-      }, 1050);
-    }, delay);
-  }
-
-  clearIdleGestureTimers() {
-    if (this.idleGestureTimer) clearTimeout(this.idleGestureTimer);
-    if (this.gestureResetTimer) clearTimeout(this.gestureResetTimer);
-    this.idleGestureTimer = null;
-    this.gestureResetTimer = null;
-    this.botRig?.classList.remove('gesture-wave-left', 'gesture-wave-right', 'gesture-lean');
   }
 
   handleMouseMove(e) {
@@ -200,44 +113,9 @@ export class SyncroBot {
       const offsetX = Math.cos(angle) * moveDistance;
       const offsetY = Math.sin(angle) * moveDistance;
 
-      this.eyeTargets.set(pupil, { x: offsetX, y: offsetY });
+      // Apply transform: translate from center (-50%, -50%) plus the offset
+      pupil.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
     });
-
-    this.startEyeSmoothing();
-  }
-
-  /**
-   * Smooths pupil movement in its own animation loop so rapid mouse events
-   * feel like a gaze settling on a target instead of a cursor-controlled jump.
-   */
-  startEyeSmoothing() {
-    if (this.eyeAnimationFrame) return;
-
-    const tick = () => {
-      let isMoving = false;
-
-      this.pupils.forEach((pupil) => {
-        const target = this.eyeTargets.get(pupil) || { x: 0, y: 0 };
-        const position = this.eyePositions.get(pupil) || { x: 0, y: 0 };
-        const x = position.x + (target.x - position.x) * this.config.eyeSmoothing;
-        const y = position.y + (target.y - position.y) * this.config.eyeSmoothing;
-
-        this.eyePositions.set(pupil, { x, y });
-        pupil.style.transform = `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px))`;
-
-        if (Math.abs(target.x - x) > 0.05 || Math.abs(target.y - y) > 0.05) {
-          isMoving = true;
-        }
-      });
-
-      if (isMoving) {
-        this.eyeAnimationFrame = requestAnimationFrame(tick);
-      } else {
-        this.eyeAnimationFrame = null;
-      }
-    };
-
-    this.eyeAnimationFrame = requestAnimationFrame(tick);
   }
 
   /**
@@ -283,9 +161,8 @@ export class SyncroBot {
    */
   resetEyePosition() {
     this.pupils.forEach((pupil) => {
-      this.eyeTargets.set(pupil, { x: 0, y: 0 });
+      pupil.style.transform = 'translate(-50%, -50%)';
     });
-    this.startEyeSmoothing();
     this.stopTrackingLoop();
   }
 
@@ -374,8 +251,8 @@ export class SyncroBot {
       'confused',
       'hover-ready',
       'hover-blocked',
-      'startled',
-      'annoyed',
+      'typing',
+      'nearby',
     ];
 
     stateClasses.forEach((cls) => this.botRig.classList.remove(cls));
@@ -385,17 +262,11 @@ export class SyncroBot {
     this.currentState = state;
 
     if (['processing', 'success', 'error'].includes(state)) {
-      this.clearIdleGestureTimers();
       this.clearBlinkTimer();
       this.botRig.classList.remove('blinking');
       this.blinking = false;
     } else {
       this.scheduleBlink();
-      if (['idle', 'bored'].includes(state)) {
-        this.scheduleIdleGesture();
-      } else {
-        this.clearIdleGestureTimers();
-      }
     }
   }
 
@@ -474,6 +345,14 @@ export class SyncroBot {
       this.formCompleteness = 'invalid';
     } else if (fieldValue.length > 0) {
       this.formCompleteness = 'partial';
+    }
+
+    if (fieldName !== 'password' && !this.isProcessing) {
+      this.applyState('typing');
+      clearTimeout(this.typingTimer);
+      this.typingTimer = setTimeout(() => {
+        if (this.focusTarget === fieldName && !this.isProcessing) this.applyState('tracking');
+      }, 650);
     }
   }
 
@@ -598,19 +477,10 @@ export class SyncroBot {
    * Cleanup
    */
   destroy() {
-    this.clearAnnoyedTimer();
-    this.clearIdleGestureTimers();
-    if (this.botRig && this.botPlayHandler) {
-      this.botRig.removeEventListener('click', this.botPlayHandler);
-      this.botRig.removeEventListener('keydown', this.botPlayHandler);
-    }
-    if (this.eyeAnimationFrame) {
-      cancelAnimationFrame(this.eyeAnimationFrame);
-      this.eyeAnimationFrame = null;
-    }
     this.clearIdleTimer();
     this.clearBlinkTimer();
     this.clearPasswordToggleTimer();
+    clearTimeout(this.typingTimer);
     this.stopTrackingLoop();
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
@@ -618,5 +488,7 @@ export class SyncroBot {
     if (this.mouseMoveHandler) {
       document.removeEventListener('mousemove', this.mouseMoveHandler);
     }
+    this.container?.removeEventListener('pointerenter', this.nearbyEnterHandler);
+    this.container?.removeEventListener('pointerleave', this.nearbyLeaveHandler);
   }
 }

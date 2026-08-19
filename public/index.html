@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>SyncroEdit - Document Editor</title>
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/logo.svg" />
@@ -106,7 +103,6 @@
         }
       }
     </style>
-    <script src="/js/dev-cache-reset.js"></script>
     <link rel="stylesheet" href="/css/app/core.css" />
     <link rel="stylesheet" href="/css/app/editor.css" />
     <link rel="stylesheet" href="/css/app/effects.css" />
@@ -125,7 +121,7 @@
   <body data-page="editor" data-view-state="booting" style="margin: 0; padding: 0">
     <!-- Boot Loader -->
     <div id="bootLoader">
-      <div class="boot-loader-card"
+      <div
         style="
           display: flex;
           flex-direction: column;
@@ -141,7 +137,7 @@
           width: calc(100% - 32px);
         "
       >
-        <img class="boot-loader-mark" src="/logo.svg" alt="" />
+        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
         <div>
           <h1
             style="
@@ -164,10 +160,10 @@
               letter-spacing: 0.5px;
             "
           >
-            Preparing your workspace
+            Loading workspace...
           </p>
         </div>
-        <div class="boot-loader-progress"
+        <div
           style="
             width: 36px;
             height: 36px;
@@ -183,9 +179,7 @@
     <!-- Document Opening Loader (Instant reveal on click) -->
     <div id="documentOpeningLoader" class="document-opening-loader" hidden>
       <div class="document-opening-card">
-        <div class="document-opening-icon">
-          <img src="/logo.svg" alt="" />
-        </div>
+        <div class="document-opening-icon">✦</div>
         <div id="documentOpeningTitle" class="document-opening-title">Opening document...</div>
         <div id="documentOpeningSubtitle" class="document-opening-subtitle">
           Preparing your workspace
@@ -256,6 +250,16 @@
     >
       <div class="header-left" style="display: flex; align-items: center; gap: 12px; flex: 1">
         <button
+          class="app-brand app-brand--compact"
+          id="editorBrand"
+          type="button"
+          aria-label="Back to documents"
+          title="Back to documents"
+        >
+          <img src="/logo.svg" alt="" width="30" height="30" />
+          <span>SyncroEdit</span>
+        </button>
+        <button
           class="toolbar-btn"
           id="menuBtn"
           title="Document Menu"
@@ -317,6 +321,19 @@
         <div id="activeCollaborators" style="display: none; align-items: center">
           <!-- Active users will appear here -->
         </div>
+
+        <button
+          class="toolbar-btn chat-toggle"
+          id="chatToggle"
+          type="button"
+          aria-controls="documentChat"
+          aria-expanded="false"
+          title="Document chat"
+        >
+          <i class="far fa-comment" aria-hidden="true"></i
+          ><span class="chat-toggle-label"> Chat</span>
+          <span id="chatUnreadBadge" class="chat-unread-badge" hidden>0</span>
+        </button>
 
         <div style="display: flex; gap: 8px; align-items: center">
           <!-- Save button (primary filled) -->
@@ -445,11 +462,9 @@
             margin-bottom: 32px;
           "
         >
-          <div class="library-brand-lockup" style="display: flex; align-items: center; gap: 12px">
-            <img class="library-brand-mark" src="/logo.svg" alt="" />
-            <h1 style="margin: 0; color: var(--text); font-size: 16px; font-weight: 600">
-              SyncroEdit
-            </h1>
+          <div class="app-brand" aria-label="SyncroEdit">
+            <img src="/logo.svg" alt="" width="34" height="34" />
+            <h1>SyncroEdit</h1>
           </div>
           <div style="display: flex; align-items: center; gap: 20px">
             <div
@@ -506,14 +521,8 @@
           </div>
         </div>
 
-        <div class="library-page-intro">
-          <div class="library-eyebrow">Workspace</div>
-          <h2>Your documents</h2>
-          <p>Open a recent file or start something new.</p>
-        </div>
-
         <!-- New Document Section -->
-        <div class="library-new-section" style="margin-bottom: 40px">
+        <div style="margin-bottom: 40px">
           <h2
             style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
             class="section-title"
@@ -521,54 +530,90 @@
             New
           </h2>
           <div
-            class="library-create-grid"
             style="
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
               gap: 20px;
             "
           >
-            <div
+            <button
               id="createNewDoc"
-              class="create-doc-card"
-              role="button"
-              tabindex="0"
-              aria-label="Create a blank document"
+              class="create-doc-card blank-document-action"
+              type="button"
+              style="
+                width: 168px;
+                min-height: 176px;
+                background: var(--surface-elevated);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all var(--transition-speed);
+                text-align: center;
+              "
             >
-              <div class="doc-thumbnail">
-                <i class="far fa-file-alt" aria-hidden="true"></i>
-              </div>
-              <div class="create-doc-copy">
-                <div class="create-doc-title">Blank document</div>
-                <div class="create-doc-description">Start from scratch</div>
-              </div>
-              <div class="create-doc-action" aria-hidden="true">
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
+              <span class="blank-document-action__icon" aria-hidden="true"
+                ><i class="far fa-file"></i
+              ></span>
+              <span class="blank-document-action__copy">
+                <strong>Start with a blank document</strong>
+                <small>Open a clean page and begin writing</small>
+              </span>
+              <i class="fas fa-arrow-right blank-document-action__arrow" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div style="margin-bottom: 24px; display: flex; justify-content: flex-end">
+          <div style="position: relative; width: min(420px, 100%)">
+            <i
+              class="fas fa-search"
+              style="
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-soft);
+                font-size: 13px;
+              "
+            ></i>
+            <input
+              type="text"
+              id="docSearch"
+              placeholder="Search documents..."
+              class="document-search"
+              style="
+                width: 100%;
+                height: 40px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                color: var(--text);
+                padding-left: 36px;
+                padding-right: 12px;
+                font-size: var(--font-md);
+                outline: none;
+                transition:
+                  border-color var(--transition-speed),
+                  box-shadow var(--transition-speed);
+              "
+            />
           </div>
         </div>
 
         <!-- Recent Documents -->
-        <div class="library-recent-section">
-          <div class="library-recent-toolbar">
-            <h2
-              style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
-              class="section-title"
-            >
-              Recent
-            </h2>
-            <label class="library-search-row" for="docSearch">
-              <i class="fas fa-search" aria-hidden="true"></i>
-              <input
-                type="search"
-                id="docSearch"
-                placeholder="Search documents"
-                class="document-search"
-                autocomplete="off"
-              />
-            </label>
-          </div>
+        <div>
+          <h2
+            style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
+            class="section-title"
+          >
+            Recent
+          </h2>
           <div
             class="recent-documents-table-wrapper"
             style="
@@ -1003,17 +1048,13 @@
                   >Theme
                 </h3>
                 <div class="theme-choice-group">
-                <button id="darkThemeBtn" class="theme-choice active">
-                  <i class="fas fa-moon" aria-hidden="true"></i> Dark
-                </button>
-                  <button id="lightThemeBtn" class="theme-choice">
-                    <i class="fas fa-sun" aria-hidden="true"></i> Light
-                  </button>
+                  <button id="darkThemeBtn" class="theme-choice active">🌙 Dark</button>
+                  <button id="lightThemeBtn" class="theme-choice">☀️ Light</button>
                 </div>
               </div>
 
               <!-- Accent Color Selection -->
-              <div class="settings-card accent-color-settings">
+              <div class="settings-card">
                 <h3 class="settings-card-title">
                   <i
                     class="fas fa-palette"
@@ -1900,10 +1941,37 @@
 
     <!-- Main Workspace -->
     <div class="main-workspace">
+      <aside id="documentChat" class="document-chat" aria-label="Document chat" hidden>
+        <header class="document-chat__header">
+          <div><strong>Document chat</strong><span>Everyone in this document</span></div>
+          <button id="chatClose" class="icon-button" type="button" aria-label="Close chat">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </header>
+        <div
+          id="chatMessages"
+          class="document-chat__messages"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        ></div>
+        <form id="chatForm" class="document-chat__composer">
+          <label class="sr-only" for="chatInput">Message collaborators</label>
+          <textarea
+            id="chatInput"
+            rows="1"
+            maxlength="1000"
+            placeholder="Message collaborators"
+          ></textarea>
+          <button id="chatSend" type="submit" aria-label="Send message">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+          </button>
+        </form>
+      </aside>
       <!-- Editor Workspace Loader (shows centered card above the workspace area when document is opening) -->
       <div id="editorWorkspaceLoader" class="editor-workspace-loader" hidden>
         <div class="editor-workspace-loader-card">
-          <div class="loader-document-icon"><img src="/logo.svg" alt="" /></div>
+          <div class="loader-document-icon">⌁</div>
           <div class="loader-title">Opening document...</div>
           <div class="loader-subtitle">Preparing your workspace</div>
           <div class="loader-progress"><span></span></div>

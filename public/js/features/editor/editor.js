@@ -11,6 +11,7 @@ import { ToolbarController } from '/js/features/ui/ToolbarController.js';
 import { ReadabilityManager } from '/js/features/editor/managers/ReadabilityManager.js';
 import { NavigationManager } from '/js/features/editor/managers/NavigationManager.js';
 import { SearchManager } from '/js/features/editor/managers/SearchManager.js';
+import { ChatManager } from '/js/features/editor/managers/ChatManager.js';
 import { Network } from '/js/app/network.js';
 import { debounce } from '/js/app/utils.js';
 import { convertSanitizedHtmlToDelta } from '/js/security/quillSanitizer.js';
@@ -118,6 +119,7 @@ export class Editor {
     this.readabilityManager = this.registerPlugin(ReadabilityManager);
     this.navigationManager = this.registerPlugin(NavigationManager);
     this.searchManager = this.registerPlugin(SearchManager);
+    this.chatManager = this.registerPlugin(ChatManager);
 
     this.setupGlobalListeners();
 

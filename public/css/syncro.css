@@ -88,6 +88,23 @@
   align-items: center;
 }
 
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: #f3f4f6;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.auth-brand img {
+  display: block;
+  flex: 0 0 auto;
+}
+
 .bot-rig {
   position: relative;
   animation: float 6s ease-in-out infinite;
@@ -754,8 +771,21 @@
 /* Success */
 .bot-rig.success {
   animation:
-    happyJump 0.6s ease infinite,
+    happyJump 0.6s ease 1,
     enterSuccess 0.4s ease-out;
+}
+
+.bot-rig.nearby .head {
+  transform: translateY(-3px) scale(1.01);
+}
+.bot-rig.nearby .antenna-bulb {
+  filter: brightness(1.18);
+}
+.bot-rig.typing .antenna-bulb {
+  animation: antennaPulse 900ms ease-in-out infinite;
+}
+.bot-rig.typing .head {
+  transform: rotate(-1deg);
 }
 .bot-rig.success .antenna-bulb {
   background: var(--syncro-success);

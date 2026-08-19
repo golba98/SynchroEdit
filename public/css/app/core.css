@@ -30,6 +30,10 @@
 
   --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.28);
   --transition-speed: 0.2s;
+  --motion-micro: 150ms;
+  --motion-control: 210ms;
+  --motion-view: 300ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --glow-intensity: 0;
 
   --font-xs: 11px;
@@ -86,6 +90,101 @@ body {
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text);
+}
+
+.app-brand img {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.app-brand h1,
+.app-brand span {
+  margin: 0;
+  color: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-brand--compact {
+  min-height: 40px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.app-brand--compact:hover,
+.app-brand--compact:focus-visible {
+  background: var(--surface-hover);
+}
+
+.blank-document-action {
+  width: min(100%, 480px) !important;
+  min-height: 86px !important;
+  padding: 16px 18px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 14px;
+  border-radius: var(--radius-md) !important;
+  text-align: left !important;
+  color: var(--text);
+  font: inherit;
+}
+
+.blank-document-action__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 50px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.blank-document-action__copy {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.blank-document-action__copy strong {
+  font-size: 14px;
+}
+.blank-document-action__copy small {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+.blank-document-action__arrow {
+  color: var(--text-soft);
+}
+
+.blank-document-action:hover,
+.blank-document-action:focus-visible {
+  border-color: var(--accent-border) !important;
+  background: var(--surface-hover) !important;
+  transform: translateY(-1px);
 }
 
 #docLibrary {

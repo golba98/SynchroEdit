@@ -53,14 +53,6 @@ class_name = "SynchroDocumentObject"
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
-[[env.local.migrations]]
-tag = "v1"
-new_sqlite_classes = ["SynchroDocumentObject"]
-
-[[env.local.migrations]]
-tag = "v2"
-new_sqlite_classes = ["SynchroRateLimitObject"]
-
 [env.local.vars]
 EMAIL_FROM = "SyncroEdit <verify@example.com>"
 APP_NAME = "SyncroEdit"

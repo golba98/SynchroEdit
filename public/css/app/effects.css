@@ -893,7 +893,7 @@ body.bg-code-mode .pages-container {
   }
 
   #createNewDoc {
-    display: none;
+    display: flex !important;
   }
 
   /* Header adjustments */

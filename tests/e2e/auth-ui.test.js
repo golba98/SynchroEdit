@@ -35,6 +35,41 @@ test.describe('Login Page Tests', () => {
     await expect(loginBtn).toBeEnabled();
   });
 
+  test('uses the canonical favicon and request-driven submitting state', async ({ page }) => {
+    const favicon = page.locator('link[rel="icon"]');
+    await expect(favicon).toHaveAttribute('href', '/logo.svg');
+    const faviconResponse = await page.request.get('/logo.svg');
+    expect(faviconResponse.ok()).toBeTruthy();
+    expect(faviconResponse.headers()['content-type']).toContain('image/svg+xml');
+
+    let finishLogin;
+    await page.route('/api/auth/login', async (route) => {
+      await new Promise((resolve) => {
+        finishLogin = resolve;
+      });
+      await route.fulfill({
+        status: 401,
+        body: JSON.stringify({ message: 'Invalid credentials' }),
+      });
+    });
+
+    await page.fill('#loginUsername', 'request-state-user');
+    await page.fill('#loginPassword', 'request-state-password');
+    await page.click('#loginBtn');
+
+    await expect(page.locator('#loginBtn')).toBeDisabled();
+    await expect(page.locator('#loginBtn')).toHaveAttribute('aria-busy', 'true');
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'submitting');
+
+    finishLogin();
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'error');
+    await expect(page.locator('#loginBtn')).toBeEnabled();
+    await expect(page.locator('#loginBtn')).toHaveAttribute('aria-busy', 'false');
+
+    await page.fill('#loginUsername', 'correcting-request-state-user');
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'username-typing');
+  });
+
   test('SyncroBot Animations', async ({ page }) => {
     const botRig = page.locator('#botRig');
     const pupil = page.locator('.pupil').first();
@@ -54,12 +89,12 @@ test.describe('Login Page Tests', () => {
 
     // Secure Mode
     await page.locator('#loginPassword').focus();
-    await expect(botRig).toHaveClass(/secure/);
+    await expect(botRig).toHaveAttribute('data-syncro-state', 'password-focus');
 
     // Peeking Mode
     await page.fill('#loginPassword', 'peekaboo'); // Must have content to peek
     await page.locator('#loginPasswordToggle').click();
-    await expect(botRig).toHaveClass(/peeking/);
+    await expect(botRig).toHaveAttribute('data-syncro-state', 'password-visible');
     // Toggle back
     await page.locator('#loginPasswordToggle').click();
 
@@ -185,6 +220,18 @@ test.describe('Create Account (Signup) Tests', () => {
     await page.click('#signupBackBtn');
     await expect(page.locator('#loginForm')).toBeVisible();
   });
+
+  test('uses the canonical favicon and directs mismatch feedback to the form', async ({ page }) => {
+    await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/logo.svg');
+    await page.fill('#signupUsername', 'newuser');
+    await page.fill('#signupEmail', 'newuser@example.com');
+    await page.fill('#signupPassword', 'Password123!');
+    await page.fill('#signupPasswordConfirm', 'Different123!');
+    await page.click('#signupBtn');
+    await expect(page.locator('#signupPasswordConfirm')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#signupStatusMessage')).toContainText('Passwords do not match');
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'invalid-field');
+  });
 });
 
 test.describe('Bot Alignment & Rig Tests', () => {
@@ -212,27 +259,11 @@ test.describe('Bot Alignment & Rig Tests', () => {
     expect(Math.abs(containerCenter - headCenter)).toBeLessThan(50);
   });
 
-  test('Hand Positioning', async ({ page }) => {
-    // Secure Mode
+  test('Password focus uses a restrained privacy-aware expression', async ({ page }) => {
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'idle');
     await page.locator('#loginPassword').focus();
-    // Wait for transition
-    await page.waitForTimeout(500);
-
-    const head = page.locator('.head');
-    const handLeft = page.locator('.hand.left');
-    const handRight = page.locator('.hand.right');
-
-    const headBox = await getVisibleBox(head);
-    const leftBox = await getVisibleBox(handLeft);
-    const rightBox = await getVisibleBox(handRight);
-
-    // Hands should be roughly within the head's vertical range (covering eyes)
-    // Eyes are in the middle-ish of the head.
-    // Assert hands overlap with head significantly
-    expect(leftBox.y).toBeGreaterThan(headBox.y);
-    expect(leftBox.y + leftBox.height).toBeLessThan(headBox.y + headBox.height + 21); // allow slight overflow and rounding
-    expect(rightBox.y).toBeGreaterThan(headBox.y);
-    expect(rightBox.y + rightBox.height).toBeLessThan(headBox.y + headBox.height + 21);
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'password-focus');
+    await expect(page.locator('.eye.left .eyelid.top')).toHaveCSS('height', /[1-9]\d*px/);
   });
 
   test('Face Screen Clipping', async ({ page }) => {
@@ -380,21 +411,18 @@ test.describe('Input & Animation Distortions', () => {
     expect(barBox.width).toBeLessThanOrEqual(inputBox.width + 5);
   });
 
-  test('Shake Animation Constraints', async ({ page }) => {
-    // Force error to trigger shake
+  test('Validation feedback does not shift the auth card', async ({ page }) => {
+    const container = page.locator('.login-container');
+    const before = await container.boundingBox();
     await page.click('#loginBtn');
 
     const form = page.locator('#loginForm');
-    await expect(form).toHaveClass(/shake-animation/);
-
-    // We ensure the container itself doesn't move?
-    // This is hard to test dynamically without frame-by-frame analysis.
-    // But we can check that the container's bounding box is stable after the shake starts?
-    // Or simply that the layout didn't explode.
-
-    const container = page.locator('.login-container');
+    await expect(form).not.toHaveClass(/shake-animation/);
+    await expect(page.locator('#botRig')).toHaveAttribute('data-syncro-state', 'invalid-field');
     await expect(container).toBeVisible();
-    const box = await container.boundingBox();
-    expect(box.width).toBeGreaterThan(0);
+    const after = await container.boundingBox();
+    expect(after.x).toBeCloseTo(before.x, 1);
+    expect(after.y).toBeCloseTo(before.y, 1);
+    expect(after.width).toBeCloseTo(before.width, 1);
   });
 });

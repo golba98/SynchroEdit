@@ -172,13 +172,12 @@ public/js/features/auth/
 │   ├── resetPassword.js               Reset-password validation and submission
 │   └── verify.js                      Standalone verification and resend behavior
 └── syncro/
-    ├── SyncroBot.js                  Mascot state, eye/focus tracking, timers, CSS state classes
-    └── SyncroRenderer.js             Mascot particle creation and cleanup
+    └── SyncroBot.js                  Mascot state, gaze, focus priority, and bounded reactions
 ```
 
 `auth.js` owns session state and is shared by the editor and auth pages. Page files own only their
-DOM and flow. `SyncroBot.js` changes semantic visual state; `SyncroRenderer.js` creates temporary
-visual elements. Both rely on `public/css/syncro.css` for presentation.
+DOM and flow. `SyncroBot.js` owns semantic visual state, pointer gaze, and bounded reactions. It
+relies on `public/css/syncro.css` for presentation.
 
 ### Editor and feature modules
 

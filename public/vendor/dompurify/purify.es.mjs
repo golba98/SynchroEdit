@@ -9,7 +9,8 @@ function _arrayWithHoles(r) {
   if (Array.isArray(r)) return r;
 }
 function _iterableToArrayLimit(r, l) {
-  var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+  var t =
+    null == r ? null : ('undefined' != typeof Symbol && r[Symbol.iterator]) || r['@@iterator'];
   if (null != t) {
     var e,
       n,
@@ -19,12 +20,13 @@ function _iterableToArrayLimit(r, l) {
       f = true,
       o = false;
     try {
-      if (i = (t = t.call(r)).next, 0 === l) ; else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+      if (((i = (t = t.call(r)).next), 0 === l));
+      else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
     } catch (r) {
-      o = true, n = r;
+      ((o = true), (n = r));
     } finally {
       try {
-        if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
+        if (!f && null != t.return && ((u = t.return()), Object(u) !== u)) return;
       } finally {
         if (o) throw n;
       }
@@ -33,16 +35,30 @@ function _iterableToArrayLimit(r, l) {
   }
 }
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  throw new TypeError(
+    'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'
+  );
 }
 function _slicedToArray(r, e) {
-  return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
+  return (
+    _arrayWithHoles(r) ||
+    _iterableToArrayLimit(r, e) ||
+    _unsupportedIterableToArray(r, e) ||
+    _nonIterableRest()
+  );
 }
 function _unsupportedIterableToArray(r, a) {
   if (r) {
-    if ("string" == typeof r) return _arrayLikeToArray(r, a);
+    if ('string' == typeof r) return _arrayLikeToArray(r, a);
     var t = {}.toString.call(r).slice(8, -1);
-    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    return (
+      'Object' === t && r.constructor && (t = r.constructor.name),
+      'Map' === t || 'Set' === t
+        ? Array.from(r)
+        : 'Arguments' === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)
+          ? _arrayLikeToArray(r, a)
+          : void 0
+    );
   }
 }
 
@@ -69,7 +85,11 @@ if (!seal) {
 }
 if (!apply) {
   apply = function apply(func, thisArg) {
-    for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    for (
+      var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2;
+      _key < _len;
+      _key++
+    ) {
       args[_key - 2] = arguments[_key];
     }
     return func.apply(thisArg, args);
@@ -77,7 +97,11 @@ if (!apply) {
 }
 if (!construct) {
   construct = function construct(Func) {
-    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    for (
+      var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1;
+      _key2 < _len2;
+      _key2++
+    ) {
       args[_key2 - 1] = arguments[_key2];
     }
     return new Func(...args);
@@ -114,7 +138,11 @@ function unapply(func) {
     if (thisArg instanceof RegExp) {
       thisArg.lastIndex = 0;
     }
-    for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+    for (
+      var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1;
+      _key3 < _len3;
+      _key3++
+    ) {
       args[_key3 - 1] = arguments[_key3];
     }
     return apply(func, thisArg, args);
@@ -143,7 +171,8 @@ function unconstruct(Func) {
  * @returns The modified set with added elements.
  */
 function addToSet(set, array) {
-  let transformCaseFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : stringToLowerCase;
+  let transformCaseFunc =
+    arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : stringToLowerCase;
   if (setPrototypeOf) {
     // Make 'in' and truthy checks like Boolean(set.constructor)
     // independent of any properties defined on Object.prototype.
@@ -218,48 +247,40 @@ function clone(object) {
  */
 function stringifyValue(value) {
   switch (typeof value) {
-    case 'string':
-      {
-        return value;
-      }
-    case 'number':
-      {
-        return numberToString(value);
-      }
-    case 'boolean':
-      {
-        return booleanToString(value);
-      }
-    case 'bigint':
-      {
-        return bigintToString ? bigintToString(value) : '0';
-      }
-    case 'symbol':
-      {
-        return symbolToString ? symbolToString(value) : 'Symbol()';
-      }
-    case 'undefined':
-      {
-        return objectToString(value);
-      }
+    case 'string': {
+      return value;
+    }
+    case 'number': {
+      return numberToString(value);
+    }
+    case 'boolean': {
+      return booleanToString(value);
+    }
+    case 'bigint': {
+      return bigintToString ? bigintToString(value) : '0';
+    }
+    case 'symbol': {
+      return symbolToString ? symbolToString(value) : 'Symbol()';
+    }
+    case 'undefined': {
+      return objectToString(value);
+    }
     case 'function':
-    case 'object':
-      {
-        if (value === null) {
-          return objectToString(value);
-        }
-        const valueAsRecord = value;
-        const valueToString = lookupGetter(valueAsRecord, 'toString');
-        if (typeof valueToString === 'function') {
-          const stringified = valueToString(valueAsRecord);
-          return typeof stringified === 'string' ? stringified : objectToString(stringified);
-        }
+    case 'object': {
+      if (value === null) {
         return objectToString(value);
       }
-    default:
-      {
-        return objectToString(value);
+      const valueAsRecord = value;
+      const valueToString = lookupGetter(valueAsRecord, 'toString');
+      if (typeof valueToString === 'function') {
+        const stringified = valueToString(valueAsRecord);
+        return typeof stringified === 'string' ? stringified : objectToString(stringified);
       }
+      return objectToString(value);
+    }
+    default: {
+      return objectToString(value);
+    }
   }
 }
 /**
@@ -296,23 +317,652 @@ function isRegex(value) {
   }
 }
 
-const html$1 = freeze(['a', 'abbr', 'acronym', 'address', 'area', 'article', 'aside', 'audio', 'b', 'bdi', 'bdo', 'big', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'content', 'data', 'datalist', 'dd', 'decorator', 'del', 'details', 'dfn', 'dialog', 'dir', 'div', 'dl', 'dt', 'element', 'em', 'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'img', 'input', 'ins', 'kbd', 'label', 'legend', 'li', 'main', 'map', 'mark', 'marquee', 'menu', 'menuitem', 'meter', 'nav', 'nobr', 'ol', 'optgroup', 'option', 'output', 'p', 'picture', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'search', 'section', 'select', 'shadow', 'slot', 'small', 'source', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'time', 'tr', 'track', 'tt', 'u', 'ul', 'var', 'video', 'wbr']);
-const svg$1 = freeze(['svg', 'a', 'altglyph', 'altglyphdef', 'altglyphitem', 'animatecolor', 'animatemotion', 'animatetransform', 'circle', 'clippath', 'defs', 'desc', 'ellipse', 'enterkeyhint', 'exportparts', 'filter', 'font', 'g', 'glyph', 'glyphref', 'hkern', 'image', 'inputmode', 'line', 'lineargradient', 'marker', 'mask', 'metadata', 'mpath', 'part', 'path', 'pattern', 'polygon', 'polyline', 'radialgradient', 'rect', 'stop', 'style', 'switch', 'symbol', 'text', 'textpath', 'title', 'tref', 'tspan', 'view', 'vkern']);
-const svgFilters = freeze(['feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feDistantLight', 'feDropShadow', 'feFlood', 'feFuncA', 'feFuncB', 'feFuncG', 'feFuncR', 'feGaussianBlur', 'feImage', 'feMerge', 'feMergeNode', 'feMorphology', 'feOffset', 'fePointLight', 'feSpecularLighting', 'feSpotLight', 'feTile', 'feTurbulence']);
+const html$1 = freeze([
+  'a',
+  'abbr',
+  'acronym',
+  'address',
+  'area',
+  'article',
+  'aside',
+  'audio',
+  'b',
+  'bdi',
+  'bdo',
+  'big',
+  'blink',
+  'blockquote',
+  'body',
+  'br',
+  'button',
+  'canvas',
+  'caption',
+  'center',
+  'cite',
+  'code',
+  'col',
+  'colgroup',
+  'content',
+  'data',
+  'datalist',
+  'dd',
+  'decorator',
+  'del',
+  'details',
+  'dfn',
+  'dialog',
+  'dir',
+  'div',
+  'dl',
+  'dt',
+  'element',
+  'em',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'font',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'head',
+  'header',
+  'hgroup',
+  'hr',
+  'html',
+  'i',
+  'img',
+  'input',
+  'ins',
+  'kbd',
+  'label',
+  'legend',
+  'li',
+  'main',
+  'map',
+  'mark',
+  'marquee',
+  'menu',
+  'menuitem',
+  'meter',
+  'nav',
+  'nobr',
+  'ol',
+  'optgroup',
+  'option',
+  'output',
+  'p',
+  'picture',
+  'pre',
+  'progress',
+  'q',
+  'rp',
+  'rt',
+  'ruby',
+  's',
+  'samp',
+  'search',
+  'section',
+  'select',
+  'shadow',
+  'slot',
+  'small',
+  'source',
+  'spacer',
+  'span',
+  'strike',
+  'strong',
+  'style',
+  'sub',
+  'summary',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'template',
+  'textarea',
+  'tfoot',
+  'th',
+  'thead',
+  'time',
+  'tr',
+  'track',
+  'tt',
+  'u',
+  'ul',
+  'var',
+  'video',
+  'wbr',
+]);
+const svg$1 = freeze([
+  'svg',
+  'a',
+  'altglyph',
+  'altglyphdef',
+  'altglyphitem',
+  'animatecolor',
+  'animatemotion',
+  'animatetransform',
+  'circle',
+  'clippath',
+  'defs',
+  'desc',
+  'ellipse',
+  'enterkeyhint',
+  'exportparts',
+  'filter',
+  'font',
+  'g',
+  'glyph',
+  'glyphref',
+  'hkern',
+  'image',
+  'inputmode',
+  'line',
+  'lineargradient',
+  'marker',
+  'mask',
+  'metadata',
+  'mpath',
+  'part',
+  'path',
+  'pattern',
+  'polygon',
+  'polyline',
+  'radialgradient',
+  'rect',
+  'stop',
+  'style',
+  'switch',
+  'symbol',
+  'text',
+  'textpath',
+  'title',
+  'tref',
+  'tspan',
+  'view',
+  'vkern',
+]);
+const svgFilters = freeze([
+  'feBlend',
+  'feColorMatrix',
+  'feComponentTransfer',
+  'feComposite',
+  'feConvolveMatrix',
+  'feDiffuseLighting',
+  'feDisplacementMap',
+  'feDistantLight',
+  'feDropShadow',
+  'feFlood',
+  'feFuncA',
+  'feFuncB',
+  'feFuncG',
+  'feFuncR',
+  'feGaussianBlur',
+  'feImage',
+  'feMerge',
+  'feMergeNode',
+  'feMorphology',
+  'feOffset',
+  'fePointLight',
+  'feSpecularLighting',
+  'feSpotLight',
+  'feTile',
+  'feTurbulence',
+]);
 // List of SVG elements that are disallowed by default.
 // We still need to know them so that we can do namespace
 // checks properly in case one wants to add them to
 // allow-list.
-const svgDisallowed = freeze(['animate', 'color-profile', 'cursor', 'discard', 'font-face', 'font-face-format', 'font-face-name', 'font-face-src', 'font-face-uri', 'foreignobject', 'hatch', 'hatchpath', 'mesh', 'meshgradient', 'meshpatch', 'meshrow', 'missing-glyph', 'script', 'set', 'solidcolor', 'unknown', 'use']);
-const mathMl$1 = freeze(['math', 'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mmultiscripts', 'mn', 'mo', 'mover', 'mpadded', 'mphantom', 'mroot', 'mrow', 'ms', 'mspace', 'msqrt', 'mstyle', 'msub', 'msup', 'msubsup', 'mtable', 'mtd', 'mtext', 'mtr', 'munder', 'munderover', 'mprescripts']);
+const svgDisallowed = freeze([
+  'animate',
+  'color-profile',
+  'cursor',
+  'discard',
+  'font-face',
+  'font-face-format',
+  'font-face-name',
+  'font-face-src',
+  'font-face-uri',
+  'foreignobject',
+  'hatch',
+  'hatchpath',
+  'mesh',
+  'meshgradient',
+  'meshpatch',
+  'meshrow',
+  'missing-glyph',
+  'script',
+  'set',
+  'solidcolor',
+  'unknown',
+  'use',
+]);
+const mathMl$1 = freeze([
+  'math',
+  'menclose',
+  'merror',
+  'mfenced',
+  'mfrac',
+  'mglyph',
+  'mi',
+  'mlabeledtr',
+  'mmultiscripts',
+  'mn',
+  'mo',
+  'mover',
+  'mpadded',
+  'mphantom',
+  'mroot',
+  'mrow',
+  'ms',
+  'mspace',
+  'msqrt',
+  'mstyle',
+  'msub',
+  'msup',
+  'msubsup',
+  'mtable',
+  'mtd',
+  'mtext',
+  'mtr',
+  'munder',
+  'munderover',
+  'mprescripts',
+]);
 // Similarly to SVG, we want to know all MathML elements,
 // even those that we disallow by default.
-const mathMlDisallowed = freeze(['maction', 'maligngroup', 'malignmark', 'mlongdiv', 'mscarries', 'mscarry', 'msgroup', 'mstack', 'msline', 'msrow', 'semantics', 'annotation', 'annotation-xml', 'mprescripts', 'none']);
+const mathMlDisallowed = freeze([
+  'maction',
+  'maligngroup',
+  'malignmark',
+  'mlongdiv',
+  'mscarries',
+  'mscarry',
+  'msgroup',
+  'mstack',
+  'msline',
+  'msrow',
+  'semantics',
+  'annotation',
+  'annotation-xml',
+  'mprescripts',
+  'none',
+]);
 const text = freeze(['#text']);
 
-const html = freeze(['accept', 'action', 'align', 'alt', 'autocapitalize', 'autocomplete', 'autopictureinpicture', 'autoplay', 'background', 'bgcolor', 'border', 'capture', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'clear', 'color', 'cols', 'colspan', 'command', 'commandfor', 'controls', 'controlslist', 'coords', 'crossorigin', 'datetime', 'decoding', 'default', 'dir', 'disabled', 'disablepictureinpicture', 'disableremoteplayback', 'download', 'draggable', 'enctype', 'enterkeyhint', 'exportparts', 'face', 'for', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'id', 'inert', 'inputmode', 'integrity', 'ismap', 'kind', 'label', 'lang', 'list', 'loading', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'minlength', 'multiple', 'muted', 'name', 'nonce', 'noshade', 'novalidate', 'nowrap', 'open', 'optimum', 'part', 'pattern', 'placeholder', 'playsinline', 'popover', 'popovertarget', 'popovertargetaction', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'rev', 'reversed', 'role', 'rows', 'rowspan', 'spellcheck', 'scope', 'selected', 'shape', 'size', 'sizes', 'slot', 'span', 'srclang', 'start', 'src', 'srcset', 'step', 'style', 'summary', 'tabindex', 'title', 'translate', 'type', 'usemap', 'valign', 'value', 'width', 'wrap', 'xmlns']);
-const svg = freeze(['accent-height', 'accumulate', 'additive', 'alignment-baseline', 'amplitude', 'ascent', 'attributename', 'attributetype', 'azimuth', 'basefrequency', 'baseline-shift', 'begin', 'bias', 'by', 'class', 'clip', 'clippathunits', 'clip-path', 'clip-rule', 'color', 'color-interpolation', 'color-interpolation-filters', 'color-profile', 'color-rendering', 'cx', 'cy', 'd', 'dx', 'dy', 'diffuseconstant', 'direction', 'display', 'divisor', 'dominant-baseline', 'dur', 'edgemode', 'elevation', 'end', 'exponent', 'fill', 'fill-opacity', 'fill-rule', 'filter', 'filterunits', 'flood-color', 'flood-opacity', 'font-family', 'font-size', 'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'fx', 'fy', 'g1', 'g2', 'glyph-name', 'glyphref', 'gradientunits', 'gradienttransform', 'height', 'href', 'id', 'image-rendering', 'in', 'in2', 'intercept', 'k', 'k1', 'k2', 'k3', 'k4', 'kerning', 'keypoints', 'keysplines', 'keytimes', 'lang', 'lengthadjust', 'letter-spacing', 'kernelmatrix', 'kernelunitlength', 'lighting-color', 'local', 'marker-end', 'marker-mid', 'marker-start', 'markerheight', 'markerunits', 'markerwidth', 'maskcontentunits', 'maskunits', 'max', 'mask', 'mask-type', 'media', 'method', 'mode', 'min', 'name', 'numoctaves', 'offset', 'operator', 'opacity', 'order', 'orient', 'orientation', 'origin', 'overflow', 'paint-order', 'path', 'pathlength', 'patterncontentunits', 'patterntransform', 'patternunits', 'points', 'preservealpha', 'preserveaspectratio', 'primitiveunits', 'r', 'rx', 'ry', 'radius', 'refx', 'refy', 'repeatcount', 'repeatdur', 'restart', 'result', 'rotate', 'scale', 'seed', 'shape-rendering', 'slope', 'specularconstant', 'specularexponent', 'spreadmethod', 'startoffset', 'stddeviation', 'stitchtiles', 'stop-color', 'stop-opacity', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-opacity', 'stroke', 'stroke-width', 'style', 'surfacescale', 'systemlanguage', 'tabindex', 'tablevalues', 'targetx', 'targety', 'transform', 'transform-origin', 'text-anchor', 'text-decoration', 'text-orientation', 'text-rendering', 'textlength', 'type', 'u1', 'u2', 'unicode', 'values', 'viewbox', 'visibility', 'version', 'vert-adv-y', 'vert-origin-x', 'vert-origin-y', 'width', 'word-spacing', 'wrap', 'writing-mode', 'xchannelselector', 'ychannelselector', 'x', 'x1', 'x2', 'xmlns', 'y', 'y1', 'y2', 'z', 'zoomandpan']);
-const mathMl = freeze(['accent', 'accentunder', 'align', 'bevelled', 'close', 'columnalign', 'columnlines', 'columnspacing', 'columnspan', 'denomalign', 'depth', 'dir', 'display', 'displaystyle', 'encoding', 'fence', 'frame', 'height', 'href', 'id', 'largeop', 'length', 'linethickness', 'lquote', 'lspace', 'mathbackground', 'mathcolor', 'mathsize', 'mathvariant', 'maxsize', 'minsize', 'movablelimits', 'notation', 'numalign', 'open', 'rowalign', 'rowlines', 'rowspacing', 'rowspan', 'rspace', 'rquote', 'scriptlevel', 'scriptminsize', 'scriptsizemultiplier', 'selection', 'separator', 'separators', 'stretchy', 'subscriptshift', 'supscriptshift', 'symmetric', 'voffset', 'width', 'xmlns']);
+const html = freeze([
+  'accept',
+  'action',
+  'align',
+  'alt',
+  'autocapitalize',
+  'autocomplete',
+  'autopictureinpicture',
+  'autoplay',
+  'background',
+  'bgcolor',
+  'border',
+  'capture',
+  'cellpadding',
+  'cellspacing',
+  'checked',
+  'cite',
+  'class',
+  'clear',
+  'color',
+  'cols',
+  'colspan',
+  'command',
+  'commandfor',
+  'controls',
+  'controlslist',
+  'coords',
+  'crossorigin',
+  'datetime',
+  'decoding',
+  'default',
+  'dir',
+  'disabled',
+  'disablepictureinpicture',
+  'disableremoteplayback',
+  'download',
+  'draggable',
+  'enctype',
+  'enterkeyhint',
+  'exportparts',
+  'face',
+  'for',
+  'headers',
+  'height',
+  'hidden',
+  'high',
+  'href',
+  'hreflang',
+  'id',
+  'inert',
+  'inputmode',
+  'integrity',
+  'ismap',
+  'kind',
+  'label',
+  'lang',
+  'list',
+  'loading',
+  'loop',
+  'low',
+  'max',
+  'maxlength',
+  'media',
+  'method',
+  'min',
+  'minlength',
+  'multiple',
+  'muted',
+  'name',
+  'nonce',
+  'noshade',
+  'novalidate',
+  'nowrap',
+  'open',
+  'optimum',
+  'part',
+  'pattern',
+  'placeholder',
+  'playsinline',
+  'popover',
+  'popovertarget',
+  'popovertargetaction',
+  'poster',
+  'preload',
+  'pubdate',
+  'radiogroup',
+  'readonly',
+  'rel',
+  'required',
+  'rev',
+  'reversed',
+  'role',
+  'rows',
+  'rowspan',
+  'spellcheck',
+  'scope',
+  'selected',
+  'shape',
+  'size',
+  'sizes',
+  'slot',
+  'span',
+  'srclang',
+  'start',
+  'src',
+  'srcset',
+  'step',
+  'style',
+  'summary',
+  'tabindex',
+  'title',
+  'translate',
+  'type',
+  'usemap',
+  'valign',
+  'value',
+  'width',
+  'wrap',
+  'xmlns',
+]);
+const svg = freeze([
+  'accent-height',
+  'accumulate',
+  'additive',
+  'alignment-baseline',
+  'amplitude',
+  'ascent',
+  'attributename',
+  'attributetype',
+  'azimuth',
+  'basefrequency',
+  'baseline-shift',
+  'begin',
+  'bias',
+  'by',
+  'class',
+  'clip',
+  'clippathunits',
+  'clip-path',
+  'clip-rule',
+  'color',
+  'color-interpolation',
+  'color-interpolation-filters',
+  'color-profile',
+  'color-rendering',
+  'cx',
+  'cy',
+  'd',
+  'dx',
+  'dy',
+  'diffuseconstant',
+  'direction',
+  'display',
+  'divisor',
+  'dominant-baseline',
+  'dur',
+  'edgemode',
+  'elevation',
+  'end',
+  'exponent',
+  'fill',
+  'fill-opacity',
+  'fill-rule',
+  'filter',
+  'filterunits',
+  'flood-color',
+  'flood-opacity',
+  'font-family',
+  'font-size',
+  'font-size-adjust',
+  'font-stretch',
+  'font-style',
+  'font-variant',
+  'font-weight',
+  'fx',
+  'fy',
+  'g1',
+  'g2',
+  'glyph-name',
+  'glyphref',
+  'gradientunits',
+  'gradienttransform',
+  'height',
+  'href',
+  'id',
+  'image-rendering',
+  'in',
+  'in2',
+  'intercept',
+  'k',
+  'k1',
+  'k2',
+  'k3',
+  'k4',
+  'kerning',
+  'keypoints',
+  'keysplines',
+  'keytimes',
+  'lang',
+  'lengthadjust',
+  'letter-spacing',
+  'kernelmatrix',
+  'kernelunitlength',
+  'lighting-color',
+  'local',
+  'marker-end',
+  'marker-mid',
+  'marker-start',
+  'markerheight',
+  'markerunits',
+  'markerwidth',
+  'maskcontentunits',
+  'maskunits',
+  'max',
+  'mask',
+  'mask-type',
+  'media',
+  'method',
+  'mode',
+  'min',
+  'name',
+  'numoctaves',
+  'offset',
+  'operator',
+  'opacity',
+  'order',
+  'orient',
+  'orientation',
+  'origin',
+  'overflow',
+  'paint-order',
+  'path',
+  'pathlength',
+  'patterncontentunits',
+  'patterntransform',
+  'patternunits',
+  'points',
+  'preservealpha',
+  'preserveaspectratio',
+  'primitiveunits',
+  'r',
+  'rx',
+  'ry',
+  'radius',
+  'refx',
+  'refy',
+  'repeatcount',
+  'repeatdur',
+  'restart',
+  'result',
+  'rotate',
+  'scale',
+  'seed',
+  'shape-rendering',
+  'slope',
+  'specularconstant',
+  'specularexponent',
+  'spreadmethod',
+  'startoffset',
+  'stddeviation',
+  'stitchtiles',
+  'stop-color',
+  'stop-opacity',
+  'stroke-dasharray',
+  'stroke-dashoffset',
+  'stroke-linecap',
+  'stroke-linejoin',
+  'stroke-miterlimit',
+  'stroke-opacity',
+  'stroke',
+  'stroke-width',
+  'style',
+  'surfacescale',
+  'systemlanguage',
+  'tabindex',
+  'tablevalues',
+  'targetx',
+  'targety',
+  'transform',
+  'transform-origin',
+  'text-anchor',
+  'text-decoration',
+  'text-orientation',
+  'text-rendering',
+  'textlength',
+  'type',
+  'u1',
+  'u2',
+  'unicode',
+  'values',
+  'viewbox',
+  'visibility',
+  'version',
+  'vert-adv-y',
+  'vert-origin-x',
+  'vert-origin-y',
+  'width',
+  'word-spacing',
+  'wrap',
+  'writing-mode',
+  'xchannelselector',
+  'ychannelselector',
+  'x',
+  'x1',
+  'x2',
+  'xmlns',
+  'y',
+  'y1',
+  'y2',
+  'z',
+  'zoomandpan',
+]);
+const mathMl = freeze([
+  'accent',
+  'accentunder',
+  'align',
+  'bevelled',
+  'close',
+  'columnalign',
+  'columnlines',
+  'columnspacing',
+  'columnspan',
+  'denomalign',
+  'depth',
+  'dir',
+  'display',
+  'displaystyle',
+  'encoding',
+  'fence',
+  'frame',
+  'height',
+  'href',
+  'id',
+  'largeop',
+  'length',
+  'linethickness',
+  'lquote',
+  'lspace',
+  'mathbackground',
+  'mathcolor',
+  'mathsize',
+  'mathvariant',
+  'maxsize',
+  'minsize',
+  'movablelimits',
+  'notation',
+  'numalign',
+  'open',
+  'rowalign',
+  'rowlines',
+  'rowspacing',
+  'rowspan',
+  'rspace',
+  'rquote',
+  'scriptlevel',
+  'scriptminsize',
+  'scriptsizemultiplier',
+  'selection',
+  'separator',
+  'separators',
+  'stretchy',
+  'subscriptshift',
+  'supscriptshift',
+  'symmetric',
+  'voffset',
+  'width',
+  'xmlns',
+]);
 const xml = freeze(['xlink:href', 'xml:id', 'xlink:title', 'xml:space', 'xmlns:xlink']);
 
 const MUSTACHE_EXPR = seal(/{{[\w\W]*|^[\w\W]*}}/g);
@@ -320,10 +970,12 @@ const ERB_EXPR = seal(/<%[\w\W]*|^[\w\W]*%>/g);
 const TMPLIT_EXPR = seal(/\${[\w\W]*/g);
 const DATA_ATTR = seal(/^data-[\-\w.\u00B7-\uFFFF]+$/); // eslint-disable-line no-useless-escape
 const ARIA_ATTR = seal(/^aria-[\-\w]+$/); // eslint-disable-line no-useless-escape
-const IS_ALLOWED_URI = seal(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i // eslint-disable-line no-useless-escape
+const IS_ALLOWED_URI = seal(
+  /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i // eslint-disable-line no-useless-escape
 );
 const IS_SCRIPT_OR_DATA = seal(/^(?:\w+script|data):/i);
-const ATTR_WHITESPACE = seal(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g // eslint-disable-line no-control-regex
+const ATTR_WHITESPACE = seal(
+  /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g // eslint-disable-line no-control-regex
 );
 const DOCTYPE_NAME = seal(/^html$/i);
 const CUSTOM_ELEMENT = seal(/^[a-z][.\w]*(-[.\w]+)+$/i);
@@ -350,7 +1002,7 @@ const NODE_TYPE = {
   document: 9,
   documentType: 10,
   documentFragment: 11,
-  notation: 12 // Deprecated
+  notation: 12, // Deprecated
 };
 const getGlobal = function getGlobal() {
   return typeof window === 'undefined' ? null : window;
@@ -363,7 +1015,10 @@ const getGlobal = function getGlobal() {
  * @return The policy created (or null, if Trusted Types
  * are not supported or creating the policy failed).
  */
-const _createTrustedTypesPolicy = function _createTrustedTypesPolicy(trustedTypes, purifyHostElement) {
+const _createTrustedTypesPolicy = function _createTrustedTypesPolicy(
+  trustedTypes,
+  purifyHostElement
+) {
   if (typeof trustedTypes !== 'object' || typeof trustedTypes.createPolicy !== 'function') {
     return null;
   }
@@ -383,7 +1038,7 @@ const _createTrustedTypesPolicy = function _createTrustedTypesPolicy(trustedType
       },
       createScriptURL(scriptUrl) {
         return scriptUrl;
-      }
+      },
     });
   } catch (_) {
     // Policy creation failed (most likely another DOMPurify script has
@@ -403,7 +1058,7 @@ const _createHooksMap = function _createHooksMap() {
     beforeSanitizeShadowDOM: [],
     uponSanitizeAttribute: [],
     uponSanitizeElement: [],
-    uponSanitizeShadowNode: []
+    uponSanitizeShadowNode: [],
   };
 };
 /**
@@ -419,14 +1074,21 @@ const _createHooksMap = function _createHooksMap() {
  * @returns the resolved set
  */
 const _resolveSetOption = function _resolveSetOption(cfg, key, fallback, options) {
-  return objectHasOwnProperty(cfg, key) && arrayIsArray(cfg[key]) ? addToSet(options.base ? clone(options.base) : {}, cfg[key], options.transform) : fallback;
+  return objectHasOwnProperty(cfg, key) && arrayIsArray(cfg[key])
+    ? addToSet(options.base ? clone(options.base) : {}, cfg[key], options.transform)
+    : fallback;
 };
 function createDOMPurify() {
   let window = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : getGlobal();
-  const DOMPurify = root => createDOMPurify(root);
+  const DOMPurify = (root) => createDOMPurify(root);
   DOMPurify.version = '3.4.12';
   DOMPurify.removed = [];
-  if (!window || !window.document || window.document.nodeType !== NODE_TYPE.document || !window.Element) {
+  if (
+    !window ||
+    !window.document ||
+    window.document.nodeType !== NODE_TYPE.document ||
+    !window.Element
+  ) {
     // Not running in a browser, provide a factory function
     // so that you can pass your own Window
     DOMPurify.isSupported = false;
@@ -436,14 +1098,16 @@ function createDOMPurify() {
   const originalDocument = document;
   const currentScript = originalDocument.currentScript;
   window.DocumentFragment;
-    const HTMLTemplateElement = window.HTMLTemplateElement,
+  const HTMLTemplateElement = window.HTMLTemplateElement,
     Node = window.Node,
     Element = window.Element,
     NodeFilter = window.NodeFilter,
     _window$NamedNodeMap = window.NamedNodeMap;
-    _window$NamedNodeMap === void 0 ? window.NamedNodeMap || window.MozNamedAttrMap : _window$NamedNodeMap;
-    window.HTMLFormElement;
-    const DOMParser = window.DOMParser,
+  _window$NamedNodeMap === void 0
+    ? window.NamedNodeMap || window.MozNamedAttrMap
+    : _window$NamedNodeMap;
+  window.HTMLFormElement;
+  const DOMParser = window.DOMParser,
     trustedTypes = window.trustedTypes;
   const ElementPrototype = Element.prototype;
   const cloneNode = lookupGetter(ElementPrototype, 'cloneNode');
@@ -485,7 +1149,13 @@ function createDOMPurify() {
   let IN_TRUSTED_TYPES_POLICY = 0;
   const _assertNotInTrustedTypesPolicy = function _assertNotInTrustedTypesPolicy() {
     if (IN_TRUSTED_TYPES_POLICY > 0) {
-      throw typeErrorCreate('A configured TRUSTED_TYPES_POLICY callback (createHTML or ' + 'createScriptURL) must not call DOMPurify.sanitize, as that causes ' + 'infinite recursion. Do not pass a policy whose callbacks wrap ' + 'DOMPurify as TRUSTED_TYPES_POLICY; see the "DOMPurify and Trusted ' + 'Types" section of the README.');
+      throw typeErrorCreate(
+        'A configured TRUSTED_TYPES_POLICY callback (createHTML or ' +
+          'createScriptURL) must not call DOMPurify.sanitize, as that causes ' +
+          'infinite recursion. Do not pass a policy whose callbacks wrap ' +
+          'DOMPurify as TRUSTED_TYPES_POLICY; see the "DOMPurify and Trusted ' +
+          'Types" section of the README.'
+      );
     }
   };
   const _createTrustedHTML = function _createTrustedHTML(html) {
@@ -527,7 +1197,11 @@ function createDOMPurify() {
   /**
    * Expose whether this browser supports running the full DOMPurify.
    */
-  DOMPurify.isSupported = typeof entries === 'function' && typeof getParentNode === 'function' && implementation && implementation.createHTMLDocument !== undefined;
+  DOMPurify.isSupported =
+    typeof entries === 'function' &&
+    typeof getParentNode === 'function' &&
+    implementation &&
+    implementation.createHTMLDocument !== undefined;
   const MUSTACHE_EXPR$1 = MUSTACHE_EXPR,
     ERB_EXPR$1 = ERB_EXPR,
     TMPLIT_EXPR$1 = TMPLIT_EXPR,
@@ -543,7 +1217,13 @@ function createDOMPurify() {
    */
   /* allowed element names */
   let ALLOWED_TAGS = null;
-  const DEFAULT_ALLOWED_TAGS = addToSet({}, [...html$1, ...svg$1, ...svgFilters, ...mathMl$1, ...text]);
+  const DEFAULT_ALLOWED_TAGS = addToSet({}, [
+    ...html$1,
+    ...svg$1,
+    ...svgFilters,
+    ...mathMl$1,
+    ...text,
+  ]);
   /* Allowed attribute names */
   let ALLOWED_ATTR = null;
   const DEFAULT_ALLOWED_ATTR = addToSet({}, [...html, ...svg, ...mathMl, ...xml]);
@@ -553,45 +1233,49 @@ function createDOMPurify() {
    * @property {RegExp|Function|null} attributeNameCheck one of [null, regexPattern, predicate]. Default: `null` (disallow any attributes not on the allow list)
    * @property {boolean} allowCustomizedBuiltInElements allow custom elements derived from built-ins if they pass CUSTOM_ELEMENT_HANDLING.tagNameCheck. Default: `false`.
    */
-  let CUSTOM_ELEMENT_HANDLING = Object.seal(create(null, {
-    tagNameCheck: {
-      writable: true,
-      configurable: false,
-      enumerable: true,
-      value: null
-    },
-    attributeNameCheck: {
-      writable: true,
-      configurable: false,
-      enumerable: true,
-      value: null
-    },
-    allowCustomizedBuiltInElements: {
-      writable: true,
-      configurable: false,
-      enumerable: true,
-      value: false
-    }
-  }));
+  let CUSTOM_ELEMENT_HANDLING = Object.seal(
+    create(null, {
+      tagNameCheck: {
+        writable: true,
+        configurable: false,
+        enumerable: true,
+        value: null,
+      },
+      attributeNameCheck: {
+        writable: true,
+        configurable: false,
+        enumerable: true,
+        value: null,
+      },
+      allowCustomizedBuiltInElements: {
+        writable: true,
+        configurable: false,
+        enumerable: true,
+        value: false,
+      },
+    })
+  );
   /* Explicitly forbidden tags (overrides ALLOWED_TAGS/ADD_TAGS) */
   let FORBID_TAGS = null;
   /* Explicitly forbidden attributes (overrides ALLOWED_ATTR/ADD_ATTR) */
   let FORBID_ATTR = null;
   /* Config object to store ADD_TAGS/ADD_ATTR functions (when used as functions) */
-  const EXTRA_ELEMENT_HANDLING = Object.seal(create(null, {
-    tagCheck: {
-      writable: true,
-      configurable: false,
-      enumerable: true,
-      value: null
-    },
-    attributeCheck: {
-      writable: true,
-      configurable: false,
-      enumerable: true,
-      value: null
-    }
-  }));
+  const EXTRA_ELEMENT_HANDLING = Object.seal(
+    create(null, {
+      tagCheck: {
+        writable: true,
+        configurable: false,
+        enumerable: true,
+        value: null,
+      },
+      attributeCheck: {
+        writable: true,
+        configurable: false,
+        enumerable: true,
+        value: null,
+      },
+    })
+  );
   /* Decide if ARIA attributes are okay */
   let ALLOW_ARIA_ATTR = true;
   /* Decide if custom data attributes are okay */
@@ -662,23 +1346,64 @@ function createDOMPurify() {
   let USE_PROFILES = {};
   /* Tags to ignore content of when KEEP_CONTENT is true */
   let FORBID_CONTENTS = null;
-  const DEFAULT_FORBID_CONTENTS = addToSet({}, ['annotation-xml', 'audio', 'colgroup', 'desc', 'foreignobject', 'head', 'iframe', 'math', 'mi', 'mn', 'mo', 'ms', 'mtext', 'noembed', 'noframes', 'noscript', 'plaintext', 'script',
-  // <selectedcontent> mirrors the selected <option>'s subtree, cloned by
-  // the UA (customizable <select>) — including any on* handlers — and the
-  // engine re-mirrors synchronously whenever a removal changes which
-  // option/selectedcontent is current, even inside DOMPurify's inert
-  // DOMParser document. Hoisting its children on removal re-inserts a fresh
-  // mirror target ahead of the walk, which the engine refills, looping
-  // forever (DoS) and amplifying output. Dropping its content on removal
-  // (rather than hoisting) breaks that cascade; the content is a duplicate
-  // of the option, which is sanitized on its own. See campaign-3 F1/F6.
-  'selectedcontent', 'style', 'svg', 'template', 'thead', 'title', 'video', 'xmp']);
+  const DEFAULT_FORBID_CONTENTS = addToSet({}, [
+    'annotation-xml',
+    'audio',
+    'colgroup',
+    'desc',
+    'foreignobject',
+    'head',
+    'iframe',
+    'math',
+    'mi',
+    'mn',
+    'mo',
+    'ms',
+    'mtext',
+    'noembed',
+    'noframes',
+    'noscript',
+    'plaintext',
+    'script',
+    // <selectedcontent> mirrors the selected <option>'s subtree, cloned by
+    // the UA (customizable <select>) — including any on* handlers — and the
+    // engine re-mirrors synchronously whenever a removal changes which
+    // option/selectedcontent is current, even inside DOMPurify's inert
+    // DOMParser document. Hoisting its children on removal re-inserts a fresh
+    // mirror target ahead of the walk, which the engine refills, looping
+    // forever (DoS) and amplifying output. Dropping its content on removal
+    // (rather than hoisting) breaks that cascade; the content is a duplicate
+    // of the option, which is sanitized on its own. See campaign-3 F1/F6.
+    'selectedcontent',
+    'style',
+    'svg',
+    'template',
+    'thead',
+    'title',
+    'video',
+    'xmp',
+  ]);
   /* Tags that are safe for data: URIs */
   let DATA_URI_TAGS = null;
   const DEFAULT_DATA_URI_TAGS = addToSet({}, ['audio', 'video', 'img', 'source', 'image', 'track']);
   /* Attributes safe for values like "javascript:" */
   let URI_SAFE_ATTRIBUTES = null;
-  const DEFAULT_URI_SAFE_ATTRIBUTES = addToSet({}, ['alt', 'class', 'for', 'id', 'label', 'name', 'pattern', 'placeholder', 'role', 'summary', 'title', 'value', 'style', 'xmlns']);
+  const DEFAULT_URI_SAFE_ATTRIBUTES = addToSet({}, [
+    'alt',
+    'class',
+    'for',
+    'id',
+    'label',
+    'name',
+    'pattern',
+    'placeholder',
+    'role',
+    'summary',
+    'title',
+    'value',
+    'style',
+    'xmlns',
+  ]);
   const MATHML_NAMESPACE = 'http://www.w3.org/1998/Math/MathML';
   const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
   const HTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
@@ -687,7 +1412,11 @@ function createDOMPurify() {
   let IS_EMPTY_INPUT = false;
   /* Allowed XHTML+XML namespaces */
   let ALLOWED_NAMESPACES = null;
-  const DEFAULT_ALLOWED_NAMESPACES = addToSet({}, [MATHML_NAMESPACE, SVG_NAMESPACE, HTML_NAMESPACE], stringToString);
+  const DEFAULT_ALLOWED_NAMESPACES = addToSet(
+    {},
+    [MATHML_NAMESPACE, SVG_NAMESPACE, HTML_NAMESPACE],
+    stringToString
+  );
   const DEFAULT_MATHML_TEXT_INTEGRATION_POINTS = freeze(['mi', 'mo', 'mn', 'ms', 'mtext']);
   let MATHML_TEXT_INTEGRATION_POINTS = addToSet({}, DEFAULT_MATHML_TEXT_INTEGRATION_POINTS);
   const DEFAULT_HTML_INTEGRATION_POINTS = freeze(['annotation-xml']);
@@ -728,38 +1457,45 @@ function createDOMPurify() {
     /* Shield configuration object from prototype pollution */
     cfg = clone(cfg);
     PARSER_MEDIA_TYPE =
-    // eslint-disable-next-line unicorn/prefer-includes
-    SUPPORTED_PARSER_MEDIA_TYPES.indexOf(cfg.PARSER_MEDIA_TYPE) === -1 ? DEFAULT_PARSER_MEDIA_TYPE : cfg.PARSER_MEDIA_TYPE;
+      // eslint-disable-next-line unicorn/prefer-includes
+      SUPPORTED_PARSER_MEDIA_TYPES.indexOf(cfg.PARSER_MEDIA_TYPE) === -1
+        ? DEFAULT_PARSER_MEDIA_TYPE
+        : cfg.PARSER_MEDIA_TYPE;
     // HTML tags and attributes are not case-sensitive, converting to lowercase. Keeping XHTML as is.
-    transformCaseFunc = PARSER_MEDIA_TYPE === 'application/xhtml+xml' ? stringToString : stringToLowerCase;
+    transformCaseFunc =
+      PARSER_MEDIA_TYPE === 'application/xhtml+xml' ? stringToString : stringToLowerCase;
     /* Set configuration parameters */
     ALLOWED_TAGS = _resolveSetOption(cfg, 'ALLOWED_TAGS', DEFAULT_ALLOWED_TAGS, {
-      transform: transformCaseFunc
+      transform: transformCaseFunc,
     });
     ALLOWED_ATTR = _resolveSetOption(cfg, 'ALLOWED_ATTR', DEFAULT_ALLOWED_ATTR, {
-      transform: transformCaseFunc
+      transform: transformCaseFunc,
     });
     ALLOWED_NAMESPACES = _resolveSetOption(cfg, 'ALLOWED_NAMESPACES', DEFAULT_ALLOWED_NAMESPACES, {
-      transform: stringToString
+      transform: stringToString,
     });
     URI_SAFE_ATTRIBUTES = _resolveSetOption(cfg, 'ADD_URI_SAFE_ATTR', DEFAULT_URI_SAFE_ATTRIBUTES, {
       transform: transformCaseFunc,
-      base: DEFAULT_URI_SAFE_ATTRIBUTES
+      base: DEFAULT_URI_SAFE_ATTRIBUTES,
     });
     DATA_URI_TAGS = _resolveSetOption(cfg, 'ADD_DATA_URI_TAGS', DEFAULT_DATA_URI_TAGS, {
       transform: transformCaseFunc,
-      base: DEFAULT_DATA_URI_TAGS
+      base: DEFAULT_DATA_URI_TAGS,
     });
     FORBID_CONTENTS = _resolveSetOption(cfg, 'FORBID_CONTENTS', DEFAULT_FORBID_CONTENTS, {
-      transform: transformCaseFunc
+      transform: transformCaseFunc,
     });
     FORBID_TAGS = _resolveSetOption(cfg, 'FORBID_TAGS', clone({}), {
-      transform: transformCaseFunc
+      transform: transformCaseFunc,
     });
     FORBID_ATTR = _resolveSetOption(cfg, 'FORBID_ATTR', clone({}), {
-      transform: transformCaseFunc
+      transform: transformCaseFunc,
     });
-    USE_PROFILES = objectHasOwnProperty(cfg, 'USE_PROFILES') ? cfg.USE_PROFILES && typeof cfg.USE_PROFILES === 'object' ? clone(cfg.USE_PROFILES) : cfg.USE_PROFILES : false;
+    USE_PROFILES = objectHasOwnProperty(cfg, 'USE_PROFILES')
+      ? cfg.USE_PROFILES && typeof cfg.USE_PROFILES === 'object'
+        ? clone(cfg.USE_PROFILES)
+        : cfg.USE_PROFILES
+      : false;
     ALLOW_ARIA_ATTR = cfg.ALLOW_ARIA_ATTR !== false; // Default true
     ALLOW_DATA_ATTR = cfg.ALLOW_DATA_ATTR !== false; // Default true
     ALLOW_UNKNOWN_PROTOCOLS = cfg.ALLOW_UNKNOWN_PROTOCOLS || false; // Default false
@@ -777,18 +1513,43 @@ function createDOMPurify() {
     IN_PLACE = cfg.IN_PLACE || false; // Default false
     IS_ALLOWED_URI$1 = isRegex(cfg.ALLOWED_URI_REGEXP) ? cfg.ALLOWED_URI_REGEXP : IS_ALLOWED_URI; // Default regexp
     NAMESPACE = typeof cfg.NAMESPACE === 'string' ? cfg.NAMESPACE : HTML_NAMESPACE; // Default HTML namespace
-    MATHML_TEXT_INTEGRATION_POINTS = objectHasOwnProperty(cfg, 'MATHML_TEXT_INTEGRATION_POINTS') && cfg.MATHML_TEXT_INTEGRATION_POINTS && typeof cfg.MATHML_TEXT_INTEGRATION_POINTS === 'object' ? clone(cfg.MATHML_TEXT_INTEGRATION_POINTS) : addToSet({}, DEFAULT_MATHML_TEXT_INTEGRATION_POINTS); // Default built-in map
-    HTML_INTEGRATION_POINTS = objectHasOwnProperty(cfg, 'HTML_INTEGRATION_POINTS') && cfg.HTML_INTEGRATION_POINTS && typeof cfg.HTML_INTEGRATION_POINTS === 'object' ? clone(cfg.HTML_INTEGRATION_POINTS) : addToSet({}, DEFAULT_HTML_INTEGRATION_POINTS); // Default built-in map
-    const customElementHandling = objectHasOwnProperty(cfg, 'CUSTOM_ELEMENT_HANDLING') && cfg.CUSTOM_ELEMENT_HANDLING && typeof cfg.CUSTOM_ELEMENT_HANDLING === 'object' ? clone(cfg.CUSTOM_ELEMENT_HANDLING) : create(null);
+    MATHML_TEXT_INTEGRATION_POINTS =
+      objectHasOwnProperty(cfg, 'MATHML_TEXT_INTEGRATION_POINTS') &&
+      cfg.MATHML_TEXT_INTEGRATION_POINTS &&
+      typeof cfg.MATHML_TEXT_INTEGRATION_POINTS === 'object'
+        ? clone(cfg.MATHML_TEXT_INTEGRATION_POINTS)
+        : addToSet({}, DEFAULT_MATHML_TEXT_INTEGRATION_POINTS); // Default built-in map
+    HTML_INTEGRATION_POINTS =
+      objectHasOwnProperty(cfg, 'HTML_INTEGRATION_POINTS') &&
+      cfg.HTML_INTEGRATION_POINTS &&
+      typeof cfg.HTML_INTEGRATION_POINTS === 'object'
+        ? clone(cfg.HTML_INTEGRATION_POINTS)
+        : addToSet({}, DEFAULT_HTML_INTEGRATION_POINTS); // Default built-in map
+    const customElementHandling =
+      objectHasOwnProperty(cfg, 'CUSTOM_ELEMENT_HANDLING') &&
+      cfg.CUSTOM_ELEMENT_HANDLING &&
+      typeof cfg.CUSTOM_ELEMENT_HANDLING === 'object'
+        ? clone(cfg.CUSTOM_ELEMENT_HANDLING)
+        : create(null);
     CUSTOM_ELEMENT_HANDLING = create(null);
-    if (objectHasOwnProperty(customElementHandling, 'tagNameCheck') && isRegexOrFunction(customElementHandling.tagNameCheck)) {
+    if (
+      objectHasOwnProperty(customElementHandling, 'tagNameCheck') &&
+      isRegexOrFunction(customElementHandling.tagNameCheck)
+    ) {
       CUSTOM_ELEMENT_HANDLING.tagNameCheck = customElementHandling.tagNameCheck; // Default undefined
     }
-    if (objectHasOwnProperty(customElementHandling, 'attributeNameCheck') && isRegexOrFunction(customElementHandling.attributeNameCheck)) {
+    if (
+      objectHasOwnProperty(customElementHandling, 'attributeNameCheck') &&
+      isRegexOrFunction(customElementHandling.attributeNameCheck)
+    ) {
       CUSTOM_ELEMENT_HANDLING.attributeNameCheck = customElementHandling.attributeNameCheck; // Default undefined
     }
-    if (objectHasOwnProperty(customElementHandling, 'allowCustomizedBuiltInElements') && typeof customElementHandling.allowCustomizedBuiltInElements === 'boolean') {
-      CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements = customElementHandling.allowCustomizedBuiltInElements; // Default undefined
+    if (
+      objectHasOwnProperty(customElementHandling, 'allowCustomizedBuiltInElements') &&
+      typeof customElementHandling.allowCustomizedBuiltInElements === 'boolean'
+    ) {
+      CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements =
+        customElementHandling.allowCustomizedBuiltInElements; // Default undefined
     }
     seal(CUSTOM_ELEMENT_HANDLING);
     if (SAFE_FOR_TEMPLATES) {
@@ -883,10 +1644,14 @@ function createDOMPurify() {
     // See GHSA-vxr8-fq34-vvx9.
     if (cfg.TRUSTED_TYPES_POLICY) {
       if (typeof cfg.TRUSTED_TYPES_POLICY.createHTML !== 'function') {
-        throw typeErrorCreate('TRUSTED_TYPES_POLICY configuration option must provide a "createHTML" hook.');
+        throw typeErrorCreate(
+          'TRUSTED_TYPES_POLICY configuration option must provide a "createHTML" hook.'
+        );
       }
       if (typeof cfg.TRUSTED_TYPES_POLICY.createScriptURL !== 'function') {
-        throw typeErrorCreate('TRUSTED_TYPES_POLICY configuration option must provide a "createScriptURL" hook.');
+        throw typeErrorCreate(
+          'TRUSTED_TYPES_POLICY configuration option must provide a "createScriptURL" hook.'
+        );
       }
       // A caller-supplied policy applies to this configuration only.
       const previousTrustedTypesPolicy = trustedTypesPolicy;
@@ -960,7 +1725,10 @@ function createDOMPurify() {
     // if the parent is either <annotation-xml> or a MathML
     // text integration point.
     if (parent.namespaceURI === MATHML_NAMESPACE) {
-      return tagName === 'svg' && (parentTagName === 'annotation-xml' || MATHML_TEXT_INTEGRATION_POINTS[parentTagName]);
+      return (
+        tagName === 'svg' &&
+        (parentTagName === 'annotation-xml' || MATHML_TEXT_INTEGRATION_POINTS[parentTagName])
+      );
     }
     // We only allow elements that are defined in SVG
     // spec. All others are disallowed in SVG namespace.
@@ -1005,12 +1773,17 @@ function createDOMPurify() {
     if (parent.namespaceURI === SVG_NAMESPACE && !HTML_INTEGRATION_POINTS[parentTagName]) {
       return false;
     }
-    if (parent.namespaceURI === MATHML_NAMESPACE && !MATHML_TEXT_INTEGRATION_POINTS[parentTagName]) {
+    if (
+      parent.namespaceURI === MATHML_NAMESPACE &&
+      !MATHML_TEXT_INTEGRATION_POINTS[parentTagName]
+    ) {
       return false;
     }
     // We disallow tags that are specific for MathML
     // or SVG and should never appear in HTML namespace
-    return !ALL_MATHML_TAGS[tagName] && (COMMON_SVG_AND_HTML_ELEMENTS[tagName] || !ALL_SVG_TAGS[tagName]);
+    return (
+      !ALL_MATHML_TAGS[tagName] && (COMMON_SVG_AND_HTML_ELEMENTS[tagName] || !ALL_SVG_TAGS[tagName])
+    );
   };
   /**
    * @param element a DOM element whose namespace is being checked
@@ -1025,7 +1798,7 @@ function createDOMPurify() {
     if (!parent || !parent.tagName) {
       parent = {
         namespaceURI: NAMESPACE,
-        tagName: 'template'
+        tagName: 'template',
       };
     }
     const tagName = stringToLowerCase(element.tagName);
@@ -1059,7 +1832,7 @@ function createDOMPurify() {
    */
   const _forceRemove = function _forceRemove(node) {
     arrayPush(DOMPurify.removed, {
-      element: node
+      element: node,
     });
     try {
       // eslint-disable-next-line unicorn/prefer-dom-node-remove
@@ -1085,7 +1858,10 @@ function createDOMPurify() {
          catch is not entered. Only a kept (parentless) root reaches here. */
       remove(node);
       if (!getParentNode(node)) {
-        throw typeErrorCreate('a node selected for removal could not be detached from its tree ' + 'and cannot be safely returned; refusing to sanitize in place');
+        throw typeErrorCreate(
+          'a node selected for removal could not be detached from its tree ' +
+            'and cannot be safely returned; refusing to sanitize in place'
+        );
       }
     }
   };
@@ -1116,10 +1892,10 @@ function createDOMPurify() {
     const childNodes = getChildNodes(root);
     if (childNodes) {
       const snapshot = [];
-      arrayForEach(childNodes, child => {
+      arrayForEach(childNodes, (child) => {
         arrayPush(snapshot, child);
       });
-      arrayForEach(snapshot, child => {
+      arrayForEach(snapshot, (child) => {
         try {
           remove(child);
         } catch (_) {
@@ -1152,12 +1928,12 @@ function createDOMPurify() {
     try {
       arrayPush(DOMPurify.removed, {
         attribute: element.getAttributeNode(name),
-        from: element
+        from: element,
       });
     } catch (_) {
       arrayPush(DOMPurify.removed, {
         attribute: null,
-        from: element
+        from: element,
       });
     }
     element.removeAttribute(name);
@@ -1285,7 +2061,10 @@ function createDOMPurify() {
       const nodeType = getNodeType ? getNodeType(node) : node.nodeType;
       /* Remove range markers (the target side of a patch linkage): every
          processing instruction, and any markup-bearing comment. */
-      if (nodeType === NODE_TYPE.processingInstruction || nodeType === NODE_TYPE.comment && regExpTest(COMMENT_MARKUP_PROBE, node.data)) {
+      if (
+        nodeType === NODE_TYPE.processingInstruction ||
+        (nodeType === NODE_TYPE.comment && regExpTest(COMMENT_MARKUP_PROBE, node.data))
+      ) {
         try {
           remove(node);
         } catch (_) {
@@ -1301,7 +2080,12 @@ function createDOMPurify() {
           if (element.hasAttribute && element.hasAttribute('patchsrc')) {
             element.removeAttribute('patchsrc');
           }
-          if (element.hasAttribute && element.hasAttribute('for') && lcTag !== 'label' && lcTag !== 'output') {
+          if (
+            element.hasAttribute &&
+            element.hasAttribute('for') &&
+            lcTag !== 'label' &&
+            lcTag !== 'output'
+          ) {
             element.removeAttribute('for');
           }
         } catch (_) {
@@ -1335,7 +2119,8 @@ function createDOMPurify() {
     }
     if (PARSER_MEDIA_TYPE === 'application/xhtml+xml' && NAMESPACE === HTML_NAMESPACE) {
       // Root of XHTML doc must contain xmlns declaration (see https://www.w3.org/TR/xhtml1/normative.html#strict)
-      dirty = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>' + dirty + '</body></html>';
+      dirty =
+        '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>' + dirty + '</body></html>';
     }
     const dirtyPayload = trustedTypesPolicy ? _createTrustedHTML(dirty) : dirty;
     /*
@@ -1373,9 +2158,17 @@ function createDOMPurify() {
    * @return The created NodeIterator
    */
   const _createNodeIterator = function _createNodeIterator(root) {
-    return createNodeIterator.call(root.ownerDocument || root, root,
-    // eslint-disable-next-line no-bitwise
-    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_PROCESSING_INSTRUCTION | NodeFilter.SHOW_CDATA_SECTION, null);
+    return createNodeIterator.call(
+      root.ownerDocument || root,
+      root,
+      // eslint-disable-next-line no-bitwise
+      NodeFilter.SHOW_ELEMENT |
+        NodeFilter.SHOW_COMMENT |
+        NodeFilter.SHOW_TEXT |
+        NodeFilter.SHOW_PROCESSING_INSTRUCTION |
+        NodeFilter.SHOW_CDATA_SECTION,
+      null
+    );
   };
   /**
    * Replace template expression syntax (mustache, ERB, template
@@ -1413,9 +2206,16 @@ function createDOMPurify() {
   const _scrubTemplateExpressions2 = function _scrubTemplateExpressions(node) {
     var _node$querySelectorAl;
     node.normalize();
-    const walker = createNodeIterator.call(node.ownerDocument || node, node,
-    // eslint-disable-next-line no-bitwise
-    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_CDATA_SECTION | NodeFilter.SHOW_PROCESSING_INSTRUCTION, null);
+    const walker = createNodeIterator.call(
+      node.ownerDocument || node,
+      node,
+      // eslint-disable-next-line no-bitwise
+      NodeFilter.SHOW_TEXT |
+        NodeFilter.SHOW_COMMENT |
+        NodeFilter.SHOW_CDATA_SECTION |
+        NodeFilter.SHOW_PROCESSING_INSTRUCTION,
+      null
+    );
     let currentNode = walker.nextNode();
     while (currentNode) {
       currentNode.data = _stripTemplateExpressions(currentNode.data);
@@ -1424,9 +2224,12 @@ function createDOMPurify() {
     // NodeIterator does not descend into <template>.content per the DOM spec,
     // so we must explicitly recurse into each template's content fragment,
     // mirroring the approach used by _sanitizeShadowDOM.
-    const templates = (_node$querySelectorAl = node.querySelectorAll) === null || _node$querySelectorAl === void 0 ? void 0 : _node$querySelectorAl.call(node, 'template');
+    const templates =
+      (_node$querySelectorAl = node.querySelectorAll) === null || _node$querySelectorAl === void 0
+        ? void 0
+        : _node$querySelectorAl.call(node, 'template');
     if (templates) {
-      arrayForEach(templates, tmpl => {
+      arrayForEach(templates, (tmpl) => {
         if (_isDocumentFragment(tmpl.content)) {
           _scrubTemplateExpressions2(tmpl.content);
         }
@@ -1456,33 +2259,42 @@ function createDOMPurify() {
     if (transformCaseFunc(realTagName) !== 'form') {
       return false;
     }
-    return typeof element.nodeName !== 'string' || typeof element.textContent !== 'string' || typeof element.removeChild !== 'function' ||
-    // Realm-safe NamedNodeMap detection: equality against the cached
-    // prototype getter. Clobbered .attributes (e.g. <input name="attributes">)
-    // makes the direct read diverge from the cached read; a clean form
-    // (same-realm OR foreign-realm) has both reads pointing at the same
-    // canonical NamedNodeMap.
-    element.attributes !== getAttributes(element) || typeof element.removeAttribute !== 'function' || typeof element.setAttribute !== 'function' || typeof element.namespaceURI !== 'string' || typeof element.insertBefore !== 'function' || typeof element.hasChildNodes !== 'function' ||
-    // NodeType clobbering probe. Cached Node.prototype.nodeType getter
-    // returns the integer 1 for any Element regardless of realm; direct
-    // read on a clobbered form (e.g. <input name="nodeType">) returns
-    // the named child element. Cheap addition — nodeType is read from
-    // an internal slot, no serialization cost — and removes a residual
-    // clobbering surface used by several mXSS / PI / comment branches
-    // in _sanitizeElements that compare currentNode.nodeType directly.
-    element.nodeType !== getNodeType(element) ||
-    // HTMLFormElement has [LegacyOverrideBuiltIns]: a descendant named
-    // "childNodes" shadows the prototype getter. Direct reads of
-    // form.childNodes from a clobbered form return the named child
-    // instead of the real NodeList, so any walk that reads it directly
-    // skips the form's real children. Compare the direct read to the
-    // cached Node.prototype getter — when the form's named-property
-    // getter intercepts the read, the two values differ and we flag
-    // the form. This catches every clobbering child type (input,
-    // select, etc.) regardless of whether the named child happens to
-    // carry a numeric .length, which a typeof-based probe would miss
-    // (e.g. HTMLSelectElement.length is a defined unsigned-long).
-    element.childNodes !== getChildNodes(element);
+    return (
+      typeof element.nodeName !== 'string' ||
+      typeof element.textContent !== 'string' ||
+      typeof element.removeChild !== 'function' ||
+      // Realm-safe NamedNodeMap detection: equality against the cached
+      // prototype getter. Clobbered .attributes (e.g. <input name="attributes">)
+      // makes the direct read diverge from the cached read; a clean form
+      // (same-realm OR foreign-realm) has both reads pointing at the same
+      // canonical NamedNodeMap.
+      element.attributes !== getAttributes(element) ||
+      typeof element.removeAttribute !== 'function' ||
+      typeof element.setAttribute !== 'function' ||
+      typeof element.namespaceURI !== 'string' ||
+      typeof element.insertBefore !== 'function' ||
+      typeof element.hasChildNodes !== 'function' ||
+      // NodeType clobbering probe. Cached Node.prototype.nodeType getter
+      // returns the integer 1 for any Element regardless of realm; direct
+      // read on a clobbered form (e.g. <input name="nodeType">) returns
+      // the named child element. Cheap addition — nodeType is read from
+      // an internal slot, no serialization cost — and removes a residual
+      // clobbering surface used by several mXSS / PI / comment branches
+      // in _sanitizeElements that compare currentNode.nodeType directly.
+      element.nodeType !== getNodeType(element) ||
+      // HTMLFormElement has [LegacyOverrideBuiltIns]: a descendant named
+      // "childNodes" shadows the prototype getter. Direct reads of
+      // form.childNodes from a clobbered form return the named child
+      // instead of the real NodeList, so any walk that reads it directly
+      // skips the form's real children. Compare the direct read to the
+      // cached Node.prototype getter — when the form's named-property
+      // getter intercepts the read, the two values differ and we flag
+      // the form. This catches every clobbering child type (input,
+      // select, etc.) regardless of whether the named child happens to
+      // carry a numeric .length, which a typeof-based probe would miss
+      // (e.g. HTMLSelectElement.length is a defined unsigned-long).
+      element.childNodes !== getChildNodes(element)
+    );
   };
   /**
    * Checks whether the given value is a DocumentFragment from any realm.
@@ -1530,7 +2342,7 @@ function createDOMPurify() {
     if (hooks.length === 0) {
       return;
     }
-    arrayForEach(hooks, hook => {
+    arrayForEach(hooks, (hook) => {
       hook.call(DOMPurify, currentNode, data, CONFIG);
     });
   }
@@ -1546,11 +2358,22 @@ function createDOMPurify() {
    */
   const _isUnsafeNode = function _isUnsafeNode(currentNode, tagName) {
     /* Detect mXSS attempts abusing namespace confusion */
-    if (SAFE_FOR_XML && currentNode.hasChildNodes() && !_isNode(currentNode.firstElementChild) && regExpTest(ELEMENT_MARKUP_PROBE, currentNode.textContent) && regExpTest(ELEMENT_MARKUP_PROBE, currentNode.innerHTML)) {
+    if (
+      SAFE_FOR_XML &&
+      currentNode.hasChildNodes() &&
+      !_isNode(currentNode.firstElementChild) &&
+      regExpTest(ELEMENT_MARKUP_PROBE, currentNode.textContent) &&
+      regExpTest(ELEMENT_MARKUP_PROBE, currentNode.innerHTML)
+    ) {
       return true;
     }
     /* Remove risky CSS construction leading to mXSS */
-    if (SAFE_FOR_XML && currentNode.namespaceURI === HTML_NAMESPACE && tagName === 'style' && _isNode(currentNode.firstElementChild)) {
+    if (
+      SAFE_FOR_XML &&
+      currentNode.namespaceURI === HTML_NAMESPACE &&
+      tagName === 'style' &&
+      _isNode(currentNode.firstElementChild)
+    ) {
       return true;
     }
     /* Remove any occurrence of processing instructions */
@@ -1558,7 +2381,11 @@ function createDOMPurify() {
       return true;
     }
     /* Remove any kind of possibly harmful comments */
-    if (SAFE_FOR_XML && currentNode.nodeType === NODE_TYPE.comment && regExpTest(COMMENT_MARKUP_PROBE, currentNode.data)) {
+    if (
+      SAFE_FOR_XML &&
+      currentNode.nodeType === NODE_TYPE.comment &&
+      regExpTest(COMMENT_MARKUP_PROBE, currentNode.data)
+    ) {
       return true;
     }
     return false;
@@ -1583,10 +2410,16 @@ function createDOMPurify() {
   const _sanitizeDisallowedNode = function _sanitizeDisallowedNode(currentNode, tagName) {
     /* Check if we have a custom element to handle */
     if (!FORBID_TAGS[tagName] && _isBasicCustomElement(tagName)) {
-      if (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp && regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, tagName)) {
+      if (
+        CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp &&
+        regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, tagName)
+      ) {
         return false;
       }
-      if (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function && CUSTOM_ELEMENT_HANDLING.tagNameCheck(tagName)) {
+      if (
+        CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function &&
+        CUSTOM_ELEMENT_HANDLING.tagNameCheck(tagName)
+      ) {
         return false;
       }
     }
@@ -1655,11 +2488,13 @@ function createDOMPurify() {
       return true;
     }
     /* Now let's check the element's type and name */
-    const tagName = transformCaseFunc(getNodeName ? getNodeName(currentNode) : currentNode.nodeName);
+    const tagName = transformCaseFunc(
+      getNodeName ? getNodeName(currentNode) : currentNode.nodeName
+    );
     /* Execute a hook if present */
     _executeHooks(hooks.uponSanitizeElement, currentNode, {
       tagName,
-      allowedTags: ALLOWED_TAGS
+      allowedTags: ALLOWED_TAGS,
     });
     /* A hook may have detached the node from the tree — a long-standing
        user pattern (issue #469; draw.io-style foreignObject filtering).
@@ -1685,7 +2520,14 @@ function createDOMPurify() {
       return true;
     }
     /* Remove element if anything forbids its presence */
-    if (FORBID_TAGS[tagName] || !(EXTRA_ELEMENT_HANDLING.tagCheck instanceof Function && EXTRA_ELEMENT_HANDLING.tagCheck(tagName)) && !ALLOWED_TAGS[tagName]) {
+    if (
+      FORBID_TAGS[tagName] ||
+      (!(
+        EXTRA_ELEMENT_HANDLING.tagCheck instanceof Function &&
+        EXTRA_ELEMENT_HANDLING.tagCheck(tagName)
+      ) &&
+        !ALLOWED_TAGS[tagName])
+    ) {
       const removed = _sanitizeDisallowedNode(currentNode, tagName);
       /* A false return means the node is a custom element kept via
          CUSTOM_ELEMENT_HANDLING - the only keep path through
@@ -1715,7 +2557,10 @@ function createDOMPurify() {
       return true;
     }
     /* Make sure that older browsers don't get fallback-tag mXSS */
-    if ((tagName === 'noscript' || tagName === 'noembed' || tagName === 'noframes') && regExpTest(FALLBACK_TAG_CLOSE, currentNode.innerHTML)) {
+    if (
+      (tagName === 'noscript' || tagName === 'noembed' || tagName === 'noframes') &&
+      regExpTest(FALLBACK_TAG_CLOSE, currentNode.innerHTML)
+    ) {
       _forceRemove(currentNode);
       return true;
     }
@@ -1725,7 +2570,7 @@ function createDOMPurify() {
       const content = _stripTemplateExpressions(currentNode.textContent);
       if (currentNode.textContent !== content) {
         arrayPush(DOMPurify.removed, {
-          element: currentNode.cloneNode()
+          element: currentNode.cloneNode(),
         });
         currentNode.textContent = content;
       }
@@ -1776,35 +2621,80 @@ function createDOMPurify() {
       return false;
     }
     /* Make sure attribute cannot clobber */
-    if (SANITIZE_DOM && (lcName === 'id' || lcName === 'name') && (value in document || value in formElement)) {
+    if (
+      SANITIZE_DOM &&
+      (lcName === 'id' || lcName === 'name') &&
+      (value in document || value in formElement)
+    ) {
       return false;
     }
-    const nameIsPermitted = ALLOWED_ATTR[lcName] || EXTRA_ELEMENT_HANDLING.attributeCheck instanceof Function && EXTRA_ELEMENT_HANDLING.attributeCheck(lcName, lcTag);
+    const nameIsPermitted =
+      ALLOWED_ATTR[lcName] ||
+      (EXTRA_ELEMENT_HANDLING.attributeCheck instanceof Function &&
+        EXTRA_ELEMENT_HANDLING.attributeCheck(lcName, lcTag));
     /* Allow valid data-* attributes: At least one character after "-"
         (https://html.spec.whatwg.org/multipage/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes)
         XML-compatible (https://html.spec.whatwg.org/multipage/infrastructure.html#xml-compatible and http://www.w3.org/TR/xml/#d0e804)
         We don't need to check the value; it's always URI safe. */
-    if (ALLOW_DATA_ATTR && regExpTest(DATA_ATTR$1, lcName)) ; else if (ALLOW_ARIA_ATTR && regExpTest(ARIA_ATTR$1, lcName)) ; else if (!nameIsPermitted) {
+    if (ALLOW_DATA_ATTR && regExpTest(DATA_ATTR$1, lcName));
+    else if (ALLOW_ARIA_ATTR && regExpTest(ARIA_ATTR$1, lcName));
+    else if (!nameIsPermitted) {
       if (
-      // First condition does a very basic check if a) it's basically a valid custom element tagname AND
-      // b) if the tagName passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.tagNameCheck
-      // and c) if the attribute name passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.attributeNameCheck
-      _isBasicCustomElement(lcTag) && (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp && regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, lcTag) || CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function && CUSTOM_ELEMENT_HANDLING.tagNameCheck(lcTag)) && (CUSTOM_ELEMENT_HANDLING.attributeNameCheck instanceof RegExp && regExpTest(CUSTOM_ELEMENT_HANDLING.attributeNameCheck, lcName) || CUSTOM_ELEMENT_HANDLING.attributeNameCheck instanceof Function && CUSTOM_ELEMENT_HANDLING.attributeNameCheck(lcName, lcTag)) ||
-      // Alternative, second condition checks if it's an `is`-attribute, AND
-      // the value passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.tagNameCheck
-      lcName === 'is' && CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements && (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp && regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, value) || CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function && CUSTOM_ELEMENT_HANDLING.tagNameCheck(value))) ; else {
+        // First condition does a very basic check if a) it's basically a valid custom element tagname AND
+        // b) if the tagName passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.tagNameCheck
+        // and c) if the attribute name passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.attributeNameCheck
+        (_isBasicCustomElement(lcTag) &&
+          ((CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp &&
+            regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, lcTag)) ||
+            (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function &&
+              CUSTOM_ELEMENT_HANDLING.tagNameCheck(lcTag))) &&
+          ((CUSTOM_ELEMENT_HANDLING.attributeNameCheck instanceof RegExp &&
+            regExpTest(CUSTOM_ELEMENT_HANDLING.attributeNameCheck, lcName)) ||
+            (CUSTOM_ELEMENT_HANDLING.attributeNameCheck instanceof Function &&
+              CUSTOM_ELEMENT_HANDLING.attributeNameCheck(lcName, lcTag)))) ||
+        // Alternative, second condition checks if it's an `is`-attribute, AND
+        // the value passes whatever the user has configured for CUSTOM_ELEMENT_HANDLING.tagNameCheck
+        (lcName === 'is' &&
+          CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements &&
+          ((CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof RegExp &&
+            regExpTest(CUSTOM_ELEMENT_HANDLING.tagNameCheck, value)) ||
+            (CUSTOM_ELEMENT_HANDLING.tagNameCheck instanceof Function &&
+              CUSTOM_ELEMENT_HANDLING.tagNameCheck(value))))
+      );
+      else {
         return false;
       }
       /* Check value is safe. First, is attr inert? If so, is safe */
-    } else if (URI_SAFE_ATTRIBUTES[lcName]) ; else if (regExpTest(IS_ALLOWED_URI$1, stringReplace(value, ATTR_WHITESPACE$1, ''))) ; else if ((lcName === 'src' || lcName === 'xlink:href' || lcName === 'href') && lcTag !== 'script' && stringIndexOf(value, 'data:') === 0 && DATA_URI_TAGS[lcTag]) ; else if (ALLOW_UNKNOWN_PROTOCOLS && !regExpTest(IS_SCRIPT_OR_DATA$1, stringReplace(value, ATTR_WHITESPACE$1, ''))) ; else if (value) {
+    } else if (URI_SAFE_ATTRIBUTES[lcName]);
+    else if (regExpTest(IS_ALLOWED_URI$1, stringReplace(value, ATTR_WHITESPACE$1, '')));
+    else if (
+      (lcName === 'src' || lcName === 'xlink:href' || lcName === 'href') &&
+      lcTag !== 'script' &&
+      stringIndexOf(value, 'data:') === 0 &&
+      DATA_URI_TAGS[lcTag]
+    );
+    else if (
+      ALLOW_UNKNOWN_PROTOCOLS &&
+      !regExpTest(IS_SCRIPT_OR_DATA$1, stringReplace(value, ATTR_WHITESPACE$1, ''))
+    );
+    else if (value) {
       return false;
-    } else ;
+    } else;
     return true;
   };
   /* Names the HTML spec reserves from valid-custom-element-name; these must
    * never be treated as basic custom elements even when a permissive
    * CUSTOM_ELEMENT_HANDLING.tagNameCheck is configured. */
-  const RESERVED_CUSTOM_ELEMENT_NAMES = addToSet({}, ['annotation-xml', 'color-profile', 'font-face', 'font-face-format', 'font-face-name', 'font-face-src', 'font-face-uri', 'missing-glyph']);
+  const RESERVED_CUSTOM_ELEMENT_NAMES = addToSet({}, [
+    'annotation-xml',
+    'color-profile',
+    'font-face',
+    'font-face-format',
+    'font-face-name',
+    'font-face-src',
+    'font-face-uri',
+    'missing-glyph',
+  ]);
   /**
    * _isBasicCustomElement
    * checks if at least one dash is included in tagName, and it's not the first char
@@ -1814,7 +2704,10 @@ function createDOMPurify() {
    * @returns Returns true if the tag name meets the basic criteria for a custom element, otherwise false.
    */
   const _isBasicCustomElement = function _isBasicCustomElement(tagName) {
-    return !RESERVED_CUSTOM_ELEMENT_NAMES[stringToLowerCase(tagName)] && regExpTest(CUSTOM_ELEMENT$1, tagName);
+    return (
+      !RESERVED_CUSTOM_ELEMENT_NAMES[stringToLowerCase(tagName)] &&
+      regExpTest(CUSTOM_ELEMENT$1, tagName)
+    );
   };
   /**
    * Wrap an attribute value in the matching Trusted Types object when
@@ -1828,17 +2721,25 @@ function createDOMPurify() {
    * @param value the attribute value to wrap
    * @return the value, wrapped when Trusted Types demand it
    */
-  const _applyTrustedTypesToAttribute = function _applyTrustedTypesToAttribute(lcTag, lcName, namespaceURI, value) {
-    if (trustedTypesPolicy && typeof trustedTypes === 'object' && typeof trustedTypes.getAttributeType === 'function' && !namespaceURI) {
+  const _applyTrustedTypesToAttribute = function _applyTrustedTypesToAttribute(
+    lcTag,
+    lcName,
+    namespaceURI,
+    value
+  ) {
+    if (
+      trustedTypesPolicy &&
+      typeof trustedTypes === 'object' &&
+      typeof trustedTypes.getAttributeType === 'function' &&
+      !namespaceURI
+    ) {
       switch (trustedTypes.getAttributeType(lcTag, lcName)) {
-        case 'TrustedHTML':
-          {
-            return _createTrustedHTML(value);
-          }
-        case 'TrustedScriptURL':
-          {
-            return _createTrustedScriptURL(value);
-          }
+        case 'TrustedHTML': {
+          return _createTrustedHTML(value);
+        }
+        case 'TrustedScriptURL': {
+          return _createTrustedScriptURL(value);
+        }
       }
     }
     return value;
@@ -1896,7 +2797,7 @@ function createDOMPurify() {
       attrValue: '',
       keepAttr: true,
       allowedAttributes: ALLOWED_ATTR,
-      forceKeepAttr: undefined
+      forceKeepAttr: undefined,
     };
     let l = attributes.length;
     const lcTag = transformCaseFunc(currentNode.nodeName);
@@ -1919,7 +2820,11 @@ function createDOMPurify() {
       /* Full DOM Clobbering protection via namespace isolation,
        * Prefix id and name attributes with `user-content-`
        */
-      if (SANITIZE_NAMED_PROPS && (lcName === 'id' || lcName === 'name') && stringIndexOf(value, SANITIZE_NAMED_PROPS_PREFIX) !== 0) {
+      if (
+        SANITIZE_NAMED_PROPS &&
+        (lcName === 'id' || lcName === 'name') &&
+        stringIndexOf(value, SANITIZE_NAMED_PROPS_PREFIX) !== 0
+      ) {
         // Remove the attribute with this value
         _removeAttribute(name, currentNode);
         // Prefix the value and later re-create the attribute with the sanitized value
@@ -1928,7 +2833,13 @@ function createDOMPurify() {
       // Else: already prefixed, leave the attribute alone — the prefix is
       // itself the clobbering protection, and re-applying it is incorrect.
       /* Work around a security issue with comments inside attributes */
-      if (SAFE_FOR_XML && regExpTest(/((--!?|])>)|<\/(style|script|title|xmp|textarea|noscript|iframe|noembed|noframes)/i, value)) {
+      if (
+        SAFE_FOR_XML &&
+        regExpTest(
+          /((--!?|])>)|<\/(style|script|title|xmp|textarea|noscript|iframe|noembed|noframes)/i,
+          value
+        )
+      ) {
         _removeAttribute(name, currentNode);
         continue;
       }
@@ -1980,7 +2891,7 @@ function createDOMPurify() {
     const shadowIterator = _createNodeIterator(fragment);
     /* Execute a hook if present */
     _executeHooks(hooks.beforeSanitizeShadowDOM, fragment, null);
-    while (shadowNode = shadowIterator.nextNode()) {
+    while ((shadowNode = shadowIterator.nextNode())) {
       /* Execute a hook if present */
       _executeHooks(hooks.uponSanitizeShadowNode, shadowNode, null);
       /* Sanitize tags and elements */
@@ -2051,10 +2962,12 @@ function createDOMPurify() {
        desired processing order (LIFO): template content, then children, then
        the shadow-sanitize, then the shadow walk — so the order matches the
        previous recursion exactly. */
-    const stack = [{
-      node: root,
-      shadow: null
-    }];
+    const stack = [
+      {
+        node: root,
+        shadow: null,
+      },
+    ];
     while (stack.length > 0) {
       const item = stack.pop();
       /* Deferred shadow-DOM sanitisation: runs after its subtree was walked. */
@@ -2073,7 +2986,7 @@ function createDOMPurify() {
         for (let i = childNodes.length - 1; i >= 0; --i) {
           stack.push({
             node: childNodes[i],
-            shadow: null
+            shadow: null,
           });
         }
       }
@@ -2087,7 +3000,7 @@ function createDOMPurify() {
           if (_isDocumentFragment(content)) {
             stack.push({
               node: content,
-              shadow: null
+              shadow: null,
             });
           }
         }
@@ -2103,13 +3016,16 @@ function createDOMPurify() {
           /* Push the deferred sanitise first so it pops after the shadow
              walk we push next, i.e. nested shadow roots are discovered
              before this one is sanitised. */
-          stack.push({
-            node: null,
-            shadow: sr
-          }, {
-            node: sr,
-            shadow: null
-          });
+          stack.push(
+            {
+              node: null,
+              shadow: sr,
+            },
+            {
+              node: sr,
+              shadow: null,
+            }
+          );
         }
       }
     }
@@ -2245,9 +3161,13 @@ function createDOMPurify() {
       _sanitizeAttachedShadowRoots(importedNode);
     } else {
       /* Exit directly if we have nothing to do */
-      if (!RETURN_DOM && !SAFE_FOR_TEMPLATES && !WHOLE_DOCUMENT &&
-      // eslint-disable-next-line unicorn/prefer-includes
-      dirty.indexOf('<') === -1) {
+      if (
+        !RETURN_DOM &&
+        !SAFE_FOR_TEMPLATES &&
+        !WHOLE_DOCUMENT &&
+        // eslint-disable-next-line unicorn/prefer-includes
+        dirty.indexOf('<') === -1
+      ) {
         return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? _createTrustedHTML(dirty) : dirty;
       }
       /* Initialize the document to work on */
@@ -2274,7 +3194,7 @@ function createDOMPurify() {
        preserved. (String/DOM-copy paths never return the partial body, so the
        propagating throw is already fail-closed there.) */
     try {
-      while (currentNode = nodeIterator.nextNode()) {
+      while ((currentNode = nodeIterator.nextNode())) {
         /* Sanitize tags and elements */
         _sanitizeElements(currentNode, walkRoot);
         /* Check attributes next */
@@ -2293,7 +3213,7 @@ function createDOMPurify() {
         /* Nodes _forceRemove'd earlier in the aborted walk are already
            detached from the root, so _neutralizeRoot's subtree pass does not
            reach them. Defuse them too, mirroring the success-path loop below. */
-        arrayForEach(DOMPurify.removed, entry => {
+        arrayForEach(DOMPurify.removed, (entry) => {
           if (entry.element) {
             _neutralizeSubtree(entry.element);
           }
@@ -2310,7 +3230,7 @@ function createDOMPurify() {
          non-allow-listed attributes off every other removed subtree (clobber,
          mXSS, namespace, comments, KEEP_CONTENT:false, …) so those handlers are
          cancelled before any event can fire. Runs synchronously, pre-return. */
-      arrayForEach(DOMPurify.removed, entry => {
+      arrayForEach(DOMPurify.removed, (entry) => {
         if (entry.element) {
           _neutralizeSubtree(entry.element);
         }
@@ -2348,14 +3268,23 @@ function createDOMPurify() {
     }
     let serializedHTML = WHOLE_DOCUMENT ? body.outerHTML : body.innerHTML;
     /* Serialize doctype if allowed */
-    if (WHOLE_DOCUMENT && ALLOWED_TAGS['!doctype'] && body.ownerDocument && body.ownerDocument.doctype && body.ownerDocument.doctype.name && regExpTest(DOCTYPE_NAME, body.ownerDocument.doctype.name)) {
+    if (
+      WHOLE_DOCUMENT &&
+      ALLOWED_TAGS['!doctype'] &&
+      body.ownerDocument &&
+      body.ownerDocument.doctype &&
+      body.ownerDocument.doctype.name &&
+      regExpTest(DOCTYPE_NAME, body.ownerDocument.doctype.name)
+    ) {
       serializedHTML = '<!DOCTYPE ' + body.ownerDocument.doctype.name + '>\n' + serializedHTML;
     }
     /* Sanitize final string template-safe */
     if (SAFE_FOR_TEMPLATES) {
       serializedHTML = _stripTemplateExpressions(serializedHTML);
     }
-    return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? _createTrustedHTML(serializedHTML) : serializedHTML;
+    return trustedTypesPolicy && RETURN_TRUSTED_TYPE
+      ? _createTrustedHTML(serializedHTML)
+      : serializedHTML;
   };
   DOMPurify.setConfig = function () {
     let cfg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};

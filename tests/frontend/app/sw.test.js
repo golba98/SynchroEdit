@@ -88,7 +88,7 @@ describe('Service Worker', () => {
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v9');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v12');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v13');
-    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v14');
+    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v15');
   });
 
   describe('fetch handler', () => {
@@ -157,7 +157,7 @@ describe('Service Worker', () => {
 
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v14');
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v15');
       expect(mockCache.put).toHaveBeenCalledWith(mockRequest, 'cloned-response');
     });
 
@@ -221,7 +221,7 @@ describe('Service Worker', () => {
       expect(global.fetch).toHaveBeenCalledWith(mockRequest);
       expect(result).toBe(mockResponse);
       expect(global.caches.match).not.toHaveBeenCalled();
-      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v14');
+      expect(global.caches.open).toHaveBeenCalledWith('syncroedit-v15');
     });
 
     it('should fall back to cached static assets if the network fails', async () => {

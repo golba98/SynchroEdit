@@ -12,6 +12,7 @@ export class AuthController {
     this.syncro = null;
     this.currentForm = 'login';
     this.usernameDebounceTimeout = null;
+    this.isSubmitting = false;
     this.init();
   }
 
@@ -60,6 +61,8 @@ export class AuthController {
       input.addEventListener('input', (e) => {
         const fieldName = this.getFieldName(e.target);
         const validation = this.validateField(e.target);
+        if (validation.isValid !== false) e.target.setAttribute('aria-invalid', 'false');
+        this._clearErrorWhenEditing(e.target);
         this.syncro.onFieldInput(fieldName, e.target.value, validation);
         this.updateFormCompleteness();
         if (e.target.id === 'signupPassword') {
@@ -106,7 +109,12 @@ export class AuthController {
             icon.className = isCurrentlyPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
           }
 
-          this.syncro.onPasswordToggle(isCurrentlyPassword);
+          button.setAttribute('aria-pressed', String(isCurrentlyPassword));
+          button.setAttribute(
+            'aria-label',
+            isCurrentlyPassword ? 'Hide password' : 'Show password'
+          );
+          this.syncro.onPasswordToggle(isCurrentlyPassword, input);
         }
       });
     });
@@ -134,6 +142,15 @@ export class AuthController {
           this.handleSubmit(form);
         }
       });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.defaultPrevented) return;
+      const activeForm = document.querySelector('.form-container.active');
+      if (activeForm?.contains(event.target)) {
+        event.preventDefault();
+        this.handleSubmit(activeForm);
+      }
     });
 
     // Form toggle (login <-> signup)
@@ -167,8 +184,10 @@ export class AuthController {
     // Try to get a meaningful field name for syncro tracking
     if (input.id) {
       const id = input.id.toLowerCase();
+      if (id.includes('passwordconfirm')) return 'confirm-password';
       if (id.includes('password')) return 'password';
-      if (id.includes('email') || id.includes('username')) return 'username';
+      if (id.includes('email')) return 'email';
+      if (id.includes('username')) return 'username';
     }
     if (input.type === 'password') return 'password';
     if (input.type === 'email') return 'username';
@@ -185,8 +204,23 @@ export class AuthController {
       return { isValid: emailRegex.test(value), message: 'Invalid email' };
     }
 
+    if (input.id === 'signupPassword') {
+      return {
+        isValid: value.length === 0 || PASSWORD_REGEX.test(value),
+        message: 'Password is incomplete',
+      };
+    }
+
+    if (input.id === 'signupPasswordConfirm') {
+      const password = document.getElementById('signupPassword')?.value || '';
+      return {
+        isValid: value.length === 0 || value === password,
+        message: 'Passwords do not match',
+      };
+    }
+
     if (type === 'password' || input.id?.toLowerCase().includes('password')) {
-      return { isValid: value.length >= 8, message: 'Password too short' };
+      return { isValid: value.length > 0, message: 'Password is required' };
     }
 
     return { isValid: value.length > 0 };
@@ -229,10 +263,12 @@ export class AuthController {
     const signupForm = document.getElementById('signupForm');
 
     if (formType === 'signup') {
+      document.title = 'SyncroEdit - Create Account';
       loginForm?.classList.remove('active');
       signupForm?.classList.add('active');
       this._clearFormInputs(loginForm);
     } else {
+      document.title = 'SyncroEdit - Login';
       signupForm?.classList.remove('active');
       loginForm?.classList.add('active');
       this._clearFormInputs(signupForm);
@@ -306,11 +342,13 @@ export class AuthController {
   }
 
   async handleSubmit(form) {
-    this.syncro.onSubmit();
-    if (form.id === 'signupForm') {
-      await this._handleSignup(form);
-    } else {
-      await this._handleLogin(form);
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+    try {
+      if (form.id === 'signupForm') await this._handleSignup(form);
+      else await this._handleLogin(form);
+    } finally {
+      this.isSubmitting = false;
     }
   }
 
@@ -318,8 +356,27 @@ export class AuthController {
     const username = form.querySelector('#loginUsername')?.value?.trim();
     const password = form.querySelector('#loginPassword')?.value;
     const statusEl = document.getElementById('loginStatusMessage');
+    const btn = document.getElementById('loginBtn');
 
-    if (statusEl) statusEl.textContent = '';
+    if (!username || !password) {
+      const invalidInput = !username
+        ? form.querySelector('#loginUsername')
+        : form.querySelector('#loginPassword');
+      this._showValidationError(
+        form,
+        statusEl,
+        invalidInput,
+        'Enter your username or email and password.'
+      );
+      return;
+    }
+
+    if (statusEl) {
+      statusEl.textContent = '';
+      statusEl.className = 'status-message';
+    }
+    this._setButtonLoading(btn, true, 'Signing in...');
+    this.syncro.onSubmit();
 
     try {
       const data = await Network.fetchAPI('/api/auth/login', {
@@ -331,6 +388,7 @@ export class AuthController {
       this._redirect();
     } catch (e) {
       if (e.message === 'Email verification required') {
+        this.syncro.onSuccess();
         const email = e.data?.email || form.querySelector('#loginUsername')?.value?.trim();
         this._goToVerification(email, 'Verify your email before signing in.');
         return;
@@ -341,9 +399,8 @@ export class AuthController {
         statusEl.className = 'status-message error';
       }
       this.syncro.onError();
-      form.classList.add('shake-animation');
-      setTimeout(() => form.classList.remove('shake-animation'), 1000);
-      setTimeout(() => this.syncro.applyState('idle'), 2000);
+    } finally {
+      this._setButtonLoading(btn, false);
     }
   }
 
@@ -355,15 +412,17 @@ export class AuthController {
     const statusEl = document.getElementById('signupStatusMessage');
     const btn = document.getElementById('signupBtn');
 
-    const showError = (msg) => {
+    const showError = (msg, invalidInput = null) => {
       if (statusEl) {
         statusEl.textContent = '✗ ' + msg;
         statusEl.className = 'status-message error';
       }
-      this.syncro.onError();
-      form.classList.add('shake-animation');
-      setTimeout(() => form.classList.remove('shake-animation'), 1000);
-      setTimeout(() => this.syncro.applyState('idle'), 2000);
+      if (invalidInput) {
+        invalidInput.setAttribute('aria-invalid', 'true');
+        this.syncro.onInvalidField(invalidInput);
+      } else {
+        this.syncro.onError();
+      }
     };
 
     if (statusEl) {
@@ -373,27 +432,33 @@ export class AuthController {
 
     // Client-side validation
     if (!username || !email || !password || !confirmPassword) {
-      return showError('Please fill in all fields.');
+      const invalidInput = Array.from(form.querySelectorAll('input[required]')).find(
+        (input) => !input.value
+      );
+      return showError('Please fill in all fields.', invalidInput);
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return showError('Please enter a valid email address.');
+      return showError('Please enter a valid email address.', form.querySelector('#signupEmail'));
     }
 
     if (!PASSWORD_REGEX.test(password)) {
-      return showError('Password must be 8+ chars with uppercase, lowercase, number, and symbol.');
+      return showError(
+        'Password must be 8+ chars with uppercase, lowercase, number, and symbol.',
+        form.querySelector('#signupPassword')
+      );
     }
 
     if (password !== confirmPassword) {
-      return showError('Passwords do not match.');
+      return showError('Passwords do not match.', form.querySelector('#signupPasswordConfirm'));
     }
 
     // Loading state
     if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Creating account...';
+      this._setButtonLoading(btn, true, 'Creating account...');
     }
+    this.syncro.onSubmit();
 
     try {
       const data = await Network.fetchAPI('/api/auth/signup', {
@@ -416,8 +481,7 @@ export class AuthController {
       showError(this._getAuthErrorMessage(e, '', 'Signup failed. Please try again.'));
     } finally {
       if (btn) {
-        btn.disabled = false;
-        btn.textContent = 'Create Account';
+        this._setButtonLoading(btn, false);
       }
     }
   }
@@ -572,10 +636,34 @@ export class AuthController {
     }
 
     const levels = [
-      { minScore: 1, maxScore: 2, cls: 'entropy-weak', width: '30%', text: 'Weak' },
-      { minScore: 3, maxScore: 3, cls: 'entropy-fair', width: '60%', text: 'Fair' },
-      { minScore: 4, maxScore: 4, cls: 'entropy-strong', width: '80%', text: 'Strong' },
-      { minScore: 5, maxScore: 5, cls: 'entropy-elite', width: '100%', text: 'Very Strong' },
+      {
+        minScore: 1,
+        maxScore: 2,
+        cls: 'entropy-weak',
+        width: '30%',
+        text: 'Weak',
+      },
+      {
+        minScore: 3,
+        maxScore: 3,
+        cls: 'entropy-fair',
+        width: '60%',
+        text: 'Fair',
+      },
+      {
+        minScore: 4,
+        maxScore: 4,
+        cls: 'entropy-strong',
+        width: '80%',
+        text: 'Strong',
+      },
+      {
+        minScore: 5,
+        maxScore: 5,
+        cls: 'entropy-elite',
+        width: '100%',
+        text: 'Very Strong',
+      },
     ];
     const level = levels.find((l) => score >= l.minScore && score <= l.maxScore) || levels[0];
 
@@ -592,12 +680,39 @@ export class AuthController {
     const overlay = document.getElementById('redirectOverlay');
     if (overlay) {
       overlay.style.display = 'flex';
-      setTimeout(() => (overlay.style.opacity = '1'), 10);
+      requestAnimationFrame(() => (overlay.style.opacity = '1'));
     }
     const docId = new URLSearchParams(window.location.search).get('doc');
-    setTimeout(() => {
-      window.location.href = docId ? `/?doc=${docId}` : '/';
-    }, 1500);
+    window.location.href = docId ? `/?doc=${docId}` : '/';
+  }
+
+  _setButtonLoading(button, isLoading, loadingLabel = '') {
+    if (!button) return;
+    if (!button.dataset.defaultContent) button.dataset.defaultContent = button.innerHTML;
+    button.disabled = isLoading;
+    button.setAttribute('aria-busy', String(isLoading));
+    button.innerHTML = isLoading
+      ? `<span>${loadingLabel}</span><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>`
+      : button.dataset.defaultContent;
+  }
+
+  _showValidationError(form, statusEl, input, message) {
+    if (statusEl) {
+      statusEl.textContent = message;
+      statusEl.className = 'status-message error';
+    }
+    input?.focus();
+    input?.setAttribute('aria-invalid', 'true');
+    this.syncro.onInvalidField(input);
+  }
+
+  _clearErrorWhenEditing(input) {
+    const form = input.closest('.form-container');
+    const statusEl = form?.querySelector('.status-message.error');
+    if (statusEl) {
+      statusEl.textContent = '';
+      statusEl.className = 'status-message';
+    }
   }
 
   _handleUsernameAvailability(username) {
@@ -718,9 +833,14 @@ export class AuthController {
     if (!el) return;
 
     if (p1 === p2 && p1 !== '') {
+      el.setAttribute('aria-invalid', 'false');
       el.style.borderColor = 'rgb(16, 185, 129)';
       el.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.4)';
     } else {
+      if (p1 && p2) {
+        el.setAttribute('aria-invalid', 'true');
+        this.syncro.onInvalidField(el);
+      }
       el.style.borderColor = '';
       el.style.boxShadow = '';
     }

@@ -99,7 +99,9 @@ export class CursorManager extends Plugin {
 
       scrollParent.scrollTo({
         top: Math.max(0, targetY),
-        behavior: behavior,
+        behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+          ? 'auto'
+          : behavior,
       });
     }
   }

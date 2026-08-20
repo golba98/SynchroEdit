@@ -96,6 +96,9 @@ export class Editor {
     this._readyForUser = false;
     this._lastSaveStatus = 'saved';
     this._hasLoggedTyping = false;
+    this.pageIndexById = new Map();
+    this.visiblePageIds = new Set();
+    this._scrollFrame = null;
 
     // Ready promise — resolves when pages first render, or after 10s safety fallback
     this._isReady = false;
@@ -221,8 +224,10 @@ export class Editor {
         if (!pageId) return;
 
         if (entry.isIntersecting) {
+          this.visiblePageIds.add(pageId);
           this.mountPage(pageId);
         } else {
+          this.visiblePageIds.delete(pageId);
           this.unmountPage(pageId);
         }
       });
@@ -233,53 +238,80 @@ export class Editor {
     const container = document.getElementById('pagesContainer');
     if (!container) return;
 
-    container.addEventListener(
-      'scroll',
-      debounce(() => {
-        if (document.activeElement && document.activeElement.closest('.ql-editor')) {
-          const activePageEl = document.activeElement.closest('.editor-container');
-          if (activePageEl) {
-            const activeId = activePageEl.dataset.pageId;
-            const pages = this.yPages.toArray();
-            const activeIndex = pages.findIndex((p) => p.get('id') === activeId);
+    this._pageScrollHandler = () => {
+      if (this._scrollFrame) return;
+      this._scrollFrame = requestAnimationFrame(() => {
+        this._scrollFrame = null;
+        this.updateCurrentPageFromScroll(container);
+      });
+    };
+    this._cancelSmoothScroll = () => {
+      container.scrollTo({
+        top: container.scrollTop,
+        left: container.scrollLeft,
+        behavior: 'auto',
+      });
+    };
 
-            if (activeIndex !== -1 && activeIndex !== this.currentPageIndex) {
-              this.currentPageIndex = activeIndex;
-              this.quill = this.pageQuillInstances.get(activeId);
-              this.onPageChange(activeIndex);
-              return;
-            }
-          }
-        }
+    container.addEventListener('scroll', this._pageScrollHandler, {
+      passive: true,
+    });
+    container.addEventListener('wheel', this._cancelSmoothScroll, {
+      passive: true,
+    });
+    container.addEventListener('touchstart', this._cancelSmoothScroll, {
+      passive: true,
+    });
+    container.addEventListener('pointerdown', this._cancelSmoothScroll, {
+      passive: true,
+    });
+  }
 
-        const pages = this.container.querySelectorAll('.editor-container');
-        let closestPageIndex = this.currentPageIndex;
-        let minDistance = Infinity;
+  updateCurrentPageFromScroll(container) {
+    const activePage = document.activeElement?.closest?.('.editor-container');
+    const activeIndex = activePage ? this.pageIndexById.get(activePage.dataset.pageId) : undefined;
+    if (activeIndex !== undefined) {
+      this.activatePageIndex(activeIndex);
+      return;
+    }
 
-        const containerRect = container.getBoundingClientRect();
-        const containerCenter = containerRect.top + containerRect.height / 2;
-        const scale = this.currentZoom / 100;
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.top + containerRect.height / 2;
+    let closestIndex = this.currentPageIndex;
+    let minDistance = Infinity;
+    const candidateIds = this.visiblePageIds.size
+      ? this.visiblePageIds
+      : new Set(
+          [this.currentPageIndex - 1, this.currentPageIndex, this.currentPageIndex + 1]
+            .map((index) => this.yPages.get(index)?.get('id'))
+            .filter(Boolean)
+        );
 
-        pages.forEach((page) => {
-          const rect = page.getBoundingClientRect();
-          const pageCenter = rect.top + rect.height / 2;
-          const distance = Math.abs(pageCenter - containerCenter) / scale;
+    candidateIds.forEach((pageId) => {
+      const page = document.getElementById(`page-container-${pageId}`);
+      const pageIndex = this.pageIndexById.get(pageId);
+      if (!page || pageIndex === undefined) return;
+      const rect = page.getBoundingClientRect();
+      const distance = Math.abs(rect.top + rect.height / 2 - containerCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = pageIndex;
+      }
+    });
 
-          if (distance < minDistance) {
-            minDistance = distance;
-            const pageId = page.dataset.pageId;
-            closestPageIndex = this.yPages.toArray().findIndex((p) => p.get('id') === pageId);
-          }
-        });
+    this.activatePageIndex(closestIndex);
+  }
 
-        if (closestPageIndex !== -1 && closestPageIndex !== this.currentPageIndex) {
-          this.currentPageIndex = closestPageIndex;
-          const pageId = this.yPages.get(closestPageIndex).get('id');
-          this.quill = this.pageQuillInstances.get(pageId) || null;
-          this.onPageChange(closestPageIndex);
-        }
-      }, 150)
-    );
+  activatePageIndex(index) {
+    if (index < 0 || index >= this.yPages.length || index === this.currentPageIndex) return;
+    this.currentPageIndex = index;
+    const pageId = this.yPages.get(index)?.get('id');
+    this.quill = this.pageQuillInstances.get(pageId) || null;
+    [index - 1, index, index + 1].forEach((adjacentIndex) => {
+      const adjacentId = this.yPages.get(adjacentIndex)?.get('id');
+      if (adjacentId) this.mountPage(adjacentId);
+    });
+    this.onPageChange(index);
   }
 
   async loadFromCache(docId) {
@@ -741,6 +773,13 @@ export class Editor {
       this.observer.disconnect();
       this.observer = null;
     }
+    if (this._scrollFrame) cancelAnimationFrame(this._scrollFrame);
+    if (this.container && this._pageScrollHandler) {
+      this.container.removeEventListener('scroll', this._pageScrollHandler);
+      this.container.removeEventListener('wheel', this._cancelSmoothScroll);
+      this.container.removeEventListener('touchstart', this._cancelSmoothScroll);
+      this.container.removeEventListener('pointerdown', this._cancelSmoothScroll);
+    }
 
     // Don't leave a view-only banner behind when switching to another document.
     const host = this.container?.parentElement || this.container;
@@ -992,6 +1031,7 @@ export class Editor {
     this._log('[Editor] renderAllPages pages=', this.yPages.length, 'event=', !!event);
 
     const pages = this.yPages.toArray();
+    this.pageIndexById = new Map(pages.map((page, index) => [page.get('id'), index]));
 
     // Late Binding: Ensure existing pages get bound when provider becomes available
     if (this.provider && this.provider.awareness) {
@@ -1060,6 +1100,10 @@ export class Editor {
       });
     }
 
+    this.pageIndexById = new Map(
+      this.yPages.toArray().map((page, index) => [page.get('id'), index])
+    );
+
     // Update active quill reference if structure changed
     const currentPageMap = this.yPages.get(this.currentPageIndex);
     if (currentPageMap) {
@@ -1115,6 +1159,7 @@ export class Editor {
     this.permissionReason = reason;
     this._applyEditPermission();
     this._renderPermissionBanner();
+    this.chatManager?.updatePermission?.();
     if (changed) {
       this.onPermissionChange({ canEdit: next, reason });
     }
@@ -1405,7 +1450,10 @@ export class Editor {
       const delta = convertSanitizedHtmlToDelta(pageQuill, html, text);
       if (!delta || !Array.isArray(delta.ops) || delta.ops.length === 0) return;
 
-      const range = pageQuill.getSelection(true) || { index: pageQuill.getLength() - 1, length: 0 };
+      const range = pageQuill.getSelection(true) || {
+        index: pageQuill.getLength() - 1,
+        length: 0,
+      };
       const ops = [];
       if (range.index > 0) ops.push({ retain: range.index });
       if (range.length > 0) ops.push({ delete: range.length });
@@ -1788,11 +1836,19 @@ export class Editor {
 
       if (charCount > 0) {
         if (this.onSelectionStatsChange) {
-          this.onSelectionStatsChange({ wordCount, charCount, hasSelection: true });
+          this.onSelectionStatsChange({
+            wordCount,
+            charCount,
+            hasSelection: true,
+          });
         }
       } else {
         if (this.onSelectionStatsChange) {
-          this.onSelectionStatsChange({ wordCount: 0, charCount: 0, hasSelection: false });
+          this.onSelectionStatsChange({
+            wordCount: 0,
+            charCount: 0,
+            hasSelection: false,
+          });
         }
       }
     } catch (err) {

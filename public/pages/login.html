@@ -4,16 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SyncroEdit - Login</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="shortcut icon" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
     <script src="/js/dev-cache-reset.js"></script>
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/css/app/core.css" />
     <link rel="stylesheet" href="/css/app/editor.css" />
     <link rel="stylesheet" href="/css/app/effects.css" />
     <link rel="stylesheet" href="/css/app/settings.css" />
-    <link rel="stylesheet" href="../css/syncro.css" />
     <link rel="stylesheet" href="/css/pages/login.css" />
+    <link rel="stylesheet" href="../css/syncro.css" />
   </head>
-  <body class="boot-up" data-page="login">
+  <body data-page="login">
     <div class="login-container">
       <div class="left-section">
         <div class="brand-lockup">
@@ -25,7 +28,6 @@
         </div>
         <!-- Login Form -->
         <div class="form-container active" id="loginForm">
-          <div class="eyebrow"><span></span> Secure workspace access</div>
           <div class="title">Welcome back.</div>
           <div class="subtitle">Sign in to pick up where your team left off.</div>
 
@@ -37,6 +39,8 @@
               autocomplete="username"
               inputmode="email"
               class="glow-on-hover input-glow-focus"
+              required
+              aria-describedby="loginStatusMessage"
             />
             <label for="loginUsername" class="floating-label">Username or Email</label>
           </div>
@@ -49,11 +53,19 @@
                 placeholder=" "
                 autocomplete="current-password"
                 class="glow-on-hover input-glow-focus"
+                required
+                aria-describedby="loginStatusMessage"
               />
               <label for="loginPassword" class="floating-label">Password</label>
-              <span class="password-toggle" id="loginPasswordToggle"
-                ><i class="fas fa-eye"></i
-              ></span>
+              <button
+                class="password-toggle"
+                id="loginPasswordToggle"
+                type="button"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                <i class="fas fa-eye" aria-hidden="true"></i>
+              </button>
             </div>
             <div style="text-align: right; margin-top: 5px">
               <a
@@ -64,10 +76,15 @@
             </div>
           </div>
 
-          <button class="login-btn" id="loginBtn">
+          <button class="login-btn" id="loginBtn" type="button">
             <span>Continue to workspace</span><i class="fas fa-arrow-right" aria-hidden="true"></i>
           </button>
-          <div class="status-message" id="loginStatusMessage"></div>
+          <div
+            class="status-message"
+            id="loginStatusMessage"
+            role="status"
+            aria-live="polite"
+          ></div>
           <div class="toggle-form">
             Don't have an account? <a id="showSignup">Create Account</a>
           </div>
@@ -109,6 +126,8 @@
                 placeholder=" "
                 autocomplete="off"
                 class="glow-on-hover input-glow-focus"
+                required
+                aria-describedby="signupStatusMessage"
               />
               <label for="signupUsername" class="floating-label">Choose a username</label>
               <div
@@ -136,6 +155,8 @@
               autocomplete="email"
               inputmode="email"
               class="glow-on-hover input-glow-focus"
+              required
+              aria-describedby="signupStatusMessage"
             />
             <label for="signupEmail" class="floating-label">Email Address</label>
             <div
@@ -158,11 +179,19 @@
                 placeholder=" "
                 autocomplete="new-password"
                 class="glow-on-hover input-glow-focus"
+                required
+                aria-describedby="signupStatusMessage"
               />
               <label for="signupPassword" class="floating-label">Create a password</label>
-              <span class="password-toggle" id="signupPasswordToggle"
-                ><i class="fas fa-eye"></i
-              ></span>
+              <button
+                class="password-toggle"
+                id="signupPasswordToggle"
+                type="button"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                <i class="fas fa-eye" aria-hidden="true"></i>
+              </button>
             </div>
             <div class="entropy-bar">
               <div id="entropySegment" class="entropy-segment" style="width: 0%"></div>
@@ -203,12 +232,19 @@
               placeholder=" "
               autocomplete="new-password"
               class="glow-on-hover input-glow-focus"
+              required
+              aria-describedby="signupStatusMessage"
             />
             <label for="signupPasswordConfirm" class="floating-label">Confirm Password</label>
           </div>
 
-          <button class="login-btn" id="signupBtn">Create Account</button>
-          <div class="status-message" id="signupStatusMessage"></div>
+          <button class="login-btn" id="signupBtn" type="button">Create Account</button>
+          <div
+            class="status-message"
+            id="signupStatusMessage"
+            role="status"
+            aria-live="polite"
+          ></div>
           <div class="toggle-form">Already have an account? <a id="showLogin">Login</a></div>
         </div>
       </div>
@@ -221,14 +257,7 @@
           <p>Write, refine, and collaborate in one calm workspace.</p>
         </div>
         <div class="character-container">
-          <div
-            class="bot-rig"
-            id="botRig"
-            role="button"
-            tabindex="0"
-            aria-label="Play with SyncroBot"
-            title="Tap SyncroBot"
-          >
+          <div class="bot-rig" id="botRig" aria-hidden="true">
             <div class="antenna-stalk"></div>
             <div class="antenna-bulb"></div>
             <div class="head">
@@ -365,7 +394,7 @@
         transition: opacity 0.5s ease-in-out;
       "
     >
-        <div class="redirect-content">
+      <div class="redirect-content">
         <img class="redirect-mark" src="/logo.svg" alt="" />
         <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0">
           Opening your workspace

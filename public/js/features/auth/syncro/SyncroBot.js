@@ -1,5 +1,6 @@
 /**
- * SyncroBot - Animated mascot with eye tracking and state-based animations
+ * SyncroBot is a deterministic view of authentication state.
+ * Application events own state changes; animation never advances the auth flow.
  */
 export class SyncroBot {
   constructor(options = {}) {
@@ -7,574 +8,263 @@ export class SyncroBot {
     this.container = null;
     this.botRig = null;
     this.pupils = [];
-    this.mouseMoveHandler = null;
-    this.targetElement = null;
     this.currentState = 'idle';
     this.focusTarget = 'none';
     this.formCompleteness = 'empty';
+    this.passwordVisible = false;
     this.isProcessing = false;
-    this.idleTimer = null;
+    this.targetElement = null;
+    this.rafId = null;
     this.blinkTimer = null;
-    this.passwordToggleTimer = null;
+    this.blinkEndTimer = null;
     this.typingTimer = null;
     this.blinking = false;
-    this.passwordVisible = false;
-
     this.config = {
-      eyeMaxMove: 8, // Maximum pupil movement from center (pixels)
-      transitionDuration: 300, // ms
-      idleTimeout: 10000, // 10 seconds
-      blinkMinDelay: 3500,
-      blinkMaxDelay: 7500,
-      blinkDuration: 140,
+      eyeMaxMove: 7,
+      blinkMinDelay: 4200,
+      blinkMaxDelay: 7800,
+      blinkDuration: 130,
+      typingSettleDelay: 500,
     };
-
-    // Special state for forgot password flow
-    if (this.authFlow === 'forgot') {
-      this.currentState = 'empathy';
-    }
   }
 
   init(containerSelector) {
     this.container = document.querySelector(containerSelector);
-    if (!this.container) {
-      console.warn('SyncroBot: Container not found');
-      return false;
-    }
-
-    this.botRig = document.getElementById('botRig');
-    this.pupils = Array.from(document.querySelectorAll('.pupil'));
-    this.mouseMoveHandler = this.handleMouseMove.bind(this);
-
-    if (!this.botRig || this.pupils.length === 0) {
+    this.botRig = this.container?.querySelector('.bot-rig') || null;
+    this.pupils = Array.from(this.container?.querySelectorAll('.pupil') || []);
+    if (!this.container || !this.botRig || this.pupils.length === 0) {
       console.warn('SyncroBot: Bot elements not found');
       return false;
     }
-
-    this.setupEventListeners();
-    this.startIdleTimer();
-    this.applyState(this.currentState);
-
+    this.applyState('idle');
     return true;
   }
 
-  setupEventListeners() {
-    // Mouse tracking for cursor following
-    document.addEventListener('mousemove', this.mouseMoveHandler);
-    this.nearbyEnterHandler = () => {
-      if (this.currentState === 'idle' && !this.isProcessing) this.applyState('nearby');
-    };
-    this.nearbyLeaveHandler = () => {
-      if (this.currentState === 'nearby' && !this.isProcessing) this.applyState('idle');
-    };
-    this.container.addEventListener('pointerenter', this.nearbyEnterHandler);
-    this.container.addEventListener('pointerleave', this.nearbyLeaveHandler);
-
-    // Interactive Reactions: Click, poke, drag, rapid hit combos
-    this.hitCount = 0;
-    this.lastHitTime = 0;
-    this.hitResetTimer = null;
-    this.isReacting = false;
-
-    this.clickHandler = (e) => this.handleBotInteraction(e);
-    this.container.addEventListener('click', this.clickHandler);
-
-    // Requestanimationframe for smooth updates
-    this.rafId = null;
-    this.pendingUpdate = null;
-  }
-
-  handleBotInteraction(e) {
-    if (this.isProcessing) return;
-
-    const now = Date.now();
-    if (now - this.lastHitTime < 800) {
-      this.hitCount++;
-    } else {
-      this.hitCount = 1;
+  applyState(state, options = {}) {
+    if (!this.botRig) return;
+    const normalizedState = this.normalizeState(state);
+    const isSameState = normalizedState === this.currentState;
+    this.currentState = normalizedState;
+    this.botRig.dataset.syncroState = normalizedState;
+    for (const className of Array.from(this.botRig.classList)) {
+      if (className !== 'bot-rig' && className !== 'blinking')
+        this.botRig.classList.remove(className);
     }
-    this.lastHitTime = now;
+    this.botRig.classList.add(normalizedState);
 
-    clearTimeout(this.hitResetTimer);
-    this.hitResetTimer = setTimeout(() => {
-      this.hitCount = 0;
-    }, 1800);
-
-    // Determine direction from click
-    const rect = this.container.getBoundingClientRect();
-    const clickX = e.clientX - (rect.left + rect.width / 2);
-    const hitDirection = clickX < 0 ? 'left' : 'right';
-
-    // Different reaction tiers
-    if (this.hitCount >= 5) {
-      // Dizzy / Overload
-      this.triggerReaction('dizzy', 2200);
-      this.hitCount = 0;
-    } else if (this.hitCount >= 3) {
-      // Annoyed / Angry
-      this.triggerReaction(hitDirection === 'left' ? 'hit-hard-left' : 'hit-hard-right', 1200);
-    } else if (this.hitCount === 2) {
-      // Bonked / Surprised
-      this.triggerReaction('surprised', 900);
-    } else {
-      // Playful poke / giggle
-      const reactions = ['poke', 'giggle', 'boing'];
-      const pick = reactions[Math.floor(Math.random() * reactions.length)];
-      this.triggerReaction(pick, 800);
+    if (this.blocksBlink(normalizedState)) {
+      this.clearBlinkTimer();
+      this.botRig.classList.remove('blinking');
+      this.blinking = false;
+    } else if (!isSameState || !this.blinkTimer) {
+      this.scheduleBlink();
     }
-  }
 
-  triggerReaction(reactionState, duration = 800) {
-    if (this.isProcessing) return;
-    this.isReacting = true;
-    const prevState =
-      this.focusTarget === 'password'
-        ? 'secure'
-        : this.focusTarget !== 'none'
-          ? 'tracking'
-          : 'idle';
-
-    this.applyState(reactionState);
-
-    clearTimeout(this.reactionTimer);
-    this.reactionTimer = setTimeout(() => {
-      this.isReacting = false;
-      if (!this.isProcessing) {
-        this.applyState(prevState);
-      }
-    }, duration);
-  }
-
-  handleMouseMove(e) {
-    // Only track mouse in idle/tracking states
-    if (['idle', 'tracking', 'bored'].includes(this.currentState) && !this.targetElement) {
-      this.updateEyePosition({ x: e.clientX, y: e.clientY });
-    }
-  }
-
-  /**
-   * Updates eye position to look at a target point
-   * @param {Object} target - {x, y} coordinates in viewport/client space
-   */
-  updateEyePosition(target) {
-    if (this.pupils.length === 0) return;
-
-    this.pupils.forEach((pupil) => {
-      // Get the center position of the pupil's eye container
-      const eye = pupil.closest('.eye');
-      const eyeRect = eye.getBoundingClientRect();
-
-      // Calculate the center of the eye in viewport coordinates
-      const eyeCenterX = eyeRect.left + eyeRect.width / 2;
-      const eyeCenterY = eyeRect.top + eyeRect.height / 2;
-
-      // Calculate the delta from eye center to target
-      const deltaX = target.x - eyeCenterX;
-      const deltaY = target.y - eyeCenterY;
-
-      // Calculate angle and distance
-      const angle = Math.atan2(deltaY, deltaX);
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-      // Clamp the movement to max range
-      const moveDistance = Math.min(distance, this.config.eyeMaxMove);
-
-      // Calculate the pupil offset from its center position
-      const offsetX = Math.cos(angle) * moveDistance;
-      const offsetY = Math.sin(angle) * moveDistance;
-
-      // Apply transform: translate from center (-50%, -50%) plus the offset
-      pupil.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
-    });
-  }
-
-  /**
-   * Sets a specific element as the focus target for eye tracking
-   * @param {HTMLElement} element - The element to track
-   */
-  setTargetElement(element) {
-    this.targetElement = element;
-    if (element) {
-      this.startTrackingLoop();
-      this.trackElement(element);
-    }
-  }
-
-  /**
-   * Tracks an element's position (for input fields)
-   */
-  trackElement(element) {
-    if (!element) {
+    if (options.target) {
+      this.setTargetElement(options.target);
+    } else if (this.usesFixedGaze(normalizedState)) {
+      this.stopTrackingLoop();
       this.targetElement = null;
-      return;
+      this.setGazeForState(normalizedState);
     }
-
-    const rect = element.getBoundingClientRect();
-
-    // Target the center of the element
-    const targetX = rect.left + rect.width / 2;
-    const targetY = rect.top + rect.height / 2;
-
-    // Validate that we got valid coordinates
-    if (isNaN(targetX) || isNaN(targetY) || !isFinite(targetX) || !isFinite(targetY)) {
-      console.warn('SyncroBot: Invalid element coordinates, resetting to center');
-      // Reset to center if coordinates are invalid
-      this.resetEyePosition();
-      return;
-    }
-
-    this.updateEyePosition({ x: targetX, y: targetY });
   }
 
-  /**
-   * Resets eyes to center position
-   */
-  resetEyePosition() {
+  normalizeState(state) {
+    const aliases = {
+      tracking: 'username-focus',
+      typing: 'username-typing',
+      secure: 'password-focus',
+      peeking: 'password-visible',
+      processing: 'submitting',
+      empathy: 'idle',
+      'hover-ready': this.focusTarget === 'password' ? 'password-focus' : 'username-focus',
+      'hover-blocked': 'invalid-field',
+      bored: 'idle',
+    };
+    return aliases[state] || state;
+  }
+
+  usesFixedGaze(state) {
+    return ['idle', 'password-focus', 'submitting', 'success', 'error', 'invalid-field'].includes(
+      state
+    );
+  }
+
+  blocksBlink(state) {
+    return ['submitting', 'success', 'error'].includes(state);
+  }
+
+  setGazeForState(state) {
+    const gaze = {
+      idle: [0, 0],
+      'password-focus': [-3, 5],
+      submitting: [0, -2],
+      success: [0, -2],
+      error: [-6, 5],
+      'invalid-field': [-7, 4],
+    }[state] || [0, 0];
+    this.setPupilOffset(gaze[0], gaze[1]);
+  }
+
+  setPupilOffset(x, y) {
     this.pupils.forEach((pupil) => {
-      pupil.style.transform = 'translate(-50%, -50%)';
+      pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
     });
-    this.stopTrackingLoop();
   }
 
-  startTrackingLoop() {
-    if (this.rafId || !this.targetElement) return;
+  updateEyePosition(target) {
+    if (!target) return;
+    this.pupils.forEach((pupil) => {
+      const eyeRect = pupil.closest('.eye')?.getBoundingClientRect();
+      if (!eyeRect) return;
+      const deltaX = target.x - (eyeRect.left + eyeRect.width / 2);
+      const deltaY = target.y - (eyeRect.top + eyeRect.height / 2);
+      const angle = Math.atan2(deltaY, deltaX);
+      const distance = Math.min(Math.hypot(deltaX, deltaY), this.config.eyeMaxMove);
+      pupil.style.transform = `translate(calc(-50% + ${Math.cos(angle) * distance}px), calc(-50% + ${Math.sin(angle) * distance}px))`;
+    });
+  }
 
+  setTargetElement(element) {
+    this.targetElement = element || null;
+    this.stopTrackingLoop();
+    if (!this.targetElement) return;
+    this.trackElement();
     const tick = () => {
-      if (!this.targetElement || ['processing', 'success', 'error'].includes(this.currentState)) {
+      if (!this.targetElement || this.blocksBlink(this.currentState)) {
         this.rafId = null;
         return;
       }
-
-      this.trackElement(this.targetElement);
+      this.trackElement();
       this.rafId = requestAnimationFrame(tick);
     };
-
     this.rafId = requestAnimationFrame(tick);
   }
 
+  trackElement() {
+    const rect = this.targetElement?.getBoundingClientRect();
+    if (rect)
+      this.updateEyePosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }
+
   stopTrackingLoop() {
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+  }
+
+  resetEyePosition() {
+    this.stopTrackingLoop();
+    this.targetElement = null;
+    this.setPupilOffset(0, 0);
+  }
+
+  onFieldFocus(fieldName) {
+    if (this.isProcessing) return;
+    this.focusTarget = fieldName;
+    const input = document.activeElement?.tagName === 'INPUT' ? document.activeElement : null;
+    if (fieldName.toLowerCase().includes('password')) {
+      this.applyState(this.passwordVisible ? 'password-visible' : 'password-focus');
+    } else {
+      this.applyState('username-focus', { target: input });
     }
+  }
+
+  onFieldInput(fieldName, fieldValue, validation = {}) {
+    if (this.isProcessing) return;
+    const invalid = validation.isValid === false || validation.formData?._hasErrors === true;
+    this.formCompleteness = invalid ? 'invalid' : fieldValue ? 'partial' : 'empty';
+    if (fieldName.toLowerCase().includes('password')) {
+      this.applyState(this.passwordVisible ? 'password-visible' : 'password-focus');
+      return;
+    }
+    this.applyState('username-typing', { target: document.activeElement });
+    clearTimeout(this.typingTimer);
+    this.typingTimer = setTimeout(() => {
+      if (!this.isProcessing && this.focusTarget === fieldName) {
+        this.applyState('username-focus', { target: document.activeElement });
+      }
+    }, this.config.typingSettleDelay);
+  }
+
+  onFieldBlur() {
+    queueMicrotask(() => {
+      if (this.isProcessing || document.activeElement?.tagName === 'INPUT') return;
+      this.focusTarget = 'none';
+      this.resetEyePosition();
+      this.applyState('idle');
+    });
+  }
+
+  onPasswordToggle(visible, input = null) {
+    if (this.isProcessing) return;
+    this.passwordVisible = visible;
+    this.applyState(visible ? 'password-visible' : 'password-focus', {
+      target: visible ? input : null,
+    });
+  }
+
+  onButtonHover() {}
+
+  onInvalidField(element) {
+    if (!this.isProcessing) this.applyState('invalid-field', { target: element || null });
+  }
+
+  onSubmit() {
+    this.isProcessing = true;
+    clearTimeout(this.typingTimer);
+    this.stopTrackingLoop();
+    this.targetElement = null;
+    this.applyState('submitting');
+  }
+
+  onSuccess() {
+    this.isProcessing = false;
+    this.applyState('success');
+  }
+
+  onError() {
+    this.isProcessing = false;
+    this.applyState('error');
   }
 
   scheduleBlink() {
     this.clearBlinkTimer();
-
-    if (['processing', 'success', 'error'].includes(this.currentState)) {
-      return;
-    }
-
-    const delay =
-      this.config.blinkMinDelay +
-      Math.floor(Math.random() * (this.config.blinkMaxDelay - this.config.blinkMinDelay));
-
-    this.blinkTimer = setTimeout(() => {
-      this.triggerBlink();
-      this.scheduleBlink();
-    }, delay);
-  }
-
-  clearBlinkTimer() {
-    if (this.blinkTimer) {
-      clearTimeout(this.blinkTimer);
-      this.blinkTimer = null;
-    }
+    const range = this.config.blinkMaxDelay - this.config.blinkMinDelay;
+    this.blinkTimer = setTimeout(
+      () => {
+        this.triggerBlink();
+        this.scheduleBlink();
+      },
+      this.config.blinkMinDelay + Math.floor(Math.random() * range)
+    );
   }
 
   triggerBlink() {
-    if (
-      !this.botRig ||
-      this.blinking ||
-      ['processing', 'success', 'error'].includes(this.currentState)
-    ) {
-      return;
-    }
-
+    if (!this.botRig || this.blinking || this.blocksBlink(this.currentState)) return;
     this.blinking = true;
     this.botRig.classList.add('blinking');
-
-    setTimeout(() => {
-      if (!this.botRig) return;
-      this.botRig.classList.remove('blinking');
+    clearTimeout(this.blinkEndTimer);
+    this.blinkEndTimer = setTimeout(() => {
+      this.botRig?.classList.remove('blinking');
       this.blinking = false;
     }, this.config.blinkDuration);
   }
 
-  /**
-   * Apply a state class to the bot
-   */
-  applyState(state) {
-    if (!this.botRig) return;
-
-    // Remove all state classes
-    const stateClasses = [
-      'idle',
-      'tracking',
-      'secure',
-      'peeking',
-      'processing',
-      'success',
-      'error',
-      'bored',
-      'confused',
-      'hover-ready',
-      'hover-blocked',
-      'typing',
-      'nearby',
-      'poke',
-      'giggle',
-      'boing',
-      'surprised',
-      'hit-hard-left',
-      'hit-hard-right',
-      'dizzy',
-      'angry',
-      'excited',
-    ];
-
-    stateClasses.forEach((cls) => this.botRig.classList.remove(cls));
-
-    // Add the new state
-    this.botRig.classList.add(state);
-    this.currentState = state;
-
-    if (
-      ['processing', 'success', 'error', 'dizzy', 'hit-hard-left', 'hit-hard-right'].includes(state)
-    ) {
-      this.clearBlinkTimer();
-      this.botRig.classList.remove('blinking');
-      this.blinking = false;
-    } else {
-      this.scheduleBlink();
-    }
+  clearBlinkTimer() {
+    clearTimeout(this.blinkTimer);
+    clearTimeout(this.blinkEndTimer);
+    this.blinkTimer = null;
+    this.blinkEndTimer = null;
   }
 
-  /**
-   * Called when a field receives focus
-   */
-  onFieldFocus(fieldName) {
-    this.clearPasswordToggleTimer();
-    this.focusTarget = fieldName;
-    this.resetIdleTimer();
+  startIdleTimer() {}
+  resetIdleTimer() {}
+  clearIdleTimer() {}
+  clearPasswordToggleTimer() {}
 
-    // Find the focused input element - try multiple approaches
-    let inputElement = document.activeElement;
-
-    // Verify it's an input and it matches the field type
-    if (!inputElement || inputElement.tagName !== 'INPUT') {
-      // Fallback: search for the input by type
-      if (fieldName === 'password') {
-        inputElement =
-          document.querySelector('input[type="password"]:focus') ||
-          document.querySelector('input[id*="Password"]');
-      } else {
-        inputElement =
-          document.querySelector('input[type="email"]:focus, input[type="text"]:focus') ||
-          document.querySelector('input[id*="Username"], input[id*="Email"]');
-      }
-    }
-
-    if (fieldName === 'password') {
-      this.applyState('secure');
-      this.resetEyePosition(); // Look at center when password field focused
-      this.targetElement = null;
-      this.stopTrackingLoop();
-    } else {
-      this.applyState('tracking');
-      if (inputElement) {
-        this.setTargetElement(inputElement);
-      }
-    }
-  }
-
-  /**
-   * Called when a field loses focus
-   */
-  onFieldBlur() {
-    this.clearPasswordToggleTimer();
-    this.focusTarget = 'none';
-    this.targetElement = null;
-    this.stopTrackingLoop();
-    this.resetEyePosition();
-    this.resetIdleTimer();
-
-    setTimeout(() => {
-      if (this.focusTarget === 'none') {
-        const protectStates = new Set(['processing', 'success', 'error']);
-        if (protectStates.has(this.currentState) || this.isProcessing) {
-          return;
-        }
-        if (this.passwordVisible) {
-          this.applyState('peeking');
-        } else {
-          this.applyState('idle');
-        }
-      }
-    }, 50);
-  }
-
-  /**
-   * Called when field value changes
-   */
-  onFieldInput(fieldName, fieldValue, validation) {
-    this.resetIdleTimer();
-
-    // Update form completeness based on validation
-    if (validation.isValid === false) {
-      this.formCompleteness = 'invalid';
-    } else if (fieldValue.length > 0) {
-      this.formCompleteness = 'partial';
-    }
-
-    if (fieldName !== 'password' && !this.isProcessing) {
-      this.applyState('typing');
-      clearTimeout(this.typingTimer);
-      this.typingTimer = setTimeout(() => {
-        if (this.focusTarget === fieldName && !this.isProcessing) this.applyState('tracking');
-      }, 650);
-    }
-  }
-
-  /**
-   * Called when password visibility is toggled
-   */
-  onPasswordToggle(visible) {
-    this.passwordVisible = visible;
-    this.clearPasswordToggleTimer();
-
-    this.passwordToggleTimer = setTimeout(() => {
-      if (visible) {
-        this.applyState('peeking');
-        const passwordInput = document.querySelector(
-          'input[type="text"][id*="password"], input[type="password"]'
-        );
-        if (passwordInput) {
-          this.setTargetElement(passwordInput);
-        }
-      } else {
-        if (this.focusTarget === 'password') {
-          this.applyState('secure');
-        } else {
-          this.applyState('idle');
-        }
-        this.resetEyePosition();
-        this.targetElement = null;
-      }
-    }, this.config.transitionDuration);
-  }
-
-  /**
-   * Called when submit button is hovered
-   */
-  onButtonHover(isHovering) {
-    if (!isHovering) {
-      // Restore previous state
-      if (this.focusTarget !== 'none') {
-        if (this.focusTarget === 'password' && !this.passwordVisible) {
-          this.applyState('secure');
-        } else {
-          this.applyState('tracking');
-        }
-      } else {
-        this.applyState('idle');
-      }
-      return;
-    }
-
-    if (this.formCompleteness === 'empty' || this.formCompleteness === 'invalid') {
-      this.applyState('hover-blocked');
-    } else if (this.formCompleteness === 'valid' || this.formCompleteness === 'partial') {
-      this.applyState('hover-ready');
-    }
-  }
-
-  /**
-   * Called when form is submitted
-   */
-  onSubmit() {
-    this.clearPasswordToggleTimer();
-    this.isProcessing = true;
-    this.targetElement = null;
-    this.stopTrackingLoop();
-    this.applyState('processing');
-    this.clearIdleTimer();
-  }
-
-  /**
-   * Called on successful submission
-   */
-  onSuccess() {
-    this.clearPasswordToggleTimer();
-    this.isProcessing = false;
-    this.stopTrackingLoop();
-    this.applyState('success');
-    this.clearIdleTimer();
-  }
-
-  /**
-   * Called on submission error
-   */
-  onError() {
-    this.clearPasswordToggleTimer();
-    this.isProcessing = false;
-    this.stopTrackingLoop();
-    this.applyState('error');
-    this.resetIdleTimer();
-  }
-
-  /**
-   * Idle timer management
-   */
-  startIdleTimer() {
-    this.clearIdleTimer();
-    this.idleTimer = setTimeout(() => {
-      if (this.currentState === 'idle') {
-        this.applyState('bored');
-      }
-    }, this.config.idleTimeout);
-  }
-
-  resetIdleTimer() {
-    this.startIdleTimer();
-  }
-
-  clearIdleTimer() {
-    if (this.idleTimer) {
-      clearTimeout(this.idleTimer);
-      this.idleTimer = null;
-    }
-  }
-
-  clearPasswordToggleTimer() {
-    if (this.passwordToggleTimer) {
-      clearTimeout(this.passwordToggleTimer);
-      this.passwordToggleTimer = null;
-    }
-  }
-
-  /**
-   * Cleanup
-   */
   destroy() {
-    this.clearIdleTimer();
-    this.clearBlinkTimer();
-    this.clearPasswordToggleTimer();
     clearTimeout(this.typingTimer);
-    clearTimeout(this.hitResetTimer);
-    clearTimeout(this.reactionTimer);
+    this.clearBlinkTimer();
     this.stopTrackingLoop();
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-    }
-    if (this.mouseMoveHandler) {
-      document.removeEventListener('mousemove', this.mouseMoveHandler);
-    }
-    this.container?.removeEventListener('pointerenter', this.nearbyEnterHandler);
-    this.container?.removeEventListener('pointerleave', this.nearbyLeaveHandler);
-    if (this.clickHandler) {
-      this.container?.removeEventListener('click', this.clickHandler);
-    }
   }
 }

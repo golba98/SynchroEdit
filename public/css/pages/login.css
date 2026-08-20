@@ -1706,9 +1706,248 @@ body[data-page='login'] .bot-rig.startled .hand.right {
   }
 }
 
+@media (max-width: 768px) {
+  body[data-page='login'] .right-section {
+    height: 160px;
+    min-height: 160px;
+  }
+
+  body[data-page='login'] .bot-intro {
+    right: 150px;
+  }
+
+  body[data-page='login'] .bot-intro h2 {
+    font-size: 19px;
+  }
+
+  body[data-page='login'] .character-container {
+    position: absolute;
+    right: 8px;
+    bottom: -4px;
+    width: 180px;
+    height: 180px;
+    margin: 0;
+    transform: scale(0.42);
+    transform-origin: center;
+  }
+}
+
 body[data-page='login'] .bot-rig.error .antenna-bulb,
 body[data-page='login'] .bot-rig.error .pupil,
 body[data-page='login'] .bot-rig.searching .antenna-bulb {
   background: #ffffff !important;
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Deterministic auth feedback: one state class owns the complete face at a time. */
+body[data-page='login'] .brand-lockup {
+  margin-bottom: 58px;
+}
+
+body[data-page='login'] .password-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+body[data-page='login'] .password-toggle:focus-visible,
+body[data-page='login'] .toggle-form a:focus-visible,
+body[data-page='login'] #signupBackBtn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+body[data-page='login'] .login-btn:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+body[data-page='login'] input[aria-invalid='true'] {
+  border-color: #f5f5f5;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+body[data-page='login'] .bot-rig,
+body[data-page='login'] .boot-up .bot-rig {
+  animation: none;
+  transform: none;
+  transition: none;
+}
+
+body[data-page='login'] .bot-rig .head {
+  animation: none;
+  transform: translateY(0);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms ease,
+    box-shadow 240ms ease;
+}
+
+body[data-page='login'] .bot-rig.idle .head {
+  animation: syncrobot-breathe 7s ease-in-out infinite;
+}
+
+body[data-page='login'] .bot-rig .antenna-bulb {
+  animation: none;
+  opacity: 0.82;
+  transition:
+    opacity 240ms ease,
+    box-shadow 240ms ease;
+}
+
+body[data-page='login'] .bot-rig .eyes-container {
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+body[data-page='login'] .bot-rig .eye,
+body[data-page='login'] .bot-rig .pupil,
+body[data-page='login'] .bot-rig .eyelid,
+body[data-page='login'] .bot-rig .mouth,
+body[data-page='login'] .bot-rig .hand {
+  animation: none;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body[data-page='login'] .bot-rig .hand {
+  bottom: -20px;
+}
+
+body[data-page='login'] .bot-rig .hand.left {
+  left: -10px;
+  transform: none;
+}
+
+body[data-page='login'] .bot-rig .hand.right {
+  right: -10px;
+  transform: none;
+}
+
+body[data-page='login'] .bot-rig.password-focus .eyelid.top {
+  height: 42%;
+}
+
+body[data-page='login'] .bot-rig.password-focus .eyelid.bottom {
+  height: 18%;
+}
+
+body[data-page='login'] .bot-rig.password-focus .mouth {
+  width: 18px;
+  height: 3px;
+}
+
+body[data-page='login'] .bot-rig.password-visible .eye {
+  transform: scale(1.04);
+}
+
+body[data-page='login'] .bot-rig.password-visible .pupil {
+  width: 9px;
+  height: 14px;
+}
+
+body[data-page='login'] .bot-rig.password-visible .mouth {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+body[data-page='login'] .bot-rig.submitting .head {
+  transform: translateY(-2px);
+}
+
+body[data-page='login'] .bot-rig.submitting .eyes-container {
+  opacity: 0;
+}
+
+body[data-page='login'] .bot-rig.submitting .loader {
+  opacity: 1;
+  animation: spin 1.15s linear infinite;
+}
+
+body[data-page='login'] .bot-rig.submitting .mouth {
+  width: 18px;
+  height: 3px;
+}
+
+body[data-page='login'] .bot-rig.success .head {
+  transform: translateY(-3px);
+}
+
+body[data-page='login'] .bot-rig.success .eye {
+  background: #f2f2f2;
+}
+
+body[data-page='login'] .bot-rig.success .pupil {
+  width: 12px;
+  height: 13px;
+  border-radius: 50%;
+  background: #444444 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.28) !important;
+}
+
+body[data-page='login'] .bot-rig.success .hand {
+  transform: none;
+}
+
+body[data-page='login'] .bot-rig.success .mouth {
+  width: 28px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-top: 0;
+  border-radius: 0 0 22px 22px;
+  background: transparent !important;
+}
+
+body[data-page='login'] .bot-rig.error,
+body[data-page='login'] .bot-rig.invalid-field {
+  animation: none;
+  transform: none;
+}
+
+body[data-page='login'] .bot-rig.error .pupil,
+body[data-page='login'] .bot-rig.invalid-field .pupil {
+  width: 10px;
+  height: 14px;
+  border-radius: 50%;
+  background: #555555 !important;
+  transform: translate(calc(-50% - 6px), calc(-50% + 4px));
+}
+
+body[data-page='login'] .bot-rig.error .pupil::before {
+  content: none;
+}
+
+body[data-page='login'] .bot-rig.error .mouth,
+body[data-page='login'] .bot-rig.invalid-field .mouth {
+  width: 24px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: transparent !important;
+  transform: translateX(-50%);
+}
+
+@keyframes syncrobot-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-page='login'] .bot-rig.idle .head,
+  body[data-page='login'] .bot-rig.submitting .loader {
+    animation: none;
+  }
 }

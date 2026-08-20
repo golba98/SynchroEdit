@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>SyncroEdit - Document Editor</title>
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/logo.svg" />
@@ -42,28 +39,74 @@
         display: none !important;
       }
 
-      /* Simple initial styling for bootLoader overlay to show immediately */
+      /* Keep the first paint aligned with the monochrome loading system. */
       #bootLoader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 32%), #101418;
+        background: #080b12;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 999999;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
         transition: opacity 0.2s ease-out;
+      }
+
+      #bootLoader .boot-loader-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        width: min(390px, calc(100% - 40px));
+        padding: 36px 32px 32px;
+        box-sizing: border-box;
+        background: #0f141f;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+      }
+
+      .boot-loader-mark {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        place-items: center;
+        border-radius: 16px;
+        background: #09090b;
+      }
+
+      .boot-loader-mark img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .boot-loader-copy h1,
+      .boot-loader-copy p {
+        margin: 0;
+      }
+
+      .boot-loader-copy h1 {
+        color: #fafafa;
+        font-size: 21px;
+        letter-spacing: -0.03em;
+      }
+
+      .boot-loader-copy p {
+        margin-top: 8px;
+        color: #94a3b8;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+
+      .boot-loader-progress {
+        width: 42px;
+        height: 42px;
+        border: 3px solid rgba(255, 255, 255, 0.14);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.85s linear infinite;
       }
 
       #bootLoader.fading-out {
@@ -106,7 +149,6 @@
         }
       }
     </style>
-    <script src="/js/dev-cache-reset.js"></script>
     <link rel="stylesheet" href="/css/app/core.css" />
     <link rel="stylesheet" href="/css/app/editor.css" />
     <link rel="stylesheet" href="/css/app/effects.css" />
@@ -125,74 +167,15 @@
   <body data-page="editor" data-view-state="booting" style="margin: 0; padding: 0">
     <!-- Boot Loader -->
     <div id="bootLoader">
-      <div class="boot-loader-card"
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 24px;
-          text-align: center;
-          padding: 32px;
-          background: #151a20;
-          border: 1px solid #2a323d;
-          border-radius: 12px;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-          max-width: 320px;
-          width: calc(100% - 32px);
-        "
-      >
-        <img class="boot-loader-mark" src="/logo.svg" alt="" />
-        <div>
-          <h1
-            style="
-              color: #f3f4f6;
-              font-size: 20px;
-              font-weight: 700;
-              margin: 0 0 8px 0;
-              letter-spacing: 0.5px;
-            "
-          >
-            SyncroEdit
-          </h1>
-          <p
-            style="
-              color: #b0b7c3;
-              font-size: 13px;
-              font-weight: 500;
-              margin: 0;
-              opacity: 0.8;
-              letter-spacing: 0.5px;
-            "
-          >
-            Preparing your workspace
-          </p>
-        </div>
-        <div class="boot-loader-progress"
-          style="
-            width: 36px;
-            height: 36px;
-            border: 3.5px solid rgba(59, 130, 246, 0.15);
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-          "
-        ></div>
-      </div>
-    </div>
-
-    <!-- Document Opening Loader (Instant reveal on click) -->
-    <div id="documentOpeningLoader" class="document-opening-loader" hidden>
-      <div class="document-opening-card">
-        <div class="document-opening-icon">
+      <div class="boot-loader-card" role="status" aria-live="polite" aria-busy="true">
+        <div class="boot-loader-mark" aria-hidden="true">
           <img src="/logo.svg" alt="" />
         </div>
-        <div id="documentOpeningTitle" class="document-opening-title">Opening document...</div>
-        <div id="documentOpeningSubtitle" class="document-opening-subtitle">
-          Preparing your workspace
+        <div class="boot-loader-copy">
+          <h1>SyncroEdit</h1>
+          <p>Loading workspace...</p>
         </div>
-        <div class="document-opening-bar">
-          <span></span>
-        </div>
+        <div class="boot-loader-progress" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -256,6 +239,16 @@
     >
       <div class="header-left" style="display: flex; align-items: center; gap: 12px; flex: 1">
         <button
+          class="app-brand app-brand--compact"
+          id="editorBrand"
+          type="button"
+          aria-label="Back to documents"
+          title="Back to documents"
+        >
+          <img src="/logo.svg" alt="" width="30" height="30" />
+          <span>SyncroEdit</span>
+        </button>
+        <button
           class="toolbar-btn"
           id="menuBtn"
           title="Document Menu"
@@ -317,6 +310,19 @@
         <div id="activeCollaborators" style="display: none; align-items: center">
           <!-- Active users will appear here -->
         </div>
+
+        <button
+          class="toolbar-btn chat-toggle"
+          id="chatToggle"
+          type="button"
+          aria-controls="documentChat"
+          aria-expanded="false"
+          title="Document chat"
+        >
+          <i class="far fa-comment" aria-hidden="true"></i
+          ><span class="chat-toggle-label"> Chat</span>
+          <span id="chatUnreadBadge" class="chat-unread-badge" hidden>0</span>
+        </button>
 
         <div style="display: flex; gap: 8px; align-items: center">
           <!-- Save button (primary filled) -->
@@ -445,11 +451,9 @@
             margin-bottom: 32px;
           "
         >
-          <div class="library-brand-lockup" style="display: flex; align-items: center; gap: 12px">
-            <img class="library-brand-mark" src="/logo.svg" alt="" />
-            <h1 style="margin: 0; color: var(--text); font-size: 16px; font-weight: 600">
-              SyncroEdit
-            </h1>
+          <div class="app-brand" aria-label="SyncroEdit">
+            <img src="/logo.svg" alt="" width="34" height="34" />
+            <h1>SyncroEdit</h1>
           </div>
           <div style="display: flex; align-items: center; gap: 20px">
             <div
@@ -506,69 +510,79 @@
           </div>
         </div>
 
-        <div class="library-page-intro">
-          <div class="library-eyebrow">Workspace</div>
-          <h2>Your documents</h2>
-          <p>Open a recent file or start something new.</p>
-        </div>
-
-        <!-- New Document Section -->
-        <div class="library-new-section" style="margin-bottom: 40px">
+        <!-- Start a new document Section (Google Docs style) -->
+        <div style="margin-bottom: 36px">
           <h2
-            style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
+            style="font-size: 14px; font-weight: 500; margin-bottom: 16px; color: var(--text-soft)"
             class="section-title"
           >
-            New
+            Start a new document
           </h2>
-          <div
-            class="library-create-grid"
-            style="
-              display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-              gap: 20px;
-            "
-          >
-            <div
+          <div class="google-docs-templates">
+            <button
               id="createNewDoc"
-              class="create-doc-card"
-              role="button"
-              tabindex="0"
-              aria-label="Create a blank document"
+              class="create-doc-card doc-template-card"
+              type="button"
+              aria-label="Blank document"
             >
-              <div class="doc-thumbnail">
-                <i class="far fa-file-alt" aria-hidden="true"></i>
+              <div class="doc-template-thumbnail">
+                <div class="doc-template-plus">
+                  <i class="fas fa-plus"></i>
+                </div>
               </div>
-              <div class="create-doc-copy">
-                <div class="create-doc-title">Blank document</div>
-                <div class="create-doc-description">Start from scratch</div>
+              <div class="doc-template-info">
+                <span class="doc-template-title">Blank document</span>
               </div>
-              <div class="create-doc-action" aria-hidden="true">
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div style="margin-bottom: 24px; display: flex; justify-content: flex-end">
+          <div style="position: relative; width: min(420px, 100%)">
+            <i
+              class="fas fa-search"
+              style="
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-soft);
+                font-size: 13px;
+              "
+            ></i>
+            <input
+              type="text"
+              id="docSearch"
+              placeholder="Search documents..."
+              class="document-search"
+              style="
+                width: 100%;
+                height: 40px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                color: var(--text);
+                padding-left: 36px;
+                padding-right: 12px;
+                font-size: var(--font-md);
+                outline: none;
+                transition:
+                  border-color var(--transition-speed),
+                  box-shadow var(--transition-speed);
+              "
+            />
           </div>
         </div>
 
         <!-- Recent Documents -->
-        <div class="library-recent-section">
-          <div class="library-recent-toolbar">
-            <h2
-              style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
-              class="section-title"
-            >
-              Recent
-            </h2>
-            <label class="library-search-row" for="docSearch">
-              <i class="fas fa-search" aria-hidden="true"></i>
-              <input
-                type="search"
-                id="docSearch"
-                placeholder="Search documents"
-                class="document-search"
-                autocomplete="off"
-              />
-            </label>
-          </div>
+        <div>
+          <h2
+            style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
+            class="section-title"
+          >
+            Recent
+          </h2>
           <div
             class="recent-documents-table-wrapper"
             style="
@@ -1003,17 +1017,13 @@
                   >Theme
                 </h3>
                 <div class="theme-choice-group">
-                <button id="darkThemeBtn" class="theme-choice active">
-                  <i class="fas fa-moon" aria-hidden="true"></i> Dark
-                </button>
-                  <button id="lightThemeBtn" class="theme-choice">
-                    <i class="fas fa-sun" aria-hidden="true"></i> Light
-                  </button>
+                  <button id="darkThemeBtn" class="theme-choice active">🌙 Dark</button>
+                  <button id="lightThemeBtn" class="theme-choice">☀️ Light</button>
                 </div>
               </div>
 
               <!-- Accent Color Selection -->
-              <div class="settings-card accent-color-settings">
+              <div class="settings-card">
                 <h3 class="settings-card-title">
                   <i
                     class="fas fa-palette"
@@ -1143,16 +1153,20 @@
                       </div>
                       <ul id="passwordRequirements" class="password-requirements">
                         <li data-req="length">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> 8+ Characters
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          8+ Characters
                         </li>
                         <li data-req="upper">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Uppercase
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Uppercase
                         </li>
                         <li data-req="number">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Number
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Number
                         </li>
                         <li data-req="symbol">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Symbol
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Symbol
                         </li>
                       </ul>
                     </div>
@@ -1900,32 +1914,61 @@
 
     <!-- Main Workspace -->
     <div class="main-workspace">
-      <!-- Editor Workspace Loader (shows centered card above the workspace area when document is opening) -->
-      <div id="editorWorkspaceLoader" class="editor-workspace-loader" hidden>
-        <div class="editor-workspace-loader-card">
-          <div class="loader-document-icon"><img src="/logo.svg" alt="" /></div>
-          <div class="loader-title">Opening document...</div>
-          <div class="loader-subtitle">Preparing your workspace</div>
-          <div class="loader-progress"><span></span></div>
+      <aside id="documentChat" class="document-chat" aria-label="Document chat" hidden>
+        <header class="document-chat__header">
+          <div><strong>Document chat</strong><span>Everyone in this document</span></div>
+          <button id="chatClose" class="icon-button" type="button" aria-label="Close chat">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </header>
+        <div
+          id="chatMessages"
+          class="document-chat__messages"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        ></div>
+        <button id="chatNewMessages" class="document-chat__new-messages" type="button" hidden>
+          New messages
+        </button>
+        <form id="chatForm" class="document-chat__composer">
+          <label class="sr-only" for="chatInput">Message collaborators</label>
+          <textarea
+            id="chatInput"
+            rows="1"
+            maxlength="1000"
+            placeholder="Message collaborators"
+          ></textarea>
+          <button id="chatSend" type="submit" aria-label="Send message">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+          </button>
+        </form>
+      </aside>
+      <!-- One authoritative paper-first surface for the complete document-open lifecycle. -->
+      <div
+        id="editorSkeleton"
+        class="editor-skeleton hidden"
+        role="status"
+        aria-live="polite"
+        aria-busy="false"
+      >
+        <div class="editor-loading-paper" aria-hidden="true">
+          <div class="editor-loading-paper__brand">
+            <img src="/logo.svg" alt="" />
+          </div>
+          <span class="editor-loading-paper__line editor-loading-paper__line--title"></span>
+          <span class="editor-loading-paper__line"></span>
+          <span class="editor-loading-paper__line"></span>
+          <span class="editor-loading-paper__line editor-loading-paper__line--short"></span>
         </div>
-      </div>
-
-      <!-- Editor Skeleton (shown inside the editor workspace during document load) -->
-      <div id="editorSkeleton" class="editor-skeleton hidden">
-        <div class="skeleton-toolbar">
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
-          <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-        </div>
-        <div class="editor-loading-card">
-          <div id="editorSkeletonStatus" class="editor-loading-status">Opening document...</div>
+        <div class="editor-loading-copy">
+          <div id="editorSkeletonStatus" class="editor-loading-status">Opening</div>
           <div id="editorSkeletonTitle" class="editor-loading-title">Opening document...</div>
           <div id="editorSkeletonDescription" class="editor-loading-description">
             Loading document content.
+          </div>
+          <div class="editor-loading-progress" aria-hidden="true">
+            <span></span>
           </div>
         </div>
         <div id="editorSkeletonMessage" class="editor-skeleton-message" hidden>
@@ -2428,9 +2471,15 @@
     <!-- Mobile Contextual Toolbar (Fixed above keyboard) -->
     <div id="mobileContextualToolbar" class="mobile-toolbar">
       <div class="mobile-toolbar-scroll">
-        <button class="mobile-tool-btn ql-bold"><i class="fas fa-bold"></i></button>
-        <button class="mobile-tool-btn ql-italic"><i class="fas fa-italic"></i></button>
-        <button class="mobile-tool-btn ql-underline"><i class="fas fa-underline"></i></button>
+        <button class="mobile-tool-btn ql-bold">
+          <i class="fas fa-bold"></i>
+        </button>
+        <button class="mobile-tool-btn ql-italic">
+          <i class="fas fa-italic"></i>
+        </button>
+        <button class="mobile-tool-btn ql-underline">
+          <i class="fas fa-underline"></i>
+        </button>
         <div class="mobile-tool-separator"></div>
         <button class="mobile-tool-btn ql-list" value="ordered">
           <i class="fas fa-list-ol"></i>
@@ -2439,11 +2488,15 @@
           <i class="fas fa-list-ul"></i>
         </button>
         <div class="mobile-tool-separator"></div>
-        <button class="mobile-tool-btn ql-align" value=""><i class="fas fa-align-left"></i></button>
+        <button class="mobile-tool-btn ql-align" value="">
+          <i class="fas fa-align-left"></i>
+        </button>
         <button class="mobile-tool-btn ql-align" value="center">
           <i class="fas fa-align-center"></i>
         </button>
-        <button class="mobile-tool-btn ql-image"><i class="fas fa-image"></i></button>
+        <button class="mobile-tool-btn ql-image">
+          <i class="fas fa-image"></i>
+        </button>
         <div class="mobile-tool-separator"></div>
         <button class="mobile-tool-btn" id="mobileCloseKeyboard">
           <i class="fas fa-keyboard"></i>

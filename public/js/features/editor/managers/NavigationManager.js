@@ -230,7 +230,12 @@ export class NavigationManager extends Plugin {
       const rect = wrapper.getBoundingClientRect();
       const y = e.clientY - rect.top;
       const scrollTarget = y / 0.12;
-      pagesContainer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+      pagesContainer.scrollTo({
+        top: scrollTarget,
+        behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+          ? 'auto'
+          : 'smooth',
+      });
     };
   }
 

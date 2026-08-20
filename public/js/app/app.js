@@ -218,6 +218,7 @@ export class App {
   }
 
   setDocumentLifecycleState(state, options = {}) {
+    if (options.requestToken && options.requestToken !== this.loadDocumentToken) return;
     const nextLoadState = this.normalizeDocumentLoadState(state);
     const isFullLoadingState = [
       'opening',
@@ -257,7 +258,8 @@ export class App {
     }
   }
 
-  handleEditorStatusChange(status, docId) {
+  handleEditorStatusChange(status, docId, requestToken = this.loadDocumentToken) {
+    if (requestToken !== this.loadDocumentToken) return;
     const wasReady = this.isEditorReadyForCurrentDocument();
     this.handleWSStatusChange(status);
 
@@ -275,8 +277,6 @@ export class App {
         description: 'Keeping local edits available while sync reconnects.',
       });
     }
-
-    this.uiManager.preventBlackEditorLoadingState();
   }
 
   /**
@@ -301,7 +301,11 @@ export class App {
   handleEditorPermissionChange({ canEdit, reason, diverged } = {}) {
     this.canEditDocument = Boolean(canEdit);
     document.body.dataset.documentPermission = canEdit ? 'editable' : 'view-only';
-    this.logLifecycle('editor-permission', { canEdit, reason, diverged: Boolean(diverged) });
+    this.logLifecycle('editor-permission', {
+      canEdit,
+      reason,
+      diverged: Boolean(diverged),
+    });
 
     if (!canEdit) {
       // Never leave a "Saving…"/"Saved" indicator up when the server is refusing our edits.
@@ -328,8 +332,8 @@ export class App {
     docId = this.documentId,
     isNewDocument = false,
   } = {}) {
-    const loaderText = mode === 'creating' ? 'Creating document...' : 'Opening document...';
-    const documentState = mode === 'creating' ? 'creating' : 'opening';
+    const requestToken = ++this.loadDocumentToken;
+    const documentState = this.normalizeDocumentLoadState(mode);
 
     this.openingDocumentId = docId || null;
     this.hasReachedEditorReady = false;
@@ -341,14 +345,13 @@ export class App {
     this.documentLifecycleState = documentState;
 
     document.body.dataset.editorReady = 'false';
-    document.body.dataset.documentState = documentState;
-    document.body.dataset.documentOpenState = documentState;
 
     if (this.uiManager) {
       this.uiManager.hasShownEditorReady = false;
-      this.uiManager.showEditorWorkspaceLoader(loaderText, 'Preparing your workspace');
-      this.uiManager.showDocumentOpeningLoader(loaderText);
+      this.uiManager.setDocumentOpenState(documentState, { requestToken });
     }
+
+    return requestToken;
   }
 
   async loadDocument(options = {}) {
@@ -375,31 +378,27 @@ export class App {
       return;
     }
 
-    const mode = options.mode || 'loading-content';
-    const requestToken = ++this.loadDocumentToken;
-    this.openingDocumentId = docId;
-    this.beginDocumentOpen({ mode, docId, isNewDocument: Boolean(options.isNewDocument) });
-    this.logLifecycle('document-open-start', { docId, mode });
+    const initialMode = options.mode || 'opening';
+    const requestToken =
+      options.requestToken ||
+      this.beginDocumentOpen({
+        mode: initialMode,
+        docId,
+        isNewDocument: Boolean(options.isNewDocument),
+      });
+    if (requestToken !== this.loadDocumentToken) return;
 
-    this.setDocumentLifecycleState(mode);
+    this.openingDocumentId = docId;
+    this.logLifecycle('document-open-start', {
+      docId,
+      mode: initialMode,
+      requestToken,
+    });
+
+    this.setDocumentLifecycleState('loading-content', { requestToken });
     this.uiManager.applyViewState('opening-document');
     this.uiManager.setOpeningDocumentState();
     this.uiManager.handleWSStatusChange('connecting');
-
-    // Safety timeout to clear stuck opening states after 10 seconds
-    if (this.openingSafetyTimeout) clearTimeout(this.openingSafetyTimeout);
-    this.openingSafetyTimeout = setTimeout(() => {
-      if (requestToken === this.loadDocumentToken && this.documentLifecycleState !== 'ready') {
-        console.warn('[OPEN] Safety timeout triggered. Cleaning up opening states.');
-        this.showDocumentOpenError(requestToken, 'Opening timed out. Please try again.');
-      }
-    }, 10000);
-
-    const slowLoadTimer = setTimeout(() => {
-      if (requestToken === this.loadDocumentToken && !this.hasLoadedEditorContent()) {
-        this.uiManager.showSkeletonMessage(true, 'Still opening document...');
-      }
-    }, 2000);
 
     try {
       Network.addToRecent(docId).catch((err) => console.warn('Recent list update failed:', err));
@@ -436,7 +435,7 @@ export class App {
               console.warn('Failed to update library cache title:', e);
             }
           },
-          onStatusChange: (status) => this.handleEditorStatusChange(status, docId),
+          onStatusChange: (status) => this.handleEditorStatusChange(status, docId, requestToken),
           onPermissionChange: (permission) => this.handleEditorPermissionChange(permission),
           onCollaboratorsChange: (users) => {
             UI.updateCollaboratorsUI(
@@ -457,6 +456,8 @@ export class App {
       this.editor.onSelectionStatsChange = (stats) => this.uiManager.updateSelectionStats(stats);
       this.editor.onPermissionChange = (permission) =>
         this.handleEditorPermissionChange(permission);
+      this.editor.onStatusChange = (status) =>
+        this.handleEditorStatusChange(status, docId, requestToken);
 
       this.seedEditPermission(docId);
 
@@ -491,12 +492,10 @@ export class App {
         this.showDocumentOpenError(requestToken, 'Could not load this document.');
       }
     } finally {
-      clearTimeout(slowLoadTimer);
       if (requestToken === this.loadDocumentToken) {
         this.openingDocumentId = null;
         this.uiManager.updateMobileUIState();
       }
-      this.uiManager.preventBlackEditorLoadingState();
     }
   }
 
@@ -565,11 +564,6 @@ export class App {
       return;
     }
 
-    if (this.openingSafetyTimeout) {
-      clearTimeout(this.openingSafetyTimeout);
-      this.openingSafetyTimeout = null;
-    }
-
     this.uiManager.applyViewState('editor-ready');
     this.uiManager.clearOpeningDocumentState();
     this.hasReachedEditorReady = true;
@@ -578,16 +572,15 @@ export class App {
     this.documentLifecycleState = 'ready';
     this.setSaveState('saved');
     this.libraryManager.clearOpeningStates();
-    this.logLifecycle('editor-ready', { docId: this.documentId, token: requestToken, reason });
+    this.logLifecycle('editor-ready', {
+      docId: this.documentId,
+      token: requestToken,
+      reason,
+    });
   }
 
   showDocumentOpenError(requestToken, message) {
     if (requestToken !== this.loadDocumentToken) return;
-
-    if (this.openingSafetyTimeout) {
-      clearTimeout(this.openingSafetyTimeout);
-      this.openingSafetyTimeout = null;
-    }
 
     this.uiManager.applyViewState('editor-error');
     this.setDocumentLifecycleState('error', { description: message });

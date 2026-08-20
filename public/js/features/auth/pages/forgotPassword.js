@@ -1,20 +1,15 @@
 import { Network } from '/js/app/network.js';
 import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
-import { SyncroRenderer } from '/js/features/auth/syncro/SyncroRenderer.js';
 import { isValidEmail } from '/js/core/validation.js';
 import { stripApiErrorPrefix } from '/js/core/errors.js';
 
 export function initForgotPasswordPage() {
   const container = document.querySelector('.character-container');
   let syncro = null;
-  let renderer = null;
 
   if (container) {
     syncro = new SyncroBot({ authFlow: 'forgot' });
     syncro.init('.character-container');
-
-    renderer = new SyncroRenderer(container);
-    renderer.injectParticleCSS();
   }
 
   const emailInput = document.getElementById('email');
@@ -27,7 +22,10 @@ export function initForgotPasswordPage() {
 
   emailInput?.addEventListener('input', () => {
     syncro?.onFieldInput('email', emailInput.value, {
-      formData: { email: emailInput.value, _hasErrors: !emailInput.value.includes('@') },
+      formData: {
+        email: emailInput.value,
+        _hasErrors: !emailInput.value.includes('@'),
+      },
     });
   });
 
@@ -48,15 +46,14 @@ export function initForgotPasswordPage() {
     if (!email) {
       statusMessage.textContent = 'Please enter your email.';
       statusMessage.className = 'status-message error';
-      syncro?.onError();
+      syncro?.onInvalidField(emailInput);
       return;
     }
 
     if (!isValidEmail(email)) {
       statusMessage.textContent = 'Please enter a valid email address.';
       statusMessage.className = 'status-message error';
-      syncro?.onError();
-      setTimeout(() => syncro?.applyState('empathy'), 2000);
+      syncro?.onInvalidField(emailInput);
       return;
     }
 
@@ -72,7 +69,6 @@ export function initForgotPasswordPage() {
       });
 
       syncro?.onSuccess();
-      renderer?.burst('star', 3);
       statusMessage.textContent = '✓ ' + data.message;
       statusMessage.className = 'status-message success';
       emailInput.value = '';

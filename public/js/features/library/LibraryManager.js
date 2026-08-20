@@ -263,18 +263,16 @@ export class LibraryManager {
     if (this.openLock) return;
     this.openLock = true;
     this.isTransitioning = true;
-    this.app.beginDocumentOpen?.({ mode: 'creating', isNewDocument: true });
+    const requestToken = this.app.beginDocumentOpen?.({
+      mode: 'creating',
+      isNewDocument: true,
+    });
     this.markCreateOpening(true);
     this.disableLibraryInteraction('create');
 
     try {
-      this.app.setDocumentLifecycleState?.('creating');
-      this.app.uiManager?.showDocumentOpeningLoader('Creating document...');
       this.app.uiManager?.applyViewState('opening-document');
-      this.app.uiManager?.setOpeningDocumentState();
-      await this.startEditorTransition();
 
-      // Create document in background
       const doc = await Network.createDocument();
 
       // Update URL without reload
@@ -286,26 +284,21 @@ export class LibraryManager {
 
       // Load document inline (same as openDocument does)
       this.app.documentId = doc._id;
-      await this.app.loadDocument({ mode: 'creating', isNewDocument: true });
+      await this.app.loadDocument({
+        mode: 'loading-content',
+        isNewDocument: true,
+        requestToken,
+      });
 
       this.openLock = false;
       this.isTransitioning = false;
       this.markCreateOpening(false);
     } catch (err) {
       console.error('Failed to create document:', err);
-      this.clearOpeningStates();
-      // Re-show library on error
-      const library = document.getElementById('docLibrary');
-      const overlay = document.getElementById('libraryOverlay');
-      if (library) {
-        library.style.display = 'block';
-        library.classList.add('view-visible');
-      }
-      if (overlay) {
-        overlay.style.display = 'block';
-        overlay.classList.add('view-visible');
-      }
-      alert('Failed to create document. Please try again.');
+      this.app.showDocumentOpenError?.(
+        requestToken,
+        'Could not create the document. Check your connection and try again.'
+      );
     }
   }
 
@@ -319,69 +312,34 @@ export class LibraryManager {
     if (this.openLock) return;
     this.openLock = true;
     this.isTransitioning = true;
-    this.app.beginDocumentOpen?.({ mode: 'opening', docId, isNewDocument: false });
+    const requestToken = this.app.beginDocumentOpen?.({
+      mode: 'opening',
+      docId,
+      isNewDocument: false,
+    });
     this.disableLibraryInteraction('open', docId);
 
     try {
       this.app.openingDocumentId = docId;
       this.markDocumentOpening(docId);
-      this.app.setDocumentLifecycleState?.('opening');
-      this.app.uiManager?.showDocumentOpeningLoader('Opening document...');
       this.app.uiManager?.applyViewState('opening-document');
-      this.app.uiManager?.setOpeningDocumentState();
-      await this.startEditorTransition();
 
       const newUrl = `${window.location.pathname}?doc=${docId}`;
       window.history.pushState({ view: 'editor', docId }, '', newUrl);
 
       this.app.documentId = docId;
-      await this.app.loadDocument({ mode: 'loading-content', isNewDocument: false });
+      await this.app.loadDocument({
+        mode: 'loading-content',
+        isNewDocument: false,
+        requestToken,
+      });
 
       this.openLock = false;
       this.isTransitioning = false;
     } catch (err) {
       console.error('Failed to open document:', err);
-      this.clearOpeningStates();
-      alert('Failed to open document');
+      this.app.showDocumentOpenError?.(requestToken, 'Could not open this document.');
     }
-  }
-
-  async startEditorTransition() {
-    const library = document.getElementById('docLibrary');
-    const overlay = document.getElementById('libraryOverlay');
-
-    if (library) {
-      library.classList.remove('view-visible');
-      library.classList.add('view-exiting');
-    }
-    if (overlay) {
-      overlay.classList.remove('view-visible');
-      overlay.classList.add('view-exiting');
-    }
-
-    // Cleanup after animation finishes, but don't block the main flow
-    setTimeout(() => {
-      const isStillOpening = document.body.dataset.viewState === 'opening-document';
-      if (library) {
-        library.classList.remove('view-exiting');
-        // Only hide if we are not back on the dashboard AND not currently opening a document
-        if (
-          !document.body.dataset.viewState ||
-          (document.body.dataset.viewState !== 'dashboard' && !isStillOpening)
-        ) {
-          library.style.display = 'none';
-        }
-      }
-      if (overlay) {
-        overlay.classList.remove('view-exiting');
-        if (
-          !document.body.dataset.viewState ||
-          (document.body.dataset.viewState !== 'dashboard' && !isStillOpening)
-        ) {
-          overlay.style.display = 'none';
-        }
-      }
-    }, 250);
   }
 
   markCreateOpening(isOpening) {

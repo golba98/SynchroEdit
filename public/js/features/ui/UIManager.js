@@ -11,17 +11,6 @@ export class UIManager {
     this.saveStatusTimer = null;
     this.documentOpenState = 'idle';
     this.hasShownEditorReady = false;
-
-    // Bind and expose workspace loader helpers globally
-    this.showEditorWorkspaceLoader = this.showEditorWorkspaceLoader.bind(this);
-    this.hideEditorWorkspaceLoader = this.hideEditorWorkspaceLoader.bind(this);
-    this.revealPagesContainer = this.revealPagesContainer.bind(this);
-    this.preventBlackEditorLoadingState = this.preventBlackEditorLoadingState.bind(this);
-
-    window.showEditorWorkspaceLoader = this.showEditorWorkspaceLoader;
-    window.hideEditorWorkspaceLoader = this.hideEditorWorkspaceLoader;
-    window.revealPagesContainer = this.revealPagesContainer;
-    window.preventBlackEditorLoadingState = this.preventBlackEditorLoadingState;
   }
 
   setupEventListeners() {
@@ -36,11 +25,7 @@ export class UIManager {
       this.app.libraryManager.showLibrary();
     });
     addEvent('createNewDoc', 'click', () => this.app.libraryManager.createNewDocument());
-    addEvent('createNewDoc', 'keydown', (event) => {
-      if (!['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      this.app.libraryManager.createNewDocument();
-    });
+    addEvent('editorBrand', 'click', () => this.app.libraryManager.showLibrary());
     addEvent('closeLibrary', 'click', () => {
       if (this.app.documentId) {
         const docLibrary = document.getElementById('docLibrary');
@@ -345,7 +330,6 @@ export class UIManager {
   }
 
   applyViewState(state) {
-    const previousViewState = document.body.dataset.viewState;
     document.body.dataset.viewState = state;
 
     const bootLoader = document.getElementById('bootLoader');
@@ -375,12 +359,7 @@ export class UIManager {
     const overlay = document.getElementById('libraryOverlay');
     const closeBtn = document.getElementById('closeLibrary');
     const showDashboard = state === 'dashboard';
-    const hadDashboardMounted =
-      previousViewState === 'dashboard' ||
-      library?.classList.contains('view-visible') ||
-      library?.style.display === 'block';
-    const fadingDashboard = state === 'opening-document' && hadDashboardMounted;
-    const keepDashboardMounted = showDashboard || fadingDashboard;
+    const keepDashboardMounted = showDashboard;
 
     if (library) {
       library.style.display = keepDashboardMounted ? 'block' : 'none';
@@ -390,20 +369,6 @@ export class UIManager {
     if (overlay) {
       overlay.style.display = keepDashboardMounted ? 'block' : 'none';
       overlay.classList.toggle('view-visible', showDashboard);
-    }
-
-    if (fadingDashboard) {
-      const duration = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ? 0 : 180;
-      setTimeout(() => {
-        if (
-          document.body.dataset.viewState !== 'dashboard' &&
-          document.body.dataset.viewState !== 'opening-document'
-        ) {
-          if (library) library.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-          this.updateMobileUIState();
-        }
-      }, duration);
     }
 
     if (closeBtn) {
@@ -417,13 +382,11 @@ export class UIManager {
     const softRevealEls = [header, ribbonTabs, ribbonContent].filter(Boolean);
 
     if (state === 'opening-document') {
-      this.assertNoBlankOpeningState();
       softRevealEls.forEach((el) => {
         el.classList.add('soft-reveal-enter');
         el.classList.remove('soft-reveal-ready');
       });
     } else if (state === 'editor-loading' || state === 'editor-ready') {
-      this.hideDocumentOpeningLoader();
       requestAnimationFrame(() => {
         softRevealEls.forEach((el) => {
           el.classList.remove('soft-reveal-enter');
@@ -431,75 +394,10 @@ export class UIManager {
         });
       });
     } else if (state === 'booting' || state === 'auth' || state === 'dashboard') {
-      this.hideDocumentOpeningLoader();
       softRevealEls.forEach((el) => {
         el.classList.remove('soft-reveal-enter', 'soft-reveal-ready');
       });
-    } else if (state === 'editor-error') {
-      this.hideDocumentOpeningLoader();
     }
-    this.preventBlackEditorLoadingState();
-  }
-
-  showDocumentOpeningLoader(text = 'Opening document...') {
-    const loader = document.getElementById('documentOpeningLoader');
-    const title = document.getElementById('documentOpeningTitle');
-    if (loader) {
-      if (title) title.textContent = text;
-      loader.hidden = false;
-    }
-  }
-
-  hideDocumentOpeningLoader() {
-    const loader = document.getElementById('documentOpeningLoader');
-    if (loader) loader.hidden = true;
-  }
-
-  assertNoBlankOpeningState() {
-    const isOpening = document.body.dataset.viewState === 'opening-document';
-    const loader = document.getElementById('documentOpeningLoader');
-    const loaderVisible = loader && !loader.hidden;
-
-    if (isOpening && !loaderVisible) {
-      console.warn('[OPEN] Prevented blank opening state: showing loader');
-      this.showDocumentOpeningLoader('Opening document...');
-    }
-  }
-
-  showEditorWorkspaceLoader(message = 'Opening document...', subtext = 'Preparing your workspace') {
-    const loader = document.getElementById('editorWorkspaceLoader');
-    if (!loader) return;
-
-    // Must remove the HTML `hidden` attribute — browsers apply
-    // [hidden] { display: none !important } in their UA stylesheet which
-    // takes precedence over any CSS class-based or body-state display rule.
-    // Setting loader.hidden = false alone only clears the IDL property but
-    // does NOT remove the content attribute in all browser implementations.
-    loader.removeAttribute('hidden');
-    loader.hidden = false;
-    const titleEl = loader.querySelector('.loader-title');
-    const subEl = loader.querySelector('.loader-subtitle');
-    if (titleEl) titleEl.textContent = message;
-    if (subEl) subEl.textContent = subtext;
-
-    document.querySelector('.main-workspace')?.classList.add('is-document-opening');
-  }
-
-  hideEditorWorkspaceLoader() {
-    // Guard: never hide the workspace loader before the editor is confirmed
-    // ready. Premature hiding is the primary cause of the black workspace
-    // screen because the pages container is still opacity:0 at that point.
-    if (document.body.dataset.editorReady !== 'true') {
-      console.warn(
-        '[LOADER] Blocked hideEditorWorkspaceLoader — editor not ready yet (editorReady =',
-        document.body.dataset.editorReady + ')'
-      );
-      return;
-    }
-    const loader = document.getElementById('editorWorkspaceLoader');
-    if (loader) loader.hidden = true;
-
-    document.querySelector('.main-workspace')?.classList.remove('is-document-opening');
   }
 
   revealPagesContainer() {
@@ -508,26 +406,6 @@ export class UIManager {
       pagesContainer.hidden = false;
       pagesContainer.style.opacity = '';
       pagesContainer.style.transform = '';
-    }
-  }
-
-  preventBlackEditorLoadingState() {
-    const mainWorkspace = document.querySelector('.main-workspace');
-    const pagesContainer = document.getElementById('pagesContainer');
-    const loader = document.getElementById('editorWorkspaceLoader');
-
-    const editorVisible = mainWorkspace && getComputedStyle(mainWorkspace).display !== 'none';
-    const pagesHidden =
-      !pagesContainer ||
-      pagesContainer.hidden ||
-      getComputedStyle(pagesContainer).display === 'none' ||
-      getComputedStyle(pagesContainer).opacity === '0';
-
-    const editorReady = document.body.dataset.editorReady === 'true';
-
-    if (editorVisible && pagesHidden && !editorReady && (loader ? loader.hidden : true)) {
-      console.warn('[OPEN] Prevented black editor workspace: showing loader');
-      this.showEditorWorkspaceLoader('Opening document...', 'Preparing your workspace');
     }
   }
 
@@ -542,8 +420,6 @@ export class UIManager {
 
     const error = document.getElementById('editorOpenError');
     if (error) error.hidden = true;
-
-    this.preventBlackEditorLoadingState();
   }
 
   clearOpeningDocumentState() {
@@ -551,9 +427,7 @@ export class UIManager {
     this.showSkeleton(false);
     this.hasShownEditorReady = true;
 
-    document.body.dataset.documentState = 'ready';
     document.body.dataset.editorReady = 'true';
-    this.hideEditorWorkspaceLoader();
     this.revealPagesContainer();
 
     this.setDocumentOpenState('ready');
@@ -562,8 +436,6 @@ export class UIManager {
     if (this.connectionPendingStatus) {
       this.renderConnectionStatus(this.connectionPendingStatus);
     }
-
-    this.preventBlackEditorLoadingState();
   }
 
   showSkeleton(visible) {
@@ -571,6 +443,10 @@ export class UIManager {
     if (!skeleton) return;
 
     skeleton.classList.toggle('hidden', !visible);
+    skeleton.setAttribute(
+      'aria-busy',
+      String(visible && !skeleton.classList.contains('has-error'))
+    );
     if (!visible) {
       skeleton.classList.remove('has-error');
       this.showSkeletonMessage(false);
@@ -624,16 +500,9 @@ export class UIManager {
 
     if (loadingStates.has(normalizedState)) {
       document.body.dataset.editorReady = 'false';
-      if (normalizedState === 'idle') {
-        document.body.dataset.documentState = 'opening';
-      } else {
-        document.body.dataset.documentState = normalizedState;
-      }
     } else if (normalizedState === 'ready') {
-      document.body.dataset.documentState = 'ready';
       document.body.dataset.editorReady = 'true';
     } else {
-      document.body.dataset.documentState = normalizedState;
       document.body.dataset.editorReady = 'false';
     }
 
@@ -657,18 +526,12 @@ export class UIManager {
     if (titleEl) titleEl.textContent = options.title || title;
     if (descEl) descEl.textContent = options.description || description;
 
-    if (loadingStates.has(normalizedState)) {
-      this.showEditorWorkspaceLoader(options.status || title, options.description || description);
-    } else {
-      this.hideEditorWorkspaceLoader();
-    }
-
     if (skeleton) {
       skeleton.dataset.openState = normalizedState;
       if (normalizedState !== 'ready') this.showSkeleton(true);
+      if (normalizedState === 'ready') this.showSkeleton(false);
+      skeleton.setAttribute('aria-busy', String(loadingStates.has(normalizedState)));
     }
-
-    this.preventBlackEditorLoadingState();
   }
 
   showDocumentOpenError({ message, onRetry, onBack }) {

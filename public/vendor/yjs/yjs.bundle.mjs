@@ -134,12 +134,12 @@ var q = (e) => {
   };
 var Bt = D;
 var g = (e, t) => {
-    for (; t > 127; ) (D(e, 128 | (127 & t)), (t = B(t / 128)));
+    for (; t > 127;) (D(e, 128 | (127 & t)), (t = B(t / 128)));
     D(e, 127 & t);
   },
   pe = (e, t) => {
     let n = Je(t);
-    for (n && (t = -t), D(e, (t > 63 ? 128 : 0) | (n ? 64 : 0) | (63 & t)), t = B(t / 64); t > 0; )
+    for (n && (t = -t), D(e, (t > 63 ? 128 : 0) | (n ? 64 : 0) | (63 & t)), t = B(t / 64); t > 0;)
       (D(e, (t > 127 ? 128 : 0) | (127 & t)), (t = B(t / 128)));
   },
   Rn = new Uint8Array(3e4),
@@ -316,7 +316,7 @@ var w = (e) => {
     let t = 0,
       n = 1,
       r = e.arr.length;
-    for (; e.pos < r; ) {
+    for (; e.pos < r;) {
       let s = e.arr[e.pos++];
       if (((t = t + (s & 127) * n), (n *= 128), s < 128)) return t;
       if (t > Tt) throw rs;
@@ -330,7 +330,7 @@ var w = (e) => {
       s = (t & 64) > 0 ? -1 : 1;
     if ((t & 128) === 0) return s * n;
     let i = e.arr.length;
-    for (; e.pos < i; ) {
+    for (; e.pos < i;) {
       if (((t = e.arr[e.pos++]), (n = n + (t & 127) * r), (r *= 128), t < 128)) return s * n;
       if (n > Tt) throw rs;
     }
@@ -341,9 +341,9 @@ var ro = (e) => {
     if (t === 0) return '';
     {
       let n = String.fromCodePoint(St(e));
-      if (--t < 100) for (; t--; ) n += String.fromCodePoint(St(e));
+      if (--t < 100) for (; t--;) n += String.fromCodePoint(St(e));
       else
-        for (; t > 0; ) {
+        for (; t > 0;) {
           let r = t < 1e4 ? t : 1e4,
             s = e.arr.subarray(e.pos, e.pos + r);
           ((e.pos += r), (n += String.fromCodePoint.apply(null, s)), (t -= r));
@@ -1167,7 +1167,7 @@ var Rs = class extends Dt {
   lc = (e, t) => {
     let n = 0,
       r = e.length - 1;
-    for (; n <= r; ) {
+    for (; n <= r;) {
       let s = B((n + r) / 2),
         i = e[s],
         o = i.clock;
@@ -1778,7 +1778,7 @@ var Rs = class extends Dt {
     let i = () => {
         if (s.length === 0) return null;
         let f = n.get(s[s.length - 1]);
-        for (; f.refs.length === f.i; )
+        for (; f.refs.length === f.i;)
           if ((s.pop(), s.length > 0)) f = n.get(s[s.length - 1]);
           else return null;
         return f;
@@ -1955,7 +1955,7 @@ var Rs = class extends Dt {
     throw T();
   },
   kn = (e, t) => {
-    for (; t !== null; ) {
+    for (; t !== null;) {
       if (t.parent === e) return !0;
       t = t.parent._item;
     }
@@ -1964,7 +1964,7 @@ var Rs = class extends Dt {
   pa = (e) => {
     let t = [],
       n = e._start;
-    for (; n; ) (t.push(n), (n = n.right));
+    for (; n;) (t.push(n), (n = n.right));
     (console.log('Children: ', t),
       console.log(
         'Children content: ',
@@ -2076,7 +2076,7 @@ var Rs = class extends Dt {
       if (t === 0) return gn(e, null, n);
       t--;
     }
-    for (; r !== null; ) {
+    for (; r !== null;) {
       if (!r.deleted && r.countable) {
         if (r.length > t) return gn(e, m(r.id.client, r.id.clock + t), n);
         t -= r.length;
@@ -2137,7 +2137,7 @@ var Rs = class extends Dt {
       if (((l = u.parent), l._item === null || !l._item.deleted)) {
         h = u.deleted || !u.countable ? 0 : a.diff + (c >= 0 ? 0 : 1);
         let d = u.left;
-        for (; d !== null; ) (!d.deleted && d.countable && (h += d.length), (d = d.left));
+        for (; d !== null;) (!d.deleted && d.countable && (h += d.length), (d = d.left));
       }
     } else {
       if (o !== null) l = t.get(o);
@@ -2274,7 +2274,7 @@ var Rs = class extends Dt {
       i = s.id.clock;
     if (i === t) return r;
     let o = B((t / (i + s.length - 1)) * r);
-    for (; n <= r; ) {
+    for (; n <= r;) {
       if (((s = e[o]), (i = s.id.clock), i <= t)) {
         if (t < i + s.length) return o;
         n = o + 1;
@@ -2431,7 +2431,7 @@ var Rs = class extends Dt {
             if (d !== a) {
               let f = s.clients.get(u),
                 p = it(P(f, d), 1);
-              for (let y = f.length - 1; y >= p; ) y -= 1 + yn(f, y);
+              for (let y = f.length - 1; y >= p;) y -= 1 + yn(f, y);
             }
           }));
         for (let a = o.length - 1; a >= 0; a--) {
@@ -2515,7 +2515,7 @@ var Rs = class extends Dt {
     x(
       s,
       (c) => {
-        for (; t.length > 0 && e.currStackItem === null; ) {
+        for (; t.length > 0 && e.currStackItem === null;) {
           let l = s.store,
             h = t.pop(),
             a = new Set(),
@@ -2916,7 +2916,7 @@ var et = class {
       o = new Ne(i),
       c = new n(v(e)),
       l = new et(c, !1);
-    for (; l.curr; ) {
+    for (; l.curr;) {
       let a = l.curr,
         u = a.id.client,
         d = s.get(u) || 0;
@@ -2925,10 +2925,10 @@ var et = class {
         continue;
       }
       if (a.id.clock + a.length > d)
-        for (dt(o, a, it(d - a.id.clock, 0)), l.next(); l.curr && l.curr.id.client === u; )
+        for (dt(o, a, it(d - a.id.clock, 0)), l.next(); l.curr && l.curr.id.client === u;)
           (dt(o, l.curr, 0), l.next());
       else
-        for (; l.curr && l.curr.id.client === u && l.curr.id.clock + l.curr.length <= d; ) l.next();
+        for (; l.curr && l.curr.id.client === u && l.curr.id.clock + l.curr.length <= d;) l.next();
     }
     Rr(o);
     let h = ot(c);
@@ -3077,7 +3077,7 @@ var et = class {
               c;
             if (this.adds(i)) {
               let l = i.left;
-              for (; l !== null && this.adds(l); ) l = l.left;
+              for (; l !== null && this.adds(l);) l = l.left;
               if (this.deletes(i))
                 if (l !== null && this.deletes(l))
                   ((o = 'delete'), (c = Ge(l.content.getContent())));
@@ -3139,12 +3139,12 @@ var et = class {
   },
   Lc = (e, t) => {
     let n = [];
-    for (; t._item !== null && t !== e; ) {
+    for (; t._item !== null && t !== e;) {
       if (t._item.parentSub !== null) n.unshift(t._item.parentSub);
       else {
         let r = 0,
           s = t._item.parent._start;
-        for (; s !== t._item && s !== null; )
+        for (; s !== t._item && s !== null;)
           (!s.deleted && s.countable && (r += s.length), (s = s.right));
         n.unshift(r);
       }
@@ -3185,14 +3185,14 @@ var et = class {
           : e._searchMarker.reduce((i, o) => (yt(t - i.index) < yt(t - o.index) ? i : o)),
       r = e._start,
       s = 0;
-    for (n !== null && ((r = n.p), (s = n.index), Bc(n)); r.right !== null && s < t; ) {
+    for (n !== null && ((r = n.p), (s = n.index), Bc(n)); r.right !== null && s < t;) {
       if (!r.deleted && r.countable) {
         if (t < s + r.length) break;
         s += r.length;
       }
       r = r.right;
     }
-    for (; r.left !== null && s > t; ) ((r = r.left), !r.deleted && r.countable && (s -= r.length));
+    for (; r.left !== null && s > t;) ((r = r.left), !r.deleted && r.countable && (s -= r.length));
     for (
       ;
       r.left !== null &&
@@ -3209,7 +3209,7 @@ var et = class {
       let s = e[r];
       if (n > 0) {
         let i = s.p;
-        for (i.marker = !1; i && (i.deleted || !i.countable); )
+        for (i.marker = !1; i && (i.deleted || !i.countable);)
           ((i = i.left), i && !i.deleted && i.countable && (s.index -= i.length));
         if (i === null || i.marker === !0) {
           e.splice(r, 1);
@@ -3224,13 +3224,13 @@ var et = class {
     e.doc ?? V();
     let t = e._start,
       n = [];
-    for (; t; ) (n.push(t), (t = t.right));
+    for (; t;) (n.push(t), (t = t.right));
     return n;
   },
   On = (e, t, n) => {
     let r = e,
       s = t.changedParentTypes;
-    for (; L(s, e, () => []).push(n), e._item !== null; ) e = e._item.parent;
+    for (; L(s, e, () => []).push(n), e._item !== null;) e = e._item.parent;
     li(r._eH, n, t);
   },
   U = class {
@@ -3259,7 +3259,7 @@ var et = class {
     _write(t) {}
     get _first() {
       let t = this._start;
-      for (; t !== null && t.deleted; ) t = t.right;
+      for (; t !== null && t.deleted;) t = t.right;
       return t;
     }
     _callObserver(t, n) {
@@ -3284,7 +3284,7 @@ var et = class {
     let r = n - t,
       s = [],
       i = e._start;
-    for (; i !== null && r > 0; ) {
+    for (; i !== null && r > 0;) {
       if (i.countable && !i.deleted) {
         let o = i.content.getContent();
         if (o.length <= t) t -= o.length;
@@ -3301,7 +3301,7 @@ var et = class {
     e.doc ?? V();
     let t = [],
       n = e._start;
-    for (; n !== null; ) {
+    for (; n !== null;) {
       if (n.countable && !n.deleted) {
         let r = n.content.getContent();
         for (let s = 0; s < r.length; s++) t.push(r[s]);
@@ -3313,7 +3313,7 @@ var et = class {
   $a = (e, t) => {
     let n = [],
       r = e._start;
-    for (; r !== null; ) {
+    for (; r !== null;) {
       if (r.countable && ut(r, t)) {
         let s = r.content.getContent();
         for (let i = 0; i < s.length; i++) n.push(s[i]);
@@ -3325,7 +3325,7 @@ var et = class {
   Be = (e, t) => {
     let n = 0,
       r = e._start;
-    for (e.doc ?? V(); r !== null; ) {
+    for (e.doc ?? V(); r !== null;) {
       if (r.countable && !r.deleted) {
         let s = r.content.getContent();
         for (let i = 0; i < s.length; i++) t(s[i], n++, e);
@@ -3352,7 +3352,7 @@ var et = class {
       },
       next: () => {
         if (n === null) {
-          for (; t !== null && t.deleted; ) t = t.right;
+          for (; t !== null && t.deleted;) t = t.right;
           if (t === null) return { done: !0, value: void 0 };
           ((n = t.content.getContent()), (r = 0), (t = t.right));
         }
@@ -3454,7 +3454,7 @@ var et = class {
       index: 0,
       p: t._start,
     }).p;
-    if (s) for (; s.right; ) s = s.right;
+    if (s) for (; s.right;) s = s.right;
     return Un(e, t, s, n);
   },
   Ai = (e, t, n, r) => {
@@ -3467,7 +3467,7 @@ var et = class {
       !c.deleted &&
         c.countable &&
         (n < c.length && M(e, m(c.id.client, c.id.clock + n)), (n -= c.length));
-    for (; r > 0 && c !== null; )
+    for (; r > 0 && c !== null;)
       (c.deleted ||
         (r < c.length && M(e, m(c.id.client, c.id.clock + r)), c.delete(e), (r -= c.length)),
         (c = c.right));
@@ -3529,7 +3529,7 @@ var et = class {
   },
   Fa = (e, t, n) => {
     let r = e._map.get(t) || null;
-    for (; r !== null && (!n.sv.has(r.id.client) || r.id.clock >= (n.sv.get(r.id.client) || 0)); )
+    for (; r !== null && (!n.sv.has(r.id.client) || r.id.clock >= (n.sv.get(r.id.client) || 0));)
       r = r.left;
     return r !== null && ut(r, n) ? r.content.getContent()[r.length - 1] : void 0;
   },
@@ -3752,7 +3752,7 @@ var et = class {
     }
   },
   Qs = (e, t, n) => {
-    for (; t.right !== null && n > 0; ) {
+    for (; t.right !== null && n > 0;) {
       switch (t.right.content.constructor) {
         case C:
           t.right.deleted || ce(t.currentAttributes, t.right.content);
@@ -3802,14 +3802,12 @@ var et = class {
     r === null ? e.delete(n) : e.set(n, r);
   },
   vi = (e, t) => {
-    for (; e.right !== null; ) {
-      if (
-        !(
-          e.right.deleted ||
-          (e.right.content.constructor === C &&
-            ft(t[e.right.content.key] ?? null, e.right.content.value))
-        )
-      )
+    for (; e.right !== null;) {
+      if (!(
+        e.right.deleted ||
+        (e.right.content.constructor === C &&
+          ft(t[e.right.content.key] ?? null, e.right.content.value))
+      ))
         break;
       e.forward();
     }
@@ -3913,7 +3911,7 @@ var et = class {
   Vi = (e, t, n, r, s) => {
     let i = t,
       o = A();
-    for (; i && (!i.countable || i.deleted); ) {
+    for (; i && (!i.countable || i.deleted);) {
       if (!i.deleted && i.content.constructor === C) {
         let h = i.content;
         o.set(h.key, h);
@@ -3922,7 +3920,7 @@ var et = class {
     }
     let c = 0,
       l = !1;
-    for (; t !== i; ) {
+    for (; t !== i;) {
       if ((n === t && (l = !0), !t.deleted)) {
         let h = t.content;
         switch (h.constructor) {
@@ -3946,9 +3944,9 @@ var et = class {
     return c;
   },
   Gc = (e, t) => {
-    for (; t && t.right && (t.right.deleted || !t.right.countable); ) t = t.right;
+    for (; t && t.right && (t.right.deleted || !t.right.countable);) t = t.right;
     let n = new Set();
-    for (; t && (t.deleted || !t.countable); ) {
+    for (; t && (t.deleted || !t.countable);) {
       if (!t.deleted && t.content.constructor === C) {
         let r = t.content.key;
         n.has(r) ? t.delete(e) : n.add(r);
@@ -3964,7 +3962,7 @@ var et = class {
           s = e._start,
           i = A(),
           o = qe(i);
-        for (; s; ) {
+        for (; s;) {
           if (s.deleted === !1)
             switch (s.content.constructor) {
               case C:
@@ -4003,7 +4001,7 @@ var et = class {
     let r = n,
       s = qe(t.currentAttributes),
       i = t.right;
-    for (; n > 0 && t.right !== null; ) {
+    for (; n > 0 && t.right !== null;) {
       if (t.right.deleted === !1)
         switch (t.right.content.constructor) {
           case K:
@@ -4073,7 +4071,7 @@ var et = class {
                 (f && n.push(f), (c = null));
               }
             };
-          for (; o !== null; ) {
+          for (; o !== null;) {
             switch (o.content.constructor) {
               case K:
               case wt:
@@ -4118,7 +4116,7 @@ var et = class {
             }
             o = o.right;
           }
-          for (d(); n.length > 0; ) {
+          for (d(); n.length > 0;) {
             let f = n[n.length - 1];
             if (f.retain !== void 0 && f.attributes === void 0) n.pop();
             else break;
@@ -4164,7 +4162,7 @@ var et = class {
       this.doc ?? V();
       let t = '',
         n = this._start;
-      for (; n !== null; )
+      for (; n !== null;)
         (!n.deleted && n.countable && n.content.constructor === nt && (t += n.content.str),
           (n = n.right));
       return t;
@@ -4217,7 +4215,7 @@ var et = class {
         }
       }
       let a = () => {
-        for (; l !== null; ) {
+        for (; l !== null;) {
           if (ut(l, t) || (n !== void 0 && ut(l, n)))
             switch (l.content.constructor) {
               case nt: {
@@ -4357,7 +4355,7 @@ var et = class {
           )
             t = n._start;
           else
-            for (; t !== null; ) {
+            for (; t !== null;) {
               let r = t.next;
               if (r !== null) {
                 t = r;
@@ -5068,7 +5066,7 @@ var et = class {
     }
     delete(t) {
       let n = this.type._start;
-      for (; n !== null; )
+      for (; n !== null;)
         (n.deleted
           ? n.id.clock < (t.beforeState.get(n.id.client) || 0) && t._mergeStructs.push(n)
           : n.delete(t),
@@ -5082,10 +5080,10 @@ var et = class {
     }
     gc(t) {
       let n = this.type._start;
-      for (; n !== null; ) (n.gc(t, !0), (n = n.right));
+      for (; n !== null;) (n.gc(t, !0), (n = n.right));
       ((this.type._start = null),
         this.type._map.forEach((r) => {
-          for (; r !== null; ) (r.gc(t, !0), (r = r.left));
+          for (; r !== null;) (r.gc(t, !0), (r = r.left));
         }),
         (this.type._map = new Map()));
     }
@@ -5110,7 +5108,7 @@ var et = class {
     return { item: s, diff: r };
   },
   qr = (e, t) => {
-    for (; e !== null && e.keep !== t; ) ((e.keep = t), (e = e.parent._item));
+    for (; e !== null && e.keep !== t;) ((e.keep = t), (e = e.parent._item));
   },
   Dn = (e, t, n) => {
     let { client: r, clock: s } = t.id,
@@ -5148,22 +5146,22 @@ var et = class {
       d;
     if (a !== null && a.deleted === !0) {
       if (a.redone === null && (!n.has(a) || Li(e, a, n, r, s, i) === null)) return null;
-      for (; a.redone !== null; ) a = M(e, a.redone);
+      for (; a.redone !== null;) a = M(e, a.redone);
     }
     let f = a === null ? t.parent : a.content.type;
     if (t.parentSub === null) {
-      for (u = t.left, d = t; u !== null; ) {
+      for (u = t.left, d = t; u !== null;) {
         let S = u;
-        for (; S !== null && S.parent._item !== a; ) S = S.redone === null ? null : M(e, S.redone);
+        for (; S !== null && S.parent._item !== a;) S = S.redone === null ? null : M(e, S.redone);
         if (S !== null && S.parent._item === a) {
           u = S;
           break;
         }
         u = u.left;
       }
-      for (; d !== null; ) {
+      for (; d !== null;) {
         let S = d;
-        for (; S !== null && S.parent._item !== a; ) S = S.redone === null ? null : M(e, S.redone);
+        for (; S !== null && S.parent._item !== a;) S = S.redone === null ? null : M(e, S.redone);
         if (S !== null && S.parent._item === a) {
           d = S;
           break;
@@ -5180,7 +5178,7 @@ var et = class {
           ni(i.undoStack, u.right.id) ||
           ni(i.redoStack, u.right.id));
       )
-        for (u = u.right; u.redone; ) u = M(e, u.redone);
+        for (u = u.right; u.redone;) u = M(e, u.redone);
       if (u && u.right !== null) return null;
     } else u = f._map.get(t.parentSub) || null;
     let p = _(c, l),
@@ -5282,12 +5280,12 @@ var et = class {
             s;
           if (r !== null) s = r.right;
           else if (this.parentSub !== null)
-            for (s = this.parent._map.get(this.parentSub) || null; s !== null && s.left !== null; )
+            for (s = this.parent._map.get(this.parentSub) || null; s !== null && s.left !== null;)
               s = s.left;
           else s = this.parent._start;
           let i = new Set(),
             o = new Set();
-          for (; s !== null && s !== this.right; ) {
+          for (; s !== null && s !== this.right;) {
             if ((o.add(s), i.add(s), Pt(this.origin, s.origin))) {
               if (s.id.client < this.id.client) ((r = s), i.clear());
               else if (Pt(this.rightOrigin, s.rightOrigin)) break;
@@ -5304,7 +5302,7 @@ var et = class {
         } else {
           let r;
           if (this.parentSub !== null)
-            for (r = this.parent._map.get(this.parentSub) || null; r !== null && r.left !== null; )
+            for (r = this.parent._map.get(this.parentSub) || null; r !== null && r.left !== null;)
               r = r.left;
           else ((r = this.parent._start), (this.parent._start = this));
           this.right = r;
@@ -5327,12 +5325,12 @@ var et = class {
     }
     get next() {
       let t = this.right;
-      for (; t !== null && t.deleted; ) t = t.right;
+      for (; t !== null && t.deleted;) t = t.right;
       return t;
     }
     get prev() {
       let t = this.left;
-      for (; t !== null && t.deleted; ) t = t.left;
+      for (; t !== null && t.deleted;) t = t.left;
       return t;
     }
     get lastId() {

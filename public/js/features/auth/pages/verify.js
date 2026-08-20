@@ -1,7 +1,6 @@
 import { Network } from '/js/app/network.js';
 import { Auth } from '/js/features/auth/auth.js';
 import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
-import { SyncroRenderer } from '/js/features/auth/syncro/SyncroRenderer.js';
 import {
   getEmailConfigurationErrorMessage,
   isEmailConfigurationError,
@@ -11,14 +10,10 @@ import {
 export function initVerifyPage() {
   const container = document.querySelector('.character-container');
   let syncro = null;
-  let renderer = null;
 
   if (container) {
     syncro = new SyncroBot({ authFlow: 'verify' });
     syncro.init('.character-container');
-
-    renderer = new SyncroRenderer(container);
-    renderer.injectParticleCSS();
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -181,7 +176,6 @@ export function initVerifyPage() {
       });
 
       syncro?.onSuccess();
-      renderer?.burst('star', 5);
       setStatus(data.message || 'Email verified. Please sign in.', 'success');
       Auth.removeToken();
       sessionStorage.removeItem('verificationEmail');
@@ -191,7 +185,7 @@ export function initVerifyPage() {
         ? `login.html?verified=1&doc=${encodeURIComponent(docId)}`
         : 'login.html?verified=1';
       sessionStorage.removeItem('postLoginDocId');
-      setTimeout(() => (window.location.href = redirectUrl), 1200);
+      window.location.href = redirectUrl;
     } catch (error) {
       console.error('Verification error:', error);
       syncro?.onError();

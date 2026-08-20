@@ -3,7 +3,7 @@
  */
 
 import { App } from '/js/app/app.js';
-import { LibraryManager } from '/js/features/library/LibraryManager.js';
+import { UIManager } from '/js/features/ui/UIManager.js';
 import { Network } from '/js/app/network.js';
 import { Profile } from '/js/features/profile/profile.js';
 import { Editor } from '/js/features/editor/editor.js';
@@ -42,25 +42,19 @@ describe('App Core Initialization', () => {
       <div id="connectionBadge" hidden></div>
       <div id="saveStatusIndicator"></div>
       <div id="serverOfflineOverlay"></div>
-      <div id="documentOpeningLoader" hidden>
-        <div id="documentOpeningTitle"></div>
-      </div>
       <div class="main-workspace">
-        <div id="editorWorkspaceLoader" hidden>
-          <div class="loader-title">Opening document...</div>
-          <div class="loader-subtitle">Preparing your workspace</div>
-        </div>
         <div id="pagesContainer"></div>
-      </div>
-      <div id="editorSkeleton" class="hidden">
-        <div id="editorSkeletonStatus"></div>
-        <div id="editorSkeletonTitle"></div>
-        <div id="editorSkeletonDescription"></div>
-        <div id="editorSkeletonMessage" hidden></div>
-        <div id="editorOpenError" hidden>
-          <div id="editorOpenErrorMessage"></div>
-          <button id="editorOpenRetry"></button>
-          <button id="editorOpenBack"></button>
+        <div id="editorSkeleton" class="hidden" aria-busy="false">
+          <div class="editor-loading-paper"><img src="/logo.svg" alt="" /></div>
+          <div id="editorSkeletonStatus"></div>
+          <div id="editorSkeletonTitle"></div>
+          <div id="editorSkeletonDescription"></div>
+          <div id="editorSkeletonMessage" hidden></div>
+          <div id="editorOpenError" hidden>
+            <div id="editorOpenErrorMessage"></div>
+            <button id="editorOpenRetry"></button>
+            <button id="editorOpenBack"></button>
+          </div>
         </div>
       </div>
 
@@ -193,7 +187,9 @@ describe('App Core Initialization', () => {
     await new Promise(process.nextTick);
 
     expect(Network.getDocuments).not.toHaveBeenCalled();
-    expect(Profile.prototype.openProfileModal).toHaveBeenCalledWith({ tab: 'general' });
+    expect(Profile.prototype.openProfileModal).toHaveBeenCalledWith({
+      tab: 'general',
+    });
     expect(document.getElementById('docLibrary').style.display).toBe('block');
   });
 
@@ -472,58 +468,61 @@ describe('App Core Initialization', () => {
     expect(document.getElementById('editorSkeleton').classList.contains('hidden')).toBe(false);
   });
 
-  it('websocket connected does not mark editor ready or hide the workspace loader', async () => {
+  it('websocket connected does not mark editor ready or hide the paper loader', async () => {
     const app = new App();
     await new Promise(process.nextTick);
     app.documentId = 'doc-opening';
-    app.loadDocumentToken = 1;
     app.editor = { currentDocId: 'doc-opening' };
     app.beginDocumentOpen({ mode: 'opening', docId: 'doc-opening' });
 
-    const loader = document.getElementById('editorWorkspaceLoader');
+    const loader = document.getElementById('editorSkeleton');
     app.handleEditorStatusChange('connected', 'doc-opening');
 
     expect(app.connectionState).toBe('connected');
     expect(app.hasReachedEditorReady).toBe(false);
     expect(app.documentLoadState).toBe('opening');
     expect(document.body.dataset.editorReady).toBe('false');
-    expect(loader.hidden).toBe(false);
+    expect(loader.classList.contains('hidden')).toBe(false);
   });
 
   it('document loaded before initial sync does not mark editor ready', async () => {
     const app = new App();
     await new Promise(process.nextTick);
     app.documentId = 'doc-opening';
-    app.loadDocumentToken = 1;
     app.editor = {
       currentDocId: 'doc-opening',
       isReadyForUser: () => false,
       hasLoadedDocumentContent: () => true,
     };
-    app.beginDocumentOpen({ mode: 'opening', docId: 'doc-opening' });
+    const requestToken = app.beginDocumentOpen({
+      mode: 'opening',
+      docId: 'doc-opening',
+    });
     app.documentContentLoaded = true;
 
-    app.maybeMarkEditorReady(1, 'test-document-loaded');
+    app.maybeMarkEditorReady(requestToken, 'test-document-loaded');
 
     expect(app.hasReachedEditorReady).toBe(false);
     expect(app.documentLoadState).toBe('opening');
-    expect(document.getElementById('editorWorkspaceLoader').hidden).toBe(false);
+    expect(document.getElementById('editorSkeleton').classList.contains('hidden')).toBe(false);
   });
 
   it('editor ready cannot fire before document loaded', async () => {
     const app = new App();
     await new Promise(process.nextTick);
     app.documentId = 'doc-opening';
-    app.loadDocumentToken = 1;
     app.editor = {
       currentDocId: 'doc-opening',
       isReadyForUser: () => true,
       hasLoadedDocumentContent: () => true,
     };
-    app.beginDocumentOpen({ mode: 'opening', docId: 'doc-opening' });
+    const requestToken = app.beginDocumentOpen({
+      mode: 'opening',
+      docId: 'doc-opening',
+    });
     app.initialSyncReceived = true;
 
-    app.maybeMarkEditorReady(1, 'test-before-document-loaded');
+    app.maybeMarkEditorReady(requestToken, 'test-before-document-loaded');
 
     expect(app.hasReachedEditorReady).toBe(false);
     expect(app.documentLoadState).toBe('opening');
@@ -542,31 +541,33 @@ describe('App Core Initialization', () => {
 
     app.beginDocumentOpen({ mode: 'creating', isNewDocument: true });
 
-    const loader = document.getElementById('editorWorkspaceLoader');
+    const loader = document.getElementById('editorSkeleton');
     expect(app.hasReachedEditorReady).toBe(false);
     expect(app.documentLoadState).toBe('creating');
     expect(document.body.dataset.editorReady).toBe('false');
-    expect(loader.hidden).toBe(false);
-    expect(loader.querySelector('.loader-title').textContent).toBe('Creating document...');
+    expect(loader.classList.contains('hidden')).toBe(false);
+    expect(document.getElementById('editorSkeletonTitle').textContent).toBe('Creating document...');
   });
 
   it('repeated ready events only run cleanup once', async () => {
     const app = new App();
     await new Promise(process.nextTick);
     app.documentId = 'doc-ready';
-    app.loadDocumentToken = 1;
     app.editor = {
       currentDocId: 'doc-ready',
       isReadyForUser: () => true,
       hasLoadedDocumentContent: () => true,
     };
-    app.beginDocumentOpen({ mode: 'opening', docId: 'doc-ready' });
+    const requestToken = app.beginDocumentOpen({
+      mode: 'opening',
+      docId: 'doc-ready',
+    });
     app.documentContentLoaded = true;
     app.initialSyncReceived = true;
     const cleanupSpy = jest.spyOn(app.libraryManager, 'clearOpeningStates');
 
-    app.maybeMarkEditorReady(1, 'first-ready');
-    app.maybeMarkEditorReady(1, 'second-ready');
+    app.maybeMarkEditorReady(requestToken, 'first-ready');
+    app.maybeMarkEditorReady(requestToken, 'second-ready');
 
     expect(app.hasReachedEditorReady).toBe(true);
     expect(cleanupSpy).toHaveBeenCalledTimes(1);
@@ -660,21 +661,19 @@ describe('App Core Initialization', () => {
     expect(document.body.dataset.viewState).toBe('editor-error');
   });
 
-  it('fallback still works if View Transition API is disabled/unavailable', async () => {
+  it('opening view unmounts the dashboard without a timed transition', () => {
     const mockApp = {
       uiManager: { applyViewState: jest.fn(), updateMobileUIState: jest.fn() },
     };
-    const lm = new LibraryManager(mockApp);
+    const manager = new UIManager(mockApp);
     const library = document.getElementById('docLibrary');
     library.classList.add('view-visible');
 
-    await lm.startEditorTransition();
+    manager.applyViewState('opening-document');
 
-    // Should run transition immediately
+    expect(document.body.dataset.viewState).toBe('opening-document');
     expect(library.classList.contains('view-visible')).toBe(false);
-    expect(document.getElementById('libraryOverlay').classList.contains('view-visible')).toBe(
-      false
-    );
+    expect(library.style.display).toBe('none');
   });
 
   it('should initialize with booting view state', () => {
@@ -892,44 +891,16 @@ describe('App Core Initialization', () => {
     expect(header.classList.contains('soft-reveal-ready')).toBe(false);
   });
 
-  it('view-exiting is applied to library during transition', async () => {
-    jest.useFakeTimers();
-    try {
-      window.matchMedia = jest.fn().mockReturnValue({
-        matches: false,
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-      });
+  it('opening view has no timer-owned view-exiting state', () => {
+    const app = new App();
+    const library = document.getElementById('docLibrary');
+    const overlay = document.getElementById('libraryOverlay');
 
-      const mockApp = {
-        documentId: null,
-        uiManager: {
-          applyViewState: jest.fn(),
-          updateMobileUIState: jest.fn(),
-        },
-      };
-      document.body.dataset.viewState = 'editor-ready';
-      const lm = new LibraryManager(mockApp);
-      const library = document.getElementById('docLibrary');
-      const overlay = document.getElementById('libraryOverlay');
+    app.uiManager.applyViewState('opening-document');
 
-      library.classList.add('view-visible');
-      overlay.classList.add('view-visible');
-
-      const transitionPromise = lm.startEditorTransition();
-
-      expect(library.classList.contains('view-exiting')).toBe(true);
-      expect(overlay.classList.contains('view-exiting')).toBe(true);
-
-      jest.advanceTimersByTime(250);
-      await transitionPromise;
-
-      expect(library.classList.contains('view-visible')).toBe(false);
-      expect(library.classList.contains('view-exiting')).toBe(false);
-      expect(library.style.display).toBe('none');
-    } finally {
-      jest.useRealTimers();
-    }
+    expect(library.classList.contains('view-exiting')).toBe(false);
+    expect(overlay.classList.contains('view-exiting')).toBe(false);
+    expect(library.style.display).toBe('none');
   });
 
   it('pagesContainer state attribute control matches design', () => {

@@ -1,20 +1,15 @@
 import { Network } from '/js/app/network.js';
 import { SyncroBot } from '/js/features/auth/syncro/SyncroBot.js';
-import { SyncroRenderer } from '/js/features/auth/syncro/SyncroRenderer.js';
 import { PASSWORD_REGEX } from '/js/core/validation.js';
 import { stripApiErrorPrefix } from '/js/core/errors.js';
 
 export function initResetPasswordPage() {
   const container = document.querySelector('.character-container');
   let syncro = null;
-  let renderer = null;
 
   if (container) {
     syncro = new SyncroBot({ authFlow: 'reset' });
     syncro.init('.character-container');
-
-    renderer = new SyncroRenderer(container);
-    renderer.injectParticleCSS();
   }
 
   const usernameInput = document.getElementById('usernameConfirm');
@@ -140,13 +135,9 @@ export function initResetPasswordPage() {
       });
 
       syncro?.onSuccess();
-      renderer?.burst('star', 5);
       statusMessage.textContent = '✓ Password reset! Redirecting to login...';
       statusMessage.className = 'status-message success';
-
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 2000);
+      window.location.href = 'login.html';
     } catch (error) {
       syncro?.onError();
       if (error.data?.mfaRequired) {

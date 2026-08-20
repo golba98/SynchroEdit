@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syncroedit-v15';
+const CACHE_NAME = 'syncroedit-v16';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -9,9 +9,7 @@ const ASSETS_TO_CACHE = [
   '/css/app/effects.css',
   '/css/app/settings.css',
   '/css/pages/login.css',
-  '/css/pages/forgot-password.css',
-  '/css/pages/reset-password.css',
-  '/css/pages/verify.css',
+  '/css/pages/auth-flow.css',
   '/js/main.js',
   '/js/dev-cache-reset.js',
   '/js/core/api.js',

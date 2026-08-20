@@ -87,18 +87,15 @@ individual values because existing databases replay the sequence in order.
 
 Application styles load in the order shown below; changing that order can change the cascade.
 
-| File                                   | Purpose and ownership                                                                               |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `public/css/app/core.css`              | Defines global variables, layout foundations, controls, Quill font mappings, and shared components. |
-| `public/css/app/editor.css`            | Defines document canvas, page, editor, toolbar, responsive editor, and collaboration presentation.  |
-| `public/css/app/effects.css`           | Defines themes, loading states, skeletons, animations, notifications, and transient visual effects. |
-| `public/css/app/settings.css`          | Defines profile, settings, sharing, history, and modal-specific presentation.                       |
-| `public/css/syncro.css`                | Defines the reusable SyncroBot rig, body parts, state classes, particles, and animations.           |
-| `public/css/pages/login.css`           | Defines login/signup layout, validation feedback, verification modal, and auth-page responsiveness. |
-| `public/css/pages/auth-mobile.css`     | Defines shared mobile auth sizing, safe-area, keyboard, and compact mascot layout rules.            |
-| `public/css/pages/forgot-password.css` | Defines the forgot-password page layout and status presentation.                                    |
-| `public/css/pages/reset-password.css`  | Defines reset-password form, requirements, MFA group, and status presentation.                      |
-| `public/css/pages/verify.css`          | Defines standalone verification input, actions, and status presentation.                            |
+| File                             | Purpose and ownership                                                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `public/css/app/core.css`        | Defines global variables, layout foundations, controls, Quill font mappings, and shared components. |
+| `public/css/app/editor.css`      | Defines document canvas, page, editor, toolbar, responsive editor, and collaboration presentation.  |
+| `public/css/app/effects.css`     | Defines themes, loading states, skeletons, animations, notifications, and transient visual effects. |
+| `public/css/app/settings.css`    | Defines profile, settings, sharing, history, and modal-specific presentation.                       |
+| `public/css/syncro.css`          | Defines the reusable SyncroBot rig, body parts, state classes, particles, and animations.           |
+| `public/css/pages/login.css`     | Defines login/signup layout, validation feedback, verification modal, and auth-page responsiveness. |
+| `public/css/pages/auth-flow.css` | Defines the shared monochrome forgot-password, reset-password, and verification presentation.       |
 
 ## Browser Application Composition and Core Utilities
 
@@ -205,7 +202,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/e2e/auth-ui.test.js`                                     | Covers auth form behavior, mascot geometry, validation, verification, and responsive presentation.   |
 | `tests/e2e/interactions.test.js`                                | Covers toolbar formatting and theme interaction in a real browser.                                   |
 | `tests/e2e/responsiveness.test.js`                              | Covers login and editor layout at desktop/mobile viewports.                                          |
-| `tests/e2e/loading-states.test.js`                              | Verifies branded boot loading and viewport-safe new-document loading at desktop/mobile viewports.   |
+| `tests/e2e/loading-states.test.js`                              | Verifies branded boot loading and viewport-safe new-document loading at desktop/mobile viewports.    |
 
 ## Intentionally Local-Only Files
 

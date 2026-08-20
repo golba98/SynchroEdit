@@ -4,8 +4,8 @@
   "description": "Cloudflare Workers and Durable Objects collaborative editor.",
   "main": "src-worker/index.js",
   "scripts": {
-    "start": "wrangler dev --env local",
-    "dev": "wrangler dev --env local",
+    "start": "wrangler dev --env local --port 8787 --live-reload",
+    "dev": "wrangler dev --env local --port 8787 --live-reload",
     "deploy": "wrangler deploy --env staging",
     "db:migrate:local": "wrangler d1 migrations apply DB --local --env local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
@@ -62,15 +62,14 @@
     "yjs": "^13.6.32"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
-    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-env": "^7.29.7",
     "@playwright/browser-chromium": "^1.61.1",
     "@playwright/test": "^1.62.1",
     "babel-jest": "^30.2.0",
     "cross-env": "^10.1.0",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "prettier": "^3.9.5",

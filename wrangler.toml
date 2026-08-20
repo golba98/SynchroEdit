@@ -30,6 +30,17 @@ storage = "sqlite"
 type = "durable-object"
 storage = "sqlite"
 
+# Keep the historical production class names declared as live compatibility
+# exports. Cloudflare has provisioned namespaces for these names, and removing
+# them from the export manifest causes deployment reconciliation to fail.
+[exports.DocumentSyncObject]
+type = "durable-object"
+storage = "sqlite"
+
+[exports.RateLimitObject]
+type = "durable-object"
+storage = "sqlite"
+
 [vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"
 APP_NAME = "SyncroEdit"

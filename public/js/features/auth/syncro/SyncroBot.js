@@ -1,6 +1,20 @@
+const AUTH_STATES = new Set([
+  'idle',
+  'username-focus',
+  'username-typing',
+  'password-focus',
+  'password-visible',
+  'invalid-field',
+  'submitting',
+  'success',
+  'error',
+]);
+
+const LOCKED_STATES = new Set(['submitting', 'success', 'error']);
+
 /**
- * SyncroBot is a deterministic view of authentication state.
- * Application events own state changes; animation never advances the auth flow.
+ * One deterministic Syncrobot controller shared by every authentication route.
+ * Authentication state always wins; pointer and tap reactions are supplementary.
  */
 export class SyncroBot {
   constructor(options = {}) {
@@ -8,24 +22,37 @@ export class SyncroBot {
     this.container = null;
     this.botRig = null;
     this.pupils = [];
+    this.primaryState = 'idle';
     this.currentState = 'idle';
     this.focusTarget = 'none';
     this.formCompleteness = 'empty';
     this.passwordVisible = false;
     this.isProcessing = false;
     this.targetElement = null;
+    this.pointer = null;
+    this.gaze = { x: 0, y: 0 };
     this.rafId = null;
     this.blinkTimer = null;
     this.blinkEndTimer = null;
     this.typingTimer = null;
-    this.blinking = false;
+    this.reaction = null;
+    this.reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)') || null;
     this.config = {
-      eyeMaxMove: 7,
+      eyeMaxX: 7,
+      eyeMaxY: 6,
+      gazeEase: 0.18,
       blinkMinDelay: 4200,
-      blinkMaxDelay: 7800,
-      blinkDuration: 130,
-      typingSettleDelay: 500,
+      blinkMaxDelay: 7600,
+      blinkDuration: 120,
+      typingSettleDelay: 420,
     };
+
+    this.onPointerMove = this.onPointerMove.bind(this);
+    this.onPointerLeave = this.onPointerLeave.bind(this);
+    this.onCharacterPress = this.onCharacterPress.bind(this);
+    this.onCharacterKeydown = this.onCharacterKeydown.bind(this);
+    this.onReactionEnd = this.onReactionEnd.bind(this);
+    this.tickGaze = this.tickGaze.bind(this);
   }
 
   init(containerSelector) {
@@ -36,37 +63,26 @@ export class SyncroBot {
       console.warn('SyncroBot: Bot elements not found');
       return false;
     }
-    this.applyState('idle');
+
+    this.pointerSurface = this.container.closest('.right-section') || this.container;
+    this.container.setAttribute('role', 'button');
+    this.container.setAttribute('tabindex', '0');
+    this.container.setAttribute('aria-label', 'Play with Syncrobot');
+    this.botRig.setAttribute('aria-hidden', 'true');
+
+    this.pointerSurface.addEventListener('pointermove', this.onPointerMove, {
+      passive: true,
+    });
+    this.pointerSurface.addEventListener('pointerleave', this.onPointerLeave, {
+      passive: true,
+    });
+    this.container.addEventListener('pointerdown', this.onCharacterPress);
+    this.container.addEventListener('keydown', this.onCharacterKeydown);
+    this.botRig.addEventListener('animationend', this.onReactionEnd);
+
+    this.setAuthState('idle');
+    this.rafId = requestAnimationFrame(this.tickGaze);
     return true;
-  }
-
-  applyState(state, options = {}) {
-    if (!this.botRig) return;
-    const normalizedState = this.normalizeState(state);
-    const isSameState = normalizedState === this.currentState;
-    this.currentState = normalizedState;
-    this.botRig.dataset.syncroState = normalizedState;
-    for (const className of Array.from(this.botRig.classList)) {
-      if (className !== 'bot-rig' && className !== 'blinking')
-        this.botRig.classList.remove(className);
-    }
-    this.botRig.classList.add(normalizedState);
-
-    if (this.blocksBlink(normalizedState)) {
-      this.clearBlinkTimer();
-      this.botRig.classList.remove('blinking');
-      this.blinking = false;
-    } else if (!isSameState || !this.blinkTimer) {
-      this.scheduleBlink();
-    }
-
-    if (options.target) {
-      this.setTargetElement(options.target);
-    } else if (this.usesFixedGaze(normalizedState)) {
-      this.stopTrackingLoop();
-      this.targetElement = null;
-      this.setGazeForState(normalizedState);
-    }
   }
 
   normalizeState(state) {
@@ -77,95 +93,143 @@ export class SyncroBot {
       peeking: 'password-visible',
       processing: 'submitting',
       empathy: 'idle',
-      'hover-ready': this.focusTarget === 'password' ? 'password-focus' : 'username-focus',
+      'hover-ready': this.focusTarget.includes('password') ? 'password-focus' : 'username-focus',
       'hover-blocked': 'invalid-field',
       bored: 'idle',
     };
-    return aliases[state] || state;
+    const normalized = aliases[state] || state;
+    return AUTH_STATES.has(normalized) ? normalized : 'idle';
   }
 
-  usesFixedGaze(state) {
-    return ['idle', 'password-focus', 'submitting', 'success', 'error', 'invalid-field'].includes(
-      state
-    );
-  }
+  setAuthState(state, options = {}) {
+    if (!this.botRig) return;
+    const normalized = this.normalizeState(state);
+    this.primaryState = normalized;
+    this.currentState = normalized;
+    this.targetElement = options.target || null;
+    this.clearReaction();
 
-  blocksBlink(state) {
-    return ['submitting', 'success', 'error'].includes(state);
-  }
-
-  setGazeForState(state) {
-    const gaze = {
-      idle: [0, 0],
-      'password-focus': [-3, 5],
-      submitting: [0, -2],
-      success: [0, -2],
-      error: [-6, 5],
-      'invalid-field': [-7, 4],
-    }[state] || [0, 0];
-    this.setPupilOffset(gaze[0], gaze[1]);
-  }
-
-  setPupilOffset(x, y) {
-    this.pupils.forEach((pupil) => {
-      pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-    });
-  }
-
-  updateEyePosition(target) {
-    if (!target) return;
-    this.pupils.forEach((pupil) => {
-      const eyeRect = pupil.closest('.eye')?.getBoundingClientRect();
-      if (!eyeRect) return;
-      const deltaX = target.x - (eyeRect.left + eyeRect.width / 2);
-      const deltaY = target.y - (eyeRect.top + eyeRect.height / 2);
-      const angle = Math.atan2(deltaY, deltaX);
-      const distance = Math.min(Math.hypot(deltaX, deltaY), this.config.eyeMaxMove);
-      pupil.style.transform = `translate(calc(-50% + ${Math.cos(angle) * distance}px), calc(-50% + ${Math.sin(angle) * distance}px))`;
-    });
-  }
-
-  setTargetElement(element) {
-    this.targetElement = element || null;
-    this.stopTrackingLoop();
-    if (!this.targetElement) return;
-    this.trackElement();
-    const tick = () => {
-      if (!this.targetElement || this.blocksBlink(this.currentState)) {
-        this.rafId = null;
-        return;
+    this.botRig.dataset.syncroState = normalized;
+    for (const className of Array.from(this.botRig.classList)) {
+      if (className.startsWith('syncro-state--') || className.startsWith('syncro-reaction--')) {
+        this.botRig.classList.remove(className);
       }
-      this.trackElement();
-      this.rafId = requestAnimationFrame(tick);
+    }
+    this.botRig.classList.add(`syncro-state--${normalized}`);
+
+    if (LOCKED_STATES.has(normalized)) {
+      this.clearBlinkTimer();
+      this.botRig.classList.remove('blinking');
+    } else {
+      this.scheduleBlink();
+    }
+  }
+
+  applyState(state, options = {}) {
+    this.setAuthState(state, options);
+  }
+
+  onPointerMove(event) {
+    this.pointer = { x: event.clientX, y: event.clientY };
+  }
+
+  onPointerLeave() {
+    this.pointer = null;
+  }
+
+  onCharacterPress(event) {
+    if (event.button !== undefined && event.button !== 0) return;
+    const rect = this.container.getBoundingClientRect();
+    const side = event.clientX < rect.left + rect.width / 2 ? 'left' : 'right';
+    this.react(`poke-${side}`);
+  }
+
+  onCharacterKeydown(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    this.react('pleased');
+  }
+
+  react(kind) {
+    if (!this.botRig || LOCKED_STATES.has(this.primaryState)) return;
+    const allowed = new Set(['poke-left', 'poke-right', 'pleased']);
+    const reaction = allowed.has(kind) ? kind : 'pleased';
+    this.clearReaction();
+    this.reaction = reaction;
+    this.botRig.classList.add(`syncro-reaction--${reaction}`);
+    if (this.reducedMotion?.matches) queueMicrotask(() => this.clearReaction());
+  }
+
+  onReactionEnd(event) {
+    if (!this.reaction || event.target !== this.botRig) return;
+    this.clearReaction();
+  }
+
+  clearReaction() {
+    if (!this.botRig) return;
+    for (const className of Array.from(this.botRig.classList)) {
+      if (className.startsWith('syncro-reaction--')) this.botRig.classList.remove(className);
+    }
+    this.reaction = null;
+  }
+
+  resolveGazeTarget() {
+    const fixed = {
+      'password-focus': { x: -0.32, y: 0.52 },
+      'password-visible': { x: -0.5, y: 0.05 },
+      submitting: { x: 0, y: -0.25 },
+      success: { x: 0, y: -0.2 },
+      error: { x: -0.65, y: 0.48 },
     };
-    this.rafId = requestAnimationFrame(tick);
+    if (fixed[this.primaryState]) return fixed[this.primaryState];
+
+    const rect = this.botRig?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+
+    let targetPoint = null;
+    if (this.targetElement?.isConnected) {
+      const targetRect = this.targetElement.getBoundingClientRect();
+      targetPoint = {
+        x: targetRect.left + targetRect.width / 2,
+        y: targetRect.top + targetRect.height / 2,
+      };
+    } else if (this.pointer) {
+      targetPoint = this.pointer;
+    }
+
+    if (!targetPoint) return { x: 0, y: 0 };
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height * 0.42;
+    return {
+      x: Math.max(-1, Math.min(1, (targetPoint.x - centerX) / Math.max(rect.width, 1))),
+      y: Math.max(-1, Math.min(1, (targetPoint.y - centerY) / Math.max(rect.height, 1))),
+    };
   }
 
-  trackElement() {
-    const rect = this.targetElement?.getBoundingClientRect();
-    if (rect)
-      this.updateEyePosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-  }
-
-  stopTrackingLoop() {
-    if (this.rafId) cancelAnimationFrame(this.rafId);
-    this.rafId = null;
-  }
-
-  resetEyePosition() {
-    this.stopTrackingLoop();
-    this.targetElement = null;
-    this.setPupilOffset(0, 0);
+  tickGaze() {
+    const target = this.resolveGazeTarget();
+    const ease = this.reducedMotion?.matches ? 1 : this.config.gazeEase;
+    this.gaze.x += (target.x - this.gaze.x) * ease;
+    this.gaze.y += (target.y - this.gaze.y) * ease;
+    const x = this.gaze.x * this.config.eyeMaxX;
+    const y = this.gaze.y * this.config.eyeMaxY;
+    this.pupils.forEach((pupil) => {
+      pupil.style.setProperty('--pupil-x', `${x.toFixed(2)}px`);
+      pupil.style.setProperty('--pupil-y', `${y.toFixed(2)}px`);
+    });
+    this.rafId = requestAnimationFrame(this.tickGaze);
   }
 
   onFieldFocus(fieldName) {
     if (this.isProcessing) return;
     this.focusTarget = fieldName;
-    const input = document.activeElement?.tagName === 'INPUT' ? document.activeElement : null;
+    const input = document.activeElement?.matches?.('input, textarea')
+      ? document.activeElement
+      : null;
     if (fieldName.toLowerCase().includes('password')) {
-      this.applyState(this.passwordVisible ? 'password-visible' : 'password-focus');
+      this.setAuthState(this.passwordVisible ? 'password-visible' : 'password-focus');
     } else {
-      this.applyState('username-focus', { target: input });
+      this.setAuthState('username-focus', { target: input });
     }
   }
 
@@ -173,58 +237,71 @@ export class SyncroBot {
     if (this.isProcessing) return;
     const invalid = validation.isValid === false || validation.formData?._hasErrors === true;
     this.formCompleteness = invalid ? 'invalid' : fieldValue ? 'partial' : 'empty';
-    if (fieldName.toLowerCase().includes('password')) {
-      this.applyState(this.passwordVisible ? 'password-visible' : 'password-focus');
+    this.focusTarget = fieldName;
+    const input = document.activeElement?.matches?.('input, textarea')
+      ? document.activeElement
+      : null;
+
+    if (invalid) {
+      this.setAuthState('invalid-field', { target: input });
       return;
     }
-    this.applyState('username-typing', { target: document.activeElement });
+    if (fieldName.toLowerCase().includes('password')) {
+      this.setAuthState(this.passwordVisible ? 'password-visible' : 'password-focus');
+      return;
+    }
+
+    this.setAuthState('username-typing', { target: input });
     clearTimeout(this.typingTimer);
     this.typingTimer = setTimeout(() => {
       if (!this.isProcessing && this.focusTarget === fieldName) {
-        this.applyState('username-focus', { target: document.activeElement });
+        this.setAuthState('username-focus', { target: input });
       }
     }, this.config.typingSettleDelay);
   }
 
   onFieldBlur() {
     queueMicrotask(() => {
-      if (this.isProcessing || document.activeElement?.tagName === 'INPUT') return;
+      if (this.isProcessing || document.activeElement?.matches?.('input, textarea')) return;
       this.focusTarget = 'none';
-      this.resetEyePosition();
-      this.applyState('idle');
+      this.targetElement = null;
+      this.setAuthState('idle');
     });
   }
 
   onPasswordToggle(visible, input = null) {
     if (this.isProcessing) return;
     this.passwordVisible = visible;
-    this.applyState(visible ? 'password-visible' : 'password-focus', {
+    this.setAuthState(visible ? 'password-visible' : 'password-focus', {
       target: visible ? input : null,
     });
   }
 
-  onButtonHover() {}
+  onButtonHover(active) {
+    if (!active || this.isProcessing || this.focusTarget !== 'none') return;
+    this.targetElement = document.activeElement?.matches?.('button')
+      ? document.activeElement
+      : null;
+  }
 
   onInvalidField(element) {
-    if (!this.isProcessing) this.applyState('invalid-field', { target: element || null });
+    if (!this.isProcessing) this.setAuthState('invalid-field', { target: element || null });
   }
 
   onSubmit() {
     this.isProcessing = true;
     clearTimeout(this.typingTimer);
-    this.stopTrackingLoop();
-    this.targetElement = null;
-    this.applyState('submitting');
+    this.setAuthState('submitting');
   }
 
   onSuccess() {
     this.isProcessing = false;
-    this.applyState('success');
+    this.setAuthState('success');
   }
 
   onError() {
     this.isProcessing = false;
-    this.applyState('error');
+    this.setAuthState('error');
   }
 
   scheduleBlink() {
@@ -240,13 +317,11 @@ export class SyncroBot {
   }
 
   triggerBlink() {
-    if (!this.botRig || this.blinking || this.blocksBlink(this.currentState)) return;
-    this.blinking = true;
+    if (!this.botRig || LOCKED_STATES.has(this.primaryState)) return;
     this.botRig.classList.add('blinking');
     clearTimeout(this.blinkEndTimer);
     this.blinkEndTimer = setTimeout(() => {
       this.botRig?.classList.remove('blinking');
-      this.blinking = false;
     }, this.config.blinkDuration);
   }
 
@@ -265,6 +340,11 @@ export class SyncroBot {
   destroy() {
     clearTimeout(this.typingTimer);
     this.clearBlinkTimer();
-    this.stopTrackingLoop();
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.pointerSurface?.removeEventListener('pointermove', this.onPointerMove);
+    this.pointerSurface?.removeEventListener('pointerleave', this.onPointerLeave);
+    this.container?.removeEventListener('pointerdown', this.onCharacterPress);
+    this.container?.removeEventListener('keydown', this.onCharacterKeydown);
+    this.botRig?.removeEventListener('animationend', this.onReactionEnd);
   }
 }

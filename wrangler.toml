@@ -22,14 +22,6 @@ class_name = "SynchroDocumentObject"
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
-[exports.SynchroDocumentObject]
-type = "durable-object"
-storage = "sqlite"
-
-[exports.SynchroRateLimitObject]
-type = "durable-object"
-storage = "sqlite"
-
 [vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"
 APP_NAME = "SyncroEdit"
@@ -53,6 +45,14 @@ class_name = "SynchroDocumentObject"
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
+[env.local.exports.SynchroDocumentObject]
+type = "durable-object"
+storage = "sqlite"
+
+[env.local.exports.SynchroRateLimitObject]
+type = "durable-object"
+storage = "sqlite"
+
 [env.local.vars]
 EMAIL_FROM = "SyncroEdit <verify@example.com>"
 APP_NAME = "SyncroEdit"
@@ -75,6 +75,16 @@ class_name = "SynchroDocumentObject"
 [[env.staging.durable_objects.bindings]]
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
+
+# Staging already owns these namespaces through the legacy migration history.
+# Keep that lifecycle authoritative so Wrangler does not send both migrations
+# and declarative exports for the same deployed Worker.
+[[env.staging.migrations]]
+tag = "v5"
+renamed_classes = [
+  { from = "SyncroDocumentObject", to = "SynchroDocumentObject" },
+  { from = "SyncroRateLimitObject", to = "SynchroRateLimitObject" },
+]
 
 [env.staging.vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"

@@ -176,20 +176,6 @@
       </div>
     </div>
 
-    <!-- Document Opening Loader (Instant reveal on click) -->
-    <div id="documentOpeningLoader" class="document-opening-loader" hidden>
-      <div class="document-opening-card">
-        <div class="document-opening-icon">✦</div>
-        <div id="documentOpeningTitle" class="document-opening-title">Opening document...</div>
-        <div id="documentOpeningSubtitle" class="document-opening-subtitle">
-          Preparing your workspace
-        </div>
-        <div class="document-opening-bar">
-          <span></span>
-        </div>
-      </div>
-    </div>
-
     <div
       id="authGuard"
       style="
@@ -1164,16 +1150,20 @@
                       </div>
                       <ul id="passwordRequirements" class="password-requirements">
                         <li data-req="length">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> 8+ Characters
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          8+ Characters
                         </li>
                         <li data-req="upper">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Uppercase
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Uppercase
                         </li>
                         <li data-req="number">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Number
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Number
                         </li>
                         <li data-req="symbol">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Symbol
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Symbol
                         </li>
                       </ul>
                     </div>
@@ -1935,6 +1925,9 @@
           aria-live="polite"
           aria-relevant="additions"
         ></div>
+        <button id="chatNewMessages" class="document-chat__new-messages" type="button" hidden>
+          New messages
+        </button>
         <form id="chatForm" class="document-chat__composer">
           <label class="sr-only" for="chatInput">Message collaborators</label>
           <textarea
@@ -1948,32 +1941,31 @@
           </button>
         </form>
       </aside>
-      <!-- Editor Workspace Loader (shows centered card above the workspace area when document is opening) -->
-      <div id="editorWorkspaceLoader" class="editor-workspace-loader" hidden>
-        <div class="editor-workspace-loader-card">
-          <div class="loader-document-icon">⌁</div>
-          <div class="loader-title">Opening document...</div>
-          <div class="loader-subtitle">Preparing your workspace</div>
-          <div class="loader-progress"><span></span></div>
+      <!-- One authoritative paper-first surface for the complete document-open lifecycle. -->
+      <div
+        id="editorSkeleton"
+        class="editor-skeleton hidden"
+        role="status"
+        aria-live="polite"
+        aria-busy="false"
+      >
+        <div class="editor-loading-paper" aria-hidden="true">
+          <div class="editor-loading-paper__brand">
+            <img src="/logo.svg" alt="" />
+          </div>
+          <span class="editor-loading-paper__line editor-loading-paper__line--title"></span>
+          <span class="editor-loading-paper__line"></span>
+          <span class="editor-loading-paper__line"></span>
+          <span class="editor-loading-paper__line editor-loading-paper__line--short"></span>
         </div>
-      </div>
-
-      <!-- Editor Skeleton (shown inside the editor workspace during document load) -->
-      <div id="editorSkeleton" class="editor-skeleton hidden">
-        <div class="skeleton-toolbar">
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
-          <div class="skeleton-toolbar-item skeleton-page" style="width: 60px"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-          <div class="skeleton-toolbar-item skeleton-page"></div>
-        </div>
-        <div class="editor-loading-card">
-          <div id="editorSkeletonStatus" class="editor-loading-status">Opening document...</div>
+        <div class="editor-loading-copy">
+          <div id="editorSkeletonStatus" class="editor-loading-status">Opening</div>
           <div id="editorSkeletonTitle" class="editor-loading-title">Opening document...</div>
           <div id="editorSkeletonDescription" class="editor-loading-description">
             Loading document content.
+          </div>
+          <div class="editor-loading-progress" aria-hidden="true">
+            <span></span>
           </div>
         </div>
         <div id="editorSkeletonMessage" class="editor-skeleton-message" hidden>
@@ -2476,9 +2468,15 @@
     <!-- Mobile Contextual Toolbar (Fixed above keyboard) -->
     <div id="mobileContextualToolbar" class="mobile-toolbar">
       <div class="mobile-toolbar-scroll">
-        <button class="mobile-tool-btn ql-bold"><i class="fas fa-bold"></i></button>
-        <button class="mobile-tool-btn ql-italic"><i class="fas fa-italic"></i></button>
-        <button class="mobile-tool-btn ql-underline"><i class="fas fa-underline"></i></button>
+        <button class="mobile-tool-btn ql-bold">
+          <i class="fas fa-bold"></i>
+        </button>
+        <button class="mobile-tool-btn ql-italic">
+          <i class="fas fa-italic"></i>
+        </button>
+        <button class="mobile-tool-btn ql-underline">
+          <i class="fas fa-underline"></i>
+        </button>
         <div class="mobile-tool-separator"></div>
         <button class="mobile-tool-btn ql-list" value="ordered">
           <i class="fas fa-list-ol"></i>
@@ -2487,11 +2485,15 @@
           <i class="fas fa-list-ul"></i>
         </button>
         <div class="mobile-tool-separator"></div>
-        <button class="mobile-tool-btn ql-align" value=""><i class="fas fa-align-left"></i></button>
+        <button class="mobile-tool-btn ql-align" value="">
+          <i class="fas fa-align-left"></i>
+        </button>
         <button class="mobile-tool-btn ql-align" value="center">
           <i class="fas fa-align-center"></i>
         </button>
-        <button class="mobile-tool-btn ql-image"><i class="fas fa-image"></i></button>
+        <button class="mobile-tool-btn ql-image">
+          <i class="fas fa-image"></i>
+        </button>
         <div class="mobile-tool-separator"></div>
         <button class="mobile-tool-btn" id="mobileCloseKeyboard">
           <i class="fas fa-keyboard"></i>

@@ -31,7 +31,6 @@ const ASSETS_TO_CACHE = [
   '/js/features/auth/pages/resetPassword.js',
   '/js/features/auth/pages/verify.js',
   '/js/features/auth/syncro/SyncroBot.js',
-  '/js/features/auth/syncro/SyncroRenderer.js',
   '/js/features/theme/theme.js',
   '/js/features/profile/profile.js',
   '/js/features/theme/background.js',

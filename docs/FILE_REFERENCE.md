@@ -119,15 +119,14 @@ Application styles load in the order shown below; changing that order can change
 
 ## Browser Authentication
 
-| File                                               | Purpose and ownership                                                                                     |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `public/js/features/auth/auth.js`                  | Owns in-memory access-token state, refresh, logout, current-user lookup, and verified-user normalization. |
-| `public/js/features/auth/pages/login.js`           | Implements login/signup forms, validation, email verification, typo suggestions, and bot interactions.    |
-| `public/js/features/auth/pages/forgotPassword.js`  | Implements forgot-password submission and its SyncroBot states.                                           |
-| `public/js/features/auth/pages/resetPassword.js`   | Implements reset-token/password validation and submission.                                                |
-| `public/js/features/auth/pages/verify.js`          | Implements standalone code verification, resend behavior, and post-verification navigation.               |
-| `public/js/features/auth/syncro/SyncroBot.js`      | Owns mascot state, eye tracking, idle behavior, focus tracking, and DOM state classes.                    |
-| `public/js/features/auth/syncro/SyncroRenderer.js` | Creates and cleans up mascot particles and state-specific visual effects.                                 |
+| File                                              | Purpose and ownership                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `public/js/features/auth/auth.js`                 | Owns in-memory access-token state, refresh, logout, current-user lookup, and verified-user normalization. |
+| `public/js/features/auth/pages/login.js`          | Implements login/signup forms, validation, email verification, typo suggestions, and bot interactions.    |
+| `public/js/features/auth/pages/forgotPassword.js` | Implements forgot-password submission and its SyncroBot states.                                           |
+| `public/js/features/auth/pages/resetPassword.js`  | Implements reset-token/password validation and submission.                                                |
+| `public/js/features/auth/pages/verify.js`         | Implements standalone code verification, resend behavior, and post-verification navigation.               |
+| `public/js/features/auth/syncro/SyncroBot.js`     | Owns mascot state, eye tracking, idle behavior, focus tracking, and DOM state classes.                    |
 
 ## Browser Editor and Feature Modules
 
@@ -189,6 +188,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/frontend/app/verification.test.js`                       | Verifies unverified-user dashboard and profile verification behavior.                                |
 | `tests/frontend/features/auth/auth.test.js`                     | Verifies canonical user verification-state normalization.                                            |
 | `tests/frontend/features/auth/authController.test.js`           | Verifies safe auth DOM rendering, validation, and signup error messages.                             |
+| `tests/frontend/features/auth/syncroBot.test.js`                | Verifies mascot state priority, pointer gaze, and bounded tap reactions.                             |
 | `tests/frontend/features/editor/editor.test.js`                 | Verifies editor lifecycle, synchronization resilience, and sanitized content handling.               |
 | `tests/frontend/features/editor/chatManager.test.js`            | Verifies chat mounting, document-scoped sync data, safe rendering, unread state, and permissions.    |
 | `tests/frontend/features/editor/quillSanitizer.test.js`         | Verifies unsafe tags, attributes, protocols, embeds, and image URLs are removed.                     |

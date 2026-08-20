@@ -636,10 +636,34 @@ export class AuthController {
     }
 
     const levels = [
-      { minScore: 1, maxScore: 2, cls: 'entropy-weak', width: '30%', text: 'Weak' },
-      { minScore: 3, maxScore: 3, cls: 'entropy-fair', width: '60%', text: 'Fair' },
-      { minScore: 4, maxScore: 4, cls: 'entropy-strong', width: '80%', text: 'Strong' },
-      { minScore: 5, maxScore: 5, cls: 'entropy-elite', width: '100%', text: 'Very Strong' },
+      {
+        minScore: 1,
+        maxScore: 2,
+        cls: 'entropy-weak',
+        width: '30%',
+        text: 'Weak',
+      },
+      {
+        minScore: 3,
+        maxScore: 3,
+        cls: 'entropy-fair',
+        width: '60%',
+        text: 'Fair',
+      },
+      {
+        minScore: 4,
+        maxScore: 4,
+        cls: 'entropy-strong',
+        width: '80%',
+        text: 'Strong',
+      },
+      {
+        minScore: 5,
+        maxScore: 5,
+        cls: 'entropy-elite',
+        width: '100%',
+        text: 'Very Strong',
+      },
     ];
     const level = levels.find((l) => score >= l.minScore && score <= l.maxScore) || levels[0];
 
@@ -659,9 +683,7 @@ export class AuthController {
       requestAnimationFrame(() => (overlay.style.opacity = '1'));
     }
     const docId = new URLSearchParams(window.location.search).get('doc');
-    setTimeout(() => {
-      window.location.href = docId ? `/?doc=${docId}` : '/';
-    }, 180);
+    window.location.href = docId ? `/?doc=${docId}` : '/';
   }
 
   _setButtonLoading(button, isLoading, loadingLabel = '') {

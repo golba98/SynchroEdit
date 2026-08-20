@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="128" fill="#050505"/>
 
-  <!-- Minimal document mark: solid black and white only. -->
+  <!-- Document Shape -->
   <path d="M150 100h150l100 100v232c0 22-18 40-40 40H150c-22 0-40-18-40-40V140c0-22 18-40 40-40Z" fill="#fff"/>
   <path d="M300 100v80c0 11 9 20 20 20h80" fill="#d4d4d4"/>
-  <path d="M320 210H210l80 76-80 76h110" fill="none" stroke="#050505" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Math Symbol (Sigma) -->
+  <path d="M296 238H206l66 62-66 62h90" fill="none" stroke="#050505" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

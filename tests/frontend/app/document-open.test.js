@@ -58,6 +58,9 @@ describe('Document Opening Flow', () => {
       openingDocumentId: null,
       documentLoadState: 'idle',
       setDocumentLifecycleState: jest.fn(),
+      beginDocumentOpen: jest.fn(({ mode }) => {
+        app.documentLoadState = mode;
+      }),
       isEditorReadyForCurrentDocument: jest.fn().mockReturnValue(false),
       loadDocument: jest.fn().mockResolvedValue(true),
     };
@@ -73,66 +76,62 @@ describe('Document Opening Flow', () => {
     document.body.dataset.viewState = 'dashboard';
   });
 
-  test('createNewDocument shows loader immediately with "Creating document..."', async () => {
-    const loader = document.getElementById('documentOpeningLoader');
-    const title = document.getElementById('documentOpeningTitle');
+  test('createNewDocument shows the workspace transition immediately', async () => {
+    const loader = document.getElementById('editorWorkspaceLoader');
 
     expect(loader.hidden).toBe(true);
 
     const promise = libraryManager.createNewDocument();
 
-    // Loader should show immediately (synchronously or before the first await)
     expect(loader.hidden).toBe(false);
-    expect(title.textContent).toBe('Creating document...');
+    expect(loader.querySelector('.loader-title').textContent).toBe('Creating document...');
+    expect(document.getElementById('documentOpeningLoader').hidden).toBe(true);
     expect(document.body.dataset.viewState).toBe('opening-document');
 
     await promise;
   });
 
-  test('openDocument shows loader immediately with "Opening document..."', async () => {
-    const loader = document.getElementById('documentOpeningLoader');
-    const title = document.getElementById('documentOpeningTitle');
+  test('openDocument shows the workspace transition immediately', async () => {
+    const loader = document.getElementById('editorWorkspaceLoader');
 
     expect(loader.hidden).toBe(true);
 
     const promise = libraryManager.openDocument('some-doc-id');
 
     expect(loader.hidden).toBe(false);
-    expect(title.textContent).toBe('Opening document...');
+    expect(loader.querySelector('.loader-title').textContent).toBe('Opening document...');
+    expect(document.getElementById('documentOpeningLoader').hidden).toBe(true);
     expect(document.body.dataset.viewState).toBe('opening-document');
 
     await promise;
   });
 
-  test('dashboard is NOT hidden while in opening-document state', async () => {
+  test('dashboard unmounts visually while the editor shell opens', async () => {
     const library = document.getElementById('docLibrary');
 
     await libraryManager.openDocument('some-doc-id');
 
-    // Even after startEditorTransition's 250ms timeout (if we were using real timers)
-    // but here we check immediately after state change
     expect(document.body.dataset.viewState).toBe('opening-document');
-    expect(library.style.display).toBe('block'); // Should stay block (dimmed via CSS)
+    expect(library.style.display).toBe('none');
   });
 
-  test('loader hides when editor reaches ready state', () => {
+  test('deprecated full-screen loader remains unmounted across states', () => {
     const loader = document.getElementById('documentOpeningLoader');
     uiManager.showDocumentOpeningLoader('Test');
-    expect(loader.hidden).toBe(false);
+    expect(loader.hidden).toBe(true);
 
     uiManager.applyViewState('editor-ready');
     expect(loader.hidden).toBe(true);
   });
 
-  test('assertNoBlankOpeningState restores loader if state is opening but loader is hidden', () => {
+  test('assertNoBlankOpeningState does not revive the deprecated overlay', () => {
     const loader = document.getElementById('documentOpeningLoader');
     document.body.dataset.viewState = 'opening-document';
     loader.hidden = true;
 
     uiManager.assertNoBlankOpeningState();
 
-    expect(loader.hidden).toBe(false);
-    expect(document.getElementById('documentOpeningTitle').textContent).toBe('Opening document...');
+    expect(loader.hidden).toBe(true);
   });
 
   test('editor shell visible + document not ready shows workspace loader', () => {

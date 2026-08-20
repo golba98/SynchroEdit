@@ -88,6 +88,23 @@
   align-items: center;
 }
 
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: #f3f4f6;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.auth-brand img {
+  display: block;
+  flex: 0 0 auto;
+}
+
 .bot-rig {
   position: relative;
   animation: float 6s ease-in-out infinite;
@@ -754,8 +771,21 @@
 /* Success */
 .bot-rig.success {
   animation:
-    happyJump 0.6s ease infinite,
+    happyJump 0.6s ease 1,
     enterSuccess 0.4s ease-out;
+}
+
+.bot-rig.nearby .head {
+  transform: translateY(-3px) scale(1.01);
+}
+.bot-rig.nearby .antenna-bulb {
+  filter: brightness(1.18);
+}
+.bot-rig.typing .antenna-bulb {
+  animation: antennaPulse 900ms ease-in-out infinite;
+}
+.bot-rig.typing .head {
+  transform: rotate(-1deg);
 }
 .bot-rig.success .antenna-bulb {
   background: var(--syncro-success);
@@ -840,16 +870,331 @@
   transform: rotate(-10deg);
 }
 
-@keyframes shakeHead {
-  0%,
-  100% {
-    transform: translateX(0);
+/* ==================== INTERACTIVE HIT & EMOTION STATES ==================== */
+
+/* Cursor pointer on character container to invite interaction */
+.character-container {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 1. Poke / Boing Reaction */
+.bot-rig.poke {
+  animation: pokeSquash 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bot-rig.poke .antenna-bulb {
+  animation: bulbWiggle 0.5s ease-in-out;
+}
+.bot-rig.poke .pupil {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+@keyframes pokeSquash {
+  0% {
+    transform: scale(1, 1);
   }
   25% {
-    transform: translateX(-15px) rotate(-5deg);
+    transform: scale(1.15, 0.82) translateY(8px);
+  }
+  50% {
+    transform: scale(0.9, 1.15) translateY(-14px);
   }
   75% {
-    transform: translateX(15px) rotate(5deg);
+    transform: scale(1.05, 0.95) translateY(2px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+@keyframes bulbWiggle {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(0);
+  }
+  25% {
+    transform: translateX(-50%) rotate(-25deg);
+  }
+  75% {
+    transform: translateX(-50%) rotate(25deg);
+  }
+}
+
+/* 2. Giggle Reaction */
+.bot-rig.giggle {
+  animation: giggleBounce 0.7s ease-in-out;
+}
+.bot-rig.giggle .eye {
+  height: 20px;
+  border-radius: 0 0 20px 20px;
+}
+.bot-rig.giggle .pupil {
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+  top: 25%;
+}
+.bot-rig.giggle .mouth {
+  width: 32px;
+  height: 16px;
+  border-radius: 0 0 32px 32px;
+  background: transparent;
+  border: 2px solid var(--syncro-accent);
+  border-top: none;
+  animation: mouthGiggle 0.2s ease-in-out infinite alternate;
+}
+.bot-rig.giggle .hand.left {
+  bottom: 30px;
+  transform: rotate(-35deg);
+}
+.bot-rig.giggle .hand.right {
+  bottom: 30px;
+  transform: rotate(35deg);
+}
+
+@keyframes giggleBounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  20% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+  40% {
+    transform: translateY(4px) rotate(3deg);
+  }
+  60% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+  80% {
+    transform: translateY(2px) rotate(2deg);
+  }
+}
+
+@keyframes mouthGiggle {
+  from {
+    transform: translateX(-50%) scaleX(0.9);
+  }
+  to {
+    transform: translateX(-50%) scaleX(1.15);
+  }
+}
+
+/* 3. Boing Reaction */
+.bot-rig.boing {
+  animation: boingSpring 0.75s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.bot-rig.boing .pupil {
+  width: 22px;
+  height: 22px;
+}
+
+@keyframes boingSpring {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.3, 0.7) translateY(12px);
+  }
+  45% {
+    transform: scale(0.75, 1.25) translateY(-32px);
+  }
+  70% {
+    transform: scale(1.1, 0.9) translateY(-6px);
+  }
+  85% {
+    transform: scale(0.95, 1.05) translateY(2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 4. Surprised Reaction (Two hits) */
+.bot-rig.surprised {
+  animation: popSurprise 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bot-rig.surprised .pupil {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.bot-rig.surprised .mouth {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--syncro-accent);
+}
+.bot-rig.surprised .hand.left {
+  bottom: 70px;
+  left: -20px;
+  transform: rotate(-45deg);
+}
+.bot-rig.surprised .hand.right {
+  bottom: 70px;
+  right: -20px;
+  transform: rotate(45deg);
+}
+.bot-rig.surprised .antenna-bulb {
+  background: #fbbf24;
+  box-shadow: 0 0 25px #fbbf24;
+}
+
+@keyframes popSurprise {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.25) translateY(-18px);
+  }
+  50% {
+    transform: scale(0.95) translateY(4px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 5. Hard Hit Left Reaction (Physical recoil) */
+.bot-rig.hit-hard-left {
+  animation: hitRecoilLeft 1.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bot-rig.hit-hard-left .antenna-bulb {
+  background: #ef4444;
+  box-shadow: 0 0 20px #ef4444;
+}
+.bot-rig.hit-hard-left .eye.left .eyelid.top {
+  height: 70%;
+}
+.bot-rig.hit-hard-left .mouth {
+  transform: translateX(-50%) rotate(12deg);
+  background: #ef4444;
+}
+
+@keyframes hitRecoilLeft {
+  0% {
+    transform: translateX(0) rotate(0);
+  }
+  15% {
+    transform: translateX(38px) rotate(18deg) scale(0.92, 1.08);
+  }
+  35% {
+    transform: translateX(-24px) rotate(-12deg) scale(1.05, 0.95);
+  }
+  55% {
+    transform: translateX(14px) rotate(6deg);
+  }
+  75% {
+    transform: translateX(-6px) rotate(-3deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+}
+
+/* 6. Hard Hit Right Reaction (Physical recoil) */
+.bot-rig.hit-hard-right {
+  animation: hitRecoilRight 1.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bot-rig.hit-hard-right .antenna-bulb {
+  background: #ef4444;
+  box-shadow: 0 0 20px #ef4444;
+}
+.bot-rig.hit-hard-right .eye.right .eyelid.top {
+  height: 70%;
+}
+.bot-rig.hit-hard-right .mouth {
+  transform: translateX(-50%) rotate(-12deg);
+  background: #ef4444;
+}
+
+@keyframes hitRecoilRight {
+  0% {
+    transform: translateX(0) rotate(0);
+  }
+  15% {
+    transform: translateX(-38px) rotate(-18deg) scale(0.92, 1.08);
+  }
+  35% {
+    transform: translateX(24px) rotate(12deg) scale(1.05, 0.95);
+  }
+  55% {
+    transform: translateX(-14px) rotate(-6deg);
+  }
+  75% {
+    transform: translateX(6px) rotate(3deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+}
+
+/* 7. Dizzy Overload Reaction (5+ rapid clicks) */
+.bot-rig.dizzy {
+  animation: dizzyWobble 2s ease-in-out;
+}
+.bot-rig.dizzy .pupil {
+  animation: dizzyEyes 0.6s linear infinite;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+}
+.bot-rig.dizzy .antenna-bulb {
+  animation: dizzyBulb 0.4s ease infinite alternate;
+}
+.bot-rig.dizzy .mouth {
+  width: 24px;
+  height: 12px;
+  border-radius: 12px;
+  animation: dizzyMouth 0.5s ease infinite alternate;
+}
+
+@keyframes dizzyWobble {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  20% {
+    transform: translateY(-10px) rotate(12deg);
+  }
+  40% {
+    transform: translateY(8px) rotate(-14deg);
+  }
+  60% {
+    transform: translateY(-6px) rotate(10deg);
+  }
+  80% {
+    transform: translateY(4px) rotate(-8deg);
+  }
+}
+
+@keyframes dizzyEyes {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(7px) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(7px) rotate(-360deg);
+  }
+}
+
+@keyframes dizzyBulb {
+  from {
+    background: #ef4444;
+    box-shadow: 0 0 20px #ef4444;
+  }
+  to {
+    background: #fbbf24;
+    box-shadow: 0 0 20px #fbbf24;
+  }
+}
+
+@keyframes dizzyMouth {
+  from {
+    transform: translateX(-50%) rotate(-10deg) scaleX(0.8);
+  }
+  to {
+    transform: translateX(-50%) rotate(10deg) scaleX(1.2);
   }
 }
 

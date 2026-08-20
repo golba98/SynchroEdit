@@ -14,19 +14,19 @@ For an annotated directory tree and dependency flows between these files, read
 
 ## Repository Root
 
-| File                        | Purpose and ownership                                                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `.env.example`              | Documents the names and intended sources of Worker bindings and secrets without containing secret values.                       |
-| `.gitignore`                | Excludes dependencies, secrets, Wrangler state, test output, editor files, and other reproducible local artifacts.              |
-| `package.json`              | Defines the package metadata, runtime/development dependencies, scripts, and Jest configuration.                                |
-| `package-lock.json`         | Pins the complete npm dependency graph for reproducible installs and security review.                                           |
-| `wrangler.toml`             | Defines the Worker entrypoint, static assets, D1 databases, Durable Object bindings/migrations, and local/staging environments. |
-| `README.md`                 | Provides the project overview, setup, commands, production boundary, and operator-facing links.                                 |
-| `docs/DOCUMENTATION.md`     | Provides the standardized technical overview and directs readers to the detailed guides.                                        |
-| `docs/ARCHITECTURE.md`      | Describes system boundaries, routes, authentication, data relationships, realtime flow, and extension rules.                    |
-| `docs/PROJECT_STRUCTURE.md` | Explains the annotated repository tree, file relationships, state ownership, and change paths.                                  |
-| `docs/FILE_REFERENCE.md`    | Lists every retained first-party file and explains why it exists.                                                               |
-| `SECURITY.md`               | Defines vulnerability reporting and records the Quill advisory mitigation boundary.                                             |
+| File                        | Purpose and ownership                                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `.env.example`              | Documents the names and intended sources of Worker bindings and secrets without containing secret values.                    |
+| `.gitignore`                | Excludes dependencies, secrets, Wrangler state, test output, editor files, and other reproducible local artifacts.           |
+| `package.json`              | Defines the package metadata, runtime/development dependencies, scripts, and Jest configuration.                             |
+| `package-lock.json`         | Pins the complete npm dependency graph for reproducible installs and security review.                                        |
+| `wrangler.toml`             | Defines the Worker entrypoint, static assets, D1 databases, Durable Object exports/bindings, and local/staging environments. |
+| `README.md`                 | Provides the project overview, setup, commands, production boundary, and operator-facing links.                              |
+| `docs/DOCUMENTATION.md`     | Provides the standardized technical overview and directs readers to the detailed guides.                                     |
+| `docs/ARCHITECTURE.md`      | Describes system boundaries, routes, authentication, data relationships, realtime flow, and extension rules.                 |
+| `docs/PROJECT_STRUCTURE.md` | Explains the annotated repository tree, file relationships, state ownership, and change paths.                               |
+| `docs/FILE_REFERENCE.md`    | Lists every retained first-party file and explains why it exists.                                                            |
+| `SECURITY.md`               | Defines vulnerability reporting and records the Quill advisory mitigation boundary.                                          |
 
 ## Repository Automation and Tooling
 
@@ -95,6 +95,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/css/app/settings.css`          | Defines profile, settings, sharing, history, and modal-specific presentation.                       |
 | `public/css/syncro.css`                | Defines the reusable SyncroBot rig, body parts, state classes, particles, and animations.           |
 | `public/css/pages/login.css`           | Defines login/signup layout, validation feedback, verification modal, and auth-page responsiveness. |
+| `public/css/pages/auth-mobile.css`     | Defines shared mobile auth sizing, safe-area, keyboard, and compact mascot layout rules.            |
 | `public/css/pages/forgot-password.css` | Defines the forgot-password page layout and status presentation.                                    |
 | `public/css/pages/reset-password.css`  | Defines reset-password form, requirements, MFA group, and status presentation.                      |
 | `public/css/pages/verify.css`          | Defines standalone verification input, actions, and status presentation.                            |
@@ -135,6 +136,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/js/features/editor/editor.js`                      | Coordinates Quill, Yjs, IndexedDB recovery, WebSocket sync, pages, plugins, and editor lifecycle signals. |
 | `public/js/features/editor/managers/PageManager.js`        | Owns page creation, sizing, ordering, virtualization, and Yjs page metadata.                              |
 | `public/js/features/editor/managers/BorderManager.js`      | Applies and reads document border controls using point-to-pixel conversion.                               |
+| `public/js/features/editor/managers/ChatManager.js`        | Owns document-scoped Yjs chat state, safe rendering, unread state, and panel lifecycle.                   |
 | `public/js/features/editor/managers/CursorManager.js`      | Renders and removes remote collaborator cursor/selection markers.                                         |
 | `public/js/features/editor/managers/ImageManager.js`       | Owns image insertion, selection, resize handles, and image interaction cleanup.                           |
 | `public/js/features/editor/managers/NavigationManager.js`  | Synchronizes page navigation controls with the active editor page.                                        |
@@ -178,6 +180,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/unit/emailVerification.test.js`                          | Verifies verification-code generation properties.                                                    |
 | `tests/unit/worker.test.js`                                     | Covers Worker API, auth, permissions, sessions, validation, and Durable Object contracts.            |
 | `tests/integration/security.test.js`                            | Exercises security headers, CORS, malformed input, and integration error behavior.                   |
+| `tests/e2e/collaboration.test.js`                               | Proves two independent users share live document edits, chat, and persisted reconnect state.         |
 | `tests/frontend/app/app.test.js`                                | Verifies application composition, authentication gates, navigation, and document lifecycle behavior. |
 | `tests/frontend/app/assets.test.js`                             | Verifies asset references, precache entries, retired paths, and this file-reference inventory.       |
 | `tests/frontend/app/document-open.test.js`                      | Verifies document-open lifecycle ordering and stale/failed open protection.                          |
@@ -187,6 +190,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/frontend/features/auth/auth.test.js`                     | Verifies canonical user verification-state normalization.                                            |
 | `tests/frontend/features/auth/authController.test.js`           | Verifies safe auth DOM rendering, validation, and signup error messages.                             |
 | `tests/frontend/features/editor/editor.test.js`                 | Verifies editor lifecycle, synchronization resilience, and sanitized content handling.               |
+| `tests/frontend/features/editor/chatManager.test.js`            | Verifies chat mounting, document-scoped sync data, safe rendering, unread state, and permissions.    |
 | `tests/frontend/features/editor/quillSanitizer.test.js`         | Verifies unsafe tags, attributes, protocols, embeds, and image URLs are removed.                     |
 | `tests/frontend/features/editor/virtualization.test.js`         | Verifies large-document page virtualization and bounded DOM work.                                    |
 | `tests/frontend/features/editor/managers/BorderManager.test.js` | Verifies border state and control synchronization.                                                   |

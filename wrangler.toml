@@ -53,14 +53,6 @@ class_name = "SynchroDocumentObject"
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
 
-[[env.local.migrations]]
-tag = "v1"
-new_sqlite_classes = ["SynchroDocumentObject"]
-
-[[env.local.migrations]]
-tag = "v2"
-new_sqlite_classes = ["SynchroRateLimitObject"]
-
 [env.local.vars]
 EMAIL_FROM = "SyncroEdit <verify@example.com>"
 APP_NAME = "SyncroEdit"
@@ -83,6 +75,17 @@ class_name = "SynchroDocumentObject"
 [[env.staging.durable_objects.bindings]]
 name = "RATE_LIMIT_OBJECT"
 class_name = "SynchroRateLimitObject"
+
+# The existing syncroedit-dev namespace was previously migrated to the
+# product-spelling classes. The application now deliberately retains the
+# historical "Synchro" Durable Object class names, so move the staging
+# instances back instead of orphaning their stored documents and rate limits.
+[[env.staging.migrations]]
+tag = "v5"
+renamed_classes = [
+  { from = "SyncroDocumentObject", to = "SynchroDocumentObject" },
+  { from = "SyncroRateLimitObject", to = "SynchroRateLimitObject" },
+]
 
 [env.staging.vars]
 EMAIL_FROM = "SyncroEdit <no-reply@syncroedit.online>"

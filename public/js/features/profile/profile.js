@@ -17,13 +17,20 @@ export class Profile {
       );
     }
 
-    // Tab switching listener (to load sessions when security tab is opened)
+    // Tab switching listener (load sessions once or when empty)
     const profileTabs = document.querySelectorAll('.profile-tab');
     profileTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        if (tab.getAttribute('data-tab') === 'security') {
-          this.loadSessions();
-          this.loadLoginHistory();
+        const tabName = tab.getAttribute('data-tab');
+        if (tabName === 'security') {
+          const container = document.getElementById('sessionListContainer');
+          if (!container || !container.children.length) {
+            this.loadSessions();
+          }
+          const tbody = document.getElementById('loginHistoryTableBody');
+          if (!tbody || !tbody.children.length) {
+            this.loadLoginHistory();
+          }
         }
       });
     });

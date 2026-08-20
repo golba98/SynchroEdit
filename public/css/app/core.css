@@ -30,6 +30,10 @@
 
   --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.28);
   --transition-speed: 0.2s;
+  --motion-micro: 150ms;
+  --motion-control: 210ms;
+  --motion-view: 300ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --glow-intensity: 0;
 
   --font-xs: 11px;
@@ -86,6 +90,159 @@ body {
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text);
+}
+
+.app-brand img {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.app-brand h1,
+.app-brand span {
+  margin: 0;
+  color: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-brand--compact {
+  min-height: 40px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.app-brand--compact:hover,
+.app-brand--compact:focus-visible {
+  background: var(--surface-hover);
+}
+
+/* Google Docs Style Template Gallery */
+.google-docs-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.doc-template-card {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+  width: auto !important;
+  height: auto !important;
+  outline: none;
+}
+
+.doc-template-thumbnail {
+  position: relative;
+  width: 140px;
+  height: 180px;
+  background: #151518;
+  border: 1px solid #28282c;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.doc-template-plus {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #202024;
+  border: 1px solid #343438;
+  color: #a3a3a8;
+  font-size: 16px;
+  transition: all 180ms ease;
+}
+
+.doc-template-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.doc-template-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f5f5f5;
+  letter-spacing: -0.01em;
+}
+
+.doc-template-card:hover .doc-template-thumbnail,
+.doc-template-card:focus-visible .doc-template-thumbnail {
+  background: #1c1c20;
+  border-color: #55555c;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.doc-template-card:hover .doc-template-plus,
+.doc-template-card:focus-visible .doc-template-plus {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #111113;
+  transform: scale(1.06);
+}
+
+.doc-template-card.is-opening {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.doc-template-card.is-opening .doc-template-thumbnail {
+  border-color: var(--accent-color);
+}
+
+body.light-theme .doc-template-title {
+  color: #111827;
+}
+
+body.light-theme .doc-template-thumbnail {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .doc-template-plus {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+
+body.light-theme .doc-template-card:hover .doc-template-plus {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
 }
 
 #docLibrary {

@@ -36,11 +36,7 @@ export class UIManager {
       this.app.libraryManager.showLibrary();
     });
     addEvent('createNewDoc', 'click', () => this.app.libraryManager.createNewDocument());
-    addEvent('createNewDoc', 'keydown', (event) => {
-      if (!['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      this.app.libraryManager.createNewDocument();
-    });
+    addEvent('editorBrand', 'click', () => this.app.libraryManager.showLibrary());
     addEvent('closeLibrary', 'click', () => {
       if (this.app.documentId) {
         const docLibrary = document.getElementById('docLibrary');
@@ -345,7 +341,6 @@ export class UIManager {
   }
 
   applyViewState(state) {
-    const previousViewState = document.body.dataset.viewState;
     document.body.dataset.viewState = state;
 
     const bootLoader = document.getElementById('bootLoader');
@@ -375,12 +370,7 @@ export class UIManager {
     const overlay = document.getElementById('libraryOverlay');
     const closeBtn = document.getElementById('closeLibrary');
     const showDashboard = state === 'dashboard';
-    const hadDashboardMounted =
-      previousViewState === 'dashboard' ||
-      library?.classList.contains('view-visible') ||
-      library?.style.display === 'block';
-    const fadingDashboard = state === 'opening-document' && hadDashboardMounted;
-    const keepDashboardMounted = showDashboard || fadingDashboard;
+    const keepDashboardMounted = showDashboard;
 
     if (library) {
       library.style.display = keepDashboardMounted ? 'block' : 'none';
@@ -390,20 +380,6 @@ export class UIManager {
     if (overlay) {
       overlay.style.display = keepDashboardMounted ? 'block' : 'none';
       overlay.classList.toggle('view-visible', showDashboard);
-    }
-
-    if (fadingDashboard) {
-      const duration = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ? 0 : 180;
-      setTimeout(() => {
-        if (
-          document.body.dataset.viewState !== 'dashboard' &&
-          document.body.dataset.viewState !== 'opening-document'
-        ) {
-          if (library) library.style.display = 'none';
-          if (overlay) overlay.style.display = 'none';
-          this.updateMobileUIState();
-        }
-      }, duration);
     }
 
     if (closeBtn) {
@@ -446,7 +422,7 @@ export class UIManager {
     const title = document.getElementById('documentOpeningTitle');
     if (loader) {
       if (title) title.textContent = text;
-      loader.hidden = false;
+      loader.hidden = true;
     }
   }
 
@@ -460,9 +436,8 @@ export class UIManager {
     const loader = document.getElementById('documentOpeningLoader');
     const loaderVisible = loader && !loader.hidden;
 
-    if (isOpening && !loaderVisible) {
-      console.warn('[OPEN] Prevented blank opening state: showing loader');
-      this.showDocumentOpeningLoader('Opening document...');
+    if (isOpening && loaderVisible) {
+      loader.hidden = true;
     }
   }
 
@@ -527,7 +502,11 @@ export class UIManager {
 
     if (editorVisible && pagesHidden && !editorReady && (loader ? loader.hidden : true)) {
       console.warn('[OPEN] Prevented black editor workspace: showing loader');
-      this.showEditorWorkspaceLoader('Opening document...', 'Preparing your workspace');
+      const isCreating = this.app?.documentLoadState === 'creating';
+      this.showEditorWorkspaceLoader(
+        isCreating ? 'Creating document...' : 'Opening document...',
+        isCreating ? 'Setting up a blank page' : 'Preparing your workspace'
+      );
     }
   }
 

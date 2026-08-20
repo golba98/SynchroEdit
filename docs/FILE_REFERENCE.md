@@ -205,6 +205,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/e2e/auth-ui.test.js`                                     | Covers auth form behavior, mascot geometry, validation, verification, and responsive presentation.   |
 | `tests/e2e/interactions.test.js`                                | Covers toolbar formatting and theme interaction in a real browser.                                   |
 | `tests/e2e/responsiveness.test.js`                              | Covers login and editor layout at desktop/mobile viewports.                                          |
+| `tests/e2e/loading-states.test.js`                              | Verifies branded boot loading and viewport-safe new-document loading at desktop/mobile viewports.   |
 
 ## Intentionally Local-Only Files
 

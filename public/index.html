@@ -39,28 +39,74 @@
         display: none !important;
       }
 
-      /* Simple initial styling for bootLoader overlay to show immediately */
+      /* Keep the first paint aligned with the monochrome loading system. */
       #bootLoader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 32%), #101418;
+        background: #080b12;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 999999;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
         transition: opacity 0.2s ease-out;
+      }
+
+      #bootLoader .boot-loader-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        width: min(390px, calc(100% - 40px));
+        padding: 36px 32px 32px;
+        box-sizing: border-box;
+        background: #0f141f;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+      }
+
+      .boot-loader-mark {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        place-items: center;
+        border-radius: 16px;
+        background: #09090b;
+      }
+
+      .boot-loader-mark img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .boot-loader-copy h1,
+      .boot-loader-copy p {
+        margin: 0;
+      }
+
+      .boot-loader-copy h1 {
+        color: #fafafa;
+        font-size: 21px;
+        letter-spacing: -0.03em;
+      }
+
+      .boot-loader-copy p {
+        margin-top: 8px;
+        color: #94a3b8;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+
+      .boot-loader-progress {
+        width: 42px;
+        height: 42px;
+        border: 3px solid rgba(255, 255, 255, 0.14);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.85s linear infinite;
       }
 
       #bootLoader.fading-out {
@@ -121,58 +167,15 @@
   <body data-page="editor" data-view-state="booting" style="margin: 0; padding: 0">
     <!-- Boot Loader -->
     <div id="bootLoader">
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 24px;
-          text-align: center;
-          padding: 32px;
-          background: #151a20;
-          border: 1px solid #2a323d;
-          border-radius: 12px;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-          max-width: 320px;
-          width: calc(100% - 32px);
-        "
-      >
-        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
-        <div>
-          <h1
-            style="
-              color: #f3f4f6;
-              font-size: 20px;
-              font-weight: 700;
-              margin: 0 0 8px 0;
-              letter-spacing: 0.5px;
-            "
-          >
-            SyncroEdit
-          </h1>
-          <p
-            style="
-              color: #b0b7c3;
-              font-size: 13px;
-              font-weight: 500;
-              margin: 0;
-              opacity: 0.8;
-              letter-spacing: 0.5px;
-            "
-          >
-            Loading workspace...
-          </p>
+      <div class="boot-loader-card" role="status" aria-live="polite" aria-busy="true">
+        <div class="boot-loader-mark" aria-hidden="true">
+          <img src="/logo.svg" alt="" />
         </div>
-        <div
-          style="
-            width: 36px;
-            height: 36px;
-            border: 3.5px solid rgba(59, 130, 246, 0.15);
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-          "
-        ></div>
+        <div class="boot-loader-copy">
+          <h1>SyncroEdit</h1>
+          <p>Loading workspace...</p>
+        </div>
+        <div class="boot-loader-progress" aria-hidden="true"></div>
       </div>
     </div>
 

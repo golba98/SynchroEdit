@@ -1015,6 +1015,40 @@ body.light-theme .toolbar {
   font-weight: 500;
 }
 
+/* Header actions keep their contrast even when broad theme/button rules load later. */
+#saveBtn.save-button {
+  min-height: 38px;
+  padding: 0 16px !important;
+  border: 1px solid #f5f5f5 !important;
+  border-radius: 10px !important;
+  background: #f5f5f5 !important;
+  color: #090909 !important;
+  opacity: 1 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22) !important;
+}
+
+#saveBtn.save-button:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+#shareBtn.share-button {
+  min-height: 38px;
+  padding: 0 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #f5f5f5 !important;
+}
+
+#shareBtn.share-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.52) !important;
+  color: #ffffff !important;
+}
+
 select {
   border: 1px solid var(--border);
   padding: 2px 6px;

@@ -59,7 +59,12 @@ export class App {
   }
 
   registerServiceWorker() {
-    if ('serviceWorker' in navigator && !navigator.webdriver) {
+    if (!('serviceWorker' in navigator) || navigator.webdriver) return;
+
+    const isLocalDevelopment = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    if (isLocalDevelopment) return;
+
+    {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')

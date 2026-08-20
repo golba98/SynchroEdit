@@ -36,6 +36,11 @@ export class UIManager {
       this.app.libraryManager.showLibrary();
     });
     addEvent('createNewDoc', 'click', () => this.app.libraryManager.createNewDocument());
+    addEvent('createNewDoc', 'keydown', (event) => {
+      if (!['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      this.app.libraryManager.createNewDocument();
+    });
     addEvent('closeLibrary', 'click', () => {
       if (this.app.documentId) {
         const docLibrary = document.getElementById('docLibrary');

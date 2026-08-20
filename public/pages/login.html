@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SyncroEdit - Login</title>
+    <script src="/js/dev-cache-reset.js"></script>
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/css/app/core.css" />
     <link rel="stylesheet" href="/css/app/editor.css" />
@@ -15,23 +16,18 @@
   <body class="boot-up" data-page="login">
     <div class="login-container">
       <div class="left-section">
-        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px">
-          <div style="font-size: 24px">📄</div>
-          <div
-            style="
-              font-size: 20px;
-              font-weight: bold;
-              color: var(--accent-color);
-              letter-spacing: 1px;
-            "
-          >
-            SyncroEdit
+        <div class="brand-lockup">
+          <img class="brand-mark" src="/logo.svg" alt="" />
+          <div>
+            <div class="brand-name">SyncroEdit</div>
+            <div class="brand-kicker">Collaborative documents</div>
           </div>
         </div>
         <!-- Login Form -->
         <div class="form-container active" id="loginForm">
-          <div class="title">Welcome Back</div>
-          <div class="subtitle">Please login to continue to SyncroEdit</div>
+          <div class="eyebrow"><span></span> Secure workspace access</div>
+          <div class="title">Welcome back.</div>
+          <div class="subtitle">Sign in to pick up where your team left off.</div>
 
           <div class="input-group floating-label-container">
             <input
@@ -68,7 +64,9 @@
             </div>
           </div>
 
-          <button class="login-btn" id="loginBtn">Login</button>
+          <button class="login-btn" id="loginBtn">
+            <span>Continue to workspace</span><i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
           <div class="status-message" id="loginStatusMessage"></div>
           <div class="toggle-form">
             Don't have an account? <a id="showSignup">Create Account</a>
@@ -217,8 +215,20 @@
 
       <!-- Right Section: SyncroBot 2.0 -->
       <div class="right-section">
+        <div class="bot-intro">
+          <span class="bot-status">SyncroBot</span>
+          <h2>Make ideas move<br /><em>in sync.</em></h2>
+          <p>Write, refine, and collaborate in one calm workspace.</p>
+        </div>
         <div class="character-container">
-          <div class="bot-rig" id="botRig">
+          <div
+            class="bot-rig"
+            id="botRig"
+            role="button"
+            tabindex="0"
+            aria-label="Play with SyncroBot"
+            title="Tap SyncroBot"
+          >
             <div class="antenna-stalk"></div>
             <div class="antenna-bulb"></div>
             <div class="head">
@@ -355,11 +365,12 @@
         transition: opacity 0.5s ease-in-out;
       "
     >
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 20px">
-        <div style="font-size: 48px; animation: float 3s ease-in-out infinite">📄</div>
+        <div class="redirect-content">
+        <img class="redirect-mark" src="/logo.svg" alt="" />
         <h2 style="color: var(--accent-color); font-size: 24px; letter-spacing: 1px; margin: 0">
-          Accessing Workspace
+          Opening your workspace
         </h2>
+        <p class="redirect-description">Preparing your documents and live collaboration.</p>
         <div
           style="
             width: 40px;

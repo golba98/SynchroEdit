@@ -78,8 +78,13 @@ test.describe('Login Page Tests', () => {
 
     await expect(botRig).toHaveClass(/error/);
     const antenna = page.locator('.antenna-bulb');
-    // Check if color changes (red-ish)
-    await expect(antenna).toHaveCSS('background-color', 'rgb(255, 0, 68)'); // #ff0044
+    // Error feedback remains monochrome in the black-and-white visual system.
+    const antennaColor = await antenna.evaluate(
+      (element) => getComputedStyle(element).backgroundColor
+    );
+    const channels = antennaColor.match(/\d+/g).map(Number);
+    expect(channels[0]).toBe(channels[1]);
+    expect(channels[1]).toBe(channels[2]);
   });
 });
 

@@ -1150,25 +1150,27 @@ body[data-view-state='dashboard'] #editorSkeleton {
 }
 
 #bootLoader {
-  background: #080b12;
-  backdrop-filter: blur(18px);
+  background: #08090b;
+  backdrop-filter: blur(18px) saturate(0.8);
 }
 
 #bootLoader .boot-loader-card {
   width: min(390px, calc(100% - 40px));
   max-width: none;
-  padding: 36px 32px 32px !important;
+  padding: 32px !important;
   gap: 18px !important;
-  background: rgba(15, 20, 31, 0.96) !important;
-  border: 1px solid rgba(148, 163, 184, 0.18) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48) !important;
+  background: #151517 !important;
+  border: 1px solid #2f2f33 !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 .boot-loader-mark {
   width: 54px;
   height: 54px;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.42);
   animation: loader-mark-pulse 2.2s ease-in-out infinite;
 }
@@ -1180,7 +1182,7 @@ body[data-view-state='dashboard'] #editorSkeleton {
 }
 
 #bootLoader .boot-loader-card p {
-  color: #94a3b8 !important;
+  color: #929297 !important;
   opacity: 1 !important;
   font-size: 12px !important;
   letter-spacing: 0.04em !important;
@@ -1189,7 +1191,7 @@ body[data-view-state='dashboard'] #editorSkeleton {
 .boot-loader-progress {
   width: 42px !important;
   height: 42px !important;
-  border: 3px solid rgba(255, 255, 255, 0.14) !important;
+  border: 3px solid #2b2b2f !important;
   border-top-color: #ffffff !important;
   border-radius: 50% !important;
   animation: spin 0.85s linear infinite !important;

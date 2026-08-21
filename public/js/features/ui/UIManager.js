@@ -1,6 +1,7 @@
 import { Auth } from '/js/features/auth/auth.js';
 import { Network } from '/js/app/network.js';
 import { escapeHTML } from '/js/app/utils.js';
+import { ResponsiveLayoutController } from '/js/features/ui/ResponsiveLayoutController.js';
 
 export class UIManager {
   constructor(app) {
@@ -11,6 +12,7 @@ export class UIManager {
     this.saveStatusTimer = null;
     this.documentOpenState = 'idle';
     this.hasShownEditorReady = false;
+    this.responsiveLayout = new ResponsiveLayoutController(app);
 
     // Bind and expose workspace loader helpers globally
     this.showEditorWorkspaceLoader = this.showEditorWorkspaceLoader.bind(this);
@@ -22,6 +24,7 @@ export class UIManager {
     window.hideEditorWorkspaceLoader = this.hideEditorWorkspaceLoader;
     window.revealPagesContainer = this.revealPagesContainer;
     window.preventBlackEditorLoadingState = this.preventBlackEditorLoadingState;
+    this.responsiveLayout.init();
   }
 
   setupEventListeners() {
@@ -60,6 +63,10 @@ export class UIManager {
       if (modal) modal.style.display = 'flex';
     });
     addEvent('libraryUserProfileTrigger', 'click', () => {
+      const modal = document.getElementById('profileModal');
+      if (modal) modal.style.display = 'flex';
+    });
+    addEvent('headerProfileMenuBtn', 'click', () => {
       const modal = document.getElementById('profileModal');
       if (modal) modal.style.display = 'flex';
     });
@@ -183,6 +190,7 @@ export class UIManager {
         modal.style.display = 'flex';
       }
     });
+    addEvent('shareRibbonBtn', 'click', () => document.getElementById('shareBtn')?.click());
 
     addEvent('linkSharingToggle', 'change', async (e) => {
       const enabled = e.target.checked;
@@ -253,8 +261,6 @@ export class UIManager {
   }
 
   setupMobileEvents() {
-    const isMobile = window.innerWidth <= 768;
-
     // FAB Logic
     const fabCreate = document.getElementById('fabCreateDoc');
     const fabEdit = document.getElementById('fabEditDoc');
@@ -303,12 +309,22 @@ export class UIManager {
       });
     }
 
+    const moreTools = document.getElementById('mobileMoreTools');
+    const moreToolsBtn = document.getElementById('mobileMoreToolsBtn');
+    if (moreTools && moreToolsBtn) {
+      moreToolsBtn.addEventListener('click', () => {
+        const open = moreTools.hidden;
+        moreTools.hidden = !open;
+        moreToolsBtn.setAttribute('aria-expanded', String(open));
+      });
+    }
+
     // Initial state
     this.updateMobileUIState();
 
     // Listen for editor focus/blur to toggle toolbar
     document.addEventListener('focusin', (e) => {
-      if (isMobile && e.target.closest('.ql-editor')) {
+      if (window.innerWidth <= 768 && e.target.closest('.ql-editor')) {
         this.setMobileEditMode(true);
       }
     });
@@ -319,7 +335,6 @@ export class UIManager {
 
   updateMobileUIState() {
     const isMobile = window.innerWidth <= 768;
-    if (!isMobile) return;
 
     const fabCreate = document.getElementById('fabCreateDoc');
     const fabEdit = document.getElementById('fabEditDoc');
@@ -329,7 +344,11 @@ export class UIManager {
     const isLibraryVisible = docLibrary && docLibrary.style.display !== 'none';
     const hasDocument = !!this.app.documentId;
 
-    if (isLibraryVisible) {
+    if (!isMobile) {
+      if (fabCreate) fabCreate.style.removeProperty('display');
+      if (fabEdit) fabEdit.style.removeProperty('display');
+      if (bottomNav) bottomNav.style.removeProperty('display');
+    } else if (isLibraryVisible) {
       if (fabCreate) fabCreate.style.display = 'flex';
       if (fabEdit) fabEdit.style.display = 'none';
       if (bottomNav) bottomNav.style.display = 'flex';
@@ -679,11 +698,11 @@ export class UIManager {
     if (active) {
       if (toolbar) toolbar.style.display = 'block';
       if (fabEdit) fabEdit.style.display = 'none';
-      if (header) header.style.height = '50px'; // Slimmer header in edit mode
+      if (header) header.classList.add('is-mobile-editing');
     } else {
       if (toolbar) toolbar.style.display = 'none';
       if (fabEdit) fabEdit.style.display = 'flex';
-      if (header) header.style.height = '60px';
+      if (header) header.classList.remove('is-mobile-editing');
     }
   }
 

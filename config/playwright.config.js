@@ -8,7 +8,7 @@ module.exports = defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8787',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8791',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     extraHTTPHeaders: {
@@ -27,10 +27,10 @@ module.exports = defineConfig({
   ],
   webServer: {
     command:
-      'rm -rf .wrangler/state/v3 && npx wrangler d1 migrations apply DB --local --env local && npx wrangler dev --env local --port 8787 --var NODE_ENV:test --var EMAIL_CODE_PEPPER:test-email-code-pepper-123 --var RESEND_API_KEY:test-resend-api-key --var "EMAIL_FROM:SyncroEdit <verify@example.com>" --var APP_NAME:SyncroEdit',
+      'rm -rf .wrangler/e2e-state && npx wrangler d1 migrations apply DB --local --env local --persist-to .wrangler/e2e-state && npx wrangler dev --env local --port 8791 --persist-to .wrangler/e2e-state --var NODE_ENV:test --var EMAIL_CODE_PEPPER:test-email-code-pepper-123 --var RESEND_API_KEY:test-resend-api-key --var "EMAIL_FROM:SyncroEdit <verify@example.com>" --var APP_NAME:SyncroEdit',
     cwd: '..',
-    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8787',
-    reuseExistingServer: !process.env.CI,
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8791',
+    reuseExistingServer: false,
     timeout: 120000,
   },
 });

@@ -107,6 +107,7 @@
     <link rel="stylesheet" href="/css/app/editor.css" />
     <link rel="stylesheet" href="/css/app/effects.css" />
     <link rel="stylesheet" href="/css/app/settings.css" />
+    <link rel="stylesheet" href="/css/app/responsive.css" />
     <script type="importmap">
       {
         "imports": {
@@ -355,13 +356,15 @@
               gap: 6px;
             "
           >
-            <i class="fas fa-save"></i> Save
+            <i class="fas fa-save" aria-hidden="true"></i
+            ><span class="header-action-label">Save</span>
           </button>
 
           <!-- Share button (secondary outlined) next to Save button -->
           <button
             class="toolbar-btn share-button"
             id="shareBtn"
+            data-action="share-document"
             title="Share Document"
             style="
               background: transparent;
@@ -377,7 +380,8 @@
               gap: 6px;
             "
           >
-            <i class="fas fa-share-alt"></i> Share
+            <i class="fas fa-share-alt" aria-hidden="true"></i
+            ><span class="header-action-label">Share</span>
           </button>
 
           <!-- Invisible saveAsBtn so we don't break JS querySelectors -->
@@ -427,6 +431,27 @@
             class="fas fa-user-circle"
             style="font-size: 28px; color: var(--text-soft)"
           ></i>
+        </div>
+        <div class="responsive-overflow header-more">
+          <button
+            id="headerMoreBtn"
+            class="toolbar-btn responsive-overflow__button"
+            type="button"
+            data-responsive-overflow-button
+            aria-expanded="false"
+            aria-label="More document actions"
+            title="More actions"
+          >
+            <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+          </button>
+          <div class="responsive-overflow__panel" role="menu">
+            <button id="headerProfileMenuBtn" type="button" role="menuitem">
+              <i class="fas fa-user" aria-hidden="true"></i> Profile and settings
+            </button>
+            <button type="button" role="menuitem" data-proxy-click="menuBtn">
+              <i class="fas fa-folder-open" aria-hidden="true"></i> Back to documents
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -521,35 +546,29 @@
           </div>
         </div>
 
-        <!-- New Document Section -->
-        <div style="margin-bottom: 40px">
+        <!-- Start a new document Section (Google Docs style) -->
+        <div style="margin-bottom: 36px">
           <h2
-            style="font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text)"
+            style="font-size: 14px; font-weight: 500; margin-bottom: 16px; color: var(--text-soft)"
             class="section-title"
           >
-            New
+            Start a new document
           </h2>
-          <div
-            style="
-              display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-              gap: 20px;
-            "
-          >
+          <div class="google-docs-templates">
             <button
               id="createNewDoc"
-              class="create-doc-card blank-document-action"
+              class="create-doc-card doc-template-card"
               type="button"
-              aria-label="Start with a blank document"
+              aria-label="Blank document"
             >
-              <span class="blank-document-action__icon" aria-hidden="true"
-                ><i class="far fa-file"></i
-              ></span>
-              <span class="blank-document-action__copy">
-                <strong>Start with a blank document</strong>
-                <small>Begin with a clean page</small>
-              </span>
-              <i class="fas fa-arrow-right blank-document-action__arrow" aria-hidden="true"></i>
+              <div class="doc-template-thumbnail">
+                <div class="doc-template-plus">
+                  <i class="fas fa-plus"></i>
+                </div>
+              </div>
+              <div class="doc-template-info">
+                <span class="doc-template-title">Blank document</span>
+              </div>
             </button>
           </div>
         </div>
@@ -1170,16 +1189,20 @@
                       </div>
                       <ul id="passwordRequirements" class="password-requirements">
                         <li data-req="length">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> 8+ Characters
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          8+ Characters
                         </li>
                         <li data-req="upper">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Uppercase
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Uppercase
                         </li>
                         <li data-req="number">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Number
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Number
                         </li>
                         <li data-req="symbol">
-                          <i class="fas fa-circle" style="font-size: 4px"></i> Symbol
+                          <i class="fas fa-circle" style="font-size: 4px"></i>
+                          Symbol
                         </li>
                       </ul>
                     </div>
@@ -1324,6 +1347,12 @@
       <div class="ribbon-section">
         <div class="ribbon-section-title">Font</div>
         <div class="ribbon-section-tools" id="editor-toolbar">
+          <button class="toolbar-btn" id="undoBtn" type="button" title="Undo" aria-label="Undo">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+          </button>
+          <button class="toolbar-btn" id="redoBtn" type="button" title="Redo" aria-label="Redo">
+            <i class="fas fa-redo" aria-hidden="true"></i>
+          </button>
           <select class="ql-font" title="Font Family">
             <option value="arial" selected>Arial</option>
             <option value="roboto">Roboto</option>
@@ -1898,7 +1927,12 @@
       <div class="ribbon-section">
         <div class="ribbon-section-title">Share</div>
         <div class="ribbon-section-tools">
-          <button class="toolbar-btn" id="shareBtn" title="Share Document">
+          <button
+            class="toolbar-btn"
+            id="shareRibbonBtn"
+            data-action="share-document"
+            title="Share Document"
+          >
             <i class="fas fa-share-alt"></i> Share
           </button>
         </div>
@@ -1927,6 +1961,12 @@
 
     <!-- Main Workspace -->
     <div class="main-workspace">
+      <button
+        id="workspacePanelBackdrop"
+        class="workspace-panel-backdrop"
+        type="button"
+        aria-label="Close workspace panel"
+      ></button>
       <aside id="documentChat" class="document-chat" aria-label="Document chat" hidden>
         <header class="document-chat__header">
           <div><strong>Document chat</strong><span>Everyone in this document</span></div>
@@ -2482,24 +2522,63 @@
     <!-- Mobile Contextual Toolbar (Fixed above keyboard) -->
     <div id="mobileContextualToolbar" class="mobile-toolbar">
       <div class="mobile-toolbar-scroll">
-        <button class="mobile-tool-btn ql-bold"><i class="fas fa-bold"></i></button>
-        <button class="mobile-tool-btn ql-italic"><i class="fas fa-italic"></i></button>
-        <button class="mobile-tool-btn ql-underline"><i class="fas fa-underline"></i></button>
-        <div class="mobile-tool-separator"></div>
-        <button class="mobile-tool-btn ql-list" value="ordered">
+        <button class="mobile-tool-btn" id="mobileUndoBtn" title="Undo" aria-label="Undo">
+          <i class="fas fa-undo" aria-hidden="true"></i>
+        </button>
+        <button class="mobile-tool-btn" id="mobileRedoBtn" title="Redo" aria-label="Redo">
+          <i class="fas fa-redo" aria-hidden="true"></i>
+        </button>
+        <button class="mobile-tool-btn ql-bold">
+          <i class="fas fa-bold"></i>
+        </button>
+        <button class="mobile-tool-btn ql-italic">
+          <i class="fas fa-italic"></i>
+        </button>
+        <button class="mobile-tool-btn ql-underline">
+          <i class="fas fa-underline"></i>
+        </button>
+        <button
+          class="mobile-tool-btn"
+          id="mobileMoreToolsBtn"
+          type="button"
+          aria-controls="mobileMoreTools"
+          aria-expanded="false"
+          title="More formatting tools"
+        >
+          <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="mobileMoreTools" class="mobile-toolbar-more" hidden>
+        <button class="mobile-tool-btn ql-list" value="ordered" aria-label="Numbered list">
           <i class="fas fa-list-ol"></i>
         </button>
-        <button class="mobile-tool-btn ql-list" value="bullet">
+        <button class="mobile-tool-btn ql-list" value="bullet" aria-label="Bulleted list">
           <i class="fas fa-list-ul"></i>
         </button>
-        <div class="mobile-tool-separator"></div>
-        <button class="mobile-tool-btn ql-align" value=""><i class="fas fa-align-left"></i></button>
-        <button class="mobile-tool-btn ql-align" value="center">
+        <button class="mobile-tool-btn ql-align" value="" aria-label="Align left">
+          <i class="fas fa-align-left"></i>
+        </button>
+        <button class="mobile-tool-btn ql-align" value="center" aria-label="Align center">
           <i class="fas fa-align-center"></i>
         </button>
-        <button class="mobile-tool-btn ql-image"><i class="fas fa-image"></i></button>
-        <div class="mobile-tool-separator"></div>
-        <button class="mobile-tool-btn" id="mobileCloseKeyboard">
+        <button class="mobile-tool-btn ql-image" aria-label="Insert image">
+          <i class="fas fa-image"></i>
+        </button>
+        <button
+          class="mobile-tool-btn"
+          data-proxy-click="toggleOutline"
+          aria-label="Document outline"
+        >
+          <i class="fas fa-list-alt"></i>
+        </button>
+        <button
+          class="mobile-tool-btn"
+          data-proxy-click="toggleSearchBtn"
+          aria-label="Find and replace"
+        >
+          <i class="fas fa-search"></i>
+        </button>
+        <button class="mobile-tool-btn" id="mobileCloseKeyboard" aria-label="Close keyboard">
           <i class="fas fa-keyboard"></i>
         </button>
       </div>

@@ -35,6 +35,14 @@ function renderBot() {
     width: 300,
     height: 300,
   });
+  document.querySelector('.right-section').getBoundingClientRect = () => ({
+    left: 400,
+    top: 0,
+    width: 500,
+    height: 500,
+    right: 900,
+    bottom: 500,
+  });
 }
 
 describe('SyncroBot', () => {
@@ -42,6 +50,7 @@ describe('SyncroBot', () => {
   let animationFrameSpy;
 
   beforeEach(() => {
+    jest.useFakeTimers();
     renderBot();
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
     animationFrameSpy = jest.spyOn(window, 'requestAnimationFrame').mockReturnValue(1);
@@ -53,6 +62,7 @@ describe('SyncroBot', () => {
   afterEach(() => {
     bot.destroy();
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   it('maintains exactly one authoritative auth state class', () => {
@@ -68,6 +78,28 @@ describe('SyncroBot', () => {
     expect(stateClasses).toEqual(['syncro-state--password-focus']);
   });
 
+  it('supports full emotional state suite (excited, mad, sad, confused, dizzy)', () => {
+    bot.setAuthState('excited');
+    expect(bot.botRig.dataset.syncroState).toBe('excited');
+    expect(bot.botRig.classList.contains('syncro-state--excited')).toBe(true);
+
+    bot.setAuthState('mad');
+    expect(bot.botRig.dataset.syncroState).toBe('mad');
+    expect(bot.botRig.classList.contains('syncro-state--mad')).toBe(true);
+
+    bot.setAuthState('sad');
+    expect(bot.botRig.dataset.syncroState).toBe('sad');
+    expect(bot.botRig.classList.contains('syncro-state--sad')).toBe(true);
+
+    bot.setAuthState('confused');
+    expect(bot.botRig.dataset.syncroState).toBe('confused');
+    expect(bot.botRig.classList.contains('syncro-state--confused')).toBe(true);
+
+    bot.setAuthState('dizzy');
+    expect(bot.botRig.dataset.syncroState).toBe('dizzy');
+    expect(bot.botRig.classList.contains('syncro-state--dizzy')).toBe(true);
+  });
+
   it('interpolates pupil gaze toward pointer movement', () => {
     bot.onPointerMove({ clientX: 760, clientY: 260 });
     bot.tickGaze();
@@ -75,6 +107,27 @@ describe('SyncroBot', () => {
     expect(bot.gaze.x).toBeGreaterThan(0);
     expect(bot.pupils[0].style.getPropertyValue('--pupil-x')).not.toBe('0.00px');
     expect(animationFrameSpy).toHaveBeenCalled();
+  });
+
+  it('moves the iris farther for a farther pointer target', () => {
+    bot.gaze.x = 0;
+    bot.onPointerMove({ clientX: 620, clientY: 260 });
+    const nearTarget = bot.resolveGazeTarget().x;
+
+    bot.onPointerMove({ clientX: 760, clientY: 260 });
+    const farTarget = bot.resolveGazeTarget().x;
+
+    expect(farTarget).toBeGreaterThan(nearTarget);
+  });
+
+  it('always ends a blink when the next blink is scheduled', () => {
+    bot.triggerBlink();
+    expect(bot.botRig.classList.contains('blinking')).toBe(true);
+
+    bot.scheduleBlink();
+    jest.advanceTimersByTime(bot.config.blinkDuration);
+
+    expect(bot.botRig.classList.contains('blinking')).toBe(false);
   });
 
   it('lets field state override pointer gaze', () => {
@@ -93,9 +146,93 @@ describe('SyncroBot', () => {
     expect(target.x).toBeLessThan(0);
   });
 
+  it('maps hits to contextual transient emotions', () => {
+    // Head hit -> confused
+    bot.onCharacterPress({ button: 0, clientX: 580, clientY: 150 });
+    expect(bot.botRig.classList.contains('syncro-reaction--confused')).toBe(true);
+
+    // Cheek hit -> annoyed
+    bot.onCharacterPress({ button: 0, clientX: 450, clientY: 250 });
+    expect(bot.botRig.classList.contains('syncro-reaction--annoyed')).toBe(true);
+
+    // Repeated hits escalate to sad
+    bot.onCharacterPress({ button: 0, clientX: 700, clientY: 250 });
+    expect(bot.botRig.classList.contains('syncro-reaction--sad')).toBe(true);
+    expect(bot.botRig.dataset.syncroState).toBe('idle');
+
+    bot.onCharacterPress({ button: 0, clientX: 700, clientY: 250 });
+    expect(bot.botRig.classList.contains('syncro-reaction--sad')).toBe(true);
+  });
+
+  it('marks a poked eye red and clears it after release', () => {
+    const eye = bot.eyes[0];
+    bot.onPointerDown({
+      button: 0,
+      clientX: 540,
+      clientY: 250,
+      pointerId: 1,
+      target: eye,
+      preventDefault: jest.fn(),
+    });
+
+    expect(eye.classList.contains('syncro-eye--hit')).toBe(true);
+
+    bot.onPointerUp({ button: 0, clientX: 540, clientY: 250, pointerId: 1 });
+    jest.advanceTimersByTime(650);
+
+    expect(eye.classList.contains('syncro-eye--hit')).toBe(false);
+  });
+
+  it('increases eye redness across repeated hits', () => {
+    const eye = bot.eyes[0];
+    const press = (pointerId) =>
+      bot.onPointerDown({
+        button: 0,
+        clientX: 540,
+        clientY: 250,
+        pointerId,
+        target: eye,
+        preventDefault: jest.fn(),
+      });
+
+    press(3);
+    const firstOpacity = Number(eye.style.getPropertyValue('--eye-hit-opacity'));
+    bot.onPointerUp({ button: 0, clientX: 540, clientY: 250, pointerId: 3 });
+    press(4);
+    const secondOpacity = Number(eye.style.getPropertyValue('--eye-hit-opacity'));
+
+    expect(secondOpacity).toBeGreaterThan(firstOpacity);
+  });
+
+  it('drags the character and clamps it inside the black panel', () => {
+    bot.onPointerDown({
+      button: 0,
+      clientX: 580,
+      clientY: 250,
+      pointerId: 2,
+      target: bot.botRig,
+      preventDefault: jest.fn(),
+    });
+    bot.onPointerMove({ clientX: 1000, clientY: 1000, pointerId: 2 });
+
+    expect(bot.botRig.style.getPropertyValue('--drag-x')).toBe('240px');
+    expect(bot.botRig.style.getPropertyValue('--drag-y')).toBe('124px');
+
+    bot.onPointerUp({ button: 0, clientX: 1000, clientY: 1000, pointerId: 2 });
+    expect(bot.botRig.classList.contains('syncro-reaction--annoyed')).toBe(false);
+    expect(bot.dragPosition).toEqual({ x: 240, y: 124 });
+  });
+
+  it('triggers dizzy reaction when poked rapidly 5+ times', () => {
+    for (let i = 0; i < 5; i++) {
+      bot.onCharacterPress({ button: 0, clientX: 580, clientY: 250 });
+    }
+    expect(bot.botRig.classList.contains('syncro-reaction--dizzy')).toBe(true);
+  });
+
   it('plays a bounded tap reaction and cancels it for submitting', () => {
-    bot.onCharacterPress({ button: 0, clientX: 450 });
-    expect(bot.botRig.classList.contains('syncro-reaction--poke-left')).toBe(true);
+    bot.onCharacterPress({ button: 0, clientX: 450, clientY: 250 });
+    expect(bot.botRig.classList.contains('syncro-reaction--annoyed')).toBe(true);
 
     bot.onSubmit();
     expect(bot.botRig.dataset.syncroState).toBe('submitting');

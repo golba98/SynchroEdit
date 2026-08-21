@@ -1,134 +1,79 @@
 /**
  * Syncro Mascot CSS - Animation States & Visual Effects
- * For SyncroEdit Authentication Screens
+ * Sleek Digital OLED Cyber-Minimalist Edition
  */
 
-/* ==================== CSS VARIABLES ==================== */
+/* ==================== DESIGN TOKENS ==================== */
 :root {
-  --syncro-accent: #3b82f6;
-  --syncro-accent-glow: rgba(59, 130, 246, 0.15);
-  --syncro-success: #22c55e;
-  --syncro-warning: #eab308;
-  --syncro-error: #ef4444;
-  --syncro-blue: #2563eb;
+  --syncro-white: #ffffff;
+  --syncro-white-glow: rgba(255, 255, 255, 0.7);
+  --syncro-eye-glow: 0 0 8px rgba(255, 255, 255, 0.85), 0 0 18px rgba(255, 255, 255, 0.3);
+  --syncro-screen-bg: #060608;
+  --syncro-chassis-bg: linear-gradient(160deg, #222226 0%, #141417 60%, #0c0c0e 100%);
+  --syncro-chassis-border: rgba(255, 255, 255, 0.22);
+  --syncro-hand-bg: #18181c;
+  --syncro-hand-border: rgba(255, 255, 255, 0.85);
 }
 
-/* ==================== GLOBAL TRANSITION SMOOTHING ==================== */
-.bot-rig,
-.bot-rig * {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bot-rig {
-  transition:
-    transform 0.4s,
-    filter 0.3s;
-}
-
-.head {
-  transition:
-    transform 0.3s,
-    border-color 0.3s,
-    box-shadow 0.3s;
-}
-
-.eye {
-  transition:
-    height 0.25s,
-    width 0.25s,
-    border-radius 0.25s,
-    background 0.25s;
-}
-
-.pupil {
-  transition:
-    transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.25s,
-    height 0.25s,
-    border-radius 0.25s,
-    background 0.25s;
-}
-
-.eyelid {
-  transition: height 0.2s ease;
-}
-
-.mouth {
-  transition:
-    width 0.25s,
-    height 0.25s,
-    border-radius 0.25s,
-    transform 0.25s,
-    background 0.25s,
-    border 0.25s;
-}
-
-.hand {
-  transition:
-    bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.antenna-bulb {
-  transition:
-    background 0.3s,
-    box-shadow 0.3s,
-    opacity 0.3s;
-}
-
-/* ==================== BASE STRUCTURE ==================== */
+/* ==================== BASE RIG ==================== */
 .character-container {
   position: relative;
-  width: 300px;
-  height: 400px;
+  width: 200px;
+  height: 220px;
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
+  cursor: pointer;
+  touch-action: none;
 }
 
-.auth-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  color: #f3f4f6;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-decoration: none;
+.character-container.is-pressed {
+  cursor: grabbing;
 }
 
-.auth-brand img {
-  display: block;
-  flex: 0 0 auto;
+.character-container:focus-visible {
+  outline: 2px solid var(--syncro-white);
+  outline-offset: 6px;
+  border-radius: 28px;
 }
 
 .bot-rig {
   position: relative;
-  animation: float 6s ease-in-out infinite;
+  width: 180px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: var(--drag-x, 0px);
+  top: var(--drag-y, 0px);
+  animation: botFloat 5.2s ease-in-out infinite;
+  transform-origin: center center;
   transition:
-    transform 0.3s,
-    filter 0.3s;
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.3s ease;
 }
 
-/* ==================== BODY STRUCTURE ==================== */
+/* ==================== CHASSIS & SCREEN ==================== */
 .head {
-  width: 160px;
-  height: 140px;
-  background: linear-gradient(135deg, #2a2a2a 0%, #0a0a0a 100%);
-  border-radius: 45px;
-  border: 2px solid var(--syncro-accent);
+  width: 164px;
+  height: 136px;
+  background: var(--syncro-chassis-bg);
+  border-radius: 42px;
+  border: 1px solid var(--syncro-chassis-border);
   box-shadow:
-    inset 0 0 20px rgba(255, 255, 255, 0.05),
-    0 0 30px var(--syncro-accent-glow);
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.8),
+    0 16px 36px rgba(0, 0, 0, 0.75),
+    0 0 20px rgba(255, 255, 255, 0.08);
   position: relative;
   z-index: 5;
+  transform: translateY(var(--head-tilt, 0px)) rotate(var(--head-rot, 0deg));
   transition:
-    border-color 0.3s,
-    box-shadow 0.3s,
-    transform 0.3s;
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.1s ease-out;
+  transform-origin: center bottom;
 }
 
 .face-screen {
@@ -136,1110 +81,882 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 120px;
-  height: 90px;
-  background: #000;
-  border-radius: 35px;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  width: 130px;
+  height: 96px;
+  background: var(--syncro-screen-bg);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    inset 0 0 16px rgba(0, 0, 0, 0.95),
+    0 2px 8px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 10;
 }
 
-/* Antenna */
+.face-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.01) 60%,
+    transparent 100%
+  );
+  border-radius: 32px 32px 0 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* ==================== DIGITAL OLED EYES ==================== */
+.eyes-container {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 15;
+  width: 100%;
+}
+
+.eye {
+  position: relative;
+  width: 32px;
+  height: 38px;
+  border-radius: 16px;
+  background: #ffffff !important;
+  box-shadow: var(--syncro-eye-glow) !important;
+  overflow: hidden;
+  will-change: transform;
+  transition:
+    transform 0.08s ease-out,
+    width 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.22s ease;
+}
+
+.eye.syncro-eye--hit {
+  background: rgba(239, 68, 68, var(--eye-hit-opacity, 0.18)) !important;
+  box-shadow:
+    0 0 10px rgba(239, 68, 68, var(--eye-hit-opacity, 0.18)),
+    0 0 22px rgba(239, 68, 68, calc(var(--eye-hit-opacity, 0.18) * 0.6)) !important;
+}
+
+/* Inner OLED Phosphor Core */
+.pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, #ffffff 0 2px, transparent 2.5px),
+    radial-gradient(circle at 50% 52%, #050505 0 32%, #26262a 44%, #09090b 72%);
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.7),
+    inset 0 0 3px rgba(255, 255, 255, 0.45);
+  transform: translate(
+    calc(-50% + var(--pupil-x, 0px)),
+    calc(-50% + var(--pupil-y, 0px))
+  );
+  transition: transform 0.08s ease-out;
+  will-change: transform;
+  z-index: 16;
+}
+
+/* ==================== SHUTTER EYELIDS ==================== */
+.eyelid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 0%;
+  background: var(--syncro-screen-bg);
+  z-index: 20;
+  pointer-events: none;
+  transition:
+    height 0.12s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.eyelid.top {
+  top: 0;
+  border-radius: 0 0 16px 16px;
+}
+
+.eyelid.bottom {
+  bottom: 0;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Crisp Organic Blink */
+.bot-rig.blinking .eyelid.top {
+  height: 50%;
+}
+
+.bot-rig.blinking .eyelid.bottom {
+  height: 50%;
+}
+
+/* ==================== MOUTH ==================== */
+.mouth {
+  width: 16px;
+  height: 5px;
+  background: transparent;
+  border-bottom: 2px solid var(--syncro-white);
+  border-radius: 0 0 10px 10px;
+  margin-top: 8px;
+  box-shadow: 0 1px 4px var(--syncro-white-glow);
+  z-index: 15;
+  transition:
+    width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-radius 0.3s ease,
+    background 0.3s ease;
+}
+
+/* ==================== ANTENNA ==================== */
 .antenna-stalk {
   position: absolute;
-  top: -20px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  height: 25px;
-  background: #333;
-  z-index: 1;
+  width: 3px;
+  height: 22px;
+  background: linear-gradient(180deg, #d4d4d8 0%, #52525b 100%);
+  border-radius: 2px 2px 0 0;
+  z-index: 2;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
 }
 
 .antenna-bulb {
   position: absolute;
-  top: -32px;
+  top: -4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
-  height: 16px;
+  width: 11px;
+  height: 11px;
+  background: var(--syncro-white);
   border-radius: 50%;
-  background: var(--syncro-accent);
-  box-shadow: 0 0 15px var(--syncro-accent);
-  z-index: 1;
-  transition:
-    background 0.3s,
-    box-shadow 0.3s;
-  animation: pulse 3s infinite;
-}
-
-/* Eyes Container */
-.eyes-container {
-  display: flex;
-  gap: 15px;
-  transition: opacity 0.2s;
-}
-
-.eye {
-  width: 32px;
-  height: 40px;
-  background: #111;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-  transition:
-    height 0.2s,
-    border-radius 0.2s,
-    background 0.2s;
-}
-
-.pupil {
-  width: 16px;
-  height: 16px;
-  background: var(--syncro-accent);
-  border-radius: 4px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--syncro-accent);
-  transition:
-    transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.2s,
-    height 0.2s,
-    border-radius 0.2s;
-}
-
-/* Eyelids */
-.eyelid {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  background: #000;
-  z-index: 10;
-  transition: height 0.2s ease;
-}
-.eyelid.top {
-  top: 0;
-  height: 0%;
-}
-.eyelid.bottom {
-  bottom: 0;
-  height: 0%;
-}
-
-/* Mouth */
-.mouth {
-  position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 4px;
-  background: #333;
-  border-radius: 2px;
-  transition: all 0.3s;
-}
-
-/* Hands */
-.hands-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.hand {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border: 2px solid var(--syncro-accent);
-  border-radius: 50%;
-  bottom: -20px;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-.hand.left {
-  left: -10px;
-}
-.hand.right {
-  right: -10px;
-}
-
-/* Loader (for processing state) */
-.loader {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--syncro-accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-/* ==================== BASE ANIMATIONS ==================== */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateX(-50%) scale(0.9);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes blink {
-  0%,
-  90%,
-  100% {
-    height: 0%;
-  }
-  95% {
-    height: 100%;
-  }
-}
-
-/* ==================== IDLE STATES ==================== */
-
-/* Base Idle - already handled by .bot-rig default */
-.bot-rig.idle {
-  animation: float 6s ease-in-out infinite;
-}
-
-.bot-rig.idle .eyelid.top {
-  animation: naturalBlink 4s ease-in-out infinite;
-}
-
-@keyframes naturalBlink {
-  0%,
-  45%,
-  55%,
-  100% {
-    height: 0%;
-  }
-  50% {
-    height: 100%;
-  }
-}
-
-.bot-rig.idle .head {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.01);
-  }
-}
-
-/* Bored (10s no input) */
-.bot-rig.bored {
-  animation: floatSlow 8s ease-in-out infinite;
-  filter: brightness(0.85);
-}
-.bot-rig.bored .eyelid.top {
-  height: 40%;
-}
-.bot-rig.bored .antenna-bulb {
-  opacity: 0.4;
-  animation: none;
-}
-.bot-rig.bored .mouth {
-  width: 25px;
-  border-radius: 0 0 10px 10px;
-  height: 6px;
-}
-
-@keyframes floatSlow {
-  0%,
-  100% {
-    transform: translateY(5px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-/* Sleeping (30s no input) */
-.bot-rig.sleeping {
-  animation: floatSleepy 10s ease-in-out infinite;
-  filter: brightness(0.5);
-}
-.bot-rig.sleeping .eyelid.top {
-  height: 55%;
-}
-.bot-rig.sleeping .eyelid.bottom {
-  height: 50%;
-}
-.bot-rig.sleeping .antenna-bulb {
-  opacity: 0.1;
-  animation: none;
-  background: #333;
-}
-.bot-rig.sleeping .mouth {
-  width: 15px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-@keyframes floatSleepy {
-  0%,
-  100% {
-    transform: translateY(8px) rotate(-2deg);
-  }
-  50% {
-    transform: translateY(3px) rotate(2deg);
-  }
-}
-
-/* Attention (knock knock) */
-.bot-rig.attention .hand.right {
-  animation: knock 0.5s ease-in-out 3;
-}
-.bot-rig.attention .pupil {
-  animation: lookAtYou 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes knock {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(10px);
-  }
-}
-
-@keyframes lookAtYou {
-  0% {
-    transform: translate(-50%, -50%);
-  }
-  100% {
-    transform: translate(calc(-50% + 5px), -50%);
-  }
-}
-
-/* ==================== FOCUS STATES ==================== */
-
-/* Tracking (watching cursor) */
-.bot-rig.tracking .antenna-bulb {
-  background: var(--syncro-blue);
-  box-shadow: 0 0 15px var(--syncro-blue);
-}
-.bot-rig.tracking .pupil {
-  transition: transform 0.05s linear;
-}
-
-/* Reading (eyes darting) */
-.bot-rig.reading .pupil {
-  animation: readDart 0.3s ease-in-out infinite;
-}
-
-@keyframes readDart {
-  0%,
-  100% {
-    transform: translate(calc(-50% - 6px), -50%);
-  }
-  50% {
-    transform: translate(calc(-50% + 6px), -50%);
-  }
-}
-
-/* Secure (covering eyes - password hidden) */
-.bot-rig.secure .hand {
-  bottom: 80px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-}
-.bot-rig.secure .hand.left {
-  left: 58px;
-  transform: rotate(-25deg);
-}
-.bot-rig.secure .hand.right {
-  right: 58px;
-  transform: rotate(25deg);
-}
-.bot-rig.secure .eyelid.top {
-  height: 50%;
-}
-.bot-rig.secure .eyelid.bottom {
-  height: 50%;
-}
-
-/* Peeking (password visible - snooping) */
-.bot-rig.peeking .hand {
-  bottom: 50px;
-}
-.bot-rig.peeking .hand.left {
-  left: 30px;
-}
-.bot-rig.peeking .hand.right {
-  right: 30px;
-}
-.bot-rig.peeking .eyelid.top {
-  height: 0%;
-}
-.bot-rig.peeking .eyelid.bottom {
-  height: 0%;
-}
-.bot-rig.peeking .pupil {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-.bot-rig.peeking .antenna-bulb {
-  background: var(--syncro-warning);
-  box-shadow: 0 0 15px var(--syncro-warning);
-}
-.bot-rig.peeking .head {
-  transform: translateX(5px);
-}
-
-/* Confused (question mark) */
-.bot-rig.confused {
-  transform: rotate(8deg);
-}
-.bot-rig.confused .eye.right .eyelid.top {
-  height: 40%;
-}
-.bot-rig.confused .mouth {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  bottom: 18px;
-}
-
-/* Searching (visible + empty) */
-.bot-rig.searching {
-  transform: rotate(10deg);
-}
-.bot-rig.searching .hand.left {
-  bottom: 90px;
-  left: 20px;
-  transform: rotate(-45deg);
-}
-.bot-rig.searching .hand.right {
-  bottom: -20px;
-  right: -10px;
-}
-.bot-rig.searching .eye.left .eyelid.top {
-  height: 40%;
-}
-.bot-rig.searching .eye.right .eyelid.top {
-  height: 0%;
-}
-.bot-rig.searching .mouth {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.bot-rig.searching .antenna-bulb {
-  background: var(--syncro-warning);
-  box-shadow: 0 0 15px var(--syncro-warning);
-}
-
-/* ==================== VALIDATION STATES ==================== */
-
-/* Validating (thoughtful) */
-.bot-rig.validating {
-  transform: rotate(-3deg);
-}
-.bot-rig.validating .pupil {
-  transform: translate(calc(-50% + 3px), calc(-50% - 3px));
-}
-
-/* Warning (thumbs down, yellow antenna) */
-.bot-rig.warning .antenna-bulb {
-  background: var(--syncro-warning);
-  box-shadow: 0 0 15px var(--syncro-warning);
-}
-.bot-rig.warning .eyelid.top {
-  height: 30%;
-}
-.bot-rig.warning .hand.right {
-  bottom: 60px;
-  right: -30px;
-  transform: rotate(180deg);
-}
-
-/* Success Partial (peeking through fingers, 1-2/3 rules) */
-.bot-rig.success-partial .hand {
-  bottom: 70px;
-}
-.bot-rig.success-partial .hand.left {
-  left: 50px;
-  transform: rotate(-15deg);
-}
-.bot-rig.success-partial .hand.right {
-  right: 50px;
-  transform: rotate(15deg);
-}
-.bot-rig.success-partial .eyelid.top {
-  height: 30%;
-}
-.bot-rig.success-partial .antenna-bulb {
-  background: var(--syncro-warning);
-  box-shadow: 0 0 15px var(--syncro-warning);
-  animation: antennaPulse 0.8s infinite;
+  border: 1.5px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.9),
+    0 0 16px rgba(255, 255, 255, 0.4);
+  z-index: 3;
+  animation: antennaPulse 3.5s ease-in-out infinite;
 }
 
 @keyframes antennaPulse {
   0%,
   100% {
-    opacity: 1;
+    box-shadow:
+      0 0 6px rgba(255, 255, 255, 0.7),
+      0 0 12px rgba(255, 255, 255, 0.25);
   }
   50% {
-    opacity: 0.5;
+    box-shadow:
+      0 0 10px #ffffff,
+      0 0 20px rgba(255, 255, 255, 0.5);
   }
 }
 
-/* Success Full (happy, 3/3 rules or match) */
-.bot-rig.success-full .antenna-bulb {
-  background: var(--syncro-success);
-  box-shadow: 0 0 20px var(--syncro-success);
+/* ==================== TACTILE GRAPHITE HANDS ==================== */
+.hands-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
 }
-.bot-rig.success-full .eye {
-  height: 20px;
-  border-radius: 0 0 20px 20px;
-}
-.bot-rig.success-full .pupil {
-  height: 4px;
-  width: 100%;
-  border-radius: 2px;
-  top: 30%;
-}
-.bot-rig.success-full .mouth {
+
+.hand {
+  position: absolute;
   width: 30px;
-  height: 15px;
-  border-radius: 0 0 30px 30px;
-  background: transparent;
-  border: 2px solid var(--syncro-success);
-  border-top: none;
+  height: 30px;
+  background: var(--syncro-hand-bg);
+  border: 1.5px solid var(--syncro-hand-border);
+  border-radius: 50%;
+  bottom: 8px;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.7),
+    0 0 10px rgba(255, 255, 255, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transition:
+    bottom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    top 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    right 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Mismatch (passwords don't match) */
-.bot-rig.mismatch .eye.left .pupil {
-  animation: blinkLeft 1s infinite;
-}
-.bot-rig.mismatch .eye.right .pupil {
-  animation: blinkRight 1s infinite;
-}
-.bot-rig.mismatch .mouth {
-  width: 25px;
-  transform: translateX(-50%) rotate(5deg);
+.hand.left {
+  left: 0px;
 }
 
-@keyframes blinkLeft {
-  0%,
-  40%,
-  100% {
-    opacity: 1;
-  }
-  20% {
-    opacity: 0;
-  }
-}
-@keyframes blinkRight {
-  0%,
-  60%,
-  100% {
-    opacity: 1;
-  }
-  40% {
-    opacity: 0;
-  }
+.hand.right {
+  right: 0px;
 }
 
-/* ==================== ACTION STATES ==================== */
-
-/* Hover Ready (confident, both fields filled) */
-.bot-rig.hover-ready .antenna-bulb {
-  background: var(--syncro-success);
-  box-shadow: 0 0 20px var(--syncro-success);
-}
-.bot-rig.hover-ready .hand.left {
-  bottom: 40px;
-  left: -20px;
-  transform: rotate(-30deg);
-}
-.bot-rig.hover-ready .hand.right {
-  bottom: 40px;
-  right: -20px;
-  transform: rotate(30deg);
-}
-.bot-rig.hover-ready .head {
-  transform: scale(1.02);
-}
-
-/* Hover Blocked (stop gesture, incomplete) */
-.bot-rig.hover-blocked .hand.left {
-  bottom: 60px;
-  left: -40px;
-  transform: rotate(-20deg) scale(1.1);
-}
-.bot-rig.hover-blocked .hand.right {
-  bottom: 60px;
-  right: -40px;
-  transform: rotate(20deg) scale(1.1);
-}
-.bot-rig.hover-blocked .eyelid.top {
-  height: 20%;
-}
-.bot-rig.hover-blocked .head {
-  animation: headShake 0.5s ease-in-out;
-}
-
-@keyframes headShake {
+/* ==================== IDLE FLOAT ==================== */
+@keyframes botFloat {
   0%,
   100% {
-    transform: rotate(0);
+    transform: translateY(0) rotate(0deg);
   }
   25% {
-    transform: rotate(-5deg);
+    transform: translateY(-6px) rotate(0.4deg);
   }
   75% {
-    transform: rotate(5deg);
+    transform: translateY(3px) rotate(-0.4deg);
   }
 }
 
-/* Processing */
-.bot-rig.processing .eyes-container {
-  opacity: 0;
-}
-.bot-rig.processing .loader {
-  opacity: 1;
-}
-.bot-rig.processing .mouth {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  animation: mouthPulse 0.5s infinite alternate;
-}
-.bot-rig.processing {
-  animation: processingFloat 1s ease-in-out infinite;
+/* ================================================================
+   EMOTIONAL STATES - 100% MONOCHROME B&W (GEOMETRY & PHYSICS)
+   ================================================================ */
+
+/* 1. EXCITED (Happy Arcs, Bouncy Cheer) */
+.bot-rig.syncro-state--excited {
+  animation: botExcited 0.75s ease-in-out infinite alternate;
 }
 
-@keyframes mouthPulse {
-  from {
-    transform: translateX(-50%) scale(1);
-  }
-  to {
-    transform: translateX(-50%) scale(1.5);
-  }
+.bot-rig.syncro-state--excited .head {
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 0 28px rgba(255, 255, 255, 0.35);
 }
-@keyframes processingFloat {
-  0%,
+
+.bot-rig.syncro-state--excited .eye {
+  width: 36px;
+  height: 42px;
+  border-radius: 18px;
+  box-shadow:
+    0 0 12px #ffffff,
+    0 0 24px rgba(255, 255, 255, 0.6) !important;
+}
+
+.bot-rig.syncro-state--excited .mouth {
+  width: 20px;
+  height: 8px;
+  border-radius: 0 0 10px 10px;
+  background: var(--syncro-white);
+  border-bottom: none;
+}
+
+.bot-rig.syncro-state--excited .antenna-bulb {
+  animation: antennaExcited 0.28s ease-in-out infinite alternate;
+}
+
+.bot-rig.syncro-state--excited .hand.left {
+  bottom: 45px;
+  transform: rotate(-30deg) scale(1.08);
+}
+
+.bot-rig.syncro-state--excited .hand.right {
+  bottom: 45px;
+  transform: rotate(30deg) scale(1.08);
+}
+
+@keyframes botExcited {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
   100% {
-    transform: rotate(-5deg) translateY(0);
+    transform: translateY(-14px) scale(0.98, 1.03);
+  }
+}
+
+@keyframes antennaExcited {
+  0% {
+    transform: translateX(-50%) rotate(-12deg) scale(1.15);
+  }
+  100% {
+    transform: translateX(-50%) rotate(12deg) scale(1.15);
+  }
+}
+
+/* 2. MAD / ANNOYED (Angled Slanted Eyelids, Rapid Shake) */
+.bot-rig.syncro-state--mad {
+  animation: botMad 0.16s ease-in-out infinite;
+}
+
+.bot-rig.syncro-state--mad .eye:first-child .eyelid.top {
+  height: 46%;
+  transform: rotate(20deg);
+}
+
+.bot-rig.syncro-state--mad .eye:last-child .eyelid.top {
+  height: 46%;
+  transform: rotate(-20deg);
+}
+
+.bot-rig.syncro-state--mad .mouth {
+  width: 16px;
+  height: 2.5px;
+  border-bottom: none;
+  background: var(--syncro-white);
+  border-radius: 2px;
+  transform: translateY(2px);
+}
+
+.bot-rig.syncro-state--mad .antenna-stalk {
+  transform: translateX(-50%) rotate(12deg);
+}
+
+@keyframes botMad {
+  0% {
+    transform: translateX(-3px) rotate(-1deg);
   }
   50% {
-    transform: rotate(5deg) translateY(-10px);
+    transform: translateX(3px) rotate(1deg);
+  }
+  100% {
+    transform: translateX(-3px) rotate(-1deg);
   }
 }
 
-/* Success */
-.bot-rig.success {
-  animation:
-    happyJump 0.6s ease 1,
-    enterSuccess 0.4s ease-out;
+/* 3. SAD / EMPATHY (Downward Eyelids, Gentle Droop) */
+.bot-rig.syncro-state--sad {
+  animation: botSad 3.6s ease-in-out infinite;
 }
 
-.bot-rig.nearby .head {
-  transform: translateY(-3px) scale(1.01);
-}
-.bot-rig.nearby .antenna-bulb {
-  filter: brightness(1.18);
-}
-.bot-rig.typing .antenna-bulb {
-  animation: antennaPulse 900ms ease-in-out infinite;
-}
-.bot-rig.typing .head {
-  transform: rotate(-1deg);
-}
-.bot-rig.success .antenna-bulb {
-  background: var(--syncro-success);
-  box-shadow: 0 0 25px var(--syncro-success);
-}
-.bot-rig.success .eye {
-  background: transparent;
-}
-.bot-rig.success .pupil {
-  width: 28px;
-  height: 28px;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
-}
-.bot-rig.success .pupil::after {
-  content: '⭐';
-  font-size: 20px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--syncro-success);
-  text-shadow: 0 0 10px var(--syncro-success);
-}
-.bot-rig.success .hand {
-  transform: translateY(-60px) rotate(20deg);
-}
-.bot-rig.success .mouth {
-  width: 40px;
-  height: 20px;
-  border-radius: 0 0 40px 40px;
-  border: 2px solid var(--syncro-success);
-  background: transparent;
+.bot-rig.syncro-state--sad .eye:first-child .eyelid.top {
+  height: 38%;
+  transform: rotate(-12deg);
 }
 
-@keyframes happyJump {
+.bot-rig.syncro-state--sad .eye:last-child .eyelid.top {
+  height: 38%;
+  transform: rotate(12deg);
+}
+
+.bot-rig.syncro-state--sad .mouth {
+  width: 14px;
+  height: 4px;
+  border-bottom: none;
+  border-top: 2px solid var(--syncro-white);
+  border-radius: 10px 10px 0 0;
+  margin-top: 10px;
+}
+
+.bot-rig.syncro-state--sad .antenna-stalk {
+  transform: translateX(-50%) rotate(16deg);
+}
+
+@keyframes botSad {
   0%,
   100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* 4. CONFUSED / CURIOUS (One Raised Eye, Tilted Head) */
+.bot-rig.syncro-state--confused .head {
+  transform: rotate(12deg) translateY(-3px);
+}
+
+.bot-rig.syncro-state--confused .eye:first-child {
+  transform: scale(1.15);
+}
+
+.bot-rig.syncro-state--confused .eye:last-child .eyelid.top {
+  height: 38%;
+}
+
+.bot-rig.syncro-state--confused .mouth {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--syncro-white);
+  background: transparent;
+  transform: translateX(4px);
+}
+
+.bot-rig.syncro-state--confused .antenna-stalk {
+  transform: translateX(-50%) rotate(-16deg);
+}
+
+/* 5. DIZZY (Spinning Geometry) */
+.bot-rig.syncro-state--dizzy {
+  animation: botDizzy 0.8s ease-in-out infinite;
+}
+
+.bot-rig.syncro-state--dizzy .eye {
+  animation: none;
+}
+
+/* Tactile reactions also need a visible face response, not only rig movement. */
+.bot-rig.syncro-reaction--pleased .eye {
+  animation: pleasedEyes 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--poke-left .eye,
+.bot-rig.syncro-reaction--poke-right .eye,
+.bot-rig.syncro-reaction--poke-head .eye {
+  animation: eyeFlinch 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--poke-left .pupil {
+  animation: glanceLeft 0.4s ease-out;
+}
+
+.bot-rig.syncro-reaction--poke-right .pupil {
+  animation: glanceRight 0.4s ease-out;
+}
+
+.bot-rig.syncro-reaction--poke-head .pupil {
+  animation: glanceDown 0.4s ease-out;
+}
+
+.bot-rig.syncro-reaction--annoyed {
+  animation: botMad 0.16s ease-in-out 3;
+}
+
+.bot-rig.syncro-reaction--annoyed .eye:first-child .eyelid.top {
+  height: 46%;
+  transform: rotate(20deg);
+}
+
+.bot-rig.syncro-reaction--annoyed .eye:last-child .eyelid.top {
+  height: 46%;
+  transform: rotate(-20deg);
+}
+
+.bot-rig.syncro-reaction--sad {
+  animation: reactSad 0.7s ease-in-out;
+}
+
+.bot-rig.syncro-reaction--sad .eye:first-child .eyelid.top {
+  height: 38%;
+  transform: rotate(-12deg);
+}
+
+.bot-rig.syncro-reaction--sad .eye:last-child .eyelid.top {
+  height: 38%;
+  transform: rotate(12deg);
+}
+
+.bot-rig.syncro-reaction--sad .mouth {
+  border-bottom: none;
+  border-top: 2px solid var(--syncro-white);
+  border-radius: 10px 10px 0 0;
+  transform: translateY(2px);
+}
+
+.bot-rig.syncro-reaction--confused {
+  animation: reactConfused 0.65s ease-in-out;
+}
+
+.bot-rig.syncro-reaction--confused .head {
+  transform: rotate(12deg) translateY(-3px);
+}
+
+.bot-rig.syncro-reaction--confused .eye:first-child {
+  transform: scale(1.15);
+}
+
+.bot-rig.syncro-reaction--confused .eye:last-child .eyelid.top {
+  height: 38%;
+}
+
+.bot-rig.syncro-reaction--confused .mouth {
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--syncro-white);
+  border-radius: 50%;
+  background: transparent;
+  transform: translateX(4px);
+}
+
+.bot-rig.syncro-reaction--dizzy {
+  animation: botDizzy 0.8s ease-in-out 2;
+}
+
+.bot-rig.syncro-reaction--dizzy .eye {
+  animation: none;
+}
+
+@keyframes pleasedEyes {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  45% {
+    transform: scale(1.1, 0.86);
+  }
+}
+
+@keyframes reactSad {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes reactConfused {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  45% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes eyeFlinch {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: scale(0.84, 1.12);
+  }
+}
+
+@keyframes glanceLeft {
+  0%,
+  100% {
+    transform: translate(
+      calc(-50% + var(--pupil-x, 0px)),
+      calc(-50% + var(--pupil-y, 0px))
+    );
+  }
+  35% {
+    transform: translate(
+      calc(-50% - 5px),
+      calc(-50% + var(--pupil-y, 0px))
+    );
+  }
+}
+
+@keyframes glanceRight {
+  0%,
+  100% {
+    transform: translate(
+      calc(-50% + var(--pupil-x, 0px)),
+      calc(-50% + var(--pupil-y, 0px))
+    );
+  }
+  35% {
+    transform: translate(
+      calc(-50% + 5px),
+      calc(-50% + var(--pupil-y, 0px))
+    );
+  }
+}
+
+@keyframes glanceDown {
+  0%,
+  100% {
+    transform: translate(
+      calc(-50% + var(--pupil-x, 0px)),
+      calc(-50% + var(--pupil-y, 0px))
+    );
+  }
+  35% {
+    transform: translate(
+      calc(-50% + var(--pupil-x, 0px)),
+      calc(-50% + 5px)
+    );
+  }
+}
+
+.bot-rig.syncro-state--dizzy .mouth {
+  width: 14px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--syncro-white);
+  background: transparent;
+}
+
+@keyframes botDizzy {
+  0% {
+    transform: rotate(-7deg) translateY(-3px);
+  }
+  50% {
+    transform: rotate(7deg) translateY(3px);
+  }
+  100% {
+    transform: rotate(-7deg) translateY(-3px);
+  }
+}
+
+/* 6. PASSWORD FOCUS (Hands Covering Eyes) */
+.bot-rig.syncro-state--password-focus .hand.left {
+  left: 34px;
+  bottom: 76px;
+  width: 36px;
+  height: 36px;
+  transform: rotate(20deg);
+  z-index: 35;
+}
+
+.bot-rig.syncro-state--password-focus .hand.right {
+  right: 34px;
+  bottom: 76px;
+  width: 36px;
+  height: 36px;
+  transform: rotate(-20deg);
+  z-index: 35;
+}
+
+.bot-rig.syncro-state--password-focus .eye .eyelid.top {
+  height: 20%;
+}
+
+/* 7. PASSWORD VISIBLE (Peeking Eyes) */
+.bot-rig.syncro-state--password-visible .hand.left {
+  left: 18px;
+  bottom: 54px;
+  transform: rotate(12deg);
+}
+
+.bot-rig.syncro-state--password-visible .hand.right {
+  right: 18px;
+  bottom: 54px;
+  transform: rotate(-12deg);
+}
+
+/* 8. SUBMITTING (Pulse Beacon) */
+.bot-rig.syncro-state--submitting {
+  animation: botSubmitting 1.1s ease-in-out infinite alternate;
+}
+
+.bot-rig.syncro-state--submitting .antenna-bulb {
+  animation: beaconPulse 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes botSubmitting {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes beaconPulse {
+  0% {
+    box-shadow:
+      0 0 6px #ffffff,
+      0 0 12px rgba(255, 255, 255, 0.4);
+    transform: translateX(-50%) scale(0.95);
+  }
+  100% {
+    box-shadow:
+      0 0 14px #ffffff,
+      0 0 28px rgba(255, 255, 255, 0.85);
+    transform: translateX(-50%) scale(1.25);
+  }
+}
+
+/* 9. SUCCESS (Celebration Cheer) */
+.bot-rig.syncro-state--success {
+  animation: botSuccess 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+}
+
+.bot-rig.syncro-state--success .hand.left {
+  bottom: 86px;
+  left: -6px;
+  transform: rotate(-35deg);
+}
+
+.bot-rig.syncro-state--success .hand.right {
+  bottom: 86px;
+  right: -6px;
+  transform: rotate(35deg);
+}
+
+.bot-rig.syncro-state--success .eye {
+  width: 38px;
+  height: 44px;
+  border-radius: 19px;
+  box-shadow:
+    0 0 16px #ffffff,
+    0 0 32px rgba(255, 255, 255, 0.8) !important;
+}
+
+.bot-rig.syncro-state--success .mouth {
+  width: 22px;
+  height: 9px;
+  border-radius: 0 0 12px 12px;
+  background: var(--syncro-white);
+  border-bottom: none;
+}
+
+@keyframes botSuccess {
+  0% {
     transform: translateY(0) scale(1);
   }
-  50% {
-    transform: translateY(-30px) scale(1.05);
+  100% {
+    transform: translateY(-18px) scale(1.04);
   }
 }
 
-/* Error */
-.bot-rig.error {
-  animation:
-    shakeHead 0.4s ease-in-out,
-    flashRed 0.4s ease-out;
+/* 10. ERROR (Disappointed Shake) */
+.bot-rig.syncro-state--error {
+  animation: botError 0.35s ease-in-out 3;
 }
-.bot-rig.error .antenna-bulb {
-  background: var(--syncro-error);
-  box-shadow: 0 0 20px var(--syncro-error);
-}
-.bot-rig.error .pupil {
-  background: var(--syncro-error);
-  width: 20px;
-  height: 4px;
-  border-radius: 2px;
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-.bot-rig.error .pupil::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 4px;
-  background: var(--syncro-error);
-  transform: rotate(90deg);
-}
-.bot-rig.error .mouth {
-  width: 30px;
-  height: 4px;
-  border-radius: 2px;
-  transform: translateX(-50%) rotate(5deg);
-  background: var(--syncro-error);
-}
-.bot-rig.error .hand.right {
-  bottom: 100px;
-  right: 50px;
+
+.bot-rig.syncro-state--error .eye:first-child .eyelid.top {
+  height: 38%;
   transform: rotate(-10deg);
 }
 
-@keyframes shakeHead {
-  0%,
-  100% {
+.bot-rig.syncro-state--error .eye:last-child .eyelid.top {
+  height: 38%;
+  transform: rotate(10deg);
+}
+
+@keyframes botError {
+  0% {
     transform: translateX(0);
   }
   25% {
-    transform: translateX(-15px) rotate(-5deg);
+    transform: translateX(-7px) rotate(-3deg);
   }
   75% {
-    transform: translateX(15px) rotate(5deg);
+    transform: translateX(7px) rotate(3deg);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 
-/* ==================== STATE ENTRY ANIMATIONS ==================== */
-.bot-rig.secure {
-  animation: enterSecure 0.3s ease-out;
+/* 11. BORED & SLEEPING */
+.bot-rig.syncro-state--bored .eyelid.top {
+  height: 0;
 }
 
-@keyframes enterSecure {
-  from {
-    transform: scale(1.02);
-  }
-  to {
-    transform: scale(1);
-  }
+.bot-rig.syncro-state--bored .eyelid.bottom {
+  height: 0;
 }
 
-.bot-rig.peeking {
-  animation: enterPeeking 0.3s ease-out;
+.bot-rig.syncro-state--sleeping .eyelid.top {
+  height: 52%;
 }
 
-@keyframes enterPeeking {
+.bot-rig.syncro-state--sleeping .eyelid.bottom {
+  height: 52%;
+}
+
+.bot-rig.syncro-state--sleeping .head {
+  transform: translateY(6px) rotate(4deg);
+}
+
+/* ================================================================
+   POKE & TACTILE REACTIONS
+   ================================================================ */
+.bot-rig.syncro-reaction--poke-left {
+  animation: pokeLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--poke-right {
+  animation: pokeRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--poke-head {
+  animation: pokeHead 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--cheer {
+  animation: reactCheer 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bot-rig.syncro-reaction--nod {
+  animation: reactNod 0.5s ease-in-out 2;
+}
+
+@keyframes pokeLeft {
   0% {
-    transform: scale(0.98);
+    transform: rotate(0) translateX(0);
   }
-  50% {
-    transform: scale(1.03);
+  35% {
+    transform: rotate(-14deg) translateX(-10px) scale(0.94, 1.04);
+  }
+  70% {
+    transform: rotate(5deg) translateX(3px);
   }
   100% {
-    transform: scale(1);
+    transform: rotate(0) translateX(0);
   }
 }
 
-@keyframes enterSuccess {
-  from {
-    transform: scale(0.8);
-    filter: brightness(1.5);
-  }
-  to {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-@keyframes flashRed {
+@keyframes pokeRight {
   0% {
-    filter: brightness(1.5) hue-rotate(-20deg);
+    transform: rotate(0) translateX(0);
+  }
+  35% {
+    transform: rotate(14deg) translateX(10px) scale(0.94, 1.04);
+  }
+  70% {
+    transform: rotate(-5deg) translateX(-3px);
   }
   100% {
-    filter: brightness(1) hue-rotate(0);
+    transform: rotate(0) translateX(0);
   }
 }
 
-.bot-rig.hover-ready {
-  animation: enterConfident 0.3s ease-out;
-}
-
-@keyframes enterConfident {
-  from {
-    transform: translateY(5px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.bot-rig.hover-blocked {
-  animation: enterBlocked 0.3s ease-out;
-}
-
-@keyframes enterBlocked {
-  from {
-    transform: scale(1.02);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-/* ==================== FORGOT PASSWORD FLOW ==================== */
-
-/* Empathy (sad, lower position) */
-.bot-rig.empathy {
-  animation: floatLow 5s ease-in-out infinite;
-  filter: brightness(0.9);
-}
-.bot-rig.empathy .eye {
-  height: 25px;
-  border-radius: 0 0 15px 15px;
-}
-.bot-rig.empathy .pupil {
-  top: 70%;
-}
-.bot-rig.empathy .mouth {
-  width: 25px;
-  height: 10px;
-  border-radius: 10px 10px 0 0;
-  background: transparent;
-  border: 2px solid #666;
-  border-bottom: none;
-}
-.bot-rig.empathy .antenna-bulb {
-  opacity: 0.6;
-  animation: pulseSlow 4s infinite;
-}
-
-@keyframes floatLow {
-  0%,
-  100% {
-    transform: translateY(10px);
-  }
-  50% {
-    transform: translateY(0);
-  }
-}
-@keyframes pulseSlow {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-/* Hopeful (looking up) */
-.bot-rig.hopeful .pupil {
-  transform: translate(-50%, calc(-50% - 8px));
-}
-.bot-rig.hopeful .eye {
-  height: 35px;
-}
-.bot-rig.hopeful .antenna-bulb {
-  opacity: 0.8;
-  animation: pulse 2s infinite;
-}
-
-/* Salute */
-.bot-rig.salute .hand.right {
-  bottom: 120px;
-  right: 30px;
-  transform: rotate(-45deg);
-}
-.bot-rig.salute .antenna-bulb {
-  background: var(--syncro-success);
-  box-shadow: 0 0 15px var(--syncro-success);
-}
-.bot-rig.salute .head {
-  transform: rotate(5deg);
-}
-
-/* Shrug */
-.bot-rig.shrug .hand.left {
-  bottom: 70px;
-  left: -30px;
-  transform: rotate(-30deg);
-}
-.bot-rig.shrug .hand.right {
-  bottom: 70px;
-  right: -30px;
-  transform: rotate(30deg);
-}
-.bot-rig.shrug .mouth {
-  width: 20px;
-  transform: translateX(-50%) rotate(-10deg);
-}
-
-/* Envelope (success - throw paper airplane) */
-.bot-rig.envelope {
-  animation: throwEnvelope 1s ease-out forwards;
-}
-.bot-rig.envelope .hand.right {
-  bottom: 80px;
-  right: 20px;
-  animation: throwMotion 0.5s ease-out forwards;
-}
-
-@keyframes throwEnvelope {
+@keyframes pokeHead {
   0% {
-    transform: translateY(0) rotate(0);
+    transform: translateY(0) scale(1, 1);
   }
-  50% {
-    transform: translateY(-20px) rotate(-10deg);
+  35% {
+    transform: translateY(12px) scale(1.1, 0.9);
+  }
+  70% {
+    transform: translateY(-7px) scale(0.96, 1.04);
   }
   100% {
-    transform: translateY(0) rotate(0);
+    transform: translateY(0) scale(1, 1);
   }
 }
-@keyframes throwMotion {
+
+@keyframes reactCheer {
   0% {
-    transform: translateX(0) rotate(0);
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-16px) scale(1.06);
   }
   100% {
-    transform: translateX(50px) rotate(45deg);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* ==================== VERIFY FLOW ==================== */
-
-/* Expectant (waiting for code) */
-.bot-rig.expectant {
-  animation: expectantBob 2s ease-in-out infinite;
-}
-.bot-rig.expectant .pupil {
-  animation: lookAround 3s ease-in-out infinite;
-}
-.bot-rig.expectant .antenna-bulb {
-  animation: antennaPulse 1.5s infinite;
-}
-
-@keyframes expectantBob {
+@keyframes reactNod {
   0%,
   100% {
     transform: translateY(0) rotate(0);
   }
-  25% {
-    transform: translateY(-5px) rotate(2deg);
-  }
-  75% {
-    transform: translateY(-5px) rotate(-2deg);
-  }
-}
-@keyframes lookAround {
-  0%,
-  100% {
-    transform: translate(-50%, -50%);
-  }
-  25% {
-    transform: translate(calc(-50% + 5px), -50%);
-  }
   50% {
-    transform: translate(-50%, -50%);
-  }
-  75% {
-    transform: translate(calc(-50% - 5px), -50%);
+    transform: translateY(7px) rotate(-4deg);
   }
 }
 
-/* ==================== SPECIAL EFFECTS ==================== */
-
-/* Boot-up Animation */
-.boot-up .bot-rig {
-  animation:
-    bootUpScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
-    float 6s ease-in-out infinite 0.8s;
-}
-
-@keyframes bootUpScale {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Zzz Particles */
-.zzz-particle {
-  position: absolute;
-  color: rgba(139, 92, 246, 0.6);
-  font-weight: bold;
-  font-size: 16px;
-  opacity: 0;
-  animation: floatZ 3s ease-out forwards;
-  pointer-events: none;
-  z-index: 200;
-}
-
-@keyframes floatZ {
-  0% {
-    transform: translate(0, 0) scale(0.5);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translate(25px, -70px) scale(1.3);
-    opacity: 0;
-  }
-}
-
-/* ==================== MOBILE RESPONSIVE ==================== */
-@media (max-width: 768px) {
-  .character-container {
-    width: 100%;
-    height: 100%;
-    transform: scale(0.4);
-    transform-origin: center center;
-  }
-
-  /* Ensure bot is centered */
-  .right-section {
-    min-height: 120px;
-    padding: 10px;
-  }
-
-  /* Simplify animations on mobile for performance */
-  .bot-rig {
-    animation-duration: 8s !important;
-  }
-
-  /* Disable complex particles on mobile */
-  .zzz-particle,
-  .syncro-particle {
-    display: none !important;
-  }
-
-  /* Reduce hand movement complexity */
-  .hand {
-    transition-duration: 0.3s;
-  }
-
-  /* Make pupils less jittery */
-  .pupil {
-    transition-duration: 0.2s;
-  }
-}
-
-/* Small phones */
-@media (max-width: 480px) {
-  .character-container {
-    transform: scale(0.35);
-  }
-
-  .right-section {
-    min-height: 100px;
-  }
-}
-
-/* Landscape mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-  .right-section {
-    display: none; /* Hide bot in landscape to save space */
-  }
-}
-
-/* Touch-friendly hover states */
-@media (hover: none) {
-  /* Add active state for buttons */
-  .action-btn:active,
-  .login-btn:active {
-    transform: scale(0.98);
-  }
-}
-
-/* ==================== REDUCED MOTION ==================== */
+/* ==================== ACCESSIBILITY ==================== */
 @media (prefers-reduced-motion: reduce) {
   .bot-rig,
+  .bot-rig *,
   .antenna-bulb,
-  .pupil,
-  .hand,
-  .eye,
-  .mouth {
+  .mouth,
+  .hand {
     animation: none !important;
     transition: none !important;
   }

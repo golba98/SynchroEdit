@@ -85,7 +85,14 @@ export class ReadabilityManager extends Plugin {
     const el = document.getElementById('zoomPercent');
     if (el) el.textContent = `${this.editor.currentZoom}%`;
     const elements = document.querySelectorAll('.zoomPercent');
-    elements.forEach((element) => (element.textContent = `${this.editor.currentZoom}%`));
+    const effectiveZoom = Math.round((this.editor.getRenderScale?.() || 1) * 100);
+    elements.forEach((element) => {
+      element.textContent = `${effectiveZoom}%`;
+      element.title =
+        effectiveZoom === this.editor.currentZoom
+          ? 'Reset Zoom'
+          : `${this.editor.currentZoom}% requested, fitted to ${effectiveZoom}%`;
+    });
   }
 
   setCanvasTheme(theme) {

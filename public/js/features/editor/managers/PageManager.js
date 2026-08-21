@@ -61,6 +61,7 @@ export class PageManager extends Plugin {
   }
 
   performReflowCheck(isAutoCascade = false) {
+    if (this.editor.responsivePresentation === 'continuous') return;
     if (this.isProcessingReflow) {
       this.pendingReflow = true;
       return;

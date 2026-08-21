@@ -93,6 +93,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/css/app/editor.css`            | Defines document canvas, page, editor, toolbar, responsive editor, and collaboration presentation.  |
 | `public/css/app/effects.css`           | Defines themes, loading states, skeletons, animations, notifications, and transient visual effects. |
 | `public/css/app/settings.css`          | Defines profile, settings, sharing, history, and modal-specific presentation.                       |
+| `public/css/app/responsive.css`        | Provides shared viewport, container, editor, panel, dialog, dashboard, and mobile layout behavior.  |
 | `public/css/syncro.css`                | Defines the reusable SyncroBot rig, body parts, state classes, particles, and animations.           |
 | `public/css/pages/login.css`           | Defines login/signup layout, validation feedback, verification modal, and auth-page responsiveness. |
 | `public/css/pages/auth-mobile.css`     | Defines shared mobile auth sizing, safe-area, keyboard, and compact mascot layout rules.            |
@@ -148,6 +149,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/js/features/theme/theme.js`                        | Persists and applies light/dark theme state and accent selections.                                        |
 | `public/js/features/ui/ui.js`                              | Provides small shared UI renderers such as notices, collaborators, and escaped content.                   |
 | `public/js/features/ui/UIManager.js`                       | Coordinates application controls, modal/view state, document-open status, and global listeners.           |
+| `public/js/features/ui/ResponsiveLayoutController.js`      | Adapts editor presentation, responsive breakpoints, ribbon priority overflow, and viewport state.         |
 | `public/js/features/ui/ToolbarController.js`               | Connects toolbar controls to Quill formats and editor plugins.                                            |
 | `public/js/security/quillSanitizer.js`                     | Sanitizes untrusted Quill HTML/URLs and converts safe markup into Delta content.                          |
 | `public/js/vendor/y-websocket.js`                          | Checked-in browser bundle of the Yjs WebSocket provider selected by the import map.                       |
@@ -198,6 +200,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/frontend/features/editor/managers/PageManager.test.js`   | Verifies page metadata, ordering, sizing, and lifecycle behavior.                                    |
 | `tests/frontend/features/editor/managers/SearchManager.test.js` | Verifies find/replace matching, navigation, escaping, and replacement.                               |
 | `tests/frontend/features/editor/managers/selection.test.js`     | Verifies selection capture, restoration, and formatting targets.                                     |
+| `tests/frontend/features/ui/responsiveLayout.test.js`           | Verifies shared responsive breakpoint classification and contracts.                                  |
 | `tests/frontend/features/profile/profile.test.js`               | Verifies profile rendering, verification, updates, and safe user content.                            |
 | `tests/frontend/features/theme/background.test.js`              | Verifies dynamic-background setup, theme reaction, and cleanup.                                      |
 | `tests/e2e/helpers/auth.js`                                     | Provides browser/API signup, verification, and login helpers for end-to-end suites.                  |
@@ -205,7 +208,7 @@ step. Keep package licences and every binary referenced by the package CSS/impor
 | `tests/e2e/auth-ui.test.js`                                     | Covers auth form behavior, mascot geometry, validation, verification, and responsive presentation.   |
 | `tests/e2e/interactions.test.js`                                | Covers toolbar formatting and theme interaction in a real browser.                                   |
 | `tests/e2e/responsiveness.test.js`                              | Covers login and editor layout at desktop/mobile viewports.                                          |
-| `tests/e2e/loading-states.test.js`                              | Verifies branded boot loading and viewport-safe new-document loading at desktop/mobile viewports.   |
+| `tests/e2e/loading-states.test.js`                              | Verifies branded boot loading and viewport-safe new-document loading at desktop/mobile viewports.    |
 
 ## Intentionally Local-Only Files
 

@@ -96,7 +96,6 @@ html,
 body {
   width: 100%;
   max-width: 100%;
-  overflow-x: clip;
 }
 
 .app-brand {
@@ -133,6 +132,116 @@ body {
 .app-brand--compact:hover,
 .app-brand--compact:focus-visible {
   background: var(--surface-hover);
+}
+
+/* Production document template tile */
+.google-docs-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.doc-template-card {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  cursor: pointer;
+  outline: none;
+}
+
+.doc-template-thumbnail {
+  position: relative;
+  display: flex;
+  width: 140px;
+  height: 180px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #28282c;
+  border-radius: 12px;
+  background: #151518;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.doc-template-plus {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #343438;
+  border-radius: 50%;
+  background: #202024;
+  color: #a3a3a8;
+  font-size: 16px;
+  transition: all 180ms ease;
+}
+
+.doc-template-info {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.doc-template-title {
+  color: #f5f5f5;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.doc-template-card:hover .doc-template-thumbnail,
+.doc-template-card:focus-visible .doc-template-thumbnail {
+  border-color: #55555c;
+  background: #1c1c20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.doc-template-card:hover .doc-template-plus,
+.doc-template-card:focus-visible .doc-template-plus {
+  border-color: #fff;
+  background: #fff;
+  color: #111113;
+  transform: scale(1.06);
+}
+
+.doc-template-card.is-opening {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.doc-template-card.is-opening .doc-template-thumbnail {
+  border-color: var(--accent-color);
+}
+
+body.light-theme .doc-template-title {
+  color: #111827;
+}
+
+body.light-theme .doc-template-thumbnail {
+  border-color: #e5e7eb;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .doc-template-plus {
+  border-color: #e5e7eb;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+body.light-theme .doc-template-card:hover .doc-template-plus {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
 }
 
 .blank-document-action {

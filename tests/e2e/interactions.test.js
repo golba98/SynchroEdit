@@ -40,7 +40,12 @@ test.describe('UI Interactions', () => {
   });
 
   test('should switch between light and dark themes', async ({ page }) => {
-    await page.click('#userProfileTrigger');
+    if (test.info().project.name === 'mobile') {
+      await page.click('#headerMoreBtn');
+      await page.click('#headerProfileMenuBtn');
+    } else {
+      await page.click('#userProfileTrigger');
+    }
     await expect(page.locator('#profileModal')).toBeVisible();
 
     // Click Appearance tab

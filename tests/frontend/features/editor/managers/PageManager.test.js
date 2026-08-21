@@ -75,6 +75,15 @@ describe('PageManager', () => {
     mockQuillPage1.getIndex.mockReturnValue(0);
   });
 
+  it('suspends viewport-driven pagination in continuous presentation mode', () => {
+    mockEditor.responsivePresentation = 'continuous';
+
+    pageManager.performReflowCheck();
+
+    expect(mockQuillPage0.getBounds).not.toHaveBeenCalled();
+    expect(mockEditor.doc.transact).not.toHaveBeenCalled();
+  });
+
   describe('attemptMergeFromNextPage', () => {
     it('should pull content from next page if there is space', () => {
       // 1. Setup Page 0 (Current)

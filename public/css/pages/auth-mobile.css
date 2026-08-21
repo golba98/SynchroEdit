@@ -4,7 +4,7 @@
     width: 100%;
     max-width: 100%;
     min-height: 100%;
-    overflow-x: clip;
+    overflow-x: visible;
   }
 
   body {
@@ -86,6 +86,29 @@
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 10px !important;
+  }
+}
+
+@media (max-height: 700px) {
+  html,
+  body {
+    min-height: 100%;
+    height: auto;
+  }
+
+  body {
+    overflow-y: auto !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    padding-block: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-bottom));
+  }
+
+  .login-container,
+  .auth-container,
+  .verify-container,
+  .reset-container {
+    margin-block: 0 !important;
+    max-height: none !important;
   }
 }
 

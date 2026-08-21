@@ -88,7 +88,7 @@ export const UI = {
                     <td class="doc-meta-text" style="padding: 16px 24px; font-size: 14px;">${location}</td>
                     <td class="doc-meta-text" style="padding: 16px 24px; font-size: 14px;">${dateStr}</td>
                     <td style="padding: 16px 24px; text-align: center;">
-                        <button class="delete-doc-btn" data-doc-id="${doc._id}" title="Delete">
+                        <button class="delete-doc-btn" data-doc-id="${doc._id}" title="Delete ${safeTitle}" aria-label="Delete ${safeTitle}">
                             <i class="far fa-trash-alt" aria-hidden="true"></i>
                         </button>
                     </td>

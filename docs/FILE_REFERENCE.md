@@ -100,6 +100,7 @@ Application styles load in the order shown below; changing that order can change
 | `public/css/pages/forgot-password.css` | Defines the forgot-password page layout and status presentation.                                    |
 | `public/css/pages/reset-password.css`  | Defines reset-password form, requirements, MFA group, and status presentation.                      |
 | `public/css/pages/verify.css`          | Defines standalone verification input, actions, and status presentation.                            |
+| `public/css/pages/auth-flow.css`       | Defines the shared monochrome forgot-password, reset-password, and verification presentation.       |
 
 ## Browser Application Composition and Core Utilities
 

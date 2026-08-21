@@ -248,10 +248,8 @@ public/css/
 │   ├── effects.css                     Themes, loaders, skeletons, notices, animations
 │   └── settings.css                    Profile, settings, sharing, history, modal presentation
 ├── pages/
-│   ├── login.css                       Login/signup and verification presentation
-│   ├── forgot-password.css             Forgot-password-only presentation
-│   ├── reset-password.css              Reset-password/MFA presentation
-│   └── verify.css                      Standalone verification presentation
+│   ├── login.css                       Login/signup presentation
+│   └── auth-flow.css                   Shared password recovery and verification presentation
 └── syncro.css                         Shared mascot rig, states, particles, and animations
 ```
 

@@ -2,6 +2,10 @@
 
 SyncroEdit is a high-performance, real-time collaborative document editor rebuilt as a **Cloudflare-native backend** with a minimalist "Dark OLED" design. It uses Conflict-free Replicated Data Types (CRDTs) via **Yjs** and WebSockets coordinated by **Durable Objects** to provide zero-conflict, real-time multi-user editing.
 
+## Project Purpose
+
+This project is not intended to become an app that competes with Google Docs or to serve as a finished product for end users. It is an ongoing software-engineering project where I apply and strengthen the skills needed to build production-level systems, including Cloudflare-native architecture, realtime collaboration, authentication, security, scalability, and load balancing. It will continue to evolve as a practical way to learn how software companies design, operate, and improve production-quality systems.
+
 ---
 
 ## Architecture Overview

@@ -50,6 +50,13 @@ describe('Document Opening Flow', () => {
       </div>
       <button id="createNewDoc"></button>
       <input id="docSearch" />
+      <div id="documentDeleteModal" style="display:none" aria-hidden="true">
+        <div role="dialog" aria-modal="true">
+          <h2 id="documentDeleteTitle">Delete document?</h2>
+          <button id="cancelDocumentDelete" type="button">Keep document</button>
+          <button id="confirmDocumentDelete" type="button">Delete permanently</button>
+        </div>
+      </div>
     `;
 
     nextToken = 0;
@@ -166,5 +173,37 @@ describe('Document Opening Flow', () => {
 
     expect(uiManager.documentOpenState).toBe('ready');
     expect(document.getElementById('editorSkeleton').classList.contains('hidden')).toBe(true);
+  });
+
+  test('document deletion uses the custom dialog and includes the document title', async () => {
+    libraryManager.documents = [{ _id: 'doc-1', title: 'Project notes' }];
+    const deleteSpy = jest.spyOn(libraryManager, 'deleteDocument').mockResolvedValue();
+
+    const deletion = libraryManager.requestDocumentDeletion('doc-1');
+    const modal = document.getElementById('documentDeleteModal');
+    expect(modal.style.display).toBe('flex');
+    expect(modal.getAttribute('aria-hidden')).toBe('false');
+    expect(document.getElementById('documentDeleteTitle').textContent).toBe(
+      'Delete “Project notes”?'
+    );
+
+    document.getElementById('confirmDocumentDelete').click();
+    await deletion;
+
+    expect(deleteSpy).toHaveBeenCalledWith('doc-1');
+    expect(modal.style.display).toBe('none');
+    expect(modal.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  test('escape closes the custom delete dialog without deleting', async () => {
+    libraryManager.documents = [{ _id: 'doc-2', title: 'Keep me' }];
+    const deleteSpy = jest.spyOn(libraryManager, 'deleteDocument').mockResolvedValue();
+
+    const deletion = libraryManager.requestDocumentDeletion('doc-2');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await deletion;
+
+    expect(deleteSpy).not.toHaveBeenCalled();
+    expect(document.getElementById('documentDeleteModal').style.display).toBe('none');
   });
 });

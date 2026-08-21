@@ -10,6 +10,7 @@ export class LibraryManager {
     this.documents = [];
     this.searchTerm = '';
     this.searchHandlerBound = false;
+    this.deleteConfirmationOpen = false;
   }
 
   async showLibrary() {
@@ -103,11 +104,7 @@ export class LibraryManager {
         (id) => {
           this.openDocument(id);
         },
-        async (id) => {
-          if (confirm('Delete this document?')) {
-            await this.deleteDocument(id);
-          }
-        },
+        (id) => this.requestDocumentDeletion(id),
         this.app.user._id
       );
     };
@@ -217,6 +214,71 @@ export class LibraryManager {
     });
   }
 
+  async requestDocumentDeletion(id) {
+    if (this.deleteConfirmationOpen) return;
+
+    const modal = document.getElementById('documentDeleteModal');
+    const title = document.getElementById('documentDeleteTitle');
+    const cancelButton = document.getElementById('cancelDocumentDelete');
+    const confirmButton = document.getElementById('confirmDocumentDelete');
+    if (!modal || !title || !cancelButton || !confirmButton) return;
+
+    const documentRecord = this.documents.find((doc) => doc._id === id);
+    const documentTitle = String(documentRecord?.title || 'Untitled document').trim();
+    title.textContent = `Delete “${documentTitle}”?`;
+
+    this.deleteConfirmationOpen = true;
+    const previousFocus = document.activeElement;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+
+    const shouldDelete = await new Promise((resolve) => {
+      let settled = false;
+      const focusable = [cancelButton, confirmButton];
+
+      const close = (confirmed) => {
+        if (settled) return;
+        settled = true;
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeEventListener('click', handleOverlayClick);
+        document.removeEventListener('keydown', handleKeydown);
+        cancelButton.onclick = null;
+        confirmButton.onclick = null;
+        this.deleteConfirmationOpen = false;
+        previousFocus?.focus?.();
+        resolve(confirmed);
+      };
+
+      const handleOverlayClick = (event) => {
+        if (event.target === modal) close(false);
+      };
+
+      const handleKeydown = (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          close(false);
+          return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const currentIndex = focusable.indexOf(document.activeElement);
+        const direction = event.shiftKey ? -1 : 1;
+        const nextIndex = (currentIndex + direction + focusable.length) % focusable.length;
+        event.preventDefault();
+        focusable[nextIndex].focus();
+      };
+
+      cancelButton.onclick = () => close(false);
+      confirmButton.onclick = () => close(true);
+      modal.addEventListener('click', handleOverlayClick);
+      document.addEventListener('keydown', handleKeydown);
+      requestAnimationFrame(() => cancelButton.focus());
+    });
+
+    if (shouldDelete) await this.deleteDocument(id);
+  }
+
   async deleteDocument(id) {
     const previousDocs = this.documents;
     const nextDocs = previousDocs.filter((doc) => doc._id !== id);
@@ -227,9 +289,7 @@ export class LibraryManager {
       this.filterDocuments(nextDocs),
       this.app.documentId,
       (docId) => this.openDocument(docId),
-      async (docId) => {
-        if (confirm('Delete this document?')) await this.deleteDocument(docId);
-      },
+      (docId) => this.requestDocumentDeletion(docId),
       this.app.user._id
     );
 
@@ -244,9 +304,7 @@ export class LibraryManager {
         this.filterDocuments(previousDocs),
         this.app.documentId,
         (docId) => this.openDocument(docId),
-        async (docId) => {
-          if (confirm('Delete this document?')) await this.deleteDocument(docId);
-        },
+        (docId) => this.requestDocumentDeletion(docId),
         this.app.user._id
       );
       alert('Failed to delete document. Please try again.');

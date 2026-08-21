@@ -8,6 +8,7 @@ const ASSETS_TO_CACHE = [
   '/css/app/editor.css',
   '/css/app/effects.css',
   '/css/app/settings.css',
+  '/css/app/responsive.css',
   '/css/pages/login.css',
   '/css/pages/auth-flow.css',
   '/js/main.js',

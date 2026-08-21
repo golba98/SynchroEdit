@@ -10,6 +10,21 @@ export class ToolbarController extends Plugin {
   }
 
   setupToolbar() {
+    const historyAction = (direction) => {
+      const quill = this.editor.quill || this.editor.pageQuillInstances?.values().next().value;
+      quill?.history?.[direction]?.();
+      quill?.focus?.();
+      this.editor.updateStats?.();
+    };
+    ['undoBtn', 'mobileUndoBtn'].forEach((id) => {
+      const button = document.getElementById(id);
+      if (button) this.addDisposableListener(button, 'click', () => historyAction('undo'));
+    });
+    ['redoBtn', 'mobileRedoBtn'].forEach((id) => {
+      const button = document.getElementById(id);
+      if (button) this.addDisposableListener(button, 'click', () => historyAction('redo'));
+    });
+
     const buttons = {
       'ql-bold': 'bold',
       'ql-italic': 'italic',

@@ -674,6 +674,14 @@ export class AuthController {
       label.textContent = level.text;
       label.className = `strength-label strength-label--${level.cls.replace('entropy-', '')}`;
     }
+
+    if (score >= 4) {
+      this.syncro?.setAuthState('excited');
+    } else if (score === 3) {
+      this.syncro?.setAuthState('username-focus');
+    } else if (score >= 1) {
+      this.syncro?.setAuthState('sad');
+    }
   }
 
   _redirect() {
@@ -742,8 +750,11 @@ export class AuthController {
         if (data.available) {
           this._setStatusIcon(icon, 'fas fa-check-circle', 'var(--success-color, #10b981)');
           if (suggestions) suggestions.style.display = 'none';
+          this.syncro?.setAuthState('excited');
+          this.syncro?.react('cheer');
         } else {
           this._setStatusIcon(icon, 'fas fa-times-circle', 'var(--error-color, #ef4444)');
+          this.syncro?.setAuthState('confused');
           if (suggestions) {
             suggestions.style.display = 'block';
             suggestions.replaceChildren(document.createTextNode('Taken! Try: '));
@@ -787,6 +798,7 @@ export class AuthController {
     const match = domains.find((d) => this._isSimilar(domain, d) && domain !== d);
 
     if (match) {
+      this.syncro?.setAuthState('confused');
       suggestion.style.display = 'block';
       const suggestedEmail = `${user}@${match}`;
       const suggestionLink = document.createElement('span');
@@ -804,6 +816,7 @@ export class AuthController {
         if (emailInput) {
           emailInput.value = suggestedEmail;
           suggestion.style.display = 'none';
+          this.syncro?.setAuthState('username-focus');
         }
       };
     } else {
@@ -836,10 +849,12 @@ export class AuthController {
       el.setAttribute('aria-invalid', 'false');
       el.style.borderColor = 'rgb(16, 185, 129)';
       el.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.4)';
+      this.syncro?.react('cheer');
     } else {
       if (p1 && p2) {
         el.setAttribute('aria-invalid', 'true');
-        this.syncro.onInvalidField(el);
+        this.syncro?.setAuthState('confused');
+        this.syncro?.onInvalidField(el);
       }
       el.style.borderColor = '';
       el.style.boxShadow = '';

@@ -285,6 +285,37 @@ test.describe('Bot Alignment & Rig Tests', () => {
     expect(pupilCenter).toBeGreaterThanOrEqual(faceBox.x);
     expect(pupilCenter).toBeLessThanOrEqual(faceBox.x + faceBox.width);
   });
+
+  test('Eye poke highlights the eye and dragging stays inside the black panel', async ({
+    page,
+  }) => {
+    const panel = page.locator('.right-section');
+    const bot = page.locator('.bot-rig');
+    const eye = page.locator('.eye.left');
+    const panelBox = await panel.boundingBox();
+    const botBox = await bot.boundingBox();
+    const eyeBox = await eye.boundingBox();
+
+    await page.mouse.move(eyeBox.x + eyeBox.width / 2, eyeBox.y + eyeBox.height / 2);
+    await page.mouse.down();
+    await expect(eye).toHaveClass(/syncro-eye--hit/);
+    await page.mouse.up();
+    await page.waitForTimeout(700);
+    await expect(eye).not.toHaveClass(/syncro-eye--hit/);
+
+    await page.mouse.move(botBox.x + botBox.width / 2, botBox.y + botBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(panelBox.x + panelBox.width - 8, panelBox.y + panelBox.height - 8);
+    await page.mouse.up();
+
+    const movedBotBox = await bot.boundingBox();
+    expect(movedBotBox.x).toBeGreaterThanOrEqual(panelBox.x - 1);
+    expect(movedBotBox.y).toBeGreaterThanOrEqual(panelBox.y - 1);
+    expect(movedBotBox.x + movedBotBox.width).toBeLessThanOrEqual(panelBox.x + panelBox.width + 1);
+    expect(movedBotBox.y + movedBotBox.height).toBeLessThanOrEqual(
+      panelBox.y + panelBox.height + 1
+    );
+  });
 });
 
 test.describe('Responsiveness & Scaling', () => {

@@ -51,6 +51,9 @@ export class Editor {
     this.pagePasteHandlers = new Map(); // pageId -> sanitized paste listener
     this.currentPageIndex = 0;
     this.currentZoom = 100;
+    this.responsivePresentation = 'paginated';
+    this.availablePageWidth = 0;
+    this.renderScale = 1;
 
     // Callbacks
     this.onPageChange = options.onPageChange || (() => {});
@@ -1689,12 +1692,39 @@ export class Editor {
     this.applyZoom();
   }
 
+  setResponsivePresentation(presentation, availableWidth) {
+    const nextPresentation = presentation === 'continuous' ? 'continuous' : 'paginated';
+    const nextWidth = Number.isFinite(availableWidth) ? Math.max(0, availableWidth) : 0;
+    const modeChanged = this.responsivePresentation !== nextPresentation;
+    const widthChanged = Math.abs(this.availablePageWidth - nextWidth) > 1;
+    if (!modeChanged && !widthChanged) return;
+
+    this.responsivePresentation = nextPresentation;
+    this.availablePageWidth = nextWidth;
+    this.applyZoom();
+
+    if (modeChanged && nextPresentation === 'paginated') {
+      requestAnimationFrame(() => this.pageManager?.performReflowCheck());
+    }
+  }
+
+  getRenderScale() {
+    return this.responsivePresentation === 'continuous' ? 1 : this.renderScale || 1;
+  }
+
   applyZoom() {
-    const scale = this.currentZoom / 100;
+    const requestedScale = this.currentZoom / 100;
     const pageWidth = this.pageManager ? this.pageManager.PAGE_WIDTH : 816;
     const pageHeight = this.pageManager ? this.pageManager.PAGE_HEIGHT : 1056;
+    const fitScale =
+      this.responsivePresentation === 'continuous' || !this.availablePageWidth
+        ? 1
+        : Math.min(1, this.availablePageWidth / pageWidth);
+    this.renderScale =
+      this.responsivePresentation === 'continuous' ? 1 : Math.min(requestedScale, fitScale);
 
-    document.documentElement.style.setProperty('--page-scale', scale);
+    document.documentElement.style.setProperty('--page-scale', requestedScale);
+    document.documentElement.style.setProperty('--page-render-scale', this.renderScale);
     document.documentElement.style.setProperty('--page-width', `${pageWidth}px`);
     document.documentElement.style.setProperty('--page-height', `${pageHeight}px`);
 

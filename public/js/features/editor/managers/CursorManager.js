@@ -87,7 +87,7 @@ export class CursorManager extends Plugin {
       if (cursorIndex !== null) {
         const bounds = quill.getBounds(cursorIndex);
         if (bounds) {
-          const scale = (this.editor.currentZoom || 100) / 100;
+          const scale = this.editor.getRenderScale?.() || (this.editor.currentZoom || 100) / 100;
           // Add the relative cursor Y to the page top, adjusted for scale and padding
           targetY += bounds.top * scale;
 

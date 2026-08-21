@@ -43,7 +43,12 @@ test.describe('Auth and Basic Document Flow', () => {
     // Let's assume it works if no error occurs.
 
     // 5. Logout
-    await page.click('#userProfileTrigger');
+    if (isMobile) {
+      await page.click('#headerMoreBtn');
+      await page.click('#headerProfileMenuBtn');
+    } else {
+      await page.click('#userProfileTrigger');
+    }
     await expect(page.locator('#profileModal')).toBeVisible();
     await page.click('#logoutBtnProfile', { force: true });
 

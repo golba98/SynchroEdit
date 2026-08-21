@@ -100,6 +100,14 @@ npm run dev
 
 Open `http://localhost:8787` in your browser.
 
+The dev command automatically applies local migrations and seeds a verified test account:
+
+| Username  | Password       |
+| --------- | -------------- |
+| `devuser` | `Password123!` |
+
+This account is written only to Wrangler's local D1 database. Use `npm run db:seed:local` to reseed it without starting the server.
+
 ---
 
 ## CLI Commands
@@ -112,6 +120,7 @@ Open `http://localhost:8787` in your browser.
 | `npm run dev`               | Runs the Wrangler dev emulator with `--env local` on `http://localhost:8787` |
 | `npm run deploy`            | Deploys the top-level production Worker and static assets with `--env=""`    |
 | `npm run db:migrate:local`  | Applies migrations to the local development D1 database with `--env local`   |
+| `npm run db:seed:local`     | Creates or refreshes the verified `devuser` account in local D1              |
 | `npm run db:migrate:remote` | Applies migrations to the production remote D1 database                      |
 | `npm test`                  | Runs the Jest test suite (unit, integration, and frontend)                   |
 | `npm run lint`              | Runs the ESLint checker                                                      |

@@ -4,6 +4,14 @@
 
 const mockSyncroMethods = {
   init: jest.fn(),
+  setAuthState: jest.fn(),
+  applyState: jest.fn(),
+  react: jest.fn(),
+  reactExcited: jest.fn(),
+  reactMad: jest.fn(),
+  reactSad: jest.fn(),
+  reactConfused: jest.fn(),
+  reactNod: jest.fn(),
   onFieldFocus: jest.fn(),
   onFieldBlur: jest.fn(),
   onFieldInput: jest.fn(),

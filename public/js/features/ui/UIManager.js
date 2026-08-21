@@ -1,6 +1,7 @@
 import { Auth } from '/js/features/auth/auth.js';
 import { Network } from '/js/app/network.js';
 import { escapeHTML } from '/js/app/utils.js';
+import { ResponsiveLayoutController } from '/js/features/ui/ResponsiveLayoutController.js';
 
 export class UIManager {
   constructor(app) {
@@ -11,6 +12,19 @@ export class UIManager {
     this.saveStatusTimer = null;
     this.documentOpenState = 'idle';
     this.hasShownEditorReady = false;
+    this.responsiveLayout = new ResponsiveLayoutController(app);
+
+    // Bind and expose workspace loader helpers globally
+    this.showEditorWorkspaceLoader = this.showEditorWorkspaceLoader.bind(this);
+    this.hideEditorWorkspaceLoader = this.hideEditorWorkspaceLoader.bind(this);
+    this.revealPagesContainer = this.revealPagesContainer.bind(this);
+    this.preventBlackEditorLoadingState = this.preventBlackEditorLoadingState.bind(this);
+
+    window.showEditorWorkspaceLoader = this.showEditorWorkspaceLoader;
+    window.hideEditorWorkspaceLoader = this.hideEditorWorkspaceLoader;
+    window.revealPagesContainer = this.revealPagesContainer;
+    window.preventBlackEditorLoadingState = this.preventBlackEditorLoadingState;
+    this.responsiveLayout.init();
   }
 
   setupEventListeners() {
@@ -49,6 +63,10 @@ export class UIManager {
       if (modal) modal.style.display = 'flex';
     });
     addEvent('libraryUserProfileTrigger', 'click', () => {
+      const modal = document.getElementById('profileModal');
+      if (modal) modal.style.display = 'flex';
+    });
+    addEvent('headerProfileMenuBtn', 'click', () => {
       const modal = document.getElementById('profileModal');
       if (modal) modal.style.display = 'flex';
     });
@@ -172,6 +190,7 @@ export class UIManager {
         modal.style.display = 'flex';
       }
     });
+    addEvent('shareRibbonBtn', 'click', () => document.getElementById('shareBtn')?.click());
 
     addEvent('linkSharingToggle', 'change', async (e) => {
       const enabled = e.target.checked;
@@ -242,8 +261,6 @@ export class UIManager {
   }
 
   setupMobileEvents() {
-    const isMobile = window.innerWidth <= 768;
-
     // FAB Logic
     const fabCreate = document.getElementById('fabCreateDoc');
     const fabEdit = document.getElementById('fabEditDoc');
@@ -292,12 +309,22 @@ export class UIManager {
       });
     }
 
+    const moreTools = document.getElementById('mobileMoreTools');
+    const moreToolsBtn = document.getElementById('mobileMoreToolsBtn');
+    if (moreTools && moreToolsBtn) {
+      moreToolsBtn.addEventListener('click', () => {
+        const open = moreTools.hidden;
+        moreTools.hidden = !open;
+        moreToolsBtn.setAttribute('aria-expanded', String(open));
+      });
+    }
+
     // Initial state
     this.updateMobileUIState();
 
     // Listen for editor focus/blur to toggle toolbar
     document.addEventListener('focusin', (e) => {
-      if (isMobile && e.target.closest('.ql-editor')) {
+      if (window.innerWidth <= 768 && e.target.closest('.ql-editor')) {
         this.setMobileEditMode(true);
       }
     });
@@ -308,7 +335,6 @@ export class UIManager {
 
   updateMobileUIState() {
     const isMobile = window.innerWidth <= 768;
-    if (!isMobile) return;
 
     const fabCreate = document.getElementById('fabCreateDoc');
     const fabEdit = document.getElementById('fabEditDoc');
@@ -318,7 +344,11 @@ export class UIManager {
     const isLibraryVisible = docLibrary && docLibrary.style.display !== 'none';
     const hasDocument = !!this.app.documentId;
 
-    if (isLibraryVisible) {
+    if (!isMobile) {
+      if (fabCreate) fabCreate.style.removeProperty('display');
+      if (fabEdit) fabEdit.style.removeProperty('display');
+      if (bottomNav) bottomNav.style.removeProperty('display');
+    } else if (isLibraryVisible) {
       if (fabCreate) fabCreate.style.display = 'flex';
       if (fabEdit) fabEdit.style.display = 'none';
       if (bottomNav) bottomNav.style.display = 'flex';
@@ -382,11 +412,13 @@ export class UIManager {
     const softRevealEls = [header, ribbonTabs, ribbonContent].filter(Boolean);
 
     if (state === 'opening-document') {
+      this.assertNoBlankOpeningState();
       softRevealEls.forEach((el) => {
         el.classList.add('soft-reveal-enter');
         el.classList.remove('soft-reveal-ready');
       });
     } else if (state === 'editor-loading' || state === 'editor-ready') {
+      this.hideDocumentOpeningLoader();
       requestAnimationFrame(() => {
         softRevealEls.forEach((el) => {
           el.classList.remove('soft-reveal-enter');
@@ -394,10 +426,74 @@ export class UIManager {
         });
       });
     } else if (state === 'booting' || state === 'auth' || state === 'dashboard') {
+      this.hideDocumentOpeningLoader();
       softRevealEls.forEach((el) => {
         el.classList.remove('soft-reveal-enter', 'soft-reveal-ready');
       });
+    } else if (state === 'editor-error') {
+      this.hideDocumentOpeningLoader();
     }
+    this.preventBlackEditorLoadingState();
+  }
+
+  showDocumentOpeningLoader(text = 'Opening document...') {
+    const loader = document.getElementById('documentOpeningLoader');
+    const title = document.getElementById('documentOpeningTitle');
+    if (loader) {
+      if (title) title.textContent = text;
+      loader.hidden = true;
+    }
+  }
+
+  hideDocumentOpeningLoader() {
+    const loader = document.getElementById('documentOpeningLoader');
+    if (loader) loader.hidden = true;
+  }
+
+  assertNoBlankOpeningState() {
+    const isOpening = document.body.dataset.viewState === 'opening-document';
+    const loader = document.getElementById('documentOpeningLoader');
+    const loaderVisible = loader && !loader.hidden;
+
+    if (isOpening && loaderVisible) {
+      loader.hidden = true;
+    }
+  }
+
+  showEditorWorkspaceLoader(message = 'Opening document...', subtext = 'Preparing your workspace') {
+    const loader = document.getElementById('editorWorkspaceLoader');
+    if (!loader) return;
+
+    // Must remove the HTML `hidden` attribute — browsers apply
+    // [hidden] { display: none !important } in their UA stylesheet which
+    // takes precedence over any CSS class-based or body-state display rule.
+    // Setting loader.hidden = false alone only clears the IDL property but
+    // does NOT remove the content attribute in all browser implementations.
+    loader.removeAttribute('hidden');
+    loader.hidden = false;
+    const titleEl = loader.querySelector('.loader-title');
+    const subEl = loader.querySelector('.loader-subtitle');
+    if (titleEl) titleEl.textContent = message;
+    if (subEl) subEl.textContent = subtext;
+
+    document.querySelector('.main-workspace')?.classList.add('is-document-opening');
+  }
+
+  hideEditorWorkspaceLoader() {
+    // Guard: never hide the workspace loader before the editor is confirmed
+    // ready. Premature hiding is the primary cause of the black workspace
+    // screen because the pages container is still opacity:0 at that point.
+    if (document.body.dataset.editorReady !== 'true') {
+      console.warn(
+        '[LOADER] Blocked hideEditorWorkspaceLoader — editor not ready yet (editorReady =',
+        document.body.dataset.editorReady + ')'
+      );
+      return;
+    }
+    const loader = document.getElementById('editorWorkspaceLoader');
+    if (loader) loader.hidden = true;
+
+    document.querySelector('.main-workspace')?.classList.remove('is-document-opening');
   }
 
   revealPagesContainer() {
@@ -406,6 +502,30 @@ export class UIManager {
       pagesContainer.hidden = false;
       pagesContainer.style.opacity = '';
       pagesContainer.style.transform = '';
+    }
+  }
+
+  preventBlackEditorLoadingState() {
+    const mainWorkspace = document.querySelector('.main-workspace');
+    const pagesContainer = document.getElementById('pagesContainer');
+    const loader = document.getElementById('editorWorkspaceLoader');
+
+    const editorVisible = mainWorkspace && getComputedStyle(mainWorkspace).display !== 'none';
+    const pagesHidden =
+      !pagesContainer ||
+      pagesContainer.hidden ||
+      getComputedStyle(pagesContainer).display === 'none' ||
+      getComputedStyle(pagesContainer).opacity === '0';
+
+    const editorReady = document.body.dataset.editorReady === 'true';
+
+    if (editorVisible && pagesHidden && !editorReady && (loader ? loader.hidden : true)) {
+      console.warn('[OPEN] Prevented black editor workspace: showing loader');
+      const isCreating = this.app?.documentLoadState === 'creating';
+      this.showEditorWorkspaceLoader(
+        isCreating ? 'Creating document...' : 'Opening document...',
+        isCreating ? 'Setting up a blank page' : 'Preparing your workspace'
+      );
     }
   }
 
@@ -420,6 +540,8 @@ export class UIManager {
 
     const error = document.getElementById('editorOpenError');
     if (error) error.hidden = true;
+
+    this.preventBlackEditorLoadingState();
   }
 
   clearOpeningDocumentState() {
@@ -427,7 +549,9 @@ export class UIManager {
     this.showSkeleton(false);
     this.hasShownEditorReady = true;
 
+    document.body.dataset.documentState = 'ready';
     document.body.dataset.editorReady = 'true';
+    this.hideEditorWorkspaceLoader();
     this.revealPagesContainer();
 
     this.setDocumentOpenState('ready');
@@ -436,6 +560,8 @@ export class UIManager {
     if (this.connectionPendingStatus) {
       this.renderConnectionStatus(this.connectionPendingStatus);
     }
+
+    this.preventBlackEditorLoadingState();
   }
 
   showSkeleton(visible) {
@@ -443,10 +569,6 @@ export class UIManager {
     if (!skeleton) return;
 
     skeleton.classList.toggle('hidden', !visible);
-    skeleton.setAttribute(
-      'aria-busy',
-      String(visible && !skeleton.classList.contains('has-error'))
-    );
     if (!visible) {
       skeleton.classList.remove('has-error');
       this.showSkeletonMessage(false);
@@ -500,9 +622,16 @@ export class UIManager {
 
     if (loadingStates.has(normalizedState)) {
       document.body.dataset.editorReady = 'false';
+      if (normalizedState === 'idle') {
+        document.body.dataset.documentState = 'opening';
+      } else {
+        document.body.dataset.documentState = normalizedState;
+      }
     } else if (normalizedState === 'ready') {
+      document.body.dataset.documentState = 'ready';
       document.body.dataset.editorReady = 'true';
     } else {
+      document.body.dataset.documentState = normalizedState;
       document.body.dataset.editorReady = 'false';
     }
 
@@ -526,12 +655,18 @@ export class UIManager {
     if (titleEl) titleEl.textContent = options.title || title;
     if (descEl) descEl.textContent = options.description || description;
 
+    if (loadingStates.has(normalizedState)) {
+      this.showEditorWorkspaceLoader(options.status || title, options.description || description);
+    } else {
+      this.hideEditorWorkspaceLoader();
+    }
+
     if (skeleton) {
       skeleton.dataset.openState = normalizedState;
       if (normalizedState !== 'ready') this.showSkeleton(true);
-      if (normalizedState === 'ready') this.showSkeleton(false);
-      skeleton.setAttribute('aria-busy', String(loadingStates.has(normalizedState)));
     }
+
+    this.preventBlackEditorLoadingState();
   }
 
   showDocumentOpenError({ message, onRetry, onBack }) {
@@ -563,11 +698,11 @@ export class UIManager {
     if (active) {
       if (toolbar) toolbar.style.display = 'block';
       if (fabEdit) fabEdit.style.display = 'none';
-      if (header) header.style.height = '50px'; // Slimmer header in edit mode
+      if (header) header.classList.add('is-mobile-editing');
     } else {
       if (toolbar) toolbar.style.display = 'none';
       if (fabEdit) fabEdit.style.display = 'flex';
-      if (header) header.style.height = '60px';
+      if (header) header.classList.remove('is-mobile-editing');
     }
   }
 

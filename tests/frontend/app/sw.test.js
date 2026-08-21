@@ -88,7 +88,7 @@ describe('Service Worker', () => {
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v9');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v12');
     expect(global.caches.delete).toHaveBeenCalledWith('syncroedit-v13');
-    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v15');
+    expect(global.caches.delete).not.toHaveBeenCalledWith('syncroedit-v16');
   });
 
   describe('fetch handler', () => {

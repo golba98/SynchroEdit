@@ -47,22 +47,38 @@ export class NavigationManager extends Plugin {
 
   toggleOutline() {
     this.isOutlineVisible = !this.isOutlineVisible;
+    if (this.isOutlineVisible && window.innerWidth < 900 && this.isMinimapVisible) {
+      this.isMinimapVisible = false;
+      const minimap = document.getElementById('minimapSidebar');
+      if (minimap) minimap.style.display = 'none';
+      document.getElementById('toggleMinimap')?.classList.remove('active');
+      document.body.classList.remove('minimap-open');
+    }
     const sidebar = document.getElementById('outlineSidebar');
     if (sidebar) {
       sidebar.style.display = this.isOutlineVisible ? 'flex' : 'none';
     }
     const btn = document.getElementById('toggleOutline');
     if (btn) btn.classList.toggle('active', this.isOutlineVisible);
+    document.body.classList.toggle('outline-open', this.isOutlineVisible);
   }
 
   toggleMinimap() {
     this.isMinimapVisible = !this.isMinimapVisible;
+    if (this.isMinimapVisible && window.innerWidth < 900 && this.isOutlineVisible) {
+      this.isOutlineVisible = false;
+      const outline = document.getElementById('outlineSidebar');
+      if (outline) outline.style.display = 'none';
+      document.getElementById('toggleOutline')?.classList.remove('active');
+      document.body.classList.remove('outline-open');
+    }
     const sidebar = document.getElementById('minimapSidebar');
     if (sidebar) {
       sidebar.style.display = this.isMinimapVisible ? 'flex' : 'none';
     }
     const btn = document.getElementById('toggleMinimap');
     if (btn) btn.classList.toggle('active', this.isMinimapVisible);
+    document.body.classList.toggle('minimap-open', this.isMinimapVisible);
   }
 
   updateOutline() {
